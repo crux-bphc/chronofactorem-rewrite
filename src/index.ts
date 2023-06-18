@@ -4,6 +4,8 @@ import { Request, Response } from "express";
 import { AppDataSource } from "./data-source";
 import { Routes } from "./routes";
 import { User } from "./entity/User";
+import "dotenv/config";
+import { env } from "../config/server";
 
 AppDataSource.initialize()
   .then(async () => {
@@ -38,7 +40,7 @@ AppDataSource.initialize()
     // ...
 
     // start express server
-    app.listen(3000);
+    app.listen(env.PORT);
 
     // insert new users for test
     await AppDataSource.manager.save(
@@ -58,7 +60,7 @@ AppDataSource.initialize()
     );
 
     console.log(
-      "Express server has started on port 3000. Open http://localhost:3000/users to see results"
+      `Express server has started on port 3000. Open http://localhost:${env.PORT}/users to see results`
     );
   })
   .catch((error) => console.log(error));
