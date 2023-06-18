@@ -1,6 +1,9 @@
 lockfileVersion: '6.0'
 
 dependencies:
+  '@types/node':
+    specifier: ^16.11.10
+    version: 16.11.10
   body-parser:
     specifier: ^1.19.1
     version: 1.19.1
@@ -19,20 +22,17 @@ dependencies:
   typeorm:
     specifier: 0.3.16
     version: 0.3.16(pg@8.5.1)(ts-node@10.7.0)
+  typescript:
+    specifier: 4.5.2
+    version: 4.5.2
   zod:
     specifier: ^3.21.4
     version: 3.21.4
 
 devDependencies:
-  '@types/node':
-    specifier: ^16.11.10
-    version: 16.11.10
   ts-node:
     specifier: 10.7.0
     version: 10.7.0(@types/node@16.11.10)(typescript@4.5.2)
-  typescript:
-    specifier: 4.5.2
-    version: 4.5.2
 
 packages:
 
