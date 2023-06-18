@@ -7,3 +7,9 @@ services:
       - "5432:5432"
     env_file:
       - .env
+  backend:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "${PORT}:${PORT}"
