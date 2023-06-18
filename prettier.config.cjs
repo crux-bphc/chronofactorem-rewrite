@@ -1,3 +1,4 @@
+/** @type {import("prettier").Config} */
 exports.defaults = {
   printWidth: 80,
   tabWidth: 2,
