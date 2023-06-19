@@ -49,7 +49,7 @@ AppDataSource.initialize()
     });
 
     console.log(
-      `Express server has started on port 3000. Open http://localhost:${env.PORT}/users to see results`
+      `Express server has started on port ${env.PORT}. Open http://localhost:${env.PORT}/ to see results`
     );
   })
   .catch((error) => console.log(error));
