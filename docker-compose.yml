@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  db:
+  db: # If you change this here, remember to change it in .env and .env.example as well
     image: "postgres:14.5"
     ports:
       - "5432:5432"

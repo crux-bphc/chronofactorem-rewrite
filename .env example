@@ -1,7 +1,7 @@
 POSTGRES_USER=""
 POSTGRES_PASSWORD=""
 POSTGRES_DB=""
-POSTGRES_HOST=""
+POSTGRES_HOST="db" # Do not change this, it is defined in docker-compose.yml
 NODE_ENV=""
 PROD_URL=""
 PORT=
