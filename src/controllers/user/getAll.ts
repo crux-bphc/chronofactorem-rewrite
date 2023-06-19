@@ -1,6 +1,4 @@
-import { AppDataSource } from "../../db";
 import { Request, Response } from "express";
-import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
 
 export const getAllUsers = async (req: Request, res: Response) => {
