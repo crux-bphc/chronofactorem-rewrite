@@ -1,0 +1,7 @@
+POSTGRES_USER=""
+POSTGRES_PASSWORD=""
+POSTGRES_DB=""
+POSTGRES_SOCKET="/var/run/postgresql" # Do not change this, it is required by postgres
+NODE_ENV=""
+PROD_URL=""
+PORT=

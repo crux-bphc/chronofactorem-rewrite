@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  db:
+    image: "postgres:15.3-bookworm"
+    env_file:
+      - .env
+    volumes:
+      - "./postgres/socket:${POSTGRES_SOCKET}"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 30s
+      retries: 3
+
+  backend:
+    build: .
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${PORT}:${PORT}"
+    volumes:
+      - "./postgres/socket:${POSTGRES_SOCKET}"
