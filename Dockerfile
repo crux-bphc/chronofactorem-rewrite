@@ -7,8 +7,6 @@ ENV PATH="${PATH}:${PNPM_HOME}"
 
 RUN npm install -g pnpm
 
-RUN pnpm i -g typescript
-
 COPY pnpm-lock.yaml ./
 
 RUN pnpm fetch --prod
@@ -19,7 +17,7 @@ COPY . .
 
 RUN pnpm install -r --offline --prod
 
-RUN tsc
+RUN pnpm tsc
 
 FROM node:18.16.0-slim
 WORKDIR /usr/src/app
