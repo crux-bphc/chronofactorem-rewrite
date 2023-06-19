@@ -2,9 +2,9 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
   CreateDateColumn,
   Index,
+  OneToMany,
 } from "typeorm";
 import { Section } from "./Section";
 
@@ -23,7 +23,7 @@ export class Course {
   @Column({ name: "ic", type: "varchar" })
   IC: string;
 
-  @ManyToOne(() => Section, (section) => section.course)
+  @OneToMany(() => Section, (section) => section.course)
   sections!: Section[];
 
   @Column({ name: "midsem_time", type: "timestamptz" })
