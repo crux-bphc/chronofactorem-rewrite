@@ -1,5 +1,5 @@
 // @ts-check
-import { serverSchema } from "./schema.js";
+import { serverSchema } from "./schema";
 import { z } from "zod";
 
 const _serverEnv = serverSchema.safeParse(process.env);
