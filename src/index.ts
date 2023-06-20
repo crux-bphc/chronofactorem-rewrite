@@ -26,7 +26,7 @@ AppDataSource.initialize()
     app.listen(env.PORT);
 
     // Error handling
-    app.use((err, req: Request, res: Response, next: NextFunction) => {
+    app.use((err: any, req: Request, res: Response, next: NextFunction) => {
       console.log(err);
       res.status(err.status || 500).send(err.stack);
     });
