@@ -10,10 +10,10 @@ export class SearchHistory {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ name: "user_email_hash", type: "varchar" })
+  @Column({ name: "user_email_hash", type: "text" })
   userEmailHash!: string;
 
-  @Column({ name: "search_term", type: "varchar" })
+  @Column({ name: "search_term", type: "text" })
   searchTerm!: string;
 
   @CreateDateColumn({

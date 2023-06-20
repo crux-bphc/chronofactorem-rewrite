@@ -42,7 +42,7 @@ export class Timetable {
   @ManyToMany(() => Section, (section) => section.timetables)
   sections!: Section[];
 
-  @Column({ type: "varchar", array: true })
+  @Column({ type: "text", array: true })
   timings!: string[];
 
   @Column({ name: "midsem_times", type: "timestamptz", array: true })
@@ -52,7 +52,7 @@ export class Timetable {
   compreTimes!: Date[];
 
   // e.g. ["CS F211-LP", "CS F212-L"]
-  @Column({ type: "varchar", array: true })
+  @Column({ type: "text", array: true })
   warnings!: string[];
 
   @CreateDateColumn({
