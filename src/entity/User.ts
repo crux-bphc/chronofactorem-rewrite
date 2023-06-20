@@ -15,13 +15,13 @@ export class User {
   id!: string;
 
   @Index()
-  @Column({ unique: true, type: "text" })
+  @Column({ unique: true, type: "varchar", length: 38 })
   email!: string;
 
   @Column({ type: "smallint" })
   batch!: number;
 
-  @Column({ type: "text" })
+  @Column({ type: "varchar", length: 200 })
   name!: string;
 
   @Column({

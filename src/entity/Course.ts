@@ -17,10 +17,10 @@ export class Course {
   @Column({ unique: true })
   code: string;
 
-  @Column({ type: "text" })
+  @Column({ type: "varchar", length: 25 })
   name: string;
 
-  @Column({ name: "ic", type: "text" })
+  @Column({ name: "ic", type: "varchar", length: 100 })
   IC: string;
 
   @OneToMany(() => Section, (section) => section.course)

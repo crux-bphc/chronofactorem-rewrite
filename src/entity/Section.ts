@@ -35,10 +35,10 @@ export class Section {
   @Column({ type: "smallint" })
   number: number;
 
-  @Column({ type: "text", array: true })
+  @Column({ type: "varchar", length: 100, array: true })
   instructors!: string[];
 
-  @Column({ name: "room_time", type: "text", array: true })
+  @Column({ name: "room_time", type: "varchar", length: 10, array: true })
   roomTime!: string[];
 
   @CreateDateColumn({
