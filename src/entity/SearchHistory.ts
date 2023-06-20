@@ -21,5 +21,5 @@ export class SearchHistory {
     type: "timestamptz",
     default: () => "CURRENT_TIMESTAMP",
   })
-  searchedAt: Date;
+  searchedAt!: Date;
 }
