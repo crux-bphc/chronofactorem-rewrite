@@ -4,6 +4,7 @@ import {
   Column,
   OneToMany,
   CreateDateColumn,
+  Index,
 } from "typeorm";
 import { DegreeEnum, ApprovedDegreeList } from "../types/degrees";
 import { Timetable } from "./Timetable";
@@ -13,6 +14,7 @@ export class User {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
+  @Index()
   @Column({ unique: true, type: "varchar" })
   email!: string;
 
