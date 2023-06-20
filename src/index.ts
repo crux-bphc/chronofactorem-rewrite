@@ -16,23 +16,6 @@ AppDataSource.initialize()
     // register express routers from defined application routers
     app.use("/user", userRouter);
 
-    // Add sample users
-    userRepository.insert({
-      batch: 21,
-      name: "Soumitra",
-      degrees: ["B3", "A7"],
-      email: "f20210781@hyderabad.bits-pilani.ac.in",
-      timetables: [],
-    });
-
-    userRepository.insert({
-      batch: 21,
-      name: "Arunachala",
-      degrees: ["A7"],
-      email: "f20210205@hyderabad.bits-pilani.ac.in",
-      timetables: [],
-    });
-
     // setup express app here
     // ...
 
