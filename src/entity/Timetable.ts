@@ -33,8 +33,11 @@ export class Timetable {
   })
   degrees!: DegreeEnum[];
 
-  @Column({ type: "boolean", default: false })
+  @Column({ type: "boolean", default: true })
   private: boolean;
+
+  @Column({ type: "boolean", default: true })
+  draft: boolean;
 
   @ManyToMany(() => Section, (section) => section.timetables)
   sections!: Section[];
@@ -47,6 +50,10 @@ export class Timetable {
 
   @Column({ name: "compre_times", type: "timestamptz", array: true })
   compreTimes!: Date[];
+
+  // e.g. ["CS F211-LP", "CS F212-L"]
+  @Column({ type: "varchar", array: true })
+  warnings!: string[];
 
   @CreateDateColumn({
     name: "created_at",
