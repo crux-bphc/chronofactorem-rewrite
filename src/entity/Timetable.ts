@@ -34,10 +34,10 @@ export class Timetable {
   degrees!: DegreeEnum[];
 
   @Column({ type: "boolean", default: true })
-  private: boolean;
+  private!: boolean;
 
   @Column({ type: "boolean", default: true })
-  draft: boolean;
+  draft!: boolean;
 
   @ManyToMany(() => Section, (section) => section.timetables)
   sections!: Section[];
@@ -60,7 +60,7 @@ export class Timetable {
     type: "timestamptz",
     default: () => "CURRENT_TIMESTAMP",
   })
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({
     name: "last_updated",
@@ -68,5 +68,5 @@ export class Timetable {
     onUpdate: "CURRENT_TIMESTAMP",
     nullable: true,
   })
-  lastUpdated: Date;
+  lastUpdated!: Date;
 }

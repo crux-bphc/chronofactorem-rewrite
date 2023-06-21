@@ -15,13 +15,13 @@ export class Course {
 
   @Index()
   @Column({ unique: true })
-  code: string;
+  code!: string;
 
   @Column({ type: "varchar", length: 25 })
-  name: string;
+  name!: string;
 
   @Column({ name: "ic", type: "varchar", length: 100 })
-  IC: string;
+  IC!: string;
 
   @OneToMany(() => Section, (section) => section.course)
   sections!: Section[];
@@ -37,5 +37,5 @@ export class Course {
     type: "timestamptz",
     default: () => "CURRENT_TIMESTAMP",
   })
-  createdAt: Date;
+  createdAt!: Date;
 }
