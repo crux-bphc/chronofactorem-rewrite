@@ -1,6 +1,13 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
+  '@types/body-parser':
+    specifier: ^1.19.2
+    version: 1.19.2
   '@types/express':
     specifier: ^4.17.17
     version: 4.17.17
@@ -33,9 +40,6 @@ dependencies:
     version: 3.21.4
 
 devDependencies:
-  '@types/body-parser':
-    specifier: ^1.19.2
-    version: 1.19.2
   ts-node:
     specifier: 10.7.0
     version: 10.7.0(@types/node@16.11.10)(typescript@4.5.2)
@@ -80,11 +84,13 @@ packages:
     dependencies:
       '@types/connect': 3.4.35
       '@types/node': 16.11.10
+    dev: false
 
   /@types/connect@3.4.35:
     resolution: {integrity: sha512-cdeYyv4KWoEgpBISTxWvqYsVy444DOqehiF3fM3ne10AmJ62RSyNkUnxMJXHQWRQQX2eR94m5y1IZyDwBjV9FQ==}
     dependencies:
       '@types/node': 16.11.10
+    dev: false
 
   /@types/express-serve-static-core@4.17.35:
     resolution: {integrity: sha512-wALWQwrgiB2AWTT91CB62b6Yt0sNHpznUXeZEcnPU3DRdlDIz74x8Qg1UUYKSVFi+va5vKOLYRBI1bRKiLLKIg==}
