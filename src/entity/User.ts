@@ -32,12 +32,12 @@ export class User {
   degrees!: DegreeEnum[];
 
   @OneToMany(() => Timetable, (timetable) => timetable.author)
-  timetables: Timetable[];
+  timetables!: Timetable[];
 
   @CreateDateColumn({
     name: "created_at",
     type: "timestamptz",
     default: () => "CURRENT_TIMESTAMP",
   })
-  createdAt: Date;
+  createdAt!: Date;
 }

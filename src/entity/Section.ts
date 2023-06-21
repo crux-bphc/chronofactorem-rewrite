@@ -33,7 +33,7 @@ export class Section {
   timetables!: Timetable[];
 
   @Column({ type: "smallint" })
-  number: number;
+  number!: number;
 
   @Column({ type: "varchar", length: 100, array: true })
   instructors!: string[];
@@ -46,5 +46,5 @@ export class Section {
     type: "timestamptz",
     default: () => "CURRENT_TIMESTAMP",
   })
-  createdAt: Date;
+  createdAt!: Date;
 }
