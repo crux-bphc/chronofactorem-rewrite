@@ -5,15 +5,20 @@ WORKDIR /usr/src/app
 ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="${PATH}:${PNPM_HOME}"
 
+COPY --chown=node:node tsconfig.json ./
+COPY --chown=node:node .env* ./
+
 RUN npm install -g pnpm
 
+COPY package.json ./
 COPY pnpm-lock.yaml ./
 
 RUN pnpm fetch --prod
 
-COPY --chown=node:node . .
 
 RUN pnpm install -r --offline --prod
+
+COPY --chown=node:node src ./
 
 RUN pnpm tsc
 
