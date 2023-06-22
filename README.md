@@ -1,5 +1,7 @@
 # ChronoFactorem (rewrite)
 
+**NOTE:** Before contributing changes, we recommend you read the [Contributing Guide](./CONTRIBUTING.md)
+
 **Steps for setup:**
 
 1. Install [nvm](https://github.com/nvm-sh/nvm), and install Node v18.16.0 LTS using `nvm install v18.16.0`. If you're using a different node version manager, do the equivalent.
