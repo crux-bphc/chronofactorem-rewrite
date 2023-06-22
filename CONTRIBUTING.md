@@ -17,3 +17,4 @@
   - Commits that do not follow this convention and format will be asked to be reverted, or rebased to fit the format.
 - **Pull Requests:** pull requests should **never** be from `master` or `main`. All pull requests should be from an appropriately named branch, and should be named with a name similar to the human readable form of the branch name. e.g. A PR from a branch `fix-auth-type-error` will be named "Fix TypeError in AuthController".
   - **If the PR has an associated Issue created for it, mention it, else describe it in the PR description.** The description **must** accurately, and exhaustively describe the nature of the changes you have made, and if possible describe the Issue it aimed to fix.
+  - **All pull requests must be reviewed.** All means all. Doesn't matter if you are the leader of the third reich, or if you're the only person in the club. Every single PR must be reviewed until the latest changes.
