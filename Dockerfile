@@ -10,11 +10,11 @@ COPY --chown=node:node .env* ./
 
 RUN npm install -g pnpm
 
+COPY --chown=node:node patches ./patches
 COPY package.json ./
 COPY pnpm-lock.yaml ./
 
 RUN pnpm fetch --prod
-
 
 RUN pnpm install -r --offline --prod
 

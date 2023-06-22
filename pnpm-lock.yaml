@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  jose@4.14.4:
+    hash: perj5a3nphqzui4sasowaltfea
+    path: patches/jose@4.14.4.patch
+
 dependencies:
   '@types/body-parser':
     specifier: ^1.19.2
@@ -523,9 +528,10 @@ packages:
     engines: {node: '>=8'}
     dev: false
 
-  /jose@4.14.4:
+  /jose@4.14.4(patch_hash=perj5a3nphqzui4sasowaltfea):
     resolution: {integrity: sha512-j8GhLiKmUAh+dsFXlX1aJCbt5KMibuKb+d7j1JaOJG6s2UjX1PQlW+OKB/sD4a/5ZYF4RcmYmLSndOoU3Lt/3g==}
     dev: false
+    patched: true
 
   /lru-cache@6.0.0:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
@@ -638,7 +644,7 @@ packages:
   /openid-client@5.4.2:
     resolution: {integrity: sha512-lIhsdPvJ2RneBm3nGBBhQchpe3Uka//xf7WPHTIglery8gnckvW7Bd9IaQzekzXJvWthCMyi/xVEyGW0RFPytw==}
     dependencies:
-      jose: 4.14.4
+      jose: 4.14.4(patch_hash=perj5a3nphqzui4sasowaltfea)
       lru-cache: 6.0.0
       object-hash: 2.2.0
       oidc-token-hash: 5.0.3
