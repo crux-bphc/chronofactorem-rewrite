@@ -23,7 +23,7 @@ export class Timetable {
   @ManyToOne(() => User, (author) => author.timetables)
   author!: User;
 
-  @Column()
+  @Column({ type: "varchar", length: 200 })
   name!: string;
 
   @Column({
@@ -42,7 +42,7 @@ export class Timetable {
   @ManyToMany(() => Section, (section) => section.timetables)
   sections!: Section[];
 
-  @Column({ type: "varchar", length: 2, array: true })
+  @Column({ type: "varchar", length: 3, array: true })
   timings!: string[];
 
   @Column({ name: "midsem_times", type: "timestamptz", array: true })
