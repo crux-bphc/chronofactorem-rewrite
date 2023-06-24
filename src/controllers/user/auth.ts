@@ -154,3 +154,11 @@ export async function getDegrees(req: Request, res: Response) {
     });
   }
 }
+
+export async function logout(req:Request,res:Response){
+  res.clearCookie('session');
+  res.json({
+    authenticated:false,
+    message:"user logged out"
+  })
+}
