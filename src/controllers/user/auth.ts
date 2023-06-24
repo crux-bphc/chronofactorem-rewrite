@@ -2,6 +2,9 @@ import { TokenSet } from "openid-client";
 import { generators } from "openid-client";
 import { Request, Response } from "express";
 import { getClient } from "../../config/authClient";
+import { userRepository } from "../../repositories/userRepository";
+import { DegreeEnum } from "../../types/degrees";
+import { Session, UserData } from "../../types/auth";
 
 // openid code_verifier
 const code_verifier = generators.codeVerifier();
@@ -10,11 +13,7 @@ const code_verifier = generators.codeVerifier();
 export async function manageAuthRedirect(req: Request, res: Response) {
   try {
     if (req.cookies["session"]) {
-      res.json({
-        authenticated: true,
-        message: "user is logged in",
-      });
-      console.log(req.cookies["session"]);
+      res.redirect("http://localhost:3000/auth/callback");
     } else {
       const client = await getClient();
       const code_challenge = generators.codeChallenge(code_verifier);
@@ -37,42 +36,51 @@ export async function manageAuthRedirect(req: Request, res: Response) {
 // starts a session after validating access_token
 export async function authCallback(req: Request, res: Response) {
   try {
-    //sets session cookie
+    if (req.cookies["session"]) {
+      res.json({
+        authenticated: true,
+        message: "user is logged in",
+      });
+    } else {
+      //sets session cookie
 
-    const client = await getClient();
-    const params = client.callbackParams(req);
+      const client = await getClient();
+      const params = client.callbackParams(req);
 
-    //tokenSet contains the refresh_token and access_token codes
-    const tokenSet = await client.callback(
-      "http://localhost:3000/auth/callback",
-      params,
-      { code_verifier }
-    );
+      //tokenSet contains the refresh_token and access_token codes
+      const tokenSet = await client.callback(
+        "http://localhost:3000/auth/callback",
+        params,
+        { code_verifier }
+      );
 
-    //obtaining the acces_token from tokenSet
-    const access_token = tokenSet.access_token;
+      //obtaining the acces_token from tokenSet
+      const access_token = tokenSet.access_token;
 
-    //obtaining userinfo from the access_token code
-    const userinfo = await client.userinfo(access_token as string | TokenSet);
+      //obtaining userinfo from the access_token code
+      const userinfo = await client.userinfo(access_token as string | TokenSet);
 
-    const userData: Session = {
-      name: userinfo.name,
-      email: userinfo.email,
-    };
+      const userData: Session = {
+        name: userinfo.name,
+        email: userinfo.email,
+      };
 
-    // tokenSet.claims() returns validated information contained upon accessing the token
-    const tokenExpiryTime = tokenSet.claims().exp;
+      console.log(userData);
 
-    //defines maxAge to be the time when the session cookie expires
-    const maxAge = tokenExpiryTime * 1000 - Date.now(); //converts into milliseconds
+      // tokenSet.claims() returns validated information contained upon accessing the token
+      const tokenExpiryTime = tokenSet.claims().exp;
 
-    //setting the cookie
-    res.cookie("session", userData, { maxAge: maxAge, httpOnly: true });
+      //defines maxAge to be the time when the session cookie expires
+      const maxAge = tokenExpiryTime * 1000 - Date.now(); //converts into milliseconds
 
-    res.status(200).json({
-      success: true,
-      message: "user session has started",
-    });
+      //setting the cookie
+      res.cookie("session", userData, { maxAge: maxAge, httpOnly: true });
+
+      res.status(200).json({
+        success: true,
+        message: "user session has started",
+      });
+    }
   } catch (err: any) {
     /*
   If user exists on database, redirect them to frontpage, if not
@@ -80,14 +88,24 @@ export async function authCallback(req: Request, res: Response) {
   on the frontend
   */
     // res.redirect("http://localhost:3000");
-    res.status(500).json({
-      success: false,
-      message: "The server has encountered an error",
-    });
+    res.status(401).redirect("http://localhost:3000/auth/login");
   }
 }
 
 export async function getDegrees(req: Request, res: Response) {
+  /*this function is declared outside teh try
+   to make the capitalised name into title case
+ */
+
+  function toTitleCase(str: string | undefined) {
+    if (str === undefined) {
+      return null;
+    }
+    return str.replace(/\w\S*/g, function (txt) {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+  }
+
   try {
     /* for user to enter their degrees */
     /* the session cookie is parsed here, and then the information about the user,
@@ -95,8 +113,9 @@ export async function getDegrees(req: Request, res: Response) {
 
     //gets userinfo as part of session
     const session: Session = req.cookies["session"];
+    console.log(session);
 
-    const degrees: Degrees = req.body.degrees;
+    const degrees: DegreeEnum[] = req.body.degrees;
 
     const userData: UserData = {
       name: session.name,
@@ -104,7 +123,26 @@ export async function getDegrees(req: Request, res: Response) {
       degrees: degrees,
     };
 
-    console.log(userData);
+    // console.log(userData);
+
+    //slices mail to obtain batch
+    const batch = userData.email?.slice(3, 5)!;
+
+    //converts name to title case
+    const name = toTitleCase(userData.name);
+
+    /*
+    this can be better handled by first accessing the find user endpoint,
+    if user exists, then send a response and return. For now, this can just insert.
+    Errors are not handled here, as of yet.
+    */
+    userRepository.insert({
+      batch: parseInt(batch),
+      name: name!,
+      degrees: userData.degrees,
+      email: userData.email,
+      timetables: [],
+    });
 
     res.json({
       success: true,
@@ -112,6 +150,7 @@ export async function getDegrees(req: Request, res: Response) {
   } catch (error: any) {
     res.status(500).json({
       success: false,
+      message: "failed to register",
     });
   }
 }
