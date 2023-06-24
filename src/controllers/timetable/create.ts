@@ -18,11 +18,13 @@ const dataSchema = z.object({
       })
       .min(0, {
         message: "email must be a non-empty string",
-      }),
-    //   .email({
-    //     message: "email provided is not a valid email",
-    //   }),
-    // NOTE: z.email() is not working for some reason with bits emails
+      })
+      .regex(
+        /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9\-]*\.)+[A-Z]{2,}$/i,
+        {
+          message: "email must be a valid email",
+        }
+      ),
   }),
 });
 
