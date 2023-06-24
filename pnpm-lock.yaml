@@ -22,6 +22,9 @@ dependencies:
   body-parser:
     specifier: ^1.19.1
     version: 1.19.1
+  cookie-parser:
+    specifier: ^1.4.6
+    version: 1.4.6
   dotenv:
     specifier: ^16.3.1
     version: 16.3.1
@@ -304,6 +307,14 @@ packages:
   /content-type@1.0.5:
     resolution: {integrity: sha512-nTjqfcBFEipKdXCv4YDQWCfmcLZKm81ldF0pAopTvyrFGVbcR6P/VAAd5G7N+0tTr8QqiU0tFadD6FK4NtJwOA==}
     engines: {node: '>= 0.6'}
+    dev: false
+
+  /cookie-parser@1.4.6:
+    resolution: {integrity: sha512-z3IzaNjdwUC2olLIB5/ITd0/setiaFMLYiZJle7xg5Fe9KWAceil7xszYfHHBtDFYLSgJduS2Ty0P1uJdPDJeA==}
+    engines: {node: '>= 0.8.0'}
+    dependencies:
+      cookie: 0.4.1
+      cookie-signature: 1.0.6
     dev: false
 
   /cookie-signature@1.0.6:
