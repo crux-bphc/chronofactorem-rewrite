@@ -55,7 +55,7 @@ export async function authCallback(req: Request, res: Response) {
     //obtaining userinfo from the access_token code
     const userinfo = await client.userinfo(access_token as string | TokenSet);
 
-    const userData: session = {
+    const userData: Session = {
       name: userinfo.name,
       email: userinfo.email,
     };
@@ -94,11 +94,11 @@ export async function getDegrees(req: Request, res: Response) {
   name, email and degrees is stored on the database */
 
     //gets userinfo as part of session
-    const session: session = req.cookies["session"];
+    const session: Session = req.cookies["session"];
 
-    const degrees: degrees = req.body.degrees;
+    const degrees: Degrees = req.body.degrees;
 
-    const userData: userData = {
+    const userData: UserData = {
       name: session.name,
       email: session.email,
       degrees: degrees,
