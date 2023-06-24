@@ -3,18 +3,18 @@ These are the types that facilitate authentication
 */
 
 //interface for userdata to be stored in the session cookie and for validating the type of session cookie
-interface session {
+interface Session {
   name: string | undefined;
   email: string | undefined;
 }
 
-interface userData {
+interface UserData {
   name: string | undefined;
   email: string | undefined;
-  degrees: degrees;
+  degrees: Degrees;
 }
 
 //interface for degrees to be given while user creation
-interface degrees {
+interface Degrees {
   degrees: string[];
 }
