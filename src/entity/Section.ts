@@ -29,9 +29,7 @@ export class Section {
   })
   type!: SectionTypeEnum;
 
-  @ManyToMany(() => Timetable, (timetable) => timetable.sections, {
-    eager: true,
-  })
+  @ManyToMany(() => Timetable, (timetable) => timetable.sections)
   timetables!: Timetable[];
 
   @Column({ type: "smallint" })
