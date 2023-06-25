@@ -1,3 +1,4 @@
+import { Request, Response } from "express";
 import { z } from "zod";
 import { validate } from "../../utils/zodValidateBody";
 
@@ -41,6 +42,19 @@ const dataSchema = z.object({
       })
       .min(0, {
         message: "section must be a non-empty string",
+      }),
+  }),
+  params: z.object({
+    id: z.coerce
+      .number({
+        invalid_type_error: "id not a number",
+        required_error: "id is a required path parameter",
+      })
+      .positive({
+        message: "invalid id",
+      })
+      .int({
+        message: "invalid id",
       }),
   }),
 });
