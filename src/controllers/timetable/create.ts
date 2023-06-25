@@ -32,7 +32,7 @@ export const createTimeTableValidator = validate(dataSchema);
 
 export const createTimetable = async (req: Request, res: Response) => {
   const numberOfDraftTimeTables: number = await timetableRepository.count({
-    where: { draft: true },
+    where: { draft: true, author: { email: req.body.email } },
   });
 
   const name: string = `Draft ${numberOfDraftTimeTables + 1}`;
@@ -43,7 +43,7 @@ export const createTimetable = async (req: Request, res: Response) => {
     return res.json({ message: "unregistered user" });
   }
 
-  // nwe timetable default properties
+  // new timetable default properties
   const degrees: DegreeEnum[] = author.degrees;
   const isPrivate: boolean = true;
   const isDraft: boolean = true;
