@@ -93,7 +93,7 @@ export async function authCallback(req: Request, res: Response) {
 }
 
 export async function getDegrees(req: Request, res: Response) {
-  /*this function is declared outside teh try
+  /*this function is declared outside the try
    to make the capitalised name into title case
  */
 
@@ -155,10 +155,19 @@ export async function getDegrees(req: Request, res: Response) {
   }
 }
 
-export async function logout(req:Request,res:Response){
-  res.clearCookie('session');
+//this function deletes the session cookie to log out
+export async function logout(req: Request, res: Response) {
+  res.clearCookie("session");
   res.json({
-    authenticated:false,
-    message:"user logged out"
-  })
+    authenticated: false,
+    message: "user logged out",
+  });
 }
+
+/* On any route, when checking if a user is logged in, check for the cookie
+in cookiestorage on the server, using -
+const session = req.cookies['session'];
+now, the session object can be used to see if the user is logged in or not
+*/
+
+/*on the frontend, for accessing routes, send requests with credentials:true*/

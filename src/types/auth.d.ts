@@ -14,4 +14,3 @@ interface UserData {
   email: string | undefined;
   degrees: DegreeEnum[];
 }
-

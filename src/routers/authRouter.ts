@@ -3,7 +3,7 @@ import {
   manageAuthRedirect,
   authCallback,
   getDegrees,
-  logout
+  logout,
 } from "../controllers/user/auth";
 import { Request, Response } from "express";
 
@@ -31,6 +31,8 @@ they have to send a post request containing their branch, this route handles tha
 */
 
 authRouter.post("/submit", getDegrees);
+
+//this handles the logout
 authRouter.get("/logout", logout);
 
 export default authRouter;
