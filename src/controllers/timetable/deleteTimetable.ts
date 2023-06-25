@@ -12,7 +12,7 @@ const dataSchema = z.object({
     email: z
       .string({
         invalid_type_error: "email not a string",
-        required_error: "email is a required path parameter",
+        required_error: "email is a required body parameter",
       })
       .min(0, {
         message: "email must be a non-empty string",
