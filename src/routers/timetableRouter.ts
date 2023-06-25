@@ -2,7 +2,7 @@ import * as express from "express";
 import {
   createTimeTableValidator,
   createTimetable,
-} from "../controllers/timetable/create";
+} from "../controllers/timetable/createTimetable";
 
 const timetableRouter = express.Router();
 
