@@ -23,7 +23,7 @@ export class Course {
   @Column({ name: "ic", type: "varchar", length: 100 })
   IC!: string;
 
-  @OneToMany(() => Section, (section) => section.course, { eager: true })
+  @OneToMany(() => Section, (section) => section.course)
   sections!: Section[];
 
   @Column({ name: "midsem_time", type: "timestamptz" })

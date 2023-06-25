@@ -20,7 +20,7 @@ export class Timetable {
   id!: number;
 
   @Index()
-  @ManyToOne(() => User, (author) => author.timetables, { eager: true })
+  @ManyToOne(() => User, (author) => author.timetables)
   author!: User;
 
   @Column({ type: "varchar", length: 200 })
@@ -39,7 +39,7 @@ export class Timetable {
   @Column({ type: "boolean", default: true })
   draft!: boolean;
 
-  @ManyToMany(() => Section, (section) => section.timetables, { eager: true })
+  @ManyToMany(() => Section, (section) => section.timetables)
   sections!: Section[];
 
   @Column({ type: "varchar", length: 3, array: true })

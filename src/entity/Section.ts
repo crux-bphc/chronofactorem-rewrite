@@ -20,7 +20,7 @@ export class Section {
   id!: string;
 
   @Index()
-  @ManyToOne(() => Course, (course) => course.sections, { eager: true })
+  @ManyToOne(() => Course, (course) => course.sections)
   course!: Course;
 
   @Column({
