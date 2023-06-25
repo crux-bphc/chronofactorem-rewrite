@@ -55,10 +55,14 @@ export const deleteTimetable = async (req: Request, res: Response) => {
   if (!timetable) {
     return res.status(404).json({ message: "timetable not found" });
   }
-  if (timetable.author.id !== author.id) {
-    return res
-      .status(403)
-      .json({ message: "you do not have permission to delete this timetable" });
+  const owns: boolean =
+    (await timetableRepository
+      .createQueryBuilder("timetable")
+      .where("timetable.id = :id", { id: timetable.id })
+      .andWhere("timetable.author = :author", { author: author.id })
+      .getCount()) > 0;
+  if (!owns) {
+    return res.status(403).json({ message: "user does not own timetable" });
   }
   await timetableRepository.delete({ id });
   return res.json({ message: "timetable deleted" });
