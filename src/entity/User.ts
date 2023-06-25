@@ -31,7 +31,7 @@ export class User {
   })
   degrees!: DegreeEnum[];
 
-  @OneToMany(() => Timetable, (timetable) => timetable.author, { eager: true })
+  @OneToMany(() => Timetable, (timetable) => timetable.author)
   timetables!: Timetable[];
 
   @CreateDateColumn({

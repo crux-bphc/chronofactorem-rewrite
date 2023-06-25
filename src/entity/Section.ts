@@ -20,7 +20,7 @@ export class Section {
   id!: string;
 
   @Index()
-  @ManyToOne(() => Course, (course) => course.sections, { eager: true })
+  @ManyToOne(() => Course, (course) => course.sections)
   course!: Course;
 
   @Column({
@@ -29,9 +29,7 @@ export class Section {
   })
   type!: SectionTypeEnum;
 
-  @ManyToMany(() => Timetable, (timetable) => timetable.sections, {
-    eager: true,
-  })
+  @ManyToMany(() => Timetable, (timetable) => timetable.sections)
   timetables!: Timetable[];
 
   @Column({ type: "smallint" })

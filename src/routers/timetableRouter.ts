@@ -2,11 +2,11 @@ import * as express from "express";
 import {
   createTimeTableValidator,
   createTimetable,
-} from "../controllers/timetable/create";
+} from "../controllers/timetable/createTimetable";
 import {
   deleteTimeTableValidator,
   deleteTimetable,
-} from "../controllers/timetable/delete";
+} from "../controllers/timetable/deleteTimetable";
 
 const timetableRouter = express.Router();
 
