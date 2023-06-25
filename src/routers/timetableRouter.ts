@@ -6,7 +6,7 @@ import {
 import {
   deleteTimeTableValidator,
   deleteTimetable,
-} from "../controllers/timetable/delete";
+} from "../controllers/timetable/deleteTimetable";
 
 const timetableRouter = express.Router();
 
