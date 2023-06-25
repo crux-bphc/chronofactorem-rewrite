@@ -69,10 +69,6 @@ export const createTimetable = async (req: Request, res: Response) => {
     createdAt,
     lastUpdated,
   });
-  console.log(timetable);
   await timetableRepository.save(timetable);
-  console.log(
-    `Timetable \n name: {timetable.name}\n id: {timetable.id}\n created successfully`
-  );
   return res.json(timetable);
 };
