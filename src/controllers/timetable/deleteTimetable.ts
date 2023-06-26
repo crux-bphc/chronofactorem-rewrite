@@ -42,28 +42,35 @@ const dataSchema = z.object({
 export const deleteTimeTableValidator = validate(dataSchema);
 
 export const deleteTimetable = async (req: Request, res: Response) => {
-  const author: User | null = await userRepository.findOne({
-    where: { email: req.body.email },
-  });
-  if (!author) {
-    return res.json({ message: "unregistered user" });
+  try {
+    const author: User | null = await userRepository.findOne({
+      where: { email: req.body.email },
+    });
+    if (!author) {
+      return res.json({ message: "unregistered user" });
+    }
+    const id: number = parseInt(req.params.id);
+    const timetable: Timetable | null = await timetableRepository.findOne({
+      where: { id },
+    });
+    if (!timetable) {
+      return res.status(404).json({ message: "timetable not found" });
+    }
+    const owns: boolean =
+      (await timetableRepository
+        .createQueryBuilder("timetable")
+        .where("timetable.id = :id", { id: timetable.id })
+        .andWhere("timetable.author = :author", { author: author.id })
+        .getCount()) > 0;
+    if (!owns) {
+      return res.status(403).json({ message: "user does not own timetable" });
+    }
+    await timetableRepository.delete({ id });
+    return res.json({ message: "timetable deleted" });
+  } catch (err: any) {
+    // will replace the console.log with a logger when we have one
+    console.log(err.message);
+
+    return res.status(500).json({ message: "Internal Server Error" });
   }
-  const id: number = parseInt(req.params.id);
-  const timetable: Timetable | null = await timetableRepository.findOne({
-    where: { id },
-  });
-  if (!timetable) {
-    return res.status(404).json({ message: "timetable not found" });
-  }
-  const owns: boolean =
-    (await timetableRepository
-      .createQueryBuilder("timetable")
-      .where("timetable.id = :id", { id: timetable.id })
-      .andWhere("timetable.author = :author", { author: author.id })
-      .getCount()) > 0;
-  if (!owns) {
-    return res.status(403).json({ message: "user does not own timetable" });
-  }
-  await timetableRepository.delete({ id });
-  return res.json({ message: "timetable deleted" });
 };
