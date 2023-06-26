@@ -7,7 +7,6 @@ import {
   UpdateDateColumn,
   CreateDateColumn,
   Index,
-  Unique,
 } from "typeorm";
 import { DegreeEnum, ApprovedDegreeList } from "../types/degrees";
 import { User } from "./User";
