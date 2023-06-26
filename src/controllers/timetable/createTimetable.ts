@@ -31,17 +31,36 @@ const dataSchema = z.object({
 export const createTimeTableValidator = validate(dataSchema);
 
 export const createTimetable = async (req: Request, res: Response) => {
-  const numberOfDraftTimeTables: number = await timetableRepository.count({
-    where: { draft: true, author: { email: req.body.email } },
-  });
-
-  const name: string = `Draft ${numberOfDraftTimeTables + 1}`;
   const author: User | null = await await userRepository.findOne({
     where: { email: req.body.email },
   });
+
   if (!author) {
-    return res.json({ message: "unregistered user" });
+    return res.status(404).json({ message: "User not found" });
   }
+
+  const timetablesWhereDraftInName: Timetable[] = await timetableRepository
+    .createQueryBuilder("timetable")
+    .where("timetable.authorId = :author", { author: author.id })
+    .andWhere("timetable.name like :name", { name: "Draft %" })
+    .getMany();
+
+  let draftNames = timetablesWhereDraftInName.map(
+    (timetable) => timetable.name
+  );
+
+  draftNames = draftNames.sort();
+
+  if (draftNames.length === 0) {
+    draftNames.push("Draft 0");
+  }
+
+  const latestDraftName = parseInt(
+    draftNames[draftNames.length - 1].split(" ")[1]
+  );
+
+  // new timetable default name
+  const name: string = `Draft ${latestDraftName + 1}`;
 
   // new timetable default properties
   const degrees: DegreeEnum[] = author.degrees;
@@ -69,6 +88,8 @@ export const createTimetable = async (req: Request, res: Response) => {
     createdAt,
     lastUpdated,
   });
+
   await timetableRepository.save(timetable);
+
   return res.json(timetable);
 };
