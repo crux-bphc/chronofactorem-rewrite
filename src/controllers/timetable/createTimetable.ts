@@ -31,44 +31,70 @@ const dataSchema = z.object({
 export const createTimeTableValidator = validate(dataSchema);
 
 export const createTimetable = async (req: Request, res: Response) => {
-  const numberOfDraftTimeTables: number = await timetableRepository.count({
-    where: { draft: true, author: { email: req.body.email } },
-  });
-
-  const name: string = `Draft ${numberOfDraftTimeTables + 1}`;
   const author: User | null = await await userRepository.findOne({
     where: { email: req.body.email },
   });
+
   if (!author) {
-    return res.json({ message: "unregistered user" });
+    return res.status(404).json({ message: "User not found" });
   }
 
-  // new timetable default properties
-  const degrees: DegreeEnum[] = author.degrees;
-  const isPrivate: boolean = true;
-  const isDraft: boolean = true;
-  const sections: Section[] = [];
-  const timings: string[] = [];
-  const midsemTimes: Date[] = [];
-  const compreTimes: Date[] = [];
-  const warnings: string[] = [];
-  const createdAt: Date = new Date();
-  const lastUpdated: Date = new Date();
+  try {
+    const timetablesWhereDraftInName: Timetable[] = await timetableRepository
+      .createQueryBuilder("timetable")
+      .where("timetable.authorId = :author", { author: author.id })
+      .andWhere("timetable.name like :name", { name: "Draft %" })
+      .getMany();
 
-  const timetable: Timetable = await timetableRepository.create({
-    author,
-    name,
-    degrees,
-    private: isPrivate,
-    draft: isDraft,
-    sections,
-    timings,
-    midsemTimes,
-    compreTimes,
-    warnings,
-    createdAt,
-    lastUpdated,
-  });
-  await timetableRepository.save(timetable);
-  return res.json(timetable);
+    let draftNames = timetablesWhereDraftInName.map(
+      (timetable) => timetable.name
+    );
+
+    draftNames = draftNames.sort();
+
+    if (draftNames.length === 0) {
+      draftNames.push("Draft 0");
+    }
+
+    const latestDraftName = parseInt(
+      draftNames[draftNames.length - 1].split(" ")[1]
+    );
+
+    // new timetable default properties
+    const name: string = `Draft ${latestDraftName + 1}`;
+    const degrees: DegreeEnum[] = author.degrees;
+    const isPrivate: boolean = true;
+    const isDraft: boolean = true;
+    const sections: Section[] = [];
+    const timings: string[] = [];
+    const midsemTimes: Date[] = [];
+    const compreTimes: Date[] = [];
+    const warnings: string[] = [];
+    const createdAt: Date = new Date();
+    const lastUpdated: Date = new Date();
+
+    const timetable: Timetable = await timetableRepository.create({
+      author,
+      name,
+      degrees,
+      private: isPrivate,
+      draft: isDraft,
+      sections,
+      timings,
+      midsemTimes,
+      compreTimes,
+      warnings,
+      createdAt,
+      lastUpdated,
+    });
+
+    await timetableRepository.save(timetable);
+
+    return res.json(timetable);
+  } catch (err: any) {
+    // will replace the console.log with a logger when we have one
+    console.log(err.message);
+
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
 };
