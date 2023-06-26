@@ -5,6 +5,7 @@ import { AppDataSource } from "./db";
 import userRouter from "./routers/userRouter";
 import "dotenv/config";
 import { env } from "./config/server";
+import courseRouter from "./routers/courseRouter";
 
 AppDataSource.initialize()
   .then(async () => {
@@ -14,6 +15,7 @@ AppDataSource.initialize()
 
     // register express routers from defined application routers
     app.use("/user", userRouter);
+    app.use("/course", courseRouter);
 
     // setup express app here
     // ...
