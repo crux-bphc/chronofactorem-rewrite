@@ -75,6 +75,7 @@ export const createTimetable = async (req: Request, res: Response) => {
       });
     } catch (err: any) {
       console.log("Error while sorting draft names: ", err.message);
+
       // for this to work we'll need to prevent them from naming timetables "Draft %""
       res.status(400).json({ message: "Bad Request (not an integer draft)" });
     }
