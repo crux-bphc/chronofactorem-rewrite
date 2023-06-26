@@ -67,18 +67,17 @@ export const createTimetable = async (req: Request, res: Response) => {
     let draftNames = timetablesWhereDraftInName.map(
       (timetable) => timetable.name
     );
-    try {
-      draftNames = draftNames.sort((a, b) => {
-        const aDraftName = parseInt(a.split(" ")[1]);
-        const bDraftName = parseInt(b.split(" ")[1]);
-        return aDraftName - bDraftName;
-      });
-    } catch (err: any) {
-      console.log("Error while sorting draft names: ", err.message);
 
-      // for this to work we'll need to prevent them from naming timetables "Draft %""
-      res.status(400).json({ message: "Bad Request (not an integer draft)" });
-    }
+    draftNames = draftNames.filter((draftName) => {
+      const secondWord = draftName.split(" ")[1];
+      return !isNaN(parseInt(secondWord));
+    });
+
+    draftNames = draftNames.sort((a, b) => {
+      const aDraftName = parseInt(a.split(" ")[1]);
+      const bDraftName = parseInt(b.split(" ")[1]);
+      return aDraftName - bDraftName;
+    });
 
     if (draftNames.length === 0) {
       console.log("No draft timetable found");
