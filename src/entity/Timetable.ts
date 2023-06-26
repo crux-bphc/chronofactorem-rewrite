@@ -14,7 +14,6 @@ import { User } from "./User";
 import { Section } from "./Section";
 
 @Entity()
-@Unique(["name", "author"])
 export class Timetable {
   @PrimaryGeneratedColumn("increment")
   id!: number;
