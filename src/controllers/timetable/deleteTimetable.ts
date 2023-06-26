@@ -92,7 +92,7 @@ export const deleteTimetable = async (req: Request, res: Response) => {
           .getCount()) > 0;
     } catch (err: any) {
       // will replace the console.log with a logger when we have one
-      console.log("Error while checking user owns tmetable: ", err.message);
+      console.log("Error while checking user owns timetable: ", err.message);
 
       res.status(500).json({ message: "Internal Server Error" });
     }
