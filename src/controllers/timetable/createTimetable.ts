@@ -49,8 +49,47 @@ export const createTimetable = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    let timetablesWhereDraftInName: Timetable[] = [];
+
+    try {
+      timetablesWhereDraftInName = await timetableRepository
+        .createQueryBuilder("timetable")
+        .where("timetable.authorId = :author", { author: author.id })
+        .andWhere("timetable.name like :name", { name: "Draft %" })
+        .getMany();
+    } catch (err: any) {
+      // will replace the console.log with a logger when we have one
+      console.log("Error while querying for draft timetables: ", err.message);
+
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+
+    let draftNames = timetablesWhereDraftInName.map(
+      (timetable) => timetable.name
+    );
+
+    draftNames = draftNames.filter((draftName) => {
+      const secondWord = draftName.split(" ")[1];
+      return !isNaN(parseInt(secondWord));
+    });
+
+    draftNames = draftNames.sort((a, b) => {
+      const aDraftName = parseInt(a.split(" ")[1]);
+      const bDraftName = parseInt(b.split(" ")[1]);
+      return aDraftName - bDraftName;
+    });
+
+    if (draftNames.length === 0) {
+      console.log("No draft timetable found");
+      draftNames.push("Draft 0");
+    }
+
+    const latestDraftName = parseInt(
+      draftNames[draftNames.length - 1].split(" ")[1]
+    );
+
     // new timetable default properties
-    const name: string = "Untitled Timetable";
+    const name: string = `Draft ${latestDraftName + 1}`;
     const degrees: DegreeEnum[] = author.degrees;
     const isPrivate: boolean = true;
     const isDraft: boolean = true;
@@ -63,7 +102,7 @@ export const createTimetable = async (req: Request, res: Response) => {
     const lastUpdated: Date = new Date();
 
     try {
-      const timetable: Timetable = timetableRepository.create({
+      const timetable: Timetable = await timetableRepository.create({
         author,
         name,
         degrees,
