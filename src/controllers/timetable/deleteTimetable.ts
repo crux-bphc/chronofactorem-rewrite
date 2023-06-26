@@ -100,7 +100,11 @@ export const deleteTimetable = async (req: Request, res: Response) => {
     }
 
     try {
-      await timetableRepository.delete({ id });
+      await timetableRepository
+        .createQueryBuilder("timetable")
+        .delete()
+        .where("timetable.id = :id", { id: timetable.id })
+        .execute();
     } catch (err: any) {
       // will replace the console.log with a logger when we have one
       console.log("Error while deleting timetable: ", err.message);
