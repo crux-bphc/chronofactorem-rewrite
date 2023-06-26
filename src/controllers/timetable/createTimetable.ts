@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { timetableRepository } from "../../repositories/timetableRepository";
 import { Timetable } from "../../entity/Timetable";
 import { z } from "zod";
-import { validate } from "../../utils/zodValidateBody";
+import { validate } from "../../utils/zodValidateRequest";
 import { DegreeEnum } from "../../types/degrees";
 import { Section } from "../../entity/Section";
 import { User } from "../../entity/User";
