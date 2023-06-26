@@ -35,9 +35,10 @@ export const createTimetable = async (req: Request, res: Response) => {
     let author: User | null = null;
 
     try {
-      author = await userRepository.findOne({
-        where: { email: req.body.email },
-      });
+      author = await userRepository
+        .createQueryBuilder("user")
+        .where("user.email = :email", { email: req.body.email })
+        .getOne();
     } catch (err: any) {
       // will replace the console.log with a logger when we have one
       console.log("Error while querying for user: ", err.message);

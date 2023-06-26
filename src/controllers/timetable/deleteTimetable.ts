@@ -46,9 +46,10 @@ export const deleteTimetable = async (req: Request, res: Response) => {
     let author: User | null = null;
 
     try {
-      author = await userRepository.findOne({
-        where: { email: req.body.email },
-      });
+      author = await userRepository
+        .createQueryBuilder("user")
+        .where("user.email = :email", { email: req.body.email })
+        .getOne();
     } catch (err: any) {
       // will replace the console.log with a logger when we have one
       console.log("Error while querying user: ", err.message);
@@ -65,9 +66,10 @@ export const deleteTimetable = async (req: Request, res: Response) => {
     let timetable: Timetable | null = null;
 
     try {
-      timetable = await timetableRepository.findOne({
-        where: { id },
-      });
+      timetable = await timetableRepository
+        .createQueryBuilder("timetable")
+        .where("timetable.id = :id", { id })
+        .getOne();
     } catch (err: any) {
       // will replace the console.log with a logger when we have one
       console.log("Error while querying timetable: ", err.message);
