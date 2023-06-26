@@ -63,24 +63,27 @@ export const createTimetable = async (req: Request, res: Response) => {
     const lastUpdated: Date = new Date();
 
     try {
-      const timetable: Timetable = timetableRepository.create({
-        author,
-        name,
-        degrees,
-        private: isPrivate,
-        draft: isDraft,
-        sections,
-        timings,
-        midsemTimes,
-        compreTimes,
-        warnings,
-        createdAt,
-        lastUpdated,
-      });
+      await timetableRepository
+        .createQueryBuilder()
+        .insert()
+        .into(Timetable)
+        .values({
+          author,
+          name,
+          degrees,
+          private: isPrivate,
+          draft: isDraft,
+          sections,
+          timings,
+          midsemTimes,
+          compreTimes,
+          warnings,
+          createdAt,
+          lastUpdated,
+        })
+        .execute();
 
-      await timetableRepository.save(timetable);
-
-      return res.json(timetable);
+      return res.json({ message: "Timetable created successfully" });
     } catch (err: any) {
       // will replace the console.log with a logger when we have one
       console.log("Error while creating timetable: ", err.message);
