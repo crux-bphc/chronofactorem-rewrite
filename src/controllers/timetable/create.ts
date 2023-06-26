@@ -31,28 +31,51 @@ const dataSchema = z.object({
 export const createTimeTableValidator = validate(dataSchema);
 
 export const createTimetable = async (req: Request, res: Response) => {
-  const author: User | null = await await userRepository.findOne({
-    where: { email: req.body.email },
-  });
-
-  if (!author) {
-    return res.status(404).json({ message: "User not found" });
-  }
-
   try {
-    const timetablesWhereDraftInName: Timetable[] = await timetableRepository
-      .createQueryBuilder("timetable")
-      .where("timetable.authorId = :author", { author: author.id })
-      .andWhere("timetable.name like :name", { name: "Draft %" })
-      .getMany();
+    let author: User | null = null;
+
+    try {
+      author = await userRepository.findOne({
+        where: { email: req.body.email },
+      });
+    } catch (err: any) {
+      // will replace the console.log with a logger when we have one
+      console.log("Error while querying for user: ", err.message);
+
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+
+    if (!author) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    let timetablesWhereDraftInName: Timetable[] = [];
+
+    try {
+      timetablesWhereDraftInName = await timetableRepository
+        .createQueryBuilder("timetable")
+        .where("timetable.authorId = :author", { author: author.id })
+        .andWhere("timetable.name like :name", { name: "Draft %" })
+        .getMany();
+    } catch (err: any) {
+      // will replace the console.log with a logger when we have one
+      console.log("Error while querying for draft timetables: ", err.message);
+
+      res.status(500).json({ message: "Internal Server Error" });
+    }
 
     let draftNames = timetablesWhereDraftInName.map(
       (timetable) => timetable.name
     );
 
-    draftNames = draftNames.sort();
+    draftNames = draftNames.sort((a, b) => {
+      const aDraftName = parseInt(a.split(" ")[1]);
+      const bDraftName = parseInt(b.split(" ")[1]);
+      return aDraftName - bDraftName;
+    });
 
     if (draftNames.length === 0) {
+      console.log("No draft timetable found");
       draftNames.push("Draft 0");
     }
 
@@ -73,28 +96,32 @@ export const createTimetable = async (req: Request, res: Response) => {
     const createdAt: Date = new Date();
     const lastUpdated: Date = new Date();
 
-    const timetable: Timetable = await timetableRepository.create({
-      author,
-      name,
-      degrees,
-      private: isPrivate,
-      draft: isDraft,
-      sections,
-      timings,
-      midsemTimes,
-      compreTimes,
-      warnings,
-      createdAt,
-      lastUpdated,
-    });
+    try {
+      const timetable: Timetable = await timetableRepository.create({
+        author,
+        name,
+        degrees,
+        private: isPrivate,
+        draft: isDraft,
+        sections,
+        timings,
+        midsemTimes,
+        compreTimes,
+        warnings,
+        createdAt,
+        lastUpdated,
+      });
 
-    await timetableRepository.save(timetable);
+      await timetableRepository.save(timetable);
 
-    return res.json(timetable);
+      return res.json(timetable);
+    } catch (err: any) {
+      // will replace the console.log with a logger when we have one
+      console.log("Error while creating timetable: ", err.message);
+
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   } catch (err: any) {
-    // will replace the console.log with a logger when we have one
-    console.log(err.message);
-
-    return res.status(500).json({ message: "Internal Server Error" });
+    throw err;
   }
 };
