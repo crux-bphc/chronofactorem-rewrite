@@ -4,6 +4,7 @@
    "description": "Awesome project developed with TypeORM.",
    "type": "commonjs",
    "devDependencies": {
+      "@types/cookie-parser": "^1.4.3",
       "ts-node": "10.7.0"
    },
    "dependencies": {

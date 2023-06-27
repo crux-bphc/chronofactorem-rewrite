@@ -6,6 +6,7 @@ import userRouter from "./routers/userRouter";
 import authRouter from "./routers/authRouter";
 import "dotenv/config";
 import { env } from "./config/server";
+import * as cookieParser from 'cookie-parser';
 
 AppDataSource.initialize()
   .then(async () => {
@@ -13,7 +14,6 @@ AppDataSource.initialize()
     const app = express();
 
     // to parse cookies
-    const cookieParser = require('cookie-parser')
     app.use(cookieParser());
 
     app.use(bodyParser.json());
