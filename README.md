@@ -12,7 +12,11 @@
 **Steps to run this project:**
 
 1. Run `docker compose down -v` to delete any existing instances of this project **WARNING:** The `-v` deletes all existing data in the database, skip this argument if you want to persist data.
-2. Run `docker compose up -d --build` to build and run the container
+2. Run `docker compose up -d --build` to build and run the container. The `-d` runs the containers in the background, so if you want to look at the logs, omit this flag.
+
+**Ingestion**
+
+To import new courses, add a `timetable.json` file to the `src` folder, and run `docker compose up --build --force-recreate ingestion`
 
 Check [.env.example](./.env.example) for an example env file. It can be arbitrary, though we recommend using:
 
