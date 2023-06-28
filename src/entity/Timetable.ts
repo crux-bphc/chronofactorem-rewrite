@@ -37,6 +37,18 @@ export class Timetable {
   @Column({ type: "boolean", default: true })
   draft!: boolean;
 
+  @Column({ type: "boolean", default: false })
+  archived!: boolean;
+
+  @Column({ type: "smallint" })
+  year!: number;
+
+  @Column({ name: "acad_year", type: "smallint" })
+  acadYear!: number;
+
+  @Column({ type: "smallint" })
+  semester!: number;
+
   @ManyToMany(() => Section, (section) => section.timetables)
   sections!: Section[];
 

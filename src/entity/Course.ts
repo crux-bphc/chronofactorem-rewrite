@@ -32,6 +32,15 @@ export class Course {
   @Column({ name: "compre_time", type: "timestamptz" })
   compreTime!: Date;
 
+  @Column({ type: "boolean", default: false })
+  archived!: boolean;
+
+  @Column({ name: "acad_year", type: "smallint" })
+  acadYear!: number;
+
+  @Column({ type: "smallint" })
+  semester!: number;
+
   @CreateDateColumn({
     name: "created_at",
     type: "timestamptz",
