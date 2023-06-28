@@ -57,7 +57,8 @@ export const createTimetable = async (req: Request, res: Response) => {
     const isDraft: boolean = true;
     const sections: Section[] = [];
     const timings: string[] = [];
-    const midsemTimes: Date[] = [];
+    const midsemStartTimes: Date[] = [];
+    const midsemEndTimes: Date[] = [];
     const compreTimes: Date[] = [];
     const warnings: string[] = [];
     const createdAt: Date = new Date();
@@ -76,7 +77,8 @@ export const createTimetable = async (req: Request, res: Response) => {
           draft: isDraft,
           sections,
           timings,
-          midsemTimes,
+          midsemStartTimes,
+          midsemEndTimes,
           compreTimes,
           warnings,
           createdAt,
