@@ -5,16 +5,17 @@ import {
   CreateDateColumn,
   Index,
   OneToMany,
+  Unique,
 } from "typeorm";
 import { Section } from "./Section";
 
 @Entity()
+@Unique(["name", "acadYear", "semester"])
 export class Course {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
   @Index()
-  @Column({ unique: true })
   code!: string;
 
   @Column({ type: "varchar", length: 50 })
