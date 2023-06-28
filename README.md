@@ -18,6 +18,10 @@
 
 To import new courses, add a `timetable.json` file to the `src` folder, and run `docker compose up --build --force-recreate ingestion`
 
+This marks all old courses as archived, and inserts new courses from the `timetable.json` file.
+
+If something goes wrong, and you need to overwrite the course data for a semester whose data has already been ingested, add the `--overwrite` flag to the ingest script in `docker-compose.yml`. **Note that overwriting course data will wipe all course, section, and timetable data for the combination of academic year and semester being overwritten.**
+
 Check [.env.example](./.env.example) for an example env file. It can be arbitrary, though we recommend using:
 
 ```
