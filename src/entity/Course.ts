@@ -17,7 +17,7 @@ export class Course {
   @Column({ unique: true })
   code!: string;
 
-  @Column({ type: "varchar", length: 25 })
+  @Column({ type: "varchar", length: 50 })
   name!: string;
 
   @Column({ name: "ic", type: "varchar", length: 100 })

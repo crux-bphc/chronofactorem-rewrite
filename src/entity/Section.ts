@@ -38,7 +38,7 @@ export class Section {
   @Column({ type: "varchar", length: 100, array: true })
   instructors!: string[];
 
-  @Column({ name: "room_time", type: "varchar", length: 10, array: true })
+  @Column({ name: "room_time", type: "varchar", length: 20, array: true })
   roomTime!: string[];
 
   @CreateDateColumn({
