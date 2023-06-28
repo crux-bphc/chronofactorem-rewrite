@@ -69,19 +69,23 @@ export const editUser = async (req: Request, res: Response) => {
       await userRepository.manager.transaction(
         async (transactionalEntityManager) => {
           // Update degrees for user
-          await transactionalEntityManager
+          const authorId = await transactionalEntityManager
             .createQueryBuilder()
             .update("user")
             .set({ degrees })
             .where("email = :email", { email: req.body.email })
-            .execute();
+            .returning("*")
+            .execute()
+            .then((response) => {
+              return response.raw[0].id;
+            });
 
           // Update degrees for user's timetables
           await transactionalEntityManager
             .createQueryBuilder()
             .update("timetable")
             .set({ degrees })
-            .where("author = :author", { author: author?.id })
+            .where("author = :author", { author: authorId })
             .execute();
         }
       );
