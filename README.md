@@ -18,9 +18,9 @@ Check [.env.example](./.env.example) for an example env file. It can be arbitrar
 
 ```
 POSTGRES_USER="chrono"
+PGUSER="chrono" # should be same as POSTGRES_USER
 POSTGRES_PASSWORD="aSBrbm93IHdoYXQgeW91IGFyZQ=="
-POSTGRES_DB="chronofactorem"
-POSTGRES_SOCKET="/var/run/postgresql" # Do not change this, it is required by postgres
+POSTGRES_DB="chrono" # should be same as POSTGRES_USER for some reason
 NODE_ENV="development"
 PROD_URL="https://chrono.crux-bphc.com"
 PORT=3000
