@@ -20,9 +20,6 @@ export class Course {
   @Column({ type: "varchar", length: 50 })
   name!: string;
 
-  @Column({ name: "ic", type: "varchar", length: 100 })
-  IC!: string;
-
   @OneToMany(() => Section, (section) => section.course)
   sections!: Section[];
 
