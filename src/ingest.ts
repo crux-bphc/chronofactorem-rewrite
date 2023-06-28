@@ -4,6 +4,7 @@ import timetableJSON from "./timetable.json";
 import { Course } from "./entity/Course";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { Section } from "./entity/Section";
+import { Timetable } from "./entity/Timetable";
 
 interface ExamJSON {
   midsem: string;
@@ -46,6 +47,172 @@ AppDataSource.initialize()
 
       const year = timetableJSON.metadata.acadYear;
       const semester = timetableJSON.metadata.semester;
+      const forceOverwrite =
+        process.argv[2] && process.argv[2] === "--overwrite";
+      let archivedCoursesUpdateCount = 0;
+      let archivedTimetablesUpdateCount = 0;
+
+      const latestCourse = await queryRunner.manager
+        .createQueryBuilder(Course, "course")
+        .orderBy("course.acad_year", "DESC")
+        .orderBy("course.semester", "DESC")
+        .getOne();
+
+      if (latestCourse !== null) {
+        if (latestCourse.acadYear > year) {
+          console.error(
+            `error: timetable.json is outdated; latest course academic year is ${latestCourse.acadYear} while the timetable is of academic year ${year}`
+          );
+          throw Error(
+            `error: timetable.json is outdated; latest course academic year is ${latestCourse.acadYear} while the timetable is of academic year ${year}`
+          );
+        } else if (latestCourse.acadYear == year) {
+          if (latestCourse.semester > semester) {
+            console.error(
+              `error: timetable.json is outdated; latest course academic year is ${latestCourse.acadYear} and semester is ${latestCourse.semester} while the timetable is of academic year ${year} and semester ${semester}`
+            );
+            throw Error(
+              `error: timetable.json is outdated; latest course academic year is ${latestCourse.acadYear} and semester is ${latestCourse.semester} while the timetable is of academic year ${year} and semester ${semester}`
+            );
+          } else if (latestCourse.semester == semester) {
+            if (!forceOverwrite) {
+              console.log(
+                `error: timetable.json is of same semester; latest course academic year is ${latestCourse.acadYear} and semester is ${latestCourse.semester} while the timetable is of academic year ${year} and semester ${semester}`
+              );
+              console.log(
+                `since the --overwrite flag has not been passed, the courses for this semester will not be overwritten`
+              );
+              console.log(
+                `if you wish to overwrite the courses for this semester, set this value to true`
+              );
+              console.log(
+                `WARNING: overwriting will wipe all courses, sections, and timetables for that combination of academic year and semester`
+              );
+              return;
+            }
+          }
+        }
+
+        if (
+          latestCourse.acadYear == year &&
+          latestCourse.semester == semester &&
+          forceOverwrite
+        ) {
+          console.log(
+            `WARNING: overwriting will wipe all courses, sections, and timetables for that combination of academic year and semester`
+          );
+          console.log(
+            `deleting courses from academic year ${latestCourse.acadYear} and semester ${latestCourse.semester}...`
+          );
+          const deletedCourseResult = await queryRunner.manager
+            .createQueryBuilder()
+            .delete()
+            .from(Course)
+            .where("acad_year = :year", { year: latestCourse.acadYear })
+            .andWhere("semester = :semester", {
+              semester: latestCourse.semester,
+            })
+            .execute();
+          console.log(
+            `deleted ${deletedCourseResult.affected} courses from academic year ${latestCourse.acadYear} and semester ${latestCourse.semester}!`
+          );
+
+          console.log(
+            `deleting timetables from academic year ${latestCourse.acadYear} and semester ${latestCourse.semester}...`
+          );
+          const deletedTimetableResult = await queryRunner.manager
+            .createQueryBuilder()
+            .delete()
+            .from(Timetable)
+            .where("acad_year = :year", { year: latestCourse.acadYear })
+            .andWhere("semester = :semester", {
+              semester: latestCourse.semester,
+            })
+            .execute();
+          console.log(
+            `deleted ${deletedTimetableResult.affected} timetables from academic year ${latestCourse.acadYear} and semester ${latestCourse.semester}!`
+          );
+        } else {
+          console.log("marking all old courses as archived...");
+          const archivedCoursesUpdateResult = await queryRunner.manager
+            .createQueryBuilder()
+            .update(Course)
+            .set({ archived: true })
+            .where("acad_year = :year", { year: latestCourse.acadYear })
+            .andWhere("semester = :semester", {
+              semester: latestCourse.semester,
+            })
+            .execute();
+          archivedCoursesUpdateCount =
+            archivedCoursesUpdateResult.affected ?? 0;
+          console.log("marked old courses as archived!");
+
+          console.log("marking all old timetables as archived...");
+          const archivedTimetablesUpdateResult = await queryRunner.manager
+            .createQueryBuilder()
+            .update(Timetable)
+            .set({ archived: true })
+            .where("acad_year = :year", { year: latestCourse.acadYear })
+            .andWhere("semester = :semester", {
+              semester: latestCourse.semester,
+            })
+            .execute();
+          archivedTimetablesUpdateCount =
+            archivedTimetablesUpdateResult.affected ?? 0;
+          console.log("marked old timetables as archived!");
+        }
+
+        console.log("checking if all existing courses are archived...");
+        const allCoursesCountResult = await queryRunner.manager
+          .createQueryBuilder()
+          .select()
+          .from(Course, "course")
+          .getCount();
+        const archivedCoursesCountResult = await queryRunner.manager
+          .createQueryBuilder()
+          .select()
+          .from(Course, "course")
+          .where("archived = :archived", { archived: true })
+          .getCount();
+        console.log(
+          `${archivedCoursesCountResult}/${allCoursesCountResult} courses are archived`
+        );
+        if (archivedCoursesCountResult != allCoursesCountResult) {
+          console.error(
+            `error: not all courses in db are archived; db state inconsistent`
+          );
+          throw Error(
+            `error: not all courses in db are archived; db state inconsistent`
+          );
+        }
+        console.log("finished checking courses!");
+
+        console.log("checking if all existing timetables are archived...");
+        const allTimetablesCountResult = await queryRunner.manager
+          .createQueryBuilder()
+          .select()
+          .from(Timetable, "timetable")
+          .getCount();
+        const archivedTimetablesCountResult = await queryRunner.manager
+          .createQueryBuilder()
+          .select()
+          .from(Timetable, "timetable")
+          .where("archived = :archived", { archived: true })
+          .getCount();
+        console.log(
+          `${archivedTimetablesCountResult}/${allTimetablesCountResult} timetables are archived`
+        );
+        if (archivedTimetablesCountResult != allTimetablesCountResult) {
+          console.error(
+            `error: not all timetables in db are archived; db state inconsistent`
+          );
+          throw Error(
+            `error: not all timetables in db are archived; db state inconsistent`
+          );
+        }
+        console.log("finished checking timetables!");
+      }
+
       const courses = timetableJSON.courses as CoursesJSON;
 
       const sectionValues = [] as QueryDeepPartialEntity<Section>[];
@@ -125,6 +292,8 @@ AppDataSource.initialize()
       await queryRunner.commitTransaction();
       // show summary of the transaction
       console.log("================= SUMMARY =================");
+      console.log(`courses archived: ${archivedCoursesUpdateCount}`);
+      console.log(`timetables archived: ${archivedTimetablesUpdateCount}`);
       console.log(`courses inserted: ${courseInsertResult.identifiers.length}`);
       console.log(
         `sections inserted: ${sectionInsertResult.identifiers.length}`
