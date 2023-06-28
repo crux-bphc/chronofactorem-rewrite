@@ -20,7 +20,7 @@ export class Section {
   id!: string;
 
   @Index()
-  @ManyToOne(() => Course, (course) => course.sections)
+  @ManyToOne(() => Course, (course) => course.sections, { onDelete: "CASCADE" })
   course!: Course;
 
   @Column({
