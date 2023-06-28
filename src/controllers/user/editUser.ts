@@ -38,25 +38,6 @@ export const editUserValidator = validate(dataSchema);
 
 export const editUser = async (req: Request, res: Response) => {
   try {
-    let author: User | null = null;
-
-    // this try-catch block will be removed when auth is added
-    try {
-      author = await userRepository
-        .createQueryBuilder("user")
-        .where("user.email = :email", { email: req.body.email })
-        .getOne();
-    } catch (err: any) {
-      // will replace the console.log with a logger when we have one
-      console.log("Error while querying for user: ", err.message);
-
-      res.status(500).json({ message: "Internal Server Error" });
-    }
-
-    if (!author) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
     const degrees: DegreeList = req.body.degrees;
 
     if (degrees.length === 2 && !isAValidDegreeCombination(degrees)) {
