@@ -23,8 +23,11 @@ export class Course {
   @OneToMany(() => Section, (section) => section.course)
   sections!: Section[];
 
-  @Column({ name: "midsem_time", type: "timestamptz" })
-  midsemTime!: Date;
+  @Column({ name: "midsem_start_time", type: "timestamptz" })
+  midsemStartTime!: Date;
+
+  @Column({ name: "midsem_end_time", type: "timestamptz" })
+  midsemEndTime!: Date;
 
   @Column({ name: "compre_time", type: "timestamptz" })
   compreTime!: Date;

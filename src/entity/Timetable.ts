@@ -55,8 +55,11 @@ export class Timetable {
   @Column({ type: "varchar", length: 3, array: true })
   timings!: string[];
 
-  @Column({ name: "midsem_times", type: "timestamptz", array: true })
-  midsemTimes!: Date[];
+  @Column({ name: "midsem_start_time", type: "timestamptz", array: true })
+  midsemStartTimes!: Date;
+
+  @Column({ name: "midsem_end_time", type: "timestamptz", array: true })
+  midsemEndTimes!: Date;
 
   @Column({ name: "compre_times", type: "timestamptz", array: true })
   compreTimes!: Date[];
