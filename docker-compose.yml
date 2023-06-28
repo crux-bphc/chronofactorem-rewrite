@@ -5,8 +5,8 @@ services:
     image: "postgres:15.3-bookworm"
     env_file:
       - .env
-    volumes:
-      - "./postgres/socket:${POSTGRES_SOCKET}"
+    ports:
+      - "5432:5432"
     healthcheck:
       test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB}"]
       interval: 10s
@@ -22,5 +22,3 @@ services:
         condition: service_healthy
     ports:
       - "${PORT}:${PORT}"
-    volumes:
-      - "./postgres/socket:${POSTGRES_SOCKET}"
