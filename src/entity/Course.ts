@@ -10,7 +10,7 @@ import {
 import { Section } from "./Section";
 
 @Entity()
-@Unique(["name", "acadYear", "semester"])
+@Unique(["code", "acadYear", "semester"])
 export class Course {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
