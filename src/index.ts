@@ -1,8 +1,9 @@
-import * as express from "express";
-import * as bodyParser from "body-parser";
+import express from "express";
+import bodyParser from "body-parser";
 import { Request, Response, NextFunction } from "express";
 import { AppDataSource } from "./db";
 import userRouter from "./routers/userRouter";
+import timetableRouter from "./routers/timetableRouter";
 import "dotenv/config";
 import { env } from "./config/server";
 import courseRouter from "./routers/courseRouter";
@@ -16,6 +17,7 @@ AppDataSource.initialize()
     // register express routers from defined application routers
     app.use("/user", userRouter);
     app.use("/course", courseRouter);
+    app.use("/timetable", timetableRouter);
 
     // setup express app here
     // ...
