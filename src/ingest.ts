@@ -229,7 +229,8 @@ AppDataSource.initialize()
           archived: false,
           midsemStartTime: new Date(midsemTimes[0]),
           midsemEndTime: new Date(midsemTimes[1]),
-          compreTime: new Date(compreTimes[0]),
+          compreStartTime: new Date(compreTimes[0]),
+          compreEndTime: new Date(compreTimes[1]),
         } as QueryDeepPartialEntity<Course>;
       });
 
