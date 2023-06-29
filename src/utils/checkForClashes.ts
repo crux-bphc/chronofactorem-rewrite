@@ -16,4 +16,6 @@ export const checkForClassHoursClash = (
   const clashes = newTimes.filter((newTime) => {
     times.includes(newTime);
   });
+
+  return clashes.length > 0;
 };
