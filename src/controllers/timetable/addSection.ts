@@ -210,31 +210,42 @@ export const addSection = async (req: Request, res: Response) => {
         newTimes.push(course?.code + ":" + day + hour);
       });
 
-      await timetableRepository
-        .createQueryBuilder("timetable")
-        .update(Timetable)
-        .set({ timings: [...timetable.timings, ...newTimes] })
-        .where("timetable.id = :id", { id: timetable.id })
-        .execute();
+      await timetableRepository.manager.transaction(
+        async (transactionalEntityManager) => {
+          // shoudn't be needed, but kept them here as it was erroring out
+          if (!course) {
+            return res.status(404).json({ message: "course not found" });
+          }
+          if (!timetable) {
+            return res.status(404).json({ message: "timetable not found" });
+          }
+          await transactionalEntityManager
+            .createQueryBuilder()
+            .update(Timetable)
+            .set({ timings: [...timetable.timings, ...newTimes] })
+            .where("timetable.id = :id", { id: timetable.id })
+            .execute();
 
-      if (!examHourClashes.sameCourse) {
-        await timetableRepository
-          .createQueryBuilder("timetable")
-          .update(Timetable)
-          .set({
-            examTimes: [
-              ...timetable.examTimes,
-              `${
-                course.code
-              }|${course.midsemStartTime.toISOString()}|${course.midsemEndTime.toISOString()}`,
-              `${
-                course.code
-              }|${course.compreStartTime.toISOString()}|${course.compreEndTime.toISOString()}`,
-            ],
-          })
-          .where("timetable.id = :id", { id: timetable.id })
-          .execute();
-      }
+          if (!examHourClashes.sameCourse) {
+            await transactionalEntityManager
+              .createQueryBuilder()
+              .update(Timetable)
+              .set({
+                examTimes: [
+                  ...timetable.examTimes,
+                  `${
+                    course.code
+                  }|${course.midsemStartTime.toISOString()}|${course.midsemEndTime.toISOString()}`,
+                  `${
+                    course.code
+                  }|${course.compreStartTime.toISOString()}|${course.compreEndTime.toISOString()}`,
+                ],
+              })
+              .where("timetable.id = :id", { id: timetable?.id })
+              .execute();
+          }
+        }
+      );
     } catch (err: any) {
       // will replace the console.log with a logger when we have one
       console.log("Error while updating timetable with section: ", err.message);
