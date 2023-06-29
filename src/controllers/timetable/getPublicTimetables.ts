@@ -23,7 +23,8 @@ const dataSchema = z.object({
             })
             .int({
                 message : "invalid year"
-            }),
+            })
+            .optional(),
         sem: z.coerce
             .number({
                 invalid_type_error : "sem is not a number"
@@ -33,7 +34,8 @@ const dataSchema = z.object({
             })
             .lte(2 , {
                 message : "invalid sem number (can only be 1 or 2)"
-            }),
+            })
+            .optional(),
         branch: z.array(z.string())
             .min(1 , {
                 message : "needs atleast one branch code"
@@ -41,6 +43,7 @@ const dataSchema = z.object({
             .max(2 , {
                 message : "cannot have more that two branch codes"
             })
+            .optional()
 
     })
 })
@@ -50,10 +53,12 @@ export const getPublicTimetablesValidator = validate(dataSchema)
 export const getPublicTimetables = async (req : Request , res : Response) => {
     try{
         let branch: string[] = req.query.branch as string[];
-        if (branch.length === 2 && !isAValidDegreeCombination(branch)) {
-            return res.status(400).json({
-            message: "Branch may only have one valid BE degree and one valid MSc degee",
-            });
+        if(branch){
+            if (branch.length === 2 && !isAValidDegreeCombination(branch)) {
+                return res.status(400).json({
+                message: "Branch may only have one valid BE degree and one valid MSc degee",
+                });
+            }
         }
     }
     catch(err : any){
