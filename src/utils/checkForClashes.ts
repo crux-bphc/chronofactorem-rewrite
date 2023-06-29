@@ -30,13 +30,14 @@ export const checkForClassHoursClash = (
       const clashCourse = clashCheck.courseCode;
       return {
         clash: true,
-        clashCourse,
+        course: clashCourse,
       };
     }
   });
 
   return {
     clash: false,
+    course: "",
   };
 };
 
