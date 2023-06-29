@@ -55,11 +55,9 @@ export class Timetable {
   @Column({ type: "varchar", length: 3, array: true })
   timings!: string[];
 
-  @Column({ name: "exam_start_times", type: "varchar", array: true })
-  examStartTimes!: string[];
-
-  @Column({ name: "exam_end_times", type: "varchar", array: true })
-  examEndTimes!: string[];
+  @Column({ name: "exam_times", type: "varchar", array: true })
+  // e.g. ["CS F211:2021-04-20T09:00:00.000Z|2021-04-20T11:00:00.000Z"]
+  examTimes!: string[];
 
   // e.g. ["CS F211-LP", "CS F212-L"]
   @Column({ type: "varchar", length: 30, array: true })
