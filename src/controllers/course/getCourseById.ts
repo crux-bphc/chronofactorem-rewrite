@@ -5,7 +5,9 @@ import { validate } from "../../utils/zodValidateRequest";
 
 const dataSchema = z.object({
   params: z.object({
-    id: z.string().min(0,{message:"id must be non-empty string"}).regex(/^\d+$/)
+    id: z.coerce
+      .number()
+      .nonnegative({ message: "id must be a non-negative number" }),
   }),
 });
 
@@ -15,12 +17,12 @@ export const getCourseById = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
     const course = await courseRepository
-      .createQueryBuilder("Course")
-      .where("Course.id = :id", { id })
+      .createQueryBuilder("course")
+      .where("course.id = :id", { id })
       .getOne();
 
     if (!course) {
-      return res.json({ message: "Course does not exist" });
+      return res.status(404).json({ message: "Course does not exist" });
     }
 
     return res.json(course);
