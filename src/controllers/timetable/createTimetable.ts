@@ -84,7 +84,9 @@ export const createTimetable = async (req: Request, res: Response) => {
         })
         .execute();
 
-      return res.json({ message: "Timetable created successfully" });
+      return res
+        .status(201)
+        .json({ message: "Timetable created successfully" });
     } catch (err: any) {
       // will replace the console.log with a logger when we have one
       console.log("Error while creating timetable: ", err.message);
