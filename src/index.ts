@@ -3,18 +3,25 @@ import bodyParser from "body-parser";
 import { Request, Response, NextFunction } from "express";
 import { AppDataSource } from "./db";
 import userRouter from "./routers/userRouter";
+import authRouter from "./routers/authRouter";
 import timetableRouter from "./routers/timetableRouter";
 import "dotenv/config";
 import { env } from "./config/server";
+import * as cookieParser from 'cookie-parser';
 
 AppDataSource.initialize()
   .then(async () => {
     // create express app
     const app = express();
+
+    // to parse cookies
+    app.use(cookieParser());
+
     app.use(bodyParser.json());
 
     // register express routers from defined application routers
     app.use("/user", userRouter);
+    app.use("/auth", authRouter);
     app.use("/timetable", timetableRouter);
 
     // setup express app here
