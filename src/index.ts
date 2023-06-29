@@ -7,6 +7,7 @@ import authRouter from "./routers/authRouter";
 import timetableRouter from "./routers/timetableRouter";
 import "dotenv/config";
 import { env } from "./config/server";
+import courseRouter from "./routers/courseRouter";
 import * as cookieParser from 'cookie-parser';
 
 AppDataSource.initialize()
@@ -21,6 +22,7 @@ AppDataSource.initialize()
 
     // register express routers from defined application routers
     app.use("/user", userRouter);
+    app.use("/course", courseRouter);
     app.use("/auth", authRouter);
     app.use("/timetable", timetableRouter);
 
