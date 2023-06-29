@@ -15,7 +15,7 @@ import {
 const timetableRouter = express.Router();
 
 timetableRouter.post("/create", createTimeTableValidator, createTimetable);
-timetableRouter.post("/delete/:id", deleteTimeTableValidator, deleteTimetable);
+timetableRouter.post("/:id/delete", deleteTimeTableValidator, deleteTimetable);
 timetableRouter.post("/:id/add", addSectionValidator, addSection);
 
 export default timetableRouter;
