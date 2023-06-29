@@ -39,3 +39,63 @@ export const checkForClassHoursClash = (
     clash: false,
   };
 };
+
+export const checkForExamHoursClash = (
+  currentTimetable: Timetable,
+  newCourse: Course
+) => {
+  const examTimes = currentTimetable.examTimes;
+  // key: start time, value: { courseCode, end time }
+  const examTimesMap = new Map<Date, { courseCode: string; end: Date }>();
+
+  examTimes.forEach((examTime) => {
+    const [course, startAndEnd] = examTime.split(":");
+    const [start, end] = startAndEnd.split("|");
+    examTimesMap.set(new Date(start), {
+      courseCode: course,
+      end: new Date(end),
+    });
+  });
+
+  const newMidsemStartTime = newCourse.midsemStartTime;
+  const newMidsemEndTime = newCourse.midsemEndTime;
+
+  examTimesMap.forEach((value, key) => {
+    const { courseCode, end } = value;
+    const start = key;
+    if (
+      (newMidsemStartTime <= start && newMidsemEndTime >= start) ||
+      (newMidsemStartTime <= end && newMidsemEndTime >= end) ||
+      (newMidsemStartTime >= start && newMidsemEndTime <= end)
+    ) {
+      return {
+        clash: true,
+        exam: "midsem",
+        clashCourse: courseCode,
+      };
+    }
+  });
+
+  const newCompreStartTime = newCourse.compreStartTime;
+  const newCompreEndTime = newCourse.compreEndTime;
+
+  examTimesMap.forEach((value, key) => {
+    const { courseCode, end } = value;
+    const start = key;
+    if (
+      (newCompreStartTime <= start && newCompreEndTime >= start) ||
+      (newCompreStartTime <= end && newCompreEndTime >= end) ||
+      (newCompreStartTime >= start && newCompreEndTime <= end)
+    ) {
+      return {
+        clash: true,
+        exam: "compre",
+        clashCourse: courseCode,
+      };
+    }
+  });
+
+  return {
+    clash: false,
+  };
+};
