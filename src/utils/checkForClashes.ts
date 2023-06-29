@@ -9,30 +9,33 @@ export const checkForClassHoursClash = (
   const times = currentTimetable.timings;
   const newRoomTimes = newSection.roomTime;
 
+  const timesMap = new Map<string, { courseCode: string }>();
+
+  times.forEach((time) => {
+    const [course, slot] = time.split(":");
+    timesMap.set(slot, { courseCode: course });
+  });
+
   const newTimes = newRoomTimes.map((roomTime) => {
     const [_, day, hour] = roomTime.split(":");
     return day + hour;
   });
 
-  const clashes = newTimes.filter((newTime) => {
-    times.includes(newTime);
+  newTimes.forEach((newTime) => {
+    if (timesMap.has(newTime)) {
+      const clashCheck = timesMap.get(newTime);
+      if (!clashCheck) {
+        throw new Error("Error while checking for clashes");
+      }
+      const clashCourse = clashCheck.courseCode;
+      return {
+        clash: true,
+        clashCourse,
+      };
+    }
   });
 
-  return clashes.length > 0;
-};
-
-export const checkForExamHoursClash = (
-  currentTimetable: Timetable,
-  newCourse: Course
-) => {
-  const midsemTimes = currentTimetable.midsemTimes;
-  const compreTimes = currentTimetable.compreTimes;
-
-  const newMidsemTime = newCourse.midsemTime;
-  const newCompreTime = newCourse.compreTime;
-
-  const midsemClash = midsemTimes.includes(newMidsemTime);
-  const compreClash = compreTimes.includes(newCompreTime);
-
-  return midsemClash || compreClash;
+  return {
+    clash: false,
+  };
 };
