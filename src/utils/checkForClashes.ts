@@ -62,6 +62,7 @@ export const checkForExamHoursClash = (
       clash: false,
       exam: "",
       course: "",
+      sameCourse: true,
     };
   }
 
@@ -80,6 +81,7 @@ export const checkForExamHoursClash = (
         clash: true,
         exam: "midsem",
         course: courseCode,
+        sameCourse: false,
       };
     }
   }
@@ -99,6 +101,7 @@ export const checkForExamHoursClash = (
         clash: true,
         exam: "compre",
         course: courseCode,
+        sameCourse: false,
       };
     }
   }
@@ -107,5 +110,6 @@ export const checkForExamHoursClash = (
     clash: false,
     exam: "",
     course: "",
+    sameCourse: false,
   };
 };

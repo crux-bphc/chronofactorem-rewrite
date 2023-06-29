@@ -217,22 +217,24 @@ export const addSection = async (req: Request, res: Response) => {
         .where("timetable.id = :id", { id: timetable.id })
         .execute();
 
-      await timetableRepository
-        .createQueryBuilder("timetable")
-        .update(Timetable)
-        .set({
-          examTimes: [
-            ...timetable.examTimes,
-            `${
-              course.code
-            }|${course.midsemStartTime.toISOString()}|${course.midsemEndTime.toISOString()}`,
-            `${
-              course.code
-            }|${course.compreStartTime.toISOString()}|${course.compreEndTime.toISOString()}`,
-          ],
-        })
-        .where("timetable.id = :id", { id: timetable.id })
-        .execute();
+      if (!examHourClashes.sameCourse) {
+        await timetableRepository
+          .createQueryBuilder("timetable")
+          .update(Timetable)
+          .set({
+            examTimes: [
+              ...timetable.examTimes,
+              `${
+                course.code
+              }|${course.midsemStartTime.toISOString()}|${course.midsemEndTime.toISOString()}`,
+              `${
+                course.code
+              }|${course.compreStartTime.toISOString()}|${course.compreEndTime.toISOString()}`,
+            ],
+          })
+          .where("timetable.id = :id", { id: timetable.id })
+          .execute();
+      }
     } catch (err: any) {
       // will replace the console.log with a logger when we have one
       console.log("Error while updating timetable with section: ", err.message);
