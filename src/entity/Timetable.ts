@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
   CreateDateColumn,
   Index,
+  JoinTable,
 } from "typeorm";
 import { DegreeEnum, ApprovedDegreeList } from "../types/degrees";
 import { User } from "./User";
@@ -49,10 +50,11 @@ export class Timetable {
   @Column({ type: "smallint" })
   semester!: number;
 
+  @JoinTable()
   @ManyToMany(() => Section, (section) => section.timetables)
   sections!: Section[];
 
-  @Column({ type: "varchar", length: 3, array: true })
+  @Column({ type: "varchar", length: 20, array: true })
   timings!: string[];
 
   @Column({ name: "exam_times", type: "varchar", array: true })
