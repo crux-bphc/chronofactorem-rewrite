@@ -58,8 +58,9 @@ const dataSchema = z.object({
       .int({
         message: "invalid id",
       }),
-
-    timetableId: z.coerce
+  }),
+  params: z.object({
+    id: z.coerce
       .number({
         invalid_type_error: "id not a number",
         required_error: "id is a required path parameter",
@@ -76,7 +77,7 @@ const dataSchema = z.object({
 export const addSectionValidator = validate(dataSchema);
 
 export const addSection = async (req: Request, res: Response) => {
-  const timetableId = parseInt(req.body.timetableId);
+  const timetableId = parseInt(req.params.id);
   const courseId = req.body.courseId;
   const sectionType = req.body.sectionType;
   const sectionNumber = parseInt(req.body.sectionNumber);
@@ -206,8 +207,8 @@ export const addSection = async (req: Request, res: Response) => {
 
       section.roomTime.forEach((time) => {
         const [_, day, hour] = time.split(":");
-        newTimes.push(course?.code+ ":" + day + hour);
-        });
+        newTimes.push(course?.code + ":" + day + hour);
+      });
 
       await timetableRepository
         .createQueryBuilder("timetable")
