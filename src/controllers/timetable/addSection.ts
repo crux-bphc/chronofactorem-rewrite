@@ -226,14 +226,24 @@ export const addSection = async (req: Request, res: Response) => {
             ...timetable.examTimes,
             `${
               course.code
-            }:${course.midsemStartTime.toISOString()}|${course.midsemEndTime.toISOString()}`,
+            }|${course.midsemStartTime.toISOString()}|${course.midsemEndTime.toISOString()}`,
             `${
               course.code
-            }:${course.compreStartTime.toISOString()}|${course.compreEndTime.toISOString()}`,
+            }|${course.compreStartTime.toISOString()}|${course.compreEndTime.toISOString()}`,
           ],
         })
         .where("timetable.id = :id", { id: timetable.id })
         .execute();
+
+      console.log([
+        ...timetable.examTimes,
+        `${
+          course.code
+        }|${course.midsemStartTime.toISOString()}|${course.midsemEndTime.toISOString()}`,
+        `${
+          course.code
+        }|${course.compreStartTime.toISOString()}|${course.compreEndTime.toISOString()}`,
+      ]);
     } catch (err: any) {
       // will replace the console.log with a logger when we have one
       console.log("Error while updating timetable with section: ", err.message);

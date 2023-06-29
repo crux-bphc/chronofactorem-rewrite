@@ -47,10 +47,11 @@ export const checkForExamHoursClash = (
   const examTimes = currentTimetable.examTimes;
   // key: start time, value: { courseCode, end time }
   const examTimesMap = new Map<Date, { courseCode: string; end: Date }>();
-
+  console.log(examTimes);
   for (const examTime of examTimes) {
-    const [course, startAndEnd] = examTime.split(":");
-    const [start, end] = startAndEnd.split("|");
+    const [course, start, end] = examTime.split("|");
+    console.log(start);
+    console.log(end);
     examTimesMap.set(new Date(start), {
       courseCode: course,
       end: new Date(end),
