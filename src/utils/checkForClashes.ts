@@ -72,7 +72,7 @@ export const checkForExamHoursClash = (
       return {
         clash: true,
         exam: "midsem",
-        clashCourse: courseCode,
+        course: courseCode,
       };
     }
   });
@@ -91,12 +91,14 @@ export const checkForExamHoursClash = (
       return {
         clash: true,
         exam: "compre",
-        clashCourse: courseCode,
+        course: courseCode,
       };
     }
   });
 
   return {
     clash: false,
+    exam: "",
+    course: "",
   };
 };
