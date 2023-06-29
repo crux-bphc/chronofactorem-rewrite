@@ -165,7 +165,6 @@ export const addSection = async (req: Request, res: Response) => {
     }
 
     const classHourClashes = checkForClassHoursClash(timetable, section);
-    console.log(classHourClashes);
     if (classHourClashes.clash) {
       return res.status(400).json({
         message: `section clashes with ${classHourClashes.course}`,
@@ -234,16 +233,6 @@ export const addSection = async (req: Request, res: Response) => {
         })
         .where("timetable.id = :id", { id: timetable.id })
         .execute();
-
-      console.log([
-        ...timetable.examTimes,
-        `${
-          course.code
-        }|${course.midsemStartTime.toISOString()}|${course.midsemEndTime.toISOString()}`,
-        `${
-          course.code
-        }|${course.compreStartTime.toISOString()}|${course.compreEndTime.toISOString()}`,
-      ]);
     } catch (err: any) {
       // will replace the console.log with a logger when we have one
       console.log("Error while updating timetable with section: ", err.message);
