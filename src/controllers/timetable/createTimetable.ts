@@ -55,6 +55,10 @@ export const createTimetable = async (req: Request, res: Response) => {
     const degrees: DegreeEnum[] = author.degrees;
     const isPrivate: boolean = true;
     const isDraft: boolean = true;
+    const isArchived: boolean = false;
+    const acadYear = new Date().getFullYear();
+    const semester = 1;
+    const year = 1;
     const sections: Section[] = [];
     const timings: string[] = [];
     const examTimes: string[] = [];
@@ -73,6 +77,10 @@ export const createTimetable = async (req: Request, res: Response) => {
           degrees,
           private: isPrivate,
           draft: isDraft,
+          archived: isArchived,
+          year,
+          acadYear,
+          semester,
           sections,
           timings,
           examTimes,
