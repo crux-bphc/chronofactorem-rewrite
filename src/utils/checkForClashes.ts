@@ -6,8 +6,13 @@ export const checkForClassHoursClash = (
   currentTimetable: Timetable,
   newSection: Section
 ) => {
+  console.log(
+    "===================================checking for clashes==================================="
+  );
   const times = currentTimetable.timings;
   const newRoomTimes = newSection.roomTime;
+  console.log(times);
+  console.log(newRoomTimes);
 
   const timesMap = new Map<string, { courseCode: string }>();
 
@@ -16,28 +21,32 @@ export const checkForClassHoursClash = (
     timesMap.set(slot, { courseCode: course });
   });
 
+  console.log(timesMap);
+
   const newTimes = newRoomTimes.map((roomTime) => {
     const [_, day, hour] = roomTime.split(":");
     return day + hour;
   });
 
-  newTimes.forEach((newTime) => {
+  console.log(newTimes);
+
+  for (const newTime of newTimes) {
     if (timesMap.has(newTime)) {
       const clashCheck = timesMap.get(newTime);
-      if (!clashCheck) {
-        throw new Error("Error while checking for clashes");
+      console.log(clashCheck);
+      if (clashCheck !== undefined) {
+        const clashCourse = clashCheck.courseCode;
+        return {
+          clash: true,
+          course: clashCourse,
+        };
       }
-      const clashCourse = clashCheck.courseCode;
-      return {
-        clash: true,
-        course: clashCourse,
-      };
     }
-  });
+  }
 
   return {
     clash: false,
-    course: "",
+    course: null,
   };
 };
 
