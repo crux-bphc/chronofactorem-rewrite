@@ -6,7 +6,7 @@ import { validate } from "../../utils/zodValidateRequest";
 import { Section } from "../../entity/Section";
 import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
-import { SectionTypeZodList } from "../../types/sectionTypes";
+import { SectionTypeZodEnum } from "../../types/sectionTypes";
 import { sectionRepository } from "../../repositories/sectionRepository";
 import {
   checkForClassHoursClash,
@@ -41,11 +41,7 @@ const dataSchema = z.object({
         message: "courseId must be a non-empty string",
       }),
 
-    sectionType: SectionTypeZodList.min(1, {
-      message: "sectionType must be a non-empty array of valid section types",
-    }).max(2, {
-      message: "sectionType may not contain more than two elements",
-    }),
+    sectionType: SectionTypeZodEnum,
 
     sectionNumber: z.coerce
       .number({
@@ -79,7 +75,7 @@ export const addSectionValidator = validate(dataSchema);
 export const addSection = async (req: Request, res: Response) => {
   const timetableId = parseInt(req.params.id);
   const courseId = req.body.courseId;
-  const sectionType = req.body.sectionType[0];
+  const sectionType = req.body.sectionType;
   const sectionNumber = parseInt(req.body.sectionNumber);
   const email = req.body.email;
 
