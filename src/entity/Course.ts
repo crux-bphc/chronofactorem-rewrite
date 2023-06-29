@@ -31,8 +31,11 @@ export class Course {
   @Column({ name: "midsem_end_time", type: "timestamptz" })
   midsemEndTime!: Date;
 
-  @Column({ name: "compre_time", type: "timestamptz" })
-  compreTime!: Date;
+  @Column({ name: "compre_start_time", type: "timestamptz" })
+  compreStartTime!: Date;
+
+  @Column({ name: "compre_end_time", type: "timestamptz" })
+  compreEndTime!: Date;
 
   @Column({ type: "boolean", default: false })
   archived!: boolean;
