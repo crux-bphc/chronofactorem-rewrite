@@ -37,17 +37,29 @@ export class Timetable {
   @Column({ type: "boolean", default: true })
   draft!: boolean;
 
+  @Column({ type: "boolean", default: false })
+  archived!: boolean;
+
+  @Column({ type: "smallint" })
+  year!: number;
+
+  @Column({ name: "acad_year", type: "smallint" })
+  acadYear!: number;
+
+  @Column({ type: "smallint" })
+  semester!: number;
+
   @ManyToMany(() => Section, (section) => section.timetables)
   sections!: Section[];
 
   @Column({ type: "varchar", length: 3, array: true })
   timings!: string[];
 
-  @Column({ name: "midsem_times", type: "timestamptz", array: true })
-  midsemTimes!: Date[];
+  @Column({ name: "exam_start_times", type: "varchar", array: true })
+  examStartTimes!: string[];
 
-  @Column({ name: "compre_times", type: "timestamptz", array: true })
-  compreTimes!: Date[];
+  @Column({ name: "exam_end_times", type: "varchar", array: true })
+  examEndTimes!: string[];
 
   // e.g. ["CS F211-LP", "CS F212-L"]
   @Column({ type: "varchar", length: 30, array: true })
