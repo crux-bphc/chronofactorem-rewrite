@@ -6,6 +6,7 @@ import { userRepository } from "../../repositories/userRepository";
 import { DegreeEnum } from "../../types/degrees";
 import { Session, UserData } from "../../types/auth";
 import { env } from "../../config/server";
+import { User } from "../../entity/User";
 
 // On any route, when checking if a user is logged in, check for the cookie
 // in cookiestorage on the server, using -
@@ -24,11 +25,11 @@ export async function manageAuthRedirect(req: Request, res: Response) {
       res.redirect(`${env.PROD_URL}/auth/callback`);
     } else {
       const client = await getClient();
-      const codeChallenge = generators.codeChallenge(code_verifier);
+      const code_challenge = generators.codeChallenge(code_verifier);
 
       const authRedirect = client.authorizationUrl({
         scope: "openid email profile",
-        codeChallenge,
+        code_challenge,
         code_challenge_method: "S256",
       });
 
@@ -63,10 +64,10 @@ export async function authCallback(req: Request, res: Response) {
       );
 
       // obtaining the access_token from tokenSet
-      const accessToken = tokenSet.access_token;
+      const access_token = tokenSet.access_token;
 
       // obtaining userInfo from the access_token code
-      const userInfo = await client.userinfo(accessToken as string | TokenSet);
+      const userInfo = await client.userinfo(access_token as string | TokenSet);
 
       const userData: Session = {
         name: userInfo.name,
@@ -88,7 +89,7 @@ export async function authCallback(req: Request, res: Response) {
       });
     }
   } catch (err: any) {
-  
+
     // If user exists on database, redirect them to frontpage, if not
     // redirect them to a /profile route where they fill their degrees
     // on the frontend
@@ -125,20 +126,37 @@ export async function getDegrees(req: Request, res: Response) {
     };
 
     // slices mail to obtain batch
-    const batch = (userData.email?.match('^f\d{8}@hyderabad\.bits-pilani\.ac\.in$'))
-      ? userData.email?.slice(3, 5)!
-      : "-1"; // batch is set to -1 if it's a non-student email, like hpc@hyderabad.bits-hyderabad.ac.in
+    let batch;
+    if (userData.email != undefined) {
+      batch = (userData.email.match(/^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/))
+        ? userData.email.slice(3, 5)
+        : "0000";
+    } else { batch = "0000"; }
+    // batch is set to 0000 if it's a non-student email, like hpc@hyderabad.bits-hyderabad.ac.in
+    // or undefined
 
     // converts name to title case
     const name = toTitleCase(userData.name);
 
-    // this can be better handled by first accessing the find user endpoint,
-    // if user exists, then send a response and return. For now, this can just insert.
-    // Errors are not handled here, as of yet.
+    // checks if user exists by email
+    const email = userData.email
+    const user = await userRepository.findOne({
+      where: { email },
+    });
+
+    if (user) {
+      res.status(200).json(
+        {
+          "message": "User already exists"
+        }
+      )
+      return;
+    }
 
     userRepository
       .createQueryBuilder()
       .insert()
+      .into(User)
       .values({
         batch: parseInt(batch),
         name: name,
@@ -146,14 +164,6 @@ export async function getDegrees(req: Request, res: Response) {
         email: userData.email,
         timetables: [],
       }).execute()
-    
-    // userRepository.insert({
-    //   batch: parseInt(batch),
-    //   name: name!,
-    //   degrees: userData.degrees,
-    //   email: userData.email,
-    //   timetables: [],
-    // });
 
     res.json({
       success: true,

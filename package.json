@@ -4,10 +4,10 @@
    "description": "Awesome project developed with TypeORM.",
    "type": "commonjs",
    "devDependencies": {
-      "@types/cookie-parser": "^1.4.3",
       "ts-node": "10.7.0"
    },
    "dependencies": {
+      "@types/cookie-parser": "^1.4.3",
       "@types/body-parser": "^1.19.2",
       "@types/express": "^4.17.17",
       "@types/node": "^16.11.10",

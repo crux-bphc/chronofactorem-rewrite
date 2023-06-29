@@ -13,6 +13,6 @@ export const serverSchema = z.object({
   POSTGRES_DB: z.string().min(1),
   PROD_URL: z.string().url().min(1),
   PORT: z.coerce.number().default(3000),
-  GOOGLE_CLIENT_ID: z.string().regex(RegExp("^\d+-[a-z0-9]+\.apps\.googleusercontent\.com$")),
+  GOOGLE_CLIENT_ID: z.string().regex(/^\d+-[a-z0-9]+\.apps\.googleusercontent\.com$/),
   GOOGLE_CLIENT_SECRET: z.string().min(1)
 });
