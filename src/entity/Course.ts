@@ -5,32 +5,46 @@ import {
   CreateDateColumn,
   Index,
   OneToMany,
+  Unique,
 } from "typeorm";
 import { Section } from "./Section";
 
 @Entity()
+@Unique(["code", "acadYear", "semester"])
 export class Course {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
   @Index()
-  @Column({ unique: true })
+  @Column({ type: "varchar", length: 30 })
   code!: string;
 
-  @Column({ type: "varchar", length: 25 })
+  @Column({ type: "varchar", length: 50 })
   name!: string;
-
-  @Column({ name: "ic", type: "varchar", length: 100 })
-  IC!: string;
 
   @OneToMany(() => Section, (section) => section.course)
   sections!: Section[];
 
-  @Column({ name: "midsem_time", type: "timestamptz" })
-  midsemTime!: Date;
+  @Column({ name: "midsem_start_time", type: "timestamptz" })
+  midsemStartTime!: Date;
 
-  @Column({ name: "compre_time", type: "timestamptz" })
-  compreTime!: Date;
+  @Column({ name: "midsem_end_time", type: "timestamptz" })
+  midsemEndTime!: Date;
+
+  @Column({ name: "compre_start_time", type: "timestamptz" })
+  compreStartTime!: Date;
+
+  @Column({ name: "compre_end_time", type: "timestamptz" })
+  compreEndTime!: Date;
+
+  @Column({ type: "boolean", default: false })
+  archived!: boolean;
+
+  @Column({ name: "acad_year", type: "smallint" })
+  acadYear!: number;
+
+  @Column({ type: "smallint" })
+  semester!: number;
 
   @CreateDateColumn({
     name: "created_at",
