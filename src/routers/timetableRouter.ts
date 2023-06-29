@@ -10,7 +10,7 @@ import {
 import {
   editTimeTableValidator,
   editTimetable,
-} from "../controllers/timetable/editTimetable";
+} from "../controllers/timetable/editTimetableMetadata";
 
 const timetableRouter = express.Router();
 
