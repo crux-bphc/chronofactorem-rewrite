@@ -79,7 +79,7 @@ export const addSectionValidator = validate(dataSchema);
 export const addSection = async (req: Request, res: Response) => {
   const timetableId = parseInt(req.params.id);
   const courseId = req.body.courseId;
-  const sectionType = req.body.sectionType;
+  const sectionType = req.body.sectionType[0];
   const sectionNumber = parseInt(req.body.sectionNumber);
   const email = req.body.email;
 
@@ -165,6 +165,7 @@ export const addSection = async (req: Request, res: Response) => {
     }
 
     const classHourClashes = checkForClassHoursClash(timetable, section);
+    console.log(classHourClashes);
     if (classHourClashes.clash) {
       return res.status(400).json({
         message: `section clashes with ${classHourClashes.course}`,
@@ -239,6 +240,7 @@ export const addSection = async (req: Request, res: Response) => {
 
       res.status(500).json({ message: "Internal Server Error" });
     }
+    res.json({ message: "section added" });
   } catch (err: any) {
     throw err;
   }
