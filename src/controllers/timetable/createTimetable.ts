@@ -80,7 +80,7 @@ export const createTimetable = async (req: Request, res: Response) => {
           examEndTimes,
           warnings,
           createdAt,
-          lastUpdated,
+          lastUpdated
         })
         .execute();
 
