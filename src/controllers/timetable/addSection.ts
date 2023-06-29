@@ -124,6 +124,24 @@ export const addSection = async (req: Request, res: Response) => {
       return res.status(403).json({ message: "user does not own timetable" });
     }
 
+    let course: Course | null = null;
+
+    try {
+      course = await courseRepository
+        .createQueryBuilder("course")
+        .where("course.id = :id", { id: courseId })
+        .getOne();
+    } catch (err: any) {
+      // will replace the console.log with a logger when we have one
+      console.log("Error while querying for course: ", err.message);
+
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+
+    if (!course) {
+      return res.status(404).json({ message: "course not found" });
+    }
+
     let section: Section | null = null;
 
     try {
@@ -153,24 +171,6 @@ export const addSection = async (req: Request, res: Response) => {
       return res.status(400).json({
         message: `section clashes with ${classHourClashes.course}`,
       });
-    }
-
-    let course: Course | null = null;
-
-    try {
-      course = await courseRepository
-        .createQueryBuilder("course")
-        .where("course.id = :id", { id: courseId })
-        .getOne();
-    } catch (err: any) {
-      // will replace the console.log with a logger when we have one
-      console.log("Error while querying for course: ", err.message);
-
-      res.status(500).json({ message: "Internal Server Error" });
-    }
-
-    if (!course) {
-      return res.status(404).json({ message: "course not found" });
     }
 
     const examHourClashes = checkForExamHoursClash(timetable, course);
