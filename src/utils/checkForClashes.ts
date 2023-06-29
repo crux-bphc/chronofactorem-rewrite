@@ -1,5 +1,6 @@
 import { Timetable } from "../entity/Timetable";
 import { Section } from "../entity/Section";
+import { Course } from "../entity/Course";
 
 export const checkForClassHoursClash = (
   currentTimetable: Timetable,
@@ -18,4 +19,20 @@ export const checkForClassHoursClash = (
   });
 
   return clashes.length > 0;
+};
+
+export const checkForExamHoursClash = (
+  currentTimetable: Timetable,
+  newCourse: Course
+) => {
+  const midsemTimes = currentTimetable.midsemTimes;
+  const compreTimes = currentTimetable.compreTimes;
+
+  const newMidsemTime = newCourse.midsemTime;
+  const newCompreTime = newCourse.compreTime;
+
+  const midsemClash = midsemTimes.includes(newMidsemTime);
+  const compreClash = compreTimes.includes(newCompreTime);
+
+  return midsemClash || compreClash;
 };
