@@ -268,7 +268,7 @@ AppDataSource.initialize()
             }
             // push the section to an array, so we can insert all sections at once
             sectionValues.push({
-              course: courseIDs[i],
+              courseId: courseIDs[i],
               instructors:
                 courses[courseValues[i].code as string].sections[
                   courseSectionCode

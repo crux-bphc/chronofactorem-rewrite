@@ -8,6 +8,7 @@ import {
   CreateDateColumn,
   Index,
   JoinTable,
+  JoinColumn,
 } from "typeorm";
 import { DegreeEnum, ApprovedDegreeList } from "../types/degrees";
 import { User } from "./User";
@@ -19,7 +20,11 @@ export class Timetable {
   id!: number;
 
   @Index()
+  @Column("uuid")
+  authorId!: string;
+
   @ManyToOne(() => User, (author) => author.timetables)
+  @JoinColumn()
   author!: User;
 
   @Column({ type: "varchar", length: 200 })
