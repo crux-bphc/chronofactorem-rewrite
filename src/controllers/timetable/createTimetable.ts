@@ -65,6 +65,7 @@ export const createTimetable = async (req: Request, res: Response) => {
     const warnings: string[] = [];
     const createdAt: Date = new Date();
     const lastUpdated: Date = new Date();
+    const authorId: string = author.id;
 
     try {
       await timetableRepository
@@ -72,7 +73,7 @@ export const createTimetable = async (req: Request, res: Response) => {
         .insert()
         .into(Timetable)
         .values({
-          author,
+          authorId,
           name,
           degrees,
           private: isPrivate,
