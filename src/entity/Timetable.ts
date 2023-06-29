@@ -55,14 +55,11 @@ export class Timetable {
   @Column({ type: "varchar", length: 3, array: true })
   timings!: string[];
 
-  @Column({ name: "midsem_start_time", type: "timestamptz", array: true })
-  midsemStartTimes!: Date;
+  @Column({ name: "exam_start_times", type: "varchar", array: true })
+  examStartTimes!: string[];
 
-  @Column({ name: "midsem_end_time", type: "timestamptz", array: true })
-  midsemEndTimes!: Date;
-
-  @Column({ name: "compre_times", type: "timestamptz", array: true })
-  compreTimes!: Date[];
+  @Column({ name: "exam_end_times", type: "varchar", array: true })
+  examEndTimes!: string[];
 
   // e.g. ["CS F211-LP", "CS F212-L"]
   @Column({ type: "varchar", length: 30, array: true })
