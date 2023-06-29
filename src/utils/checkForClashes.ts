@@ -6,34 +6,24 @@ export const checkForClassHoursClash = (
   currentTimetable: Timetable,
   newSection: Section
 ) => {
-  console.log(
-    "===================================checking for clashes==================================="
-  );
   const times = currentTimetable.timings;
   const newRoomTimes = newSection.roomTime;
-  console.log(times);
-  console.log(newRoomTimes);
 
   const timesMap = new Map<string, { courseCode: string }>();
 
-  times.forEach((time) => {
+  for (const time of times) {
     const [course, slot] = time.split(":");
     timesMap.set(slot, { courseCode: course });
-  });
-
-  console.log(timesMap);
+  }
 
   const newTimes = newRoomTimes.map((roomTime) => {
     const [_, day, hour] = roomTime.split(":");
     return day + hour;
   });
 
-  console.log(newTimes);
-
   for (const newTime of newTimes) {
     if (timesMap.has(newTime)) {
       const clashCheck = timesMap.get(newTime);
-      console.log(clashCheck);
       if (clashCheck !== undefined) {
         const clashCourse = clashCheck.courseCode;
         return {
@@ -58,19 +48,19 @@ export const checkForExamHoursClash = (
   // key: start time, value: { courseCode, end time }
   const examTimesMap = new Map<Date, { courseCode: string; end: Date }>();
 
-  examTimes.forEach((examTime) => {
+  for (const examTime of examTimes) {
     const [course, startAndEnd] = examTime.split(":");
     const [start, end] = startAndEnd.split("|");
     examTimesMap.set(new Date(start), {
       courseCode: course,
       end: new Date(end),
     });
-  });
+  }
 
   const newMidsemStartTime = newCourse.midsemStartTime;
   const newMidsemEndTime = newCourse.midsemEndTime;
 
-  examTimesMap.forEach((value, key) => {
+  for (const [key, value] of examTimesMap) {
     const { courseCode, end } = value;
     const start = key;
     if (
@@ -84,12 +74,12 @@ export const checkForExamHoursClash = (
         course: courseCode,
       };
     }
-  });
+  }
 
   const newCompreStartTime = newCourse.compreStartTime;
   const newCompreEndTime = newCourse.compreEndTime;
 
-  examTimesMap.forEach((value, key) => {
+  for (const [key, value] of examTimesMap) {
     const { courseCode, end } = value;
     const start = key;
     if (
@@ -103,7 +93,7 @@ export const checkForExamHoursClash = (
         course: courseCode,
       };
     }
-  });
+  }
 
   return {
     clash: false,
