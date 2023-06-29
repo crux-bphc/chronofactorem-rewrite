@@ -8,14 +8,14 @@ import {
   deleteTimetable,
 } from "../controllers/timetable/deleteTimetable";
 import {
-  editTimeTableValidator,
-  editTimetable,
+  editTimetableMetadataValidator,
+  editTimetableMetadata,
 } from "../controllers/timetable/editTimetableMetadata";
 
 const timetableRouter = express.Router();
 
 timetableRouter.post("/create", createTimeTableValidator, createTimetable);
 timetableRouter.post("/delete/:id", deleteTimeTableValidator, deleteTimetable);
-timetableRouter.post("/:id/edit", editTimeTableValidator, editTimetable);
+timetableRouter.post("/:id/edit", editTimetableMetadataValidator, editTimetableMetadata);
 
 export default timetableRouter;

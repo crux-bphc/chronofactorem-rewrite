@@ -53,9 +53,9 @@ const dataSchema = z.object({
   }),
 });
 
-export const editTimeTableValidator = validate(dataSchema);
+export const editTimetableMetadataValidator = validate(dataSchema);
 
-export const editTimetable = async (req: Request, res: Response) => {
+export const editTimetableMetadata = async (req: Request, res: Response) => {
   try {
     let author: User | null = null;
 
