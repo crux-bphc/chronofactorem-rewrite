@@ -154,7 +154,7 @@ export const addSection = async (req: Request, res: Response) => {
     const examHourClashes = checkForExamHoursClash(timetable, course);
     if (examHourClashes.clash && !examHourClashes.sameCourse) {
       return res.status(400).json({
-        message: `course clashes with ${examHourClashes.course}'s ${examHourClashes.exam}`,
+        message: `course's exam clashes with ${examHourClashes.course}'s ${examHourClashes.exam}`,
       });
     }
 
