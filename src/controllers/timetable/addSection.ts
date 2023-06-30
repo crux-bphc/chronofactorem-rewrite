@@ -269,7 +269,7 @@ export const addSection = async (req: Request, res: Response) => {
                   }|${course.compreStartTime.toISOString()}|${course.compreEndTime.toISOString()}`,
                 ],
               })
-              .where("timetable.id = :id", { id: timetable?.id })
+              .where("timetable.id = :id", { id: timetable.id })
               .execute();
           }
         }
