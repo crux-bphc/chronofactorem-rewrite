@@ -8,7 +8,7 @@ import timetableRouter from "./routers/timetableRouter";
 import "dotenv/config";
 import { env } from "./config/server";
 import courseRouter from "./routers/courseRouter";
-import * as cookieParser from 'cookie-parser';
+import cookieParser from "cookie-parser";
 
 AppDataSource.initialize()
   .then(async () => {
