@@ -39,14 +39,14 @@ export const updateSectionWarnings = (
       }
     } else {
       // Deleting courseType from warnings after adding course
-      for (const currentSectionWarning of currentWarning!
+      for (const currentSectionWarning of currentWarning
         .warningCourseSectionTypesSplit) {
         if (sectionType == currentSectionWarning) {
-          const index = currentWarning!.warningCourseSectionTypesSplit.indexOf(
+          const index = currentWarning.warningCourseSectionTypesSplit.indexOf(
             currentSectionWarning
           );
-          currentWarning!.warningCourseSectionTypesSplit.splice(index!, 1);
-          if (currentWarning!.warningCourseSectionTypesSplit.length == 0) {
+          currentWarning.warningCourseSectionTypesSplit.splice(index!, 1);
+          if (currentWarning.warningCourseSectionTypesSplit.length == 0) {
             warningMap.delete(courseCode);
           }
         }
