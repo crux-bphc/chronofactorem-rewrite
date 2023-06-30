@@ -170,7 +170,7 @@ export const addSection = async (req: Request, res: Response) => {
         .then((response) => {
           let sectionTypes: SectionTypeList = [];
 
-          response.forEach((sectionType) => {
+          response.map((sectionType) => {
             sectionTypes.push(sectionType.type);
           });
 
@@ -222,7 +222,7 @@ export const addSection = async (req: Request, res: Response) => {
 
     let newTimes: string[] = [];
 
-    section.roomTime.forEach((time) => {
+    section.roomTime.map((time) => {
       const [_, day, hour] = time.split(":");
       newTimes.push(course?.code + ":" + day + hour);
     });
