@@ -5,16 +5,9 @@ export const updateSectionWarnings = (
   courseCode: string,
   section: Section,
   requiredSectionTypes: SectionTypeList,
-  userSections: Section[],
   isAdded: boolean,
   warnings: string[]
 ) => {
-  // Converting userSections to userSectionsMap
-  const userSectionsMap = new Map<string, { type: SectionTypeEnum }>();
-  for (const userSection of userSections) {
-    const type = userSection.type;
-    userSectionsMap.set(courseCode, { type });
-  }
   // Converting warnings to warningMap
   const warningMap = new Map<
     string,
@@ -39,10 +32,12 @@ export const updateSectionWarnings = (
           warningCourseSectionTypesList.push(requiredSectionType);
         }
       }
-      warningCourseSectionTypesList.sort();
-      warningMap.set(courseCode, {
-        warningCourseSectionTypesSplit: warningCourseSectionTypesList,
-      });
+      if (warningCourseSectionTypesList.length != 0) {
+        warningCourseSectionTypesList.sort();
+        warningMap.set(courseCode, {
+          warningCourseSectionTypesSplit: warningCourseSectionTypesList,
+        });
+      }
     } else {
       // Deleting courseType from warnings after adding course
       for (const currentSectionWarning of currentWarning!
@@ -62,9 +57,11 @@ export const updateSectionWarnings = (
     const currentWarning = warningMap.get(courseCode);
     if (!currentWarning) {
       //No warnings currently exist, thus adding new one for this section
-      warningMap.set(courseCode, {
-        warningCourseSectionTypesSplit: [sectionType],
-      });
+      if (requiredSectionTypes.length > 1) {
+        warningMap.set(courseCode, {
+          warningCourseSectionTypesSplit: [sectionType],
+        });
+      }
     } else {
       const currentWarningCourseSectionTypesSplit =
         currentWarning.warningCourseSectionTypesSplit;
@@ -77,9 +74,12 @@ export const updateSectionWarnings = (
       if (sectionType in requiredSectionTypes) {
         currentWarningCourseSectionTypesSplit.push(sectionType);
         currentWarningCourseSectionTypesSplit.sort();
-        warningMap.set(courseCode, {
-          warningCourseSectionTypesSplit: currentWarningCourseSectionTypesSplit,
-        });
+        if (requiredSectionTypes.length != currentWarningCourseSectionTypesSplit.length) {
+          warningMap.set(courseCode, {
+            warningCourseSectionTypesSplit:
+              currentWarningCourseSectionTypesSplit,
+          });
+        }
       }
     }
   }
