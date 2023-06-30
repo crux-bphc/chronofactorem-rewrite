@@ -22,15 +22,13 @@ export const checkForClassHoursClash = (
   });
 
   for (const newTime of newTimes) {
-    if (timesMap.has(newTime)) {
-      const clashCheck = timesMap.get(newTime);
-      if (clashCheck !== undefined) {
-        const clashCourse = clashCheck.courseCode;
-        return {
-          clash: true,
-          course: clashCourse,
-        };
-      }
+    const clashCheck = timesMap.get(newTime);
+    if (clashCheck !== undefined) {
+      const clashCourse = clashCheck.courseCode;
+      return {
+        clash: true,
+        course: clashCourse,
+      };
     }
   }
 
