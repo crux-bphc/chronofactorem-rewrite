@@ -6,7 +6,7 @@ import { validate } from "../../utils/zodValidateRequest";
 import { Section } from "../../entity/Section";
 import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
-import { SectionTypeZodEnum } from "../../types/sectionTypes";
+import { SectionTypeList, SectionTypeZodEnum } from "../../types/sectionTypes";
 import { sectionRepository } from "../../repositories/sectionRepository";
 import {
   checkForClassHoursClash,
@@ -14,6 +14,7 @@ import {
 } from "../../utils/checkForClashes";
 import { Course } from "../../entity/Course";
 import { courseRepository } from "../../repositories/courseRepository";
+import { updateSectionWarnings } from "../../utils/updateWarnings";
 
 const dataSchema = z.object({
   body: z.object({
@@ -176,6 +177,70 @@ export const addSection = async (req: Request, res: Response) => {
       });
     }
 
+    let sectionTypes: SectionTypeList = [];
+
+    try {
+      sectionTypes = await sectionRepository
+        .createQueryBuilder("section")
+        .select("section.type")
+        .where("section.courseId = :courseId", { courseId: courseId })
+        .distinctOn(["section.type"])
+        .getMany()
+        .then((response) => {
+          let sectionTypes: SectionTypeList = [];
+
+          response.forEach((sectionType) => {
+            sectionTypes.push(sectionType.type);
+          });
+
+          return sectionTypes;
+        });
+    } catch (err: any) {
+      // will replace the console.log with a logger when we have one
+      console.log(
+        "Error while querying for course's section types: ",
+        err.message
+      );
+
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+
+    let sameCourseSectionsCount = 0;
+
+    try {
+      sameCourseSectionsCount = await sectionRepository
+        .createQueryBuilder("section")
+        .innerJoin("section.timetables", "timetable")
+        .where("timetable.id = :id", { id: timetable.id })
+        .andWhere("section.courseId = :courseId", { courseId })
+        .andWhere("section.type = :type", { type: section.type })
+        .getCount();
+    } catch (err: any) {
+      // will replace the console.log with a logger when we have one
+      console.log(
+        "Error while querying for other sections of same course: ",
+        err.message
+      );
+
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+
+    if (sameCourseSectionsCount > 0) {
+      return res.status(400).json({
+        message: `can't have multiple sections of type ${section.type}`,
+      });
+    }
+
+    timetable.warnings = updateSectionWarnings(
+      course.code,
+      section,
+      sectionTypes,
+      true,
+      timetable.warnings
+    );
+
+    console.log("Warnings:", timetable.warnings);
+
     let newTimes: string[] = [];
 
     section.roomTime.forEach((time) => {
@@ -203,7 +268,10 @@ export const addSection = async (req: Request, res: Response) => {
           await transactionalEntityManager
             .createQueryBuilder()
             .update(Timetable)
-            .set({ timings: [...timetable.timings, ...newTimes] })
+            .set({
+              timings: [...timetable.timings, ...newTimes],
+              warnings: timetable.warnings,
+            })
             .where("timetable.id = :id", { id: timetable.id })
             .execute();
 
