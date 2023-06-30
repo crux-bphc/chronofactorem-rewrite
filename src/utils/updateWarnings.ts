@@ -11,12 +11,12 @@ export const updateSectionWarnings = (
   // Converting warnings to warningMap
   const warningMap = new Map<
     string,
-    { warningCourseSectionTypesSplit: string[] }
+    { warningSectionTypes: string[] }
   >();
   for (const warning of warnings) {
-    const [warningCourseCode, warningCourseSectionTypes] = warning.split(":");
-    const warningCourseSectionTypesSplit = warningCourseSectionTypes.split("");
-    warningMap.set(warningCourseCode, { warningCourseSectionTypesSplit });
+    const [warningCourseCode, warningSectionTypeString] = warning.split(":");
+    const warningSectionTypes = warningSectionTypeString.split("");
+    warningMap.set(warningCourseCode, { warningSectionTypes });
   }
 
   const sectionType = section.type;
@@ -26,27 +26,27 @@ export const updateSectionWarnings = (
     const currentWarning = warningMap.get(courseCode);
     if (!currentWarning) {
       // Since warning does not exist already, add a new warning
-      const warningCourseSectionTypesList: string[] = [];
+      const warningSectionTypesList: string[] = [];
       for (const requiredSectionType of requiredSectionTypes) {
         if (requiredSectionType != sectionType) {
-          warningCourseSectionTypesList.push(requiredSectionType);
+          warningSectionTypesList.push(requiredSectionType);
         }
       }
-      if (warningCourseSectionTypesList.length != 0) {
+      if (warningSectionTypesList.length != 0) {
         warningMap.set(courseCode, {
-          warningCourseSectionTypesSplit: warningCourseSectionTypesList,
+          warningSectionTypes: warningSectionTypesList,
         });
       }
     } else {
       // Deleting courseType from warnings after adding course
       for (const currentSectionWarning of currentWarning
-        .warningCourseSectionTypesSplit) {
+        .warningSectionTypes) {
         if (sectionType == currentSectionWarning) {
-          const index = currentWarning.warningCourseSectionTypesSplit.indexOf(
+          const index = currentWarning.warningSectionTypes.indexOf(
             currentSectionWarning
           );
-          currentWarning.warningCourseSectionTypesSplit.splice(index!, 1);
-          if (currentWarning.warningCourseSectionTypesSplit.length == 0) {
+          currentWarning.warningSectionTypes.splice(index!, 1);
+          if (currentWarning.warningSectionTypes.length == 0) {
             warningMap.delete(courseCode);
           }
         }
@@ -55,30 +55,30 @@ export const updateSectionWarnings = (
   } else {
     const currentWarning = warningMap.get(courseCode);
     if (!currentWarning) {
-      //No warnings currently exist, thus adding new one for this section
+      // No warnings currently exist, thus adding new one for this section
       if (requiredSectionTypes.length > 1) {
         warningMap.set(courseCode, {
-          warningCourseSectionTypesSplit: [sectionType],
+          warningSectionTypes: [sectionType],
         });
       }
     } else {
-      const currentWarningCourseSectionTypesSplit =
-        currentWarning.warningCourseSectionTypesSplit;
-      if (sectionType in currentWarningCourseSectionTypesSplit) {
+      const currentWarningSectionTypes =
+        currentWarning.warningSectionTypes;
+      if (sectionType in currentWarningSectionTypes) {
         throw Error(
           "Removing a course that should not be there according to warnings"
         );
       }
-      //Adding new courseType to warnings after removing course
+      // Adding new courseType to warnings after removing course
       if (sectionType in requiredSectionTypes) {
-        currentWarningCourseSectionTypesSplit.push(sectionType);
+        currentWarningSectionTypes.push(sectionType);
         if (
           requiredSectionTypes.length !=
-          currentWarningCourseSectionTypesSplit.length
+          currentWarningSectionTypes.length
         ) {
           warningMap.set(courseCode, {
-            warningCourseSectionTypesSplit:
-              currentWarningCourseSectionTypesSplit,
+            warningSectionTypes:
+              currentWarningSectionTypes,
           });
         }
       }
@@ -89,7 +89,7 @@ export const updateSectionWarnings = (
     let combinedWarningString = currentWarning[0];
     combinedWarningString = combinedWarningString.concat(":");
     for (const courseSectionType of currentWarning[1]
-      .warningCourseSectionTypesSplit) {
+      .warningSectionTypes) {
       combinedWarningString = combinedWarningString.concat(courseSectionType);
     }
     updatedWarnings.push(combinedWarningString);
