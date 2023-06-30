@@ -9,10 +9,7 @@ export const updateSectionWarnings = (
   warnings: string[]
 ) => {
   // Converting warnings to warningMap
-  const warningMap = new Map<
-    string,
-    { warningSectionTypes: string[] }
-  >();
+  const warningMap = new Map<string, { warningSectionTypes: string[] }>();
   for (const warning of warnings) {
     const [warningCourseCode, warningSectionTypeString] = warning.split(":");
     const warningSectionTypes = warningSectionTypeString.split("");
@@ -26,12 +23,11 @@ export const updateSectionWarnings = (
     const currentWarning = warningMap.get(courseCode);
     if (!currentWarning) {
       // Since warning does not exist already, add a new warning
-      const warningSectionTypesList: string[] = [];
-      for (const requiredSectionType of requiredSectionTypes) {
-        if (requiredSectionType != sectionType) {
-          warningSectionTypesList.push(requiredSectionType);
+      const warningSectionTypesList: string[] = requiredSectionTypes.filter(
+        (requiredSectionType) => {
+          return requiredSectionType != sectionType;
         }
-      }
+      );
       if (warningSectionTypesList.length != 0) {
         warningMap.set(courseCode, {
           warningSectionTypes: warningSectionTypesList,
@@ -39,8 +35,7 @@ export const updateSectionWarnings = (
       }
     } else {
       // Deleting courseType from warnings after adding course
-      for (const currentSectionWarning of currentWarning
-        .warningSectionTypes) {
+      for (const currentSectionWarning of currentWarning.warningSectionTypes) {
         if (sectionType == currentSectionWarning) {
           const index = currentWarning.warningSectionTypes.indexOf(
             currentSectionWarning
@@ -62,8 +57,7 @@ export const updateSectionWarnings = (
         });
       }
     } else {
-      const currentWarningSectionTypes =
-        currentWarning.warningSectionTypes;
+      const currentWarningSectionTypes = currentWarning.warningSectionTypes;
       if (sectionType in currentWarningSectionTypes) {
         throw Error(
           "Removing a course that should not be there according to warnings"
@@ -72,13 +66,9 @@ export const updateSectionWarnings = (
       // Adding new courseType to warnings after removing course
       if (sectionType in requiredSectionTypes) {
         currentWarningSectionTypes.push(sectionType);
-        if (
-          requiredSectionTypes.length !=
-          currentWarningSectionTypes.length
-        ) {
+        if (requiredSectionTypes.length != currentWarningSectionTypes.length) {
           warningMap.set(courseCode, {
-            warningSectionTypes:
-              currentWarningSectionTypes,
+            warningSectionTypes: currentWarningSectionTypes,
           });
         }
       }
@@ -88,8 +78,7 @@ export const updateSectionWarnings = (
   for (const currentWarning of warningMap) {
     let combinedWarningString = currentWarning[0];
     combinedWarningString = combinedWarningString.concat(":");
-    for (const courseSectionType of currentWarning[1]
-      .warningSectionTypes) {
+    for (const courseSectionType of currentWarning[1].warningSectionTypes) {
       combinedWarningString = combinedWarningString.concat(courseSectionType);
     }
     updatedWarnings.push(combinedWarningString);
