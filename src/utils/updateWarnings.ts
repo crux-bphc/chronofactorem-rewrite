@@ -33,7 +33,6 @@ export const updateSectionWarnings = (
         }
       }
       if (warningCourseSectionTypesList.length != 0) {
-        warningCourseSectionTypesList.sort();
         warningMap.set(courseCode, {
           warningCourseSectionTypesSplit: warningCourseSectionTypesList,
         });
@@ -73,7 +72,6 @@ export const updateSectionWarnings = (
       //Adding new courseType to warnings after removing course
       if (sectionType in requiredSectionTypes) {
         currentWarningCourseSectionTypesSplit.push(sectionType);
-        currentWarningCourseSectionTypesSplit.sort();
         if (
           requiredSectionTypes.length !=
           currentWarningCourseSectionTypesSplit.length
@@ -96,6 +94,5 @@ export const updateSectionWarnings = (
     }
     updatedWarnings.push(combinedWarningString);
   }
-  updatedWarnings.sort();
   return updatedWarnings;
 };
