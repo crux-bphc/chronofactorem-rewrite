@@ -220,8 +220,6 @@ export const addSection = async (req: Request, res: Response) => {
       timetable.warnings
     );
 
-    console.log("Warnings:", timetable.warnings);
-
     let newTimes: string[] = [];
 
     section.roomTime.forEach((time) => {
