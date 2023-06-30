@@ -176,20 +176,14 @@ export const addSection = async (req: Request, res: Response) => {
       });
     }
 
+    let newTimes: string[] = [];
+
+    section.roomTime.forEach((time) => {
+      const [_, day, hour] = time.split(":");
+      newTimes.push(course?.code + ":" + day + hour);
+    });
+
     try {
-      await timetableRepository
-        .createQueryBuilder("timetable")
-        .relation(Timetable, "sections")
-        .of(timetable)
-        .add(section);
-
-      let newTimes: string[] = [];
-
-      section.roomTime.forEach((time) => {
-        const [_, day, hour] = time.split(":");
-        newTimes.push(course?.code + ":" + day + hour);
-      });
-
       await timetableRepository.manager.transaction(
         async (transactionalEntityManager) => {
           // shoudn't be needed, but kept them here as it was erroring out
@@ -199,6 +193,13 @@ export const addSection = async (req: Request, res: Response) => {
           if (!timetable) {
             return res.status(404).json({ message: "timetable not found" });
           }
+
+          await transactionalEntityManager
+            .createQueryBuilder()
+            .relation(Timetable, "sections")
+            .of(timetable)
+            .add(section);
+
           await transactionalEntityManager
             .createQueryBuilder()
             .update(Timetable)
