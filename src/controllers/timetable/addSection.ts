@@ -33,28 +33,16 @@ const dataSchema = z.object({
           message: "email must be a valid email",
         }
       ),
-    courseId: z
+
+    sectionId: z
       .string({
-        invalid_type_error: "courseId not a string",
-        required_error: "courseId is a required path parameter",
+        invalid_type_error: "id not a string",
+        required_error: "id is a required parameter",
       })
       .min(0, {
-        message: "courseId must be a non-empty string",
-      }),
-
-    sectionType: SectionTypeZodEnum,
-
-    sectionNumber: z.coerce
-      .number({
-        invalid_type_error: "id not a number",
-        required_error: "id is a required path parameter",
+        message: "id must be a non-empty string",
       })
-      .positive({
-        message: "invalid id",
-      })
-      .int({
-        message: "invalid id",
-      }),
+      .uuid({ message: "id must be a valid uuid" }),
   }),
   params: z.object({
     id: z.coerce
@@ -75,9 +63,7 @@ export const addSectionValidator = validate(dataSchema);
 
 export const addSection = async (req: Request, res: Response) => {
   const timetableId = parseInt(req.params.id);
-  const courseId = req.body.courseId;
-  const sectionType = req.body.sectionType;
-  const sectionNumber = parseInt(req.body.sectionNumber);
+  const sectionId = req.body.sectionId;
   const email = req.body.email;
 
   try {
@@ -121,7 +107,26 @@ export const addSection = async (req: Request, res: Response) => {
       return res.status(403).json({ message: "user does not own timetable" });
     }
 
+    let section: Section | null = null;
+
+    try {
+      section = await sectionRepository
+        .createQueryBuilder("section")
+        .where("section.id = :id", { id: sectionId })
+        .getOne();
+    } catch (err: any) {
+      // will replace the console.log with a logger when we have one
+      console.log("Error while querying for section: ", err.message);
+
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+
+    if (!section) {
+      return res.status(404).json({ message: "section not found" });
+    }
+
     let course: Course | null = null;
+    const courseId = section.courseId;
 
     try {
       course = await courseRepository
@@ -137,30 +142,6 @@ export const addSection = async (req: Request, res: Response) => {
 
     if (!course) {
       return res.status(404).json({ message: "course not found" });
-    }
-
-    let section: Section | null = null;
-
-    try {
-      section = await sectionRepository
-        .createQueryBuilder("section")
-        .where("section.courseId = :courseId", { courseId: courseId })
-        .andWhere("section.type = :sectionType", {
-          sectionType: sectionType,
-        })
-        .andWhere("section.number = :sectionNumber", {
-          sectionNumber: sectionNumber,
-        })
-        .getOne();
-    } catch (err: any) {
-      // will replace the console.log with a logger when we have one
-      console.log("Error while querying for section: ", err.message);
-
-      res.status(500).json({ message: "Internal Server Error" });
-    }
-
-    if (!section) {
-      return res.status(404).json({ message: "section not found" });
     }
 
     const classHourClashes = checkForClassHoursClash(timetable, section);
