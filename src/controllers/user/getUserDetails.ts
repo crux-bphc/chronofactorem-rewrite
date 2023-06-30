@@ -46,8 +46,7 @@ export const getUserDetails = async (req: Request, res: Response) => {
     try {
       user = await userRepository
         .createQueryBuilder("user")
-        .select()
-        .leftJoinAndSelect(
+        .leftJoin(
           "user.timetables",
           "timetable",
           "(user.email <> :email and timetable.private = :private and timetable.draft = :draft) or (user.email = :email)",
@@ -57,6 +56,20 @@ export const getUserDetails = async (req: Request, res: Response) => {
             private: false,
           }
         )
+        .select([
+          "user",
+          "timetable.id",
+          "timetable.name",
+          "timetable.degrees",
+          "timetable.private",
+          "timetable.draft",
+          "timetable.archived",
+          "timetable.year",
+          "timetable.acad_year",
+          "timetable.semester",
+          "timetable.created_at",
+          "timetable.last_updated",
+        ])
         .where("user.id = :id", { id })
         .getOne();
     } catch (err: any) {
