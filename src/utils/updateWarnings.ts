@@ -14,7 +14,7 @@ export const updateSectionWarnings = (
     { warningCourseSectionTypesSplit: string[] }
   >();
   for (const warning of warnings) {
-    const [warningCourseCode, warningCourseSectionTypes] = warning.split("|");
+    const [warningCourseCode, warningCourseSectionTypes] = warning.split(":");
     const warningCourseSectionTypesSplit = warningCourseSectionTypes.split("");
     warningMap.set(warningCourseCode, { warningCourseSectionTypesSplit });
   }
@@ -74,7 +74,10 @@ export const updateSectionWarnings = (
       if (sectionType in requiredSectionTypes) {
         currentWarningCourseSectionTypesSplit.push(sectionType);
         currentWarningCourseSectionTypesSplit.sort();
-        if (requiredSectionTypes.length != currentWarningCourseSectionTypesSplit.length) {
+        if (
+          requiredSectionTypes.length !=
+          currentWarningCourseSectionTypesSplit.length
+        ) {
           warningMap.set(courseCode, {
             warningCourseSectionTypesSplit:
               currentWarningCourseSectionTypesSplit,
@@ -86,17 +89,10 @@ export const updateSectionWarnings = (
   // Regenerating warnings from warningMap.
   for (const currentWarning of warningMap) {
     let combinedWarningString = currentWarning[0];
-    combinedWarningString.concat(":");
+    combinedWarningString = combinedWarningString.concat(":");
     for (const courseSectionType of currentWarning[1]
       .warningCourseSectionTypesSplit) {
-      if (
-        combinedWarningString.charAt(combinedWarningString.length - 1) == ":"
-      ) {
-        combinedWarningString.concat(courseSectionType);
-      } else {
-        combinedWarningString.concat("|");
-        combinedWarningString.concat(courseSectionType);
-      }
+      combinedWarningString = combinedWarningString.concat(courseSectionType);
     }
     updatedWarnings.push(combinedWarningString);
   }
