@@ -3,10 +3,10 @@ import { Section } from "../entity/Section";
 import { Course } from "../entity/Course";
 
 export const checkForClassHoursClash = (
-  currentTimetable: Timetable,
+  timetable: Timetable,
   newSection: Section
 ) => {
-  const times = currentTimetable.timings;
+  const times = timetable.timings;
   const newRoomTimes = newSection.roomTime;
 
   const timesMap = new Map<string, { courseCode: string }>();
@@ -41,10 +41,10 @@ export const checkForClassHoursClash = (
 };
 
 export const checkForExamHoursClash = (
-  currentTimetable: Timetable,
+  timetable: Timetable,
   newCourse: Course
 ) => {
-  const examTimes = currentTimetable.examTimes;
+  const examTimes = timetable.examTimes;
   const courseCodes = new Set<string>();
   // key: start time, value: { courseCode, end time }
   const examTimesMap = new Map<Date, { courseCode: string; end: Date }>();
