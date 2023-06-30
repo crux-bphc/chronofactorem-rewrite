@@ -7,6 +7,7 @@ import { DegreeEnum } from "../../types/degrees";
 import { Section } from "../../entity/Section";
 import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
+import timetableJSON from "../../timetable.json";
 
 // auth temp replacement
 const dataSchema = z.object({
@@ -53,12 +54,12 @@ export const createTimetable = async (req: Request, res: Response) => {
     // new timetable default properties
     const name: string = "Untitled Timetable";
     const degrees: DegreeEnum[] = author.degrees;
-    const isPrivate: boolean = true;
-    const isDraft: boolean = true;
+    const isPrivate: boolean = false;
+    const isDraft: boolean = false;
     const isArchived: boolean = false;
-    const acadYear = new Date().getFullYear();
-    const semester = 1;
-    const year = 1;
+    const acadYear = timetableJSON.metadata.acadYear;
+    const year: number = acadYear - author.batch + 1;
+    const semester = timetableJSON.metadata.semester;
     const sections: Section[] = [];
     const timings: string[] = [];
     const examTimes: string[] = [];
@@ -79,9 +80,9 @@ export const createTimetable = async (req: Request, res: Response) => {
           private: isPrivate,
           draft: isDraft,
           archived: isArchived,
-          year,
           acadYear,
           semester,
+          year,
           sections,
           timings,
           examTimes,
