@@ -51,11 +51,11 @@ export const createTimetable = async (req: Request, res: Response) => {
   }
 
   // new timetable default properties
-  const name: string = "Untitled Timetable";
+  const name = "Untitled Timetable";
   const degrees: DegreeEnum[] = author.degrees;
-  const isPrivate: boolean = false;
-  const isDraft: boolean = false;
-  const isArchived: boolean = false;
+  const isPrivate = false;
+  const isDraft = false;
+  const isArchived = false;
   const acadYear = timetableJSON.metadata.acadYear;
   const year: number = acadYear - author.batch + 1;
   const semester = timetableJSON.metadata.semester;
