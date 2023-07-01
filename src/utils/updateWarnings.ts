@@ -70,6 +70,8 @@ export const updateSectionWarnings = (
           warningMap.set(courseCode, {
             warningSectionTypes: currentWarningSectionTypes,
           });
+        } else {
+          warningMap.delete(courseCode);
         }
       }
     }
