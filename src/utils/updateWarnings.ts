@@ -1,5 +1,5 @@
 import { Section } from "../entity/Section";
-import { SectionTypeList, SectionTypeEnum } from "../types/sectionTypes";
+import { SectionTypeList } from "../types/sectionTypes";
 
 export const updateSectionWarnings = (
   courseCode: string,
