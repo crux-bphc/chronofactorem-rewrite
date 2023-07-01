@@ -21,7 +21,7 @@ const dataSchema = z.object({
         message: "email must be a non-empty string",
       })
       .regex(
-        /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9\-]*\.)+[A-Z]{2,}$/i,
+        /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i,
         {
           message: "email must be a valid email",
         }
