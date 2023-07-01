@@ -168,12 +168,9 @@ export const addSection = async (req: Request, res: Response) => {
         .distinctOn(["section.type"])
         .getMany()
         .then((response) => {
-          let sectionTypes: SectionTypeList = [];
-
-          response.map((sectionType) => {
-            sectionTypes.push(sectionType.type);
-          });
-
+          let sectionTypes: SectionTypeList = response.map(
+            (section) => section.type
+          );
           return sectionTypes;
         });
     } catch (err: any) {
@@ -220,12 +217,9 @@ export const addSection = async (req: Request, res: Response) => {
       timetable.warnings
     );
 
-    let newTimes: string[] = [];
-
-    section.roomTime.map((time) => {
-      const [_, day, hour] = time.split(":");
-      newTimes.push(course?.code + ":" + day + hour);
-    });
+    let newTimes: string[] = section.roomTime.map(
+      (time) => course?.code + ":" + time.split(":")[1] + time.split(":")[2]
+    );
 
     try {
       await timetableRepository.manager.transaction(
