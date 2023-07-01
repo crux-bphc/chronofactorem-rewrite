@@ -3,27 +3,20 @@ import bodyParser from "body-parser";
 import { Request, Response, NextFunction } from "express";
 import { AppDataSource } from "./db";
 import userRouter from "./routers/userRouter";
-import authRouter from "./routers/authRouter";
 import timetableRouter from "./routers/timetableRouter";
 import "dotenv/config";
 import { env } from "./config/server";
-import courseRouter from "./routers/courseRouter";
-import cookieParser from "cookie-parser";
+import { timetableRepository } from "./repositories/timetableRepository";
+import { userRepository } from "./repositories/userRepository";
 
 AppDataSource.initialize()
   .then(async () => {
     // create express app
     const app = express();
-
-    // to parse cookies
-    app.use(cookieParser());
-
     app.use(bodyParser.json());
 
     // register express routers from defined application routers
     app.use("/user", userRouter);
-    app.use("/course", courseRouter);
-    app.use("/auth", authRouter);
     app.use("/timetable", timetableRouter);
 
     // setup express app here
@@ -31,6 +24,48 @@ AppDataSource.initialize()
 
     // Disable Express header for security
     app.disable("x-powered-by");
+
+    await userRepository.insert({
+      batch: 21,
+      name: "Arunachala",
+      degrees: ["A7"],
+      email: "f20210205@hyderabad.bits-pilani.ac.in",
+      timetables: [],
+    });
+    const author = await userRepository.findOne({
+      where: { email: "f20210205@hyderabad.bits-pilani.ac.in" },
+    });
+
+    if (!author) {
+      return;
+    }
+
+    await timetableRepository.insert({
+      name: "Draft Timetable",
+      author: author,
+      degrees: ["A7"],
+      private: true,
+      draft: true,
+      archived: false,
+      year: 1,
+      acadYear: 2021,
+      semester: 1,
+      sections: [],
+      timings: [],
+      examTimes: [],
+      warnings: [],
+    });
+
+    const timetable = await timetableRepository.findOne({
+      where: { name: "Draft Timetable" },
+    });
+
+    if (!timetable) {
+      return;
+    }
+
+    console.log(timetable);
+    console.log(author);
 
     // start express server
     app.listen(env.PORT);

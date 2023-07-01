@@ -59,15 +59,15 @@ export class Timetable {
   @ManyToMany(() => Section, (section) => section.timetables)
   sections!: Section[];
 
-  @Column({ type: "varchar", length: 20, array: true })
+  @Column({ type: "varchar", length: 34, array: true })
   timings!: string[];
 
-  @Column({ name: "exam_times", type: "varchar", array: true })
+  @Column({ name: "exam_times", type: "varchar", length: 80, array: true })
   // e.g. ["CS F211:2021-04-20T09:00:00.000Z|2021-04-20T11:00:00.000Z"]
   examTimes!: string[];
 
   // e.g. ["CS F211-LP", "CS F212-L"]
-  @Column({ type: "varchar", length: 30, array: true })
+  @Column({ type: "varchar", length: 34, array: true })
   warnings!: string[];
 
   @CreateDateColumn({
