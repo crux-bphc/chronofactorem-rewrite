@@ -211,7 +211,7 @@ export const addSection = async (req: Request, res: Response) => {
     timetable.warnings
   );
 
-  let newTimes: string[] = section.roomTime.map(
+  const newTimes: string[] = section.roomTime.map(
     (time) => course?.code + ":" + time.split(":")[1] + time.split(":")[2]
   );
 
