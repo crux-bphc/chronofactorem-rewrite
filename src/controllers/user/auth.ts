@@ -89,7 +89,6 @@ export async function authCallback(req: Request, res: Response) {
       });
     }
   } catch (err: any) {
-
     // If user exists on database, redirect them to frontpage, if not
     // redirect them to a /profile route where they fill their degrees
     // on the frontend
@@ -104,9 +103,12 @@ export async function getDegrees(req: Request, res: Response) {
 
   function toTitleCase(str: string | undefined) {
     if (str === undefined) {
-      return '';
+      return "";
     }
-    return str.split(" ").map(s => s[0].toUpperCase() + s.substring(1).toLowerCase()).join(' ');
+    return str
+      .split(" ")
+      .map((s) => s[0].toUpperCase() + s.substring(1).toLowerCase())
+      .join(" ");
   }
 
   try {
@@ -128,10 +130,12 @@ export async function getDegrees(req: Request, res: Response) {
     // slices mail to obtain batch
     let batch;
     if (userData.email != undefined) {
-      batch = (userData.email.match(/^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/))
+      batch = userData.email.match(/^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/)
         ? userData.email.slice(3, 5)
         : "0000";
-    } else { batch = "0000"; }
+    } else {
+      batch = "0000";
+    }
     // batch is set to 0000 if it's a non-student email, like hpc@hyderabad.bits-hyderabad.ac.in
     // or undefined
 
@@ -139,17 +143,15 @@ export async function getDegrees(req: Request, res: Response) {
     const name = toTitleCase(userData.name);
 
     // checks if user exists by email
-    const email = userData.email
+    const email = userData.email;
     const user = await userRepository.findOne({
       where: { email },
     });
 
     if (user) {
-      res.status(200).json(
-        {
-          "message": "User already exists"
-        }
-      )
+      res.status(200).json({
+        message: "User already exists",
+      });
       return;
     }
 
@@ -163,7 +165,8 @@ export async function getDegrees(req: Request, res: Response) {
         degrees: userData.degrees,
         email: userData.email,
         timetables: [],
-      }).execute()
+      })
+      .execute();
 
     res.json({
       success: true,

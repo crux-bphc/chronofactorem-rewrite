@@ -17,15 +17,19 @@ import {
   addSectionValidator,
 } from "../controllers/timetable/addSection";
 
-import { 
-  getPublicTimetables, 
-  getPublicTimetablesValidator 
+import {
+  getPublicTimetables,
+  getPublicTimetablesValidator,
 } from "../controllers/timetable/getPublicTimetables";
 
 const timetableRouter = express.Router();
 
 timetableRouter.post("/create", createTimeTableValidator, createTimetable);
-timetableRouter.get("/getPublic" , getPublicTimetablesValidator ,getPublicTimetables);
+timetableRouter.get(
+  "/getPublic",
+  getPublicTimetablesValidator,
+  getPublicTimetables
+);
 timetableRouter.post("/:id/delete", deleteTimeTableValidator, deleteTimetable);
 timetableRouter.post("/:id/add", addSectionValidator, addSection);
 timetableRouter.post(

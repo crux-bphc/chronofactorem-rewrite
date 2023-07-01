@@ -53,9 +53,10 @@ const dataSchema = z.object({
 
     branch: DegreeZodList.min(1, {
       message: "branch must be a non-empty array of valid degree strings",
-    }).max(2, {
-      message: "branch may not contain more than two elements",
     })
+      .max(2, {
+        message: "branch may not contain more than two elements",
+      })
       .optional(),
   }),
 });
@@ -100,7 +101,7 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
         "timetable.year",
         "timetable.semester",
         "timetable.createdAt",
-        "timetable.lastUpdated"
+        "timetable.lastUpdated",
       ])
       .where("timetable.private = :isPrivate", { isPrivate });
 
@@ -111,7 +112,9 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
             "Branch may only have one valid BE degree and one valid MSc degee",
         });
       }
-      queryBuilder = queryBuilder.andWhere("timetable.degrees = :branch", { branch });
+      queryBuilder = queryBuilder.andWhere("timetable.degrees = :branch", {
+        branch,
+      });
     }
 
     if (year) {
@@ -119,7 +122,9 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
     }
 
     if (sem) {
-      queryBuilder = queryBuilder.andWhere("timetable.semester = :sem", { sem });
+      queryBuilder = queryBuilder.andWhere("timetable.semester = :sem", {
+        sem,
+      });
     }
 
     try {
