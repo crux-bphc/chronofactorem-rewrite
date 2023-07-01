@@ -58,13 +58,13 @@ export const updateSectionWarnings = (
       }
     } else {
       const currentWarningSectionTypes = currentWarning.warningSectionTypes;
-      if (sectionType in currentWarningSectionTypes) {
+      if (currentWarningSectionTypes.includes(sectionType)) {
         throw Error(
           "Removing a course that should not be there according to warnings"
         );
       }
       // Adding new courseType to warnings after removing course
-      if (sectionType in requiredSectionTypes) {
+      if (requiredSectionTypes.includes(sectionType)) {
         currentWarningSectionTypes.push(sectionType);
         if (requiredSectionTypes.length !== currentWarningSectionTypes.length) {
           warningMap.set(courseCode, {
