@@ -17,7 +17,7 @@ export const updateSectionWarnings = (
   }
 
   const sectionType = section.type;
-  let updatedWarnings: string[] = [];
+  const updatedWarnings: string[] = [];
 
   if (isAdded) {
     const currentWarning = warningMap.get(courseCode);
