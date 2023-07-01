@@ -12,10 +12,21 @@ import { isAValidDegreeCombination } from "../../types/degrees";
 const dataSchema = z.object({
   query: z.object({
     // temp auth replacement
-    email: z.string({
-      invalid_type_error: "email not a string",
-      required_error: "email is a required path parameter",
-    }),
+    email: z
+      .string({
+        invalid_type_error: "email not a string",
+        required_error: "email is a required path parameter",
+      })
+      .min(0, {
+        message: "email must be a non-empty string",
+      })
+      .regex(
+        /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9\-]*\.)+[A-Z]{2,}$/i,
+        {
+          message: "email must be a valid email",
+        }
+      ),
+
     year: z.coerce
       .number({
         invalid_type_error: "year is not a number",
@@ -27,6 +38,7 @@ const dataSchema = z.object({
         message: "invalid year",
       })
       .optional(),
+
     sem: z.coerce
       .number({
         invalid_type_error: "sem is not a number",
@@ -38,6 +50,7 @@ const dataSchema = z.object({
         message: "invalid sem number (can only be 1 or 2)",
       })
       .optional(),
+
     branch: DegreeZodList.min(1, {
       message: "branch must be a non-empty array of valid degree strings",
     }).max(2, {
