@@ -86,7 +86,7 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
     const branch: DegreeList = req.query.branch as DegreeList;
     const year: number = parseInt(req.query.year as string);
     const sem: number = parseInt(req.query.sem as string);
-    const isPrivate: boolean = false;
+    const isPrivate = false;
 
     let queryBuilder = timetableRepository
       .createQueryBuilder("timetable")
