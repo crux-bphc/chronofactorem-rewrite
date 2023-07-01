@@ -161,18 +161,13 @@ export const addSection = async (req: Request, res: Response) => {
     let sectionTypes: SectionTypeList = [];
 
     try {
-      sectionTypes = await sectionRepository
+      const sectionTypeHolders = await sectionRepository
         .createQueryBuilder("section")
         .select("section.type")
         .where("section.courseId = :courseId", { courseId: courseId })
         .distinctOn(["section.type"])
-        .getMany()
-        .then((response) => {
-          let sectionTypes: SectionTypeList = response.map(
-            (section) => section.type
-          );
-          return sectionTypes;
-        });
+        .getMany();
+      sectionTypes = sectionTypeHolders.map((section) => section.type);
     } catch (err: any) {
       // will replace the console.log with a logger when we have one
       console.log(
