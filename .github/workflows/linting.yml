@@ -39,11 +39,12 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-  prettier:
+  checks:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Run prettier
-        run: |-
-          pnpm prettier --check .
+        run: pnpm prettier --check .
+      - name: Run eslint
+        run: eslint . --ext .js,.jsx,.ts,.tsx
