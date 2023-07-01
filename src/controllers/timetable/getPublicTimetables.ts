@@ -26,7 +26,7 @@ const dataSchema = z.object({
             }
         ),
     }),
-    
+
     query : z.object({
         year: z.coerce
             .number({
@@ -71,7 +71,6 @@ export const getPublicTimetables = async (req : Request , res : Response) => {
         let sem: number = parseInt(req.query.sem as string);
         let isPrivate: boolean = false
 
-        let timetables: Timetable[] | null = null;
         const queryBuilder = timetableRepository
             .createQueryBuilder("timetable")
             .select(["timetable.id", "timetable.name", "timetable.lastUpdated", "timetable.createdAt", "timetable.degrees"])
@@ -83,35 +82,25 @@ export const getPublicTimetables = async (req : Request , res : Response) => {
                 message: "Branch may only have one valid BE degree and one valid MSc degee",
                 });
             }
-
-            try { 
-                queryBuilder.andWhere("timetable.degrees = :branch", { branch })
-            } catch (err: any) {
-                console.log("Error while querying timetable: ", err.message);
-                res.status(500).json({ message: "Internal Server Error" });
-            }
+            queryBuilder.andWhere("timetable.degrees = :branch", { branch })
+            
         }
 
-        if(year){
-            try {
-                queryBuilder.andWhere("timetable.year = :year" , { year })
-            } catch (err: any) {
-                console.log("Error while querying timetable: ", err.message);
-                res.status(500).json({ message: "Internal Server Error" });
-            }
-        }
+        if(year)
+            queryBuilder.andWhere("timetable.year = :year" , { year })
 
-        if(sem){
-            try {
-                queryBuilder.andWhere("timetable.semester = :sem" , { sem })
-            } catch (err: any) {
-                console.log("Error while querying timetable: ", err.message);
-                res.status(500).json({ message: "Internal Server Error" });
-            }
-        }
+        if(sem)     
+            queryBuilder.andWhere("timetable.semester = :sem" , { sem })
 
-        timetables = await queryBuilder.getMany();
-        return res.json(timetables)
+        try { 
+            let timetables: Timetable[] | null = null;
+            timetables = await queryBuilder.getMany();
+
+            return res.json(timetables)
+        } catch (err: any) {
+            console.log("Error while querying timetable: ", err.message);
+            res.status(500).json({ message: "Internal Server Error" });
+        }
     }
     catch(err : any){    
         return err
