@@ -40,7 +40,7 @@ export const updateSectionWarnings = (
           const index = currentWarning.warningSectionTypes.indexOf(
             currentSectionWarning
           );
-          currentWarning.warningSectionTypes.splice(index!, 1);
+          currentWarning.warningSectionTypes.splice(index, 1);
           if (currentWarning.warningSectionTypes.length === 0) {
             warningMap.delete(courseCode);
           }
