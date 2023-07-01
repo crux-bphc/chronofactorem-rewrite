@@ -48,7 +48,7 @@ export const createTimetable = async (req: Request, res: Response) => {
     }
 
     if (!author) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(401).json({ message: "unregistered user" });
     }
 
     // new timetable default properties

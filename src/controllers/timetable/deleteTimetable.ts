@@ -58,7 +58,7 @@ export const deleteTimetable = async (req: Request, res: Response) => {
     }
 
     if (!author) {
-      return res.json({ message: "unregistered user" });
+      return res.status(401).json({ message: "unregistered user" });
     }
 
     const id: number = parseInt(req.params.id);
