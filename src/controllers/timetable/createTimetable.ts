@@ -62,11 +62,11 @@ export const createTimetable = async (req: Request, res: Response) => {
     const semester = timetableJSON.metadata.semester;
     const sections: Section[] = [];
     const timings: string[] = [];
-    const examStartTimes: string[] = [];
-    const examEndTimes: string[] = [];
+    const examTimes: string[] = [];
     const warnings: string[] = [];
     const createdAt: Date = new Date();
     const lastUpdated: Date = new Date();
+    const authorId: string = author.id;
 
     try {
       await timetableRepository
@@ -74,7 +74,7 @@ export const createTimetable = async (req: Request, res: Response) => {
         .insert()
         .into(Timetable)
         .values({
-          author,
+          authorId,
           name,
           degrees,
           private: isPrivate,
@@ -85,15 +85,16 @@ export const createTimetable = async (req: Request, res: Response) => {
           year,
           sections,
           timings,
-          examStartTimes,
-          examEndTimes,
+          examTimes,
           warnings,
           createdAt,
           lastUpdated
         })
         .execute();
 
-      return res.json({ message: "Timetable created successfully" });
+      return res
+        .status(201)
+        .json({ message: "Timetable created successfully" });
     } catch (err: any) {
       // will replace the console.log with a logger when we have one
       console.log("Error while creating timetable: ", err.message);
