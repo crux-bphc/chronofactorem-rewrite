@@ -55,7 +55,8 @@ const dataSchema = z.object({
       message: "branch must be a non-empty array of valid degree strings",
     }).max(2, {
       message: "branch may not contain more than two elements",
-    }),
+    })
+      .optional(),
   }),
 });
 
@@ -91,9 +92,15 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
       .select([
         "timetable.id",
         "timetable.name",
-        "timetable.lastUpdated",
-        "timetable.createdAt",
         "timetable.degrees",
+        "timetable.private",
+        "timetable.draft",
+        "timetable.archived",
+        "timetable.acadYear",
+        "timetable.year",
+        "timetable.semester",
+        "timetable.createdAt",
+        "timetable.lastUpdated"
       ])
       .where("timetable.private = :isPrivate", { isPrivate });
 
