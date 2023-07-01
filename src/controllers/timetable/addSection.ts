@@ -82,7 +82,7 @@ export const addSection = async (req: Request, res: Response) => {
     }
 
     if (!author) {
-      return res.json({ message: "unregistered user" });
+      return res.status(401).json({ message: "unregistered user" });
     }
 
     let timetable: Timetable | null = null;
@@ -100,7 +100,7 @@ export const addSection = async (req: Request, res: Response) => {
     }
 
     if (!timetable) {
-      return res.json({ message: "timetable not found" });
+      return res.status(404).json({ message: "timetable not found" });
     }
 
     if (timetable.authorId !== author.id) {
