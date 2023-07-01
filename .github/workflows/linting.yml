@@ -1,4 +1,4 @@
-name: Check formatting with Prettier
+name: Lint code with ESLint and check formatting with Prettier
 
 on:
   - push
