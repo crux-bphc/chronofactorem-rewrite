@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { userRepository } from "../../repositories/userRepository";
 import { validate } from "../../utils/zodValidateRequest";
 import { z } from "zod";
-import { User } from "../../entity/User";
 import {
   DegreeList,
   DegreeZodList,
