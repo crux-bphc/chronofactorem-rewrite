@@ -9,7 +9,6 @@ module.exports = {
   trailingComma: "es5",
   bracketSpacing: true,
   bracketSameLine: false,
-  jsxBracketSameLine: false,
   arrowParens: "always",
   rangeEnd: Infinity,
   requirePragma: false,
