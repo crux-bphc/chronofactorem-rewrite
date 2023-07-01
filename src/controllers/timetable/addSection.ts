@@ -6,7 +6,7 @@ import { validate } from "../../utils/zodValidateRequest";
 import { Section } from "../../entity/Section";
 import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
-import { SectionTypeList, SectionTypeZodEnum } from "../../types/sectionTypes";
+import { SectionTypeList } from "../../types/sectionTypes";
 import { sectionRepository } from "../../repositories/sectionRepository";
 import {
   checkForClassHoursClash,
