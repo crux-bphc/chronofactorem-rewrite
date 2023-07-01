@@ -1,8 +1,12 @@
 name: Lint code with ESLint and check formatting with Prettier
 
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   linting:
