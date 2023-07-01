@@ -1,7 +1,6 @@
 /** @type {import("prettier").Config} */
-exports.defaults = {
+module.exports = {
   printWidth: 80,
-  tabWidth: 2,
   useTabs: false,
   semi: true,
   singleQuote: false,
@@ -12,7 +11,7 @@ exports.defaults = {
   bracketSameLine: false,
   jsxBracketSameLine: false,
   arrowParens: "always",
-  rangeEnd: null,
+  rangeEnd: Infinity,
   requirePragma: false,
   insertPragma: false,
   proseWrap: "preserve",
