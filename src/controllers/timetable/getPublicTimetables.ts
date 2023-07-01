@@ -87,7 +87,7 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
     let sem: number = parseInt(req.query.sem as string);
     let isPrivate: boolean = false;
 
-    const queryBuilder = timetableRepository
+    let queryBuilder = timetableRepository
       .createQueryBuilder("timetable")
       .select([
         "timetable.id",
@@ -111,12 +111,16 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
             "Branch may only have one valid BE degree and one valid MSc degee",
         });
       }
-      queryBuilder.andWhere("timetable.degrees = :branch", { branch });
+      queryBuilder = queryBuilder.andWhere("timetable.degrees = :branch", { branch });
     }
 
-    if (year) queryBuilder.andWhere("timetable.year = :year", { year });
+    if (year) {
+      queryBuilder = queryBuilder.andWhere("timetable.year = :year", { year });
+    }
 
-    if (sem) queryBuilder.andWhere("timetable.semester = :sem", { sem });
+    if (sem) {
+      queryBuilder = queryBuilder.andWhere("timetable.semester = :sem", { sem });
+    }
 
     try {
       let timetables: Timetable[] | null = null;
