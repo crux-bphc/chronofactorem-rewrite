@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { Timetable } from "../../entity/Timetable";
 import { timetableRepository } from "../../repositories/timetableRepository";
+import { User } from "../../entity/User";
+import { userRepository } from "../../repositories/userRepository";
 import { z } from "zod";
 import { validate } from "../../utils/zodValidateRequest";
 
@@ -9,25 +11,13 @@ import {
   } from "../../types/degrees";
 
 const dataSchema = z.object({
-      // auth temp replacement
-    body: z.object({
-        email: z
-        .string({
-            invalid_type_error: "email not a string",
-            required_error: "email is a required body parameter",
-        })
-        .min(0, {
-            message: "email must be a non-empty string",
-        })
-        .regex(
-            /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9\-]*\.)+[A-Z]{2,}$/i,
-            {
-            message: "email must be a valid email",
-            }
-        ),
-    }),
 
     query : z.object({
+        // temp auth replacement
+        authEmail: z.string({
+            invalid_type_error: "authEmail not a string",
+            required_error: "authEmail is a required path parameter",
+        }),
         year: z.coerce
             .number({
                 invalid_type_error : "year is not a number"
@@ -66,6 +56,23 @@ export const getPublicTimetablesValidator = validate(dataSchema)
 
 export const getPublicTimetables = async (req : Request , res : Response) => {
     try{
+        let user: User | null = null;
+        try {
+            user = await userRepository
+              .createQueryBuilder("user")
+              .where("user.email = :email", { email: req.body.email })
+              .getOne();
+          } catch (err: any) {
+            // will replace the console.log with a logger when we have one
+            console.log("Error while querying for user: ", err.message);
+      
+            res.status(500).json({ message: "Internal Server Error" });
+          }
+      
+          if (!user) {
+            return res.status(404).json({ message: "User not found" });
+          }
+
         let branch: string[] = req.query.branch as string[];
         let year: number = parseInt(req.query.year as string);
         let sem: number = parseInt(req.query.sem as string);
@@ -98,6 +105,7 @@ export const getPublicTimetables = async (req : Request , res : Response) => {
 
             return res.json(timetables)
         } catch (err: any) {
+            // will replace the console.log with a logger when we have one
             console.log("Error while querying timetable: ", err.message);
             res.status(500).json({ message: "Internal Server Error" });
         }
