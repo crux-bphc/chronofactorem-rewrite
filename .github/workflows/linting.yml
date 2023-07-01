@@ -39,9 +39,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-      - name: Checkout repo
-        uses: actions/checkout@v2
+
       - name: Run prettier
         run: pnpm prettier --check .
+
       - name: Run eslint
-        run: eslint . --ext .js,.jsx,.ts,.tsx
+        run: pnpm eslint . --ext .js,.jsx,.ts,.tsx
