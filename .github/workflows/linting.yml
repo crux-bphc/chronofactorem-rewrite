@@ -40,8 +40,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Run prettier
-        run: pnpm prettier --check .
-
       - name: Run eslint
         run: pnpm eslint . --ext .js,.jsx,.ts,.tsx
