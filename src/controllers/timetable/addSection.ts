@@ -66,211 +66,207 @@ export const addSection = async (req: Request, res: Response) => {
   const sectionId = req.body.sectionId;
   const email = req.body.email;
 
+  let author: User | null = null;
+
   try {
-    let author: User | null = null;
+    author = await userRepository
+      .createQueryBuilder("user")
+      .where("user.email = :email", { email: email })
+      .getOne();
+  } catch (err: any) {
+    // will replace the console.log with a logger when we have one
+    console.log("Error while querying user: ", err.message);
 
-    try {
-      author = await userRepository
-        .createQueryBuilder("user")
-        .where("user.email = :email", { email: email })
-        .getOne();
-    } catch (err: any) {
-      // will replace the console.log with a logger when we have one
-      console.log("Error while querying user: ", err.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 
-      res.status(500).json({ message: "Internal Server Error" });
-    }
+  if (!author) {
+    return res.json({ message: "unregistered user" });
+  }
 
-    if (!author) {
-      return res.json({ message: "unregistered user" });
-    }
+  let timetable: Timetable | null = null;
 
-    let timetable: Timetable | null = null;
+  try {
+    timetable = await timetableRepository
+      .createQueryBuilder("timetable")
+      .where("timetable.id = :id", { id: timetableId })
+      .getOne();
+  } catch (err: any) {
+    // will replace the console.log with a logger when we have one
+    console.log("Error while querying timetable: ", err.message);
 
-    try {
-      timetable = await timetableRepository
-        .createQueryBuilder("timetable")
-        .where("timetable.id = :id", { id: timetableId })
-        .getOne();
-    } catch (err: any) {
-      // will replace the console.log with a logger when we have one
-      console.log("Error while querying timetable: ", err.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 
-      res.status(500).json({ message: "Internal Server Error" });
-    }
+  if (!timetable) {
+    return res.json({ message: "timetable not found" });
+  }
 
-    if (!timetable) {
-      return res.json({ message: "timetable not found" });
-    }
+  if (timetable.authorId !== author.id) {
+    return res.status(403).json({ message: "user does not own timetable" });
+  }
 
-    if (timetable.authorId !== author.id) {
-      return res.status(403).json({ message: "user does not own timetable" });
-    }
+  let section: Section | null = null;
 
-    let section: Section | null = null;
+  try {
+    section = await sectionRepository
+      .createQueryBuilder("section")
+      .where("section.id = :id", { id: sectionId })
+      .getOne();
+  } catch (err: any) {
+    // will replace the console.log with a logger when we have one
+    console.log("Error while querying for section: ", err.message);
 
-    try {
-      section = await sectionRepository
-        .createQueryBuilder("section")
-        .where("section.id = :id", { id: sectionId })
-        .getOne();
-    } catch (err: any) {
-      // will replace the console.log with a logger when we have one
-      console.log("Error while querying for section: ", err.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 
-      res.status(500).json({ message: "Internal Server Error" });
-    }
+  if (!section) {
+    return res.status(404).json({ message: "section not found" });
+  }
 
-    if (!section) {
-      return res.status(404).json({ message: "section not found" });
-    }
+  let course: Course | null = null;
+  const courseId = section.courseId;
 
-    let course: Course | null = null;
-    const courseId = section.courseId;
+  try {
+    course = await courseRepository
+      .createQueryBuilder("course")
+      .where("course.id = :id", { id: courseId })
+      .getOne();
+  } catch (err: any) {
+    // will replace the console.log with a logger when we have one
+    console.log("Error while querying for course: ", err.message);
 
-    try {
-      course = await courseRepository
-        .createQueryBuilder("course")
-        .where("course.id = :id", { id: courseId })
-        .getOne();
-    } catch (err: any) {
-      // will replace the console.log with a logger when we have one
-      console.log("Error while querying for course: ", err.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 
-      res.status(500).json({ message: "Internal Server Error" });
-    }
+  if (!course) {
+    return res.status(404).json({ message: "course not found" });
+  }
 
-    if (!course) {
-      return res.status(404).json({ message: "course not found" });
-    }
+  const classHourClashes = checkForClassHoursClash(timetable, section);
+  if (classHourClashes.clash) {
+    return res.status(400).json({
+      message: `section clashes with ${classHourClashes.course}`,
+    });
+  }
 
-    const classHourClashes = checkForClassHoursClash(timetable, section);
-    if (classHourClashes.clash) {
-      return res.status(400).json({
-        message: `section clashes with ${classHourClashes.course}`,
-      });
-    }
+  const examHourClashes = checkForExamHoursClash(timetable, course);
+  if (examHourClashes.clash && !examHourClashes.sameCourse) {
+    return res.status(400).json({
+      message: `course's exam clashes with ${examHourClashes.course}'s ${examHourClashes.exam}`,
+    });
+  }
 
-    const examHourClashes = checkForExamHoursClash(timetable, course);
-    if (examHourClashes.clash && !examHourClashes.sameCourse) {
-      return res.status(400).json({
-        message: `course's exam clashes with ${examHourClashes.course}'s ${examHourClashes.exam}`,
-      });
-    }
+  let sectionTypes: SectionTypeList = [];
 
-    let sectionTypes: SectionTypeList = [];
-
-    try {
-      const sectionTypeHolders = await sectionRepository
-        .createQueryBuilder("section")
-        .select("section.type")
-        .where("section.courseId = :courseId", { courseId: courseId })
-        .distinctOn(["section.type"])
-        .getMany();
-      sectionTypes = sectionTypeHolders.map((section) => section.type);
-    } catch (err: any) {
-      // will replace the console.log with a logger when we have one
-      console.log(
-        "Error while querying for course's section types: ",
-        err.message
-      );
-
-      res.status(500).json({ message: "Internal Server Error" });
-    }
-
-    let sameCourseSectionsCount = 0;
-
-    try {
-      sameCourseSectionsCount = await sectionRepository
-        .createQueryBuilder("section")
-        .innerJoin("section.timetables", "timetable")
-        .where("timetable.id = :id", { id: timetable.id })
-        .andWhere("section.courseId = :courseId", { courseId })
-        .andWhere("section.type = :type", { type: section.type })
-        .getCount();
-    } catch (err: any) {
-      // will replace the console.log with a logger when we have one
-      console.log(
-        "Error while querying for other sections of same course: ",
-        err.message
-      );
-
-      res.status(500).json({ message: "Internal Server Error" });
-    }
-
-    if (sameCourseSectionsCount > 0) {
-      return res.status(400).json({
-        message: `can't have multiple sections of type ${section.type}`,
-      });
-    }
-
-    timetable.warnings = updateSectionWarnings(
-      course.code,
-      section,
-      sectionTypes,
-      true,
-      timetable.warnings
+  try {
+    const sectionTypeHolders = await sectionRepository
+      .createQueryBuilder("section")
+      .select("section.type")
+      .where("section.courseId = :courseId", { courseId: courseId })
+      .distinctOn(["section.type"])
+      .getMany();
+    sectionTypes = sectionTypeHolders.map((section) => section.type);
+  } catch (err: any) {
+    // will replace the console.log with a logger when we have one
+    console.log(
+      "Error while querying for course's section types: ",
+      err.message
     );
 
-    let newTimes: string[] = section.roomTime.map(
-      (time) => course?.code + ":" + time.split(":")[1] + time.split(":")[2]
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+
+  let sameCourseSectionsCount = 0;
+
+  try {
+    sameCourseSectionsCount = await sectionRepository
+      .createQueryBuilder("section")
+      .innerJoin("section.timetables", "timetable")
+      .where("timetable.id = :id", { id: timetable.id })
+      .andWhere("section.courseId = :courseId", { courseId })
+      .andWhere("section.type = :type", { type: section.type })
+      .getCount();
+  } catch (err: any) {
+    // will replace the console.log with a logger when we have one
+    console.log(
+      "Error while querying for other sections of same course: ",
+      err.message
     );
 
-    try {
-      await timetableRepository.manager.transaction(
-        async (transactionalEntityManager) => {
-          // shoudn't be needed, but kept them here as it was erroring out
-          if (!course) {
-            return res.status(404).json({ message: "course not found" });
-          }
-          if (!timetable) {
-            return res.status(404).json({ message: "timetable not found" });
-          }
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 
-          await transactionalEntityManager
-            .createQueryBuilder()
-            .relation(Timetable, "sections")
-            .of(timetable)
-            .add(section);
+  if (sameCourseSectionsCount > 0) {
+    return res.status(400).json({
+      message: `can't have multiple sections of type ${section.type}`,
+    });
+  }
 
+  timetable.warnings = updateSectionWarnings(
+    course.code,
+    section,
+    sectionTypes,
+    true,
+    timetable.warnings
+  );
+
+  let newTimes: string[] = section.roomTime.map(
+    (time) => course?.code + ":" + time.split(":")[1] + time.split(":")[2]
+  );
+
+  try {
+    await timetableRepository.manager.transaction(
+      async (transactionalEntityManager) => {
+        // shoudn't be needed, but kept them here as it was erroring out
+        if (!course) {
+          return res.status(404).json({ message: "course not found" });
+        }
+        if (!timetable) {
+          return res.status(404).json({ message: "timetable not found" });
+        }
+
+        await transactionalEntityManager
+          .createQueryBuilder()
+          .relation(Timetable, "sections")
+          .of(timetable)
+          .add(section);
+
+        await transactionalEntityManager
+          .createQueryBuilder()
+          .update(Timetable)
+          .set({
+            timings: [...timetable.timings, ...newTimes],
+            warnings: timetable.warnings,
+          })
+          .where("timetable.id = :id", { id: timetable.id })
+          .execute();
+
+        if (!examHourClashes.sameCourse) {
           await transactionalEntityManager
             .createQueryBuilder()
             .update(Timetable)
             .set({
-              timings: [...timetable.timings, ...newTimes],
-              warnings: timetable.warnings,
+              examTimes: [
+                ...timetable.examTimes,
+                `${
+                  course.code
+                }|${course.midsemStartTime.toISOString()}|${course.midsemEndTime.toISOString()}`,
+                `${
+                  course.code
+                }|${course.compreStartTime.toISOString()}|${course.compreEndTime.toISOString()}`,
+              ],
             })
             .where("timetable.id = :id", { id: timetable.id })
             .execute();
-
-          if (!examHourClashes.sameCourse) {
-            await transactionalEntityManager
-              .createQueryBuilder()
-              .update(Timetable)
-              .set({
-                examTimes: [
-                  ...timetable.examTimes,
-                  `${
-                    course.code
-                  }|${course.midsemStartTime.toISOString()}|${course.midsemEndTime.toISOString()}`,
-                  `${
-                    course.code
-                  }|${course.compreStartTime.toISOString()}|${course.compreEndTime.toISOString()}`,
-                ],
-              })
-              .where("timetable.id = :id", { id: timetable.id })
-              .execute();
-          }
         }
-      );
-    } catch (err: any) {
-      // will replace the console.log with a logger when we have one
-      console.log("Error while updating timetable with section: ", err.message);
-
-      res.status(500).json({ message: "Internal Server Error" });
-    }
-    res.json({ message: "section added" });
+      }
+    );
   } catch (err: any) {
-    throw err;
+    // will replace the console.log with a logger when we have one
+    console.log("Error while updating timetable with section: ", err.message);
+
+    res.status(500).json({ message: "Internal Server Error" });
   }
+  res.json({ message: "section added" });
 };
