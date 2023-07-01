@@ -94,7 +94,7 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
     return res.status(404).json({ message: "timetable not found" });
   }
 
-  let owns: boolean = false;
+  let owns = false;
 
   try {
     owns =
