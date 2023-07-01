@@ -83,10 +83,10 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    let branch: DegreeList = req.query.branch as DegreeList;
-    let year: number = parseInt(req.query.year as string);
-    let sem: number = parseInt(req.query.sem as string);
-    let isPrivate: boolean = false;
+    const branch: DegreeList = req.query.branch as DegreeList;
+    const year: number = parseInt(req.query.year as string);
+    const sem: number = parseInt(req.query.sem as string);
+    const isPrivate: boolean = false;
 
     let queryBuilder = timetableRepository
       .createQueryBuilder("timetable")
