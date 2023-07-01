@@ -42,9 +42,9 @@ const dataSchema = z.object({
             })
             .optional(),
         branch: DegreeZodList.min(1, {
-            message: "degrees must be a non-empty array of valid degree strings",
+            message: "branch must be a non-empty array of valid degree strings",
             }).max(2, {
-            message: "degrees may not contain more than two elements",
+            message: "branch may not contain more than two elements",
             }),
 
     })
