@@ -74,7 +74,7 @@ export const removeSection = async (req: Request, res: Response) => {
       // will replace the console.log with a logger when we have one
       console.log("Error while querying user: ", err.message);
 
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
 
     if (!author) {
@@ -93,7 +93,7 @@ export const removeSection = async (req: Request, res: Response) => {
       // will replace the console.log with a logger when we have one
       console.log("Error while querying timetable: ", err.message);
 
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
 
     if (!timetable) {
@@ -115,7 +115,7 @@ export const removeSection = async (req: Request, res: Response) => {
       // will replace the console.log with a logger when we have one
       console.log("Error while querying for section: ", err.message);
 
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
 
     if (section === null) {
@@ -149,7 +149,7 @@ export const removeSection = async (req: Request, res: Response) => {
       // will replace the console.log with a logger when we have one
       console.log("Error while querying for course: ", err.message);
 
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
 
     if (!course) {
@@ -186,7 +186,7 @@ export const removeSection = async (req: Request, res: Response) => {
         err.message
       );
 
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
 
     const classTimings = section.roomTime.map((time) => {
@@ -215,7 +215,7 @@ export const removeSection = async (req: Request, res: Response) => {
       // will replace the console.log with a logger when we have one
       console.log("Error while removing section from timetable: ", err.message);
 
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
 
     return res.json({ message: "section removed" });

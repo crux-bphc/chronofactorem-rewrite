@@ -78,7 +78,7 @@ export const addSection = async (req: Request, res: Response) => {
       // will replace the console.log with a logger when we have one
       console.log("Error while querying user: ", err.message);
 
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
 
     if (!author) {
@@ -96,7 +96,7 @@ export const addSection = async (req: Request, res: Response) => {
       // will replace the console.log with a logger when we have one
       console.log("Error while querying timetable: ", err.message);
 
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
 
     if (!timetable) {
@@ -118,7 +118,7 @@ export const addSection = async (req: Request, res: Response) => {
       // will replace the console.log with a logger when we have one
       console.log("Error while querying for section: ", err.message);
 
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
 
     if (!section) {
@@ -137,7 +137,7 @@ export const addSection = async (req: Request, res: Response) => {
       // will replace the console.log with a logger when we have one
       console.log("Error while querying for course: ", err.message);
 
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
 
     if (!course) {
@@ -175,7 +175,7 @@ export const addSection = async (req: Request, res: Response) => {
         err.message
       );
 
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
 
     let sameCourseSectionsCount = 0;
@@ -195,7 +195,7 @@ export const addSection = async (req: Request, res: Response) => {
         err.message
       );
 
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
 
     if (sameCourseSectionsCount > 0) {
@@ -267,9 +267,9 @@ export const addSection = async (req: Request, res: Response) => {
       // will replace the console.log with a logger when we have one
       console.log("Error while updating timetable with section: ", err.message);
 
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
-    res.json({ message: "section added" });
+    return res.json({ message: "section added" });
   } catch (err: any) {
     throw err;
   }
