@@ -56,85 +56,81 @@ const dataSchema = z.object({
 export const editTimetableMetadataValidator = validate(dataSchema);
 
 export const editTimetableMetadata = async (req: Request, res: Response) => {
+  let author: User | null = null;
+
   try {
-    let author: User | null = null;
-
-    try {
-      author = await userRepository
-        .createQueryBuilder("user")
-        .where("user.email = :email", { email: req.body.email })
-        .getOne();
-    } catch (err: any) {
-      // will replace the console.log with a logger when we have one
-      console.log("Error while querying user: ", err.message);
-
-      res.status(500).json({ message: "Internal Server Error" });
-    }
-
-    if (!author) {
-      return res.json({ message: "unregistered user" });
-    }
-
-    const id: number = parseInt(req.params.id);
-
-    let timetable: Timetable | null = null;
-
-    try {
-      timetable = await timetableRepository
-        .createQueryBuilder("timetable")
-        .where("timetable.id = :id", { id })
-        .getOne();
-    } catch (err: any) {
-      // will replace the console.log with a logger when we have one
-      console.log("Error while querying timetable: ", err.message);
-
-      res.status(500).json({ message: "Internal Server Error" });
-    }
-
-    if (!timetable) {
-      return res.status(404).json({ message: "timetable not found" });
-    }
-
-    let owns: boolean = false;
-
-    try {
-      owns =
-        (await timetableRepository
-          .createQueryBuilder("timetable")
-          .where("timetable.id = :id", { id: timetable.id })
-          .andWhere("timetable.author = :author", { author: author.id })
-          .getCount()) > 0;
-    } catch (err: any) {
-      // will replace the console.log with a logger when we have one
-      console.log("Error while checking user owns timetable: ", err.message);
-
-      res.status(500).json({ message: "Internal Server Error" });
-    }
-
-    if (!owns) {
-      return res.status(403).json({ message: "user does not own timetable" });
-    }
-
-    const name: string = req.body.name;
-    const isPrivate: boolean = req.body.isPrivate;
-    const isDraft: boolean = req.body.isDraft;
-
-    try {
-      await timetableRepository
-        .createQueryBuilder("timetable")
-        .update()
-        .set({ name: name, private: isPrivate, draft: isDraft })
-        .where("timetable.id = :id", { id: timetable.id })
-        .execute();
-    } catch (err: any) {
-      // will replace the console.log with a logger when we have one
-      console.log("Error while editing timetable: ", err.message);
-
-      res.status(500).json({ message: "Internal Server Error" });
-    }
-
-    return res.json({ message: "timetable edited" });
+    author = await userRepository
+      .createQueryBuilder("user")
+      .where("user.email = :email", { email: req.body.email })
+      .getOne();
   } catch (err: any) {
-    throw err;
+    // will replace the console.log with a logger when we have one
+    console.log("Error while querying user: ", err.message);
+
+    res.status(500).json({ message: "Internal Server Error" });
   }
+
+  if (!author) {
+    return res.json({ message: "unregistered user" });
+  }
+
+  const id: number = parseInt(req.params.id);
+
+  let timetable: Timetable | null = null;
+
+  try {
+    timetable = await timetableRepository
+      .createQueryBuilder("timetable")
+      .where("timetable.id = :id", { id })
+      .getOne();
+  } catch (err: any) {
+    // will replace the console.log with a logger when we have one
+    console.log("Error while querying timetable: ", err.message);
+
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+
+  if (!timetable) {
+    return res.status(404).json({ message: "timetable not found" });
+  }
+
+  let owns: boolean = false;
+
+  try {
+    owns =
+      (await timetableRepository
+        .createQueryBuilder("timetable")
+        .where("timetable.id = :id", { id: timetable.id })
+        .andWhere("timetable.author = :author", { author: author.id })
+        .getCount()) > 0;
+  } catch (err: any) {
+    // will replace the console.log with a logger when we have one
+    console.log("Error while checking user owns timetable: ", err.message);
+
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+
+  if (!owns) {
+    return res.status(403).json({ message: "user does not own timetable" });
+  }
+
+  const name: string = req.body.name;
+  const isPrivate: boolean = req.body.isPrivate;
+  const isDraft: boolean = req.body.isDraft;
+
+  try {
+    await timetableRepository
+      .createQueryBuilder("timetable")
+      .update()
+      .set({ name: name, private: isPrivate, draft: isDraft })
+      .where("timetable.id = :id", { id: timetable.id })
+      .execute();
+  } catch (err: any) {
+    // will replace the console.log with a logger when we have one
+    console.log("Error while editing timetable: ", err.message);
+
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+
+  return res.json({ message: "timetable edited" });
 };
