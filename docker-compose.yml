@@ -8,7 +8,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB}"]
+      test: [ "CMD", "pg_isready", "-d", "${POSTGRES_DB}" ]
       interval: 10s
       timeout: 30s
       retries: 3
@@ -24,7 +24,7 @@ services:
       - "${PORT}:${PORT}"
 
   ingestion:
-    command: ["dumb-init", "node", "build/ingest.js"]
+    command: [ "dumb-init", "node", "build/ingest.js" ]
     build: .
     env_file:
       - .env
