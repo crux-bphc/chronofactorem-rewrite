@@ -109,9 +109,7 @@ export const removeSection = async (req: Request, res: Response) => {
     try {
       section = await sectionRepository
         .createQueryBuilder("section")
-        .innerJoin("section.timetables", "timetable")
-        .where("timetable.id = :id", { id: timetable.id })
-        .andWhere("section.id = :sectionId", { sectionId })
+        .where("section.id = :sectionId", { sectionId })
         .getOne();
     } catch (err: any) {
       // will replace the console.log with a logger when we have one
@@ -120,10 +118,22 @@ export const removeSection = async (req: Request, res: Response) => {
       res.status(500).json({ message: "Internal Server Error" });
     }
 
-    if (!section) {
+    if (section === null) {
+      return res.status(404).json({ message: "Section not found" });
+    }
+
+    let timetableHasSection = false;
+
+    for (let timetableSection of timetable.sections) {
+      if (timetableSection.id === section.id) {
+        timetableHasSection = true;
+        break;
+      }
+    }
+
+    if (!timetableHasSection) {
       return res.status(404).json({
-        message:
-          "Section either doesn't exist or isn't part of given timetable",
+        message: "Section not part of given timetable",
       });
     }
 
