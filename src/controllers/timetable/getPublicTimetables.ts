@@ -5,6 +5,7 @@ import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
 import { z } from "zod";
 import { validate } from "../../utils/zodValidateRequest";
+import { DegreeList, DegreeZodList } from "../../types/degrees";
 
 import {
     isAValidDegreeCombination,
@@ -14,9 +15,9 @@ const dataSchema = z.object({
 
     query : z.object({
         // temp auth replacement
-        authEmail: z.string({
-            invalid_type_error: "authEmail not a string",
-            required_error: "authEmail is a required path parameter",
+        email: z.string({
+            invalid_type_error: "email not a string",
+            required_error: "email is a required path parameter",
         }),
         year: z.coerce
             .number({
@@ -40,14 +41,11 @@ const dataSchema = z.object({
                 message : "invalid sem number (can only be 1 or 2)"
             })
             .optional(),
-        branch: z.array(z.string())
-            .min(1 , {
-                message : "needs atleast one branch code"
-            })
-            .max(2 , {
-                message : "cannot have more that two branch codes"
-            })
-            .optional()
+        branch: DegreeZodList.min(1, {
+            message: "degrees must be a non-empty array of valid degree strings",
+            }).max(2, {
+            message: "degrees may not contain more than two elements",
+            }),
 
     })
 })
@@ -58,9 +56,10 @@ export const getPublicTimetables = async (req : Request , res : Response) => {
     try{
         let user: User | null = null;
         try {
+            // get user email from the cookie later, for now it's passed as a query param
             user = await userRepository
               .createQueryBuilder("user")
-              .where("user.email = :email", { email: req.body.email })
+              .where("user.email = :email", { email: req.query.email })
               .getOne();
           } catch (err: any) {
             // will replace the console.log with a logger when we have one
@@ -73,7 +72,7 @@ export const getPublicTimetables = async (req : Request , res : Response) => {
             return res.status(404).json({ message: "User not found" });
           }
 
-        let branch: string[] = req.query.branch as string[];
+        let branch: DegreeList = req.query.branch as DegreeList;
         let year: number = parseInt(req.query.year as string);
         let sem: number = parseInt(req.query.sem as string);
         let isPrivate: boolean = false
@@ -90,7 +89,6 @@ export const getPublicTimetables = async (req : Request , res : Response) => {
                 });
             }
             queryBuilder.andWhere("timetable.degrees = :branch", { branch })
-            
         }
 
         if(year)
