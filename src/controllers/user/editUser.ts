@@ -66,7 +66,7 @@ export const editUser = async (req: Request, res: Response) => {
             .createQueryBuilder()
             .update("timetable")
             .set({ degrees })
-            .where("author = :author", { author: authorId })
+            .where("authorId = :author", { author: authorId })
             .execute();
         }
       );

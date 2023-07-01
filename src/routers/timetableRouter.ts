@@ -11,11 +11,20 @@ import {
   editTimetableMetadataValidator,
   editTimetableMetadata,
 } from "../controllers/timetable/editTimetableMetadata";
+import {
+  addSection,
+  addSectionValidator,
+} from "../controllers/timetable/addSection";
 
 const timetableRouter = express.Router();
 
 timetableRouter.post("/create", createTimeTableValidator, createTimetable);
-timetableRouter.post("/delete/:id", deleteTimeTableValidator, deleteTimetable);
-timetableRouter.post("/:id/edit", editTimetableMetadataValidator, editTimetableMetadata);
+timetableRouter.post("/:id/delete", deleteTimeTableValidator, deleteTimetable);
+timetableRouter.post("/:id/add", addSectionValidator, addSection);
+timetableRouter.post(
+  "/:id/edit",
+  editTimetableMetadataValidator,
+  editTimetableMetadata
+);
 
 export default timetableRouter;
