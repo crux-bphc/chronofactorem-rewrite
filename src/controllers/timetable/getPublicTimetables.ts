@@ -9,6 +9,24 @@ import {
   } from "../../types/degrees";
 
 const dataSchema = z.object({
+      // auth temp replacement
+    body: z.object({
+        email: z
+        .string({
+            invalid_type_error: "email not a string",
+            required_error: "email is a required body parameter",
+        })
+        .min(0, {
+            message: "email must be a non-empty string",
+        })
+        .regex(
+            /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9\-]*\.)+[A-Z]{2,}$/i,
+            {
+            message: "email must be a valid email",
+            }
+        ),
+    }),
+    
     query : z.object({
         year: z.coerce
             .number({
