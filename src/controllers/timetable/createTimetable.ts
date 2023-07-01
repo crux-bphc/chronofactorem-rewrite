@@ -44,7 +44,7 @@ export const createTimetable = async (req: Request, res: Response) => {
       // will replace the console.log with a logger when we have one
       console.log("Error while querying for user: ", err.message);
 
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
 
     if (!author) {
@@ -99,7 +99,7 @@ export const createTimetable = async (req: Request, res: Response) => {
       // will replace the console.log with a logger when we have one
       console.log("Error while creating timetable: ", err.message);
 
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
   } catch (err: any) {
     throw err;

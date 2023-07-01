@@ -22,7 +22,7 @@ const code_verifier = generators.codeVerifier();
 export async function manageAuthRedirect(req: Request, res: Response) {
   try {
     if (req.cookies["session"]) {
-      res.redirect(`${env.PROD_URL}/auth/callback`);
+      return res.redirect(`${env.PROD_URL}/auth/callback`);
     } else {
       const client = await getClient();
       const code_challenge = generators.codeChallenge(code_verifier);
@@ -33,10 +33,10 @@ export async function manageAuthRedirect(req: Request, res: Response) {
         code_challenge_method: "S256",
       });
 
-      res.redirect(authRedirect);
+      return res.redirect(authRedirect);
     }
   } catch (err: any) {
-    res.status(500).json({
+    return res.status(500).json({
       message: "authentication failure",
     });
   }
@@ -46,7 +46,7 @@ export async function manageAuthRedirect(req: Request, res: Response) {
 export async function authCallback(req: Request, res: Response) {
   try {
     if (req.cookies["session"]) {
-      res.json({
+      return res.json({
         authenticated: true,
         message: "user is logged in",
       });
@@ -83,7 +83,7 @@ export async function authCallback(req: Request, res: Response) {
       // setting the cookie
       res.cookie("session", userData, { maxAge: maxAge, httpOnly: true });
 
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         message: "user session has started",
       });
@@ -93,7 +93,7 @@ export async function authCallback(req: Request, res: Response) {
     // redirect them to a /profile route where they fill their degrees
     // on the frontend
 
-    res.status(401).redirect(`${env.PROD_URL}/auth/login`);
+    return res.status(401).redirect(`${env.PROD_URL}/auth/login`);
   }
 }
 
@@ -149,10 +149,9 @@ export async function getDegrees(req: Request, res: Response) {
     });
 
     if (user) {
-      res.status(200).json({
+      return res.status(200).json({
         message: "User already exists",
       });
-      return;
     }
 
     userRepository
@@ -172,7 +171,7 @@ export async function getDegrees(req: Request, res: Response) {
       success: true,
     });
   } catch (error: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "failed to register",
     });
@@ -182,7 +181,7 @@ export async function getDegrees(req: Request, res: Response) {
 // this function deletes the session cookie to log out
 export async function logout(req: Request, res: Response) {
   res.clearCookie("session");
-  res.json({
+  return res.json({
     authenticated: false,
     message: "user logged out",
   });

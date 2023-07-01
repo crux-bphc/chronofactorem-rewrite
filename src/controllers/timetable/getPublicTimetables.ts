@@ -76,7 +76,7 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
       // will replace the console.log with a logger when we have one
       console.log("Error while querying for user: ", err.message);
 
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
 
     if (!user) {
@@ -135,7 +135,7 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
     } catch (err: any) {
       // will replace the console.log with a logger when we have one
       console.log("Error while querying timetable: ", err.message);
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
   } catch (err: any) {
     return err;

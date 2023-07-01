@@ -54,7 +54,7 @@ export const deleteTimetable = async (req: Request, res: Response) => {
       // will replace the console.log with a logger when we have one
       console.log("Error while querying user: ", err.message);
 
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
 
     if (!author) {
@@ -74,7 +74,7 @@ export const deleteTimetable = async (req: Request, res: Response) => {
       // will replace the console.log with a logger when we have one
       console.log("Error while querying timetable: ", err.message);
 
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
 
     if (!timetable) {
@@ -95,7 +95,7 @@ export const deleteTimetable = async (req: Request, res: Response) => {
       // will replace the console.log with a logger when we have one
       console.log("Error while deleting timetable: ", err.message);
 
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
 
     return res.json({ message: "timetable deleted" });
