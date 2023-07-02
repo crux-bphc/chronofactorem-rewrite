@@ -72,7 +72,7 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
   if (!author) {
     return res.status(401).json({ message: "unregistered user" });
   }
-  
+
   const id: number = parseInt(req.params.id);
 
   let timetable: Timetable | null = null;
