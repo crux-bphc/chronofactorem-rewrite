@@ -174,7 +174,7 @@ export const addSection = async (req: Request, res: Response) => {
       err.message
     );
 
-    return res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ message: "Internal Server Error" });
   }
 
   let sameCourseSectionsCount = 0;
@@ -194,7 +194,7 @@ export const addSection = async (req: Request, res: Response) => {
       err.message
     );
 
-    return res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ message: "Internal Server Error" });
   }
 
   if (sameCourseSectionsCount > 0) {

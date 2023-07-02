@@ -43,11 +43,11 @@ export const createTimetable = async (req: Request, res: Response) => {
     // will replace the console.log with a logger when we have one
     console.log("Error while querying for user: ", err.message);
 
-    res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 
   if (!author) {
-    return res.status(404).json({ message: "User not found" });
+    return res.status(401).json({ message: "unregistered user" });
   }
 
   // new timetable default properties
@@ -96,6 +96,6 @@ export const createTimetable = async (req: Request, res: Response) => {
     // will replace the console.log with a logger when we have one
     console.log("Error while creating timetable: ", err.message);
 
-    res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };

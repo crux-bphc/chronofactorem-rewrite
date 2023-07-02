@@ -66,12 +66,11 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
   } catch (err: any) {
     // will replace the console.log with a logger when we have one
     console.log("Error while querying user: ", err.message);
-
-    res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 
   if (!author) {
-    return res.json({ message: "unregistered user" });
+    return res.status(401).json({ message: "unregistered user" });
   }
 
   const id: number = parseInt(req.params.id);
@@ -87,7 +86,7 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
     // will replace the console.log with a logger when we have one
     console.log("Error while querying timetable: ", err.message);
 
-    res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 
   if (!timetable) {
@@ -107,16 +106,12 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
     // will replace the console.log with a logger when we have one
     console.log("Error while checking user owns timetable: ", err.message);
 
-    res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 
   if (!owns) {
     return res.status(403).json({ message: "user does not own timetable" });
   }
-
-  const name: string = req.body.name;
-  const isPrivate: boolean = req.body.isPrivate;
-  const isDraft: boolean = req.body.isDraft;
 
   try {
     await timetableRepository
