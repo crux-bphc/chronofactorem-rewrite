@@ -123,7 +123,7 @@ export const removeSection = async (req: Request, res: Response) => {
 
   let timetableHasSection = false;
 
-  for (let timetableSection of timetable.sections) {
+  for (const timetableSection of timetable.sections) {
     if (timetableSection.id === section.id) {
       timetableHasSection = true;
       break;
