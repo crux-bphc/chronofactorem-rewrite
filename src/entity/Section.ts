@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   Index,
   ManyToMany,
+  JoinColumn,
 } from "typeorm";
 import {
   ApprovedSectionTypeList,
@@ -20,7 +21,11 @@ export class Section {
   id!: string;
 
   @Index()
+  @Column("uuid")
+  courseId!: string;
+
   @ManyToOne(() => Course, (course) => course.sections, { onDelete: "CASCADE" })
+  @JoinColumn()
   course!: Course;
 
   @Column({

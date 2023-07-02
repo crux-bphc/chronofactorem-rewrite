@@ -30,8 +30,10 @@ PGUSER="chrono" # should be same as POSTGRES_USER
 POSTGRES_PASSWORD="aSBrbm93IHdoYXQgeW91IGFyZQ=="
 POSTGRES_DB="chrono" # should be same as POSTGRES_USER for some reason
 NODE_ENV="development"
-PROD_URL="https://chrono.crux-bphc.com"
+PROD_URL="http://localhost:3000"
 PORT=3000
+GOOGLE_CLIENT_ID=859305615575-i9o0mr1vfh728u1a0tj227qbosbrk4rk.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=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
 ```
 
 Obviously, we'll use different creds in production.
