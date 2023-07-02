@@ -1,5 +1,5 @@
 import { Section } from "../entity/Section";
-import { SectionTypeList, SectionTypeEnum } from "../types/sectionTypes";
+import { SectionTypeList } from "../types/sectionTypes";
 
 export const updateSectionWarnings = (
   courseCode: string,
@@ -17,7 +17,7 @@ export const updateSectionWarnings = (
   }
 
   const sectionType = section.type;
-  let updatedWarnings: string[] = [];
+  const updatedWarnings: string[] = [];
 
   if (isAdded) {
     const currentWarning = warningMap.get(courseCode);
@@ -58,18 +58,20 @@ export const updateSectionWarnings = (
       }
     } else {
       const currentWarningSectionTypes = currentWarning.warningSectionTypes;
-      if (sectionType in currentWarningSectionTypes) {
+      if (currentWarningSectionTypes.includes(sectionType)) {
         throw Error(
           "Removing a course that should not be there according to warnings"
         );
       }
       // Adding new courseType to warnings after removing course
-      if (sectionType in requiredSectionTypes) {
+      if (requiredSectionTypes.includes(sectionType)) {
         currentWarningSectionTypes.push(sectionType);
         if (requiredSectionTypes.length !== currentWarningSectionTypes.length) {
           warningMap.set(courseCode, {
             warningSectionTypes: currentWarningSectionTypes,
           });
+        } else {
+          warningMap.delete(courseCode);
         }
       }
     }

@@ -1,20 +1,16 @@
-import { Request, Response } from "express";
-import { timetableRepository } from "../../repositories/timetableRepository";
-import { Timetable } from "../../entity/Timetable";
 import { z } from "zod";
 import { validate } from "../../utils/zodValidateRequest";
+import { Request, Response } from "express";
 import { Section } from "../../entity/Section";
+import { Timetable } from "../../entity/Timetable";
 import { User } from "../../entity/User";
-import { userRepository } from "../../repositories/userRepository";
-import { SectionTypeList } from "../../types/sectionTypes";
 import { sectionRepository } from "../../repositories/sectionRepository";
-import {
-  checkForClassHoursClash,
-  checkForExamHoursClash,
-} from "../../utils/checkForClashes";
+import { timetableRepository } from "../../repositories/timetableRepository";
+import { userRepository } from "../../repositories/userRepository";
 import { Course } from "../../entity/Course";
 import { courseRepository } from "../../repositories/courseRepository";
 import { updateSectionWarnings } from "../../utils/updateWarnings";
+import { SectionTypeList } from "../../types/sectionTypes";
 
 const dataSchema = z.object({
   body: z.object({
@@ -59,9 +55,9 @@ const dataSchema = z.object({
   }),
 });
 
-export const addSectionValidator = validate(dataSchema);
+export const removeSectionValidator = validate(dataSchema);
 
-export const addSection = async (req: Request, res: Response) => {
+export const removeSection = async (req: Request, res: Response) => {
   const timetableId = parseInt(req.params.id);
   const sectionId = req.body.sectionId;
   const email = req.body.email;
@@ -89,6 +85,7 @@ export const addSection = async (req: Request, res: Response) => {
   try {
     timetable = await timetableRepository
       .createQueryBuilder("timetable")
+      .leftJoinAndSelect("timetable.sections", "section")
       .where("timetable.id = :id", { id: timetableId })
       .getOne();
   } catch (err: any) {
@@ -111,7 +108,7 @@ export const addSection = async (req: Request, res: Response) => {
   try {
     section = await sectionRepository
       .createQueryBuilder("section")
-      .where("section.id = :id", { id: sectionId })
+      .where("section.id = :sectionId", { sectionId })
       .getOne();
   } catch (err: any) {
     // will replace the console.log with a logger when we have one
@@ -120,8 +117,23 @@ export const addSection = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 
-  if (!section) {
-    return res.status(404).json({ message: "section not found" });
+  if (section === null) {
+    return res.status(404).json({ message: "Section not found" });
+  }
+
+  let timetableHasSection = false;
+
+  for (const timetableSection of timetable.sections) {
+    if (timetableSection.id === section.id) {
+      timetableHasSection = true;
+      break;
+    }
+  }
+
+  if (!timetableHasSection) {
+    return res.status(404).json({
+      message: "Section not part of given timetable",
+    });
   }
 
   let course: Course | null = null;
@@ -143,17 +155,16 @@ export const addSection = async (req: Request, res: Response) => {
     return res.status(404).json({ message: "course not found" });
   }
 
-  const classHourClashes = checkForClassHoursClash(timetable, section);
-  if (classHourClashes.clash) {
-    return res.status(400).json({
-      message: `section clashes with ${classHourClashes.course}`,
-    });
-  }
+  const sameCourseSections: Section[] = timetable.sections.filter(
+    (currentSection) => {
+      return currentSection.courseId === section?.courseId;
+    }
+  );
 
-  const examHourClashes = checkForExamHoursClash(timetable, course);
-  if (examHourClashes.clash && !examHourClashes.sameCourse) {
-    return res.status(400).json({
-      message: `course's exam clashes with ${examHourClashes.course}'s ${examHourClashes.exam}`,
+  // remove course's exam timings if no other sections of this course in TT
+  if (sameCourseSections.length === 1) {
+    timetable.examTimes = timetable.examTimes.filter((examTime) => {
+      return examTime.split("|")[0] !== course?.code;
     });
   }
 
@@ -174,99 +185,37 @@ export const addSection = async (req: Request, res: Response) => {
       err.message
     );
 
-    res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 
-  let sameCourseSectionsCount = 0;
+  const classTimings = section.roomTime.map((time) => {
+    return time.split(":")[1] + time.split(":")[2];
+  });
 
-  try {
-    sameCourseSectionsCount = await sectionRepository
-      .createQueryBuilder("section")
-      .innerJoin("section.timetables", "timetable")
-      .where("timetable.id = :id", { id: timetable.id })
-      .andWhere("section.courseId = :courseId", { courseId })
-      .andWhere("section.type = :type", { type: section.type })
-      .getCount();
-  } catch (err: any) {
-    // will replace the console.log with a logger when we have one
-    console.log(
-      "Error while querying for other sections of same course: ",
-      err.message
-    );
+  timetable.timings = timetable.timings.filter((time) => {
+    return !classTimings.includes(time.split(":")[1]);
+  });
 
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-
-  if (sameCourseSectionsCount > 0) {
-    return res.status(400).json({
-      message: `can't have multiple sections of type ${section.type}`,
-    });
-  }
+  timetable.sections = timetable.sections.filter((currentSection) => {
+    return currentSection.id !== section?.id;
+  });
 
   timetable.warnings = updateSectionWarnings(
     course.code,
     section,
     sectionTypes,
-    true,
+    false,
     timetable.warnings
   );
 
-  const newTimes: string[] = section.roomTime.map(
-    (time) => course?.code + ":" + time.split(":")[1] + time.split(":")[2]
-  );
-
   try {
-    await timetableRepository.manager.transaction(
-      async (transactionalEntityManager) => {
-        // shoudn't be needed, but kept them here as it was erroring out
-        if (!course) {
-          return res.status(404).json({ message: "course not found" });
-        }
-        if (!timetable) {
-          return res.status(404).json({ message: "timetable not found" });
-        }
-
-        await transactionalEntityManager
-          .createQueryBuilder()
-          .relation(Timetable, "sections")
-          .of(timetable)
-          .add(section);
-
-        await transactionalEntityManager
-          .createQueryBuilder()
-          .update(Timetable)
-          .set({
-            timings: [...timetable.timings, ...newTimes],
-            warnings: timetable.warnings,
-          })
-          .where("timetable.id = :id", { id: timetable.id })
-          .execute();
-
-        if (!examHourClashes.sameCourse) {
-          await transactionalEntityManager
-            .createQueryBuilder()
-            .update(Timetable)
-            .set({
-              examTimes: [
-                ...timetable.examTimes,
-                `${
-                  course.code
-                }|${course.midsemStartTime.toISOString()}|${course.midsemEndTime.toISOString()}`,
-                `${
-                  course.code
-                }|${course.compreStartTime.toISOString()}|${course.compreEndTime.toISOString()}`,
-              ],
-            })
-            .where("timetable.id = :id", { id: timetable.id })
-            .execute();
-        }
-      }
-    );
+    await timetableRepository.save(timetable);
   } catch (err: any) {
     // will replace the console.log with a logger when we have one
-    console.log("Error while updating timetable with section: ", err.message);
+    console.log("Error while removing section from timetable: ", err.message);
 
     return res.status(500).json({ message: "Internal Server Error" });
   }
-  return res.json({ message: "section added" });
+
+  return res.json({ message: "section removed" });
 };
