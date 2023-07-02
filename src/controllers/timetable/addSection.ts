@@ -260,6 +260,7 @@ export const addSection = async (req: Request, res: Response) => {
             .where("timetable.id = :id", { id: timetable.id })
             .execute();
         }
+      }
     );
   } catch (err: any) {
     // will replace the console.log with a logger when we have one
