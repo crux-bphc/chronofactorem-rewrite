@@ -1,5 +1,5 @@
 import { Section } from "../entity/Section";
-import { SectionTypeList, SectionTypeEnum } from "../types/sectionTypes";
+import { SectionTypeList } from "../types/sectionTypes";
 
 export const updateSectionWarnings = (
   courseCode: string,
@@ -17,7 +17,7 @@ export const updateSectionWarnings = (
   }
 
   const sectionType = section.type;
-  let updatedWarnings: string[] = [];
+  const updatedWarnings: string[] = [];
 
   if (isAdded) {
     const currentWarning = warningMap.get(courseCode);

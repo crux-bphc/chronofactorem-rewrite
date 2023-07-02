@@ -7,6 +7,10 @@ import {
   deleteTimeTableValidator,
   deleteTimetable,
 } from "../controllers/timetable/deleteTimetable";
+import {
+  getTimetableByIdValidator,
+  getTimetableById,
+} from "../controllers/timetable/getTimetableById";
 
 import {
   editTimetableMetadataValidator,
@@ -29,6 +33,7 @@ import {
 const timetableRouter = express.Router();
 
 timetableRouter.post("/create", createTimeTableValidator, createTimetable);
+timetableRouter.get("/:id", getTimetableByIdValidator, getTimetableById);
 timetableRouter.get(
   "/getPublic",
   getPublicTimetablesValidator,

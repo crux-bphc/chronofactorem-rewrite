@@ -1,6 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { AppDataSource } from "./db";
 import userRouter from "./routers/userRouter";
 import authRouter from "./routers/authRouter";
@@ -36,7 +36,7 @@ AppDataSource.initialize()
     app.listen(env.PORT);
 
     // Error handling
-    app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    app.use((err: any, req: Request, res: Response) => {
       console.log(err);
       res.status(err.status || 500).send(err.stack);
     });
