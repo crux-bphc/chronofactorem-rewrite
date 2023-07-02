@@ -25,6 +25,10 @@ import {
   getPublicTimetables,
   getPublicTimetablesValidator,
 } from "../controllers/timetable/getPublicTimetables";
+import {
+  removeSection,
+  removeSectionValidator,
+} from "../controllers/timetable/removeSection";
 
 const timetableRouter = express.Router();
 
@@ -37,6 +41,7 @@ timetableRouter.get(
 );
 timetableRouter.post("/:id/delete", deleteTimeTableValidator, deleteTimetable);
 timetableRouter.post("/:id/add", addSectionValidator, addSection);
+timetableRouter.post("/:id/remove", removeSectionValidator, removeSection);
 timetableRouter.post(
   "/:id/edit",
   editTimetableMetadataValidator,
