@@ -21,7 +21,7 @@ const dataSchema = z.object({
         message: "email must be a non-empty string",
       })
       .regex(
-        /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9\-]*\.)+[A-Z]{2,}$/i,
+        /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i,
         {
           message: "email must be a valid email",
         }
@@ -32,76 +32,70 @@ const dataSchema = z.object({
 export const createTimeTableValidator = validate(dataSchema);
 
 export const createTimetable = async (req: Request, res: Response) => {
+  let author: User | null = null;
+
   try {
-    let author: User | null = null;
-
-    try {
-      author = await userRepository
-        .createQueryBuilder("user")
-        .where("user.email = :email", { email: req.body.email })
-        .getOne();
-    } catch (err: any) {
-      // will replace the console.log with a logger when we have one
-      console.log("Error while querying for user: ", err.message);
-
-      res.status(500).json({ message: "Internal Server Error" });
-    }
-
-    if (!author) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // new timetable default properties
-    const name: string = "Untitled Timetable";
-    const degrees: DegreeEnum[] = author.degrees;
-    const isPrivate: boolean = false;
-    const isDraft: boolean = false;
-    const isArchived: boolean = false;
-    const acadYear = timetableJSON.metadata.acadYear;
-    const year: number = acadYear - author.batch + 1;
-    const semester = timetableJSON.metadata.semester;
-    const sections: Section[] = [];
-    const timings: string[] = [];
-    const examTimes: string[] = [];
-    const warnings: string[] = [];
-    const createdAt: Date = new Date();
-    const lastUpdated: Date = new Date();
-    const authorId: string = author.id;
-
-    try {
-      await timetableRepository
-        .createQueryBuilder()
-        .insert()
-        .into(Timetable)
-        .values({
-          authorId,
-          name,
-          degrees,
-          private: isPrivate,
-          draft: isDraft,
-          archived: isArchived,
-          acadYear,
-          semester,
-          year,
-          sections,
-          timings,
-          examTimes,
-          warnings,
-          createdAt,
-          lastUpdated,
-        })
-        .execute();
-
-      return res
-        .status(201)
-        .json({ message: "Timetable created successfully" });
-    } catch (err: any) {
-      // will replace the console.log with a logger when we have one
-      console.log("Error while creating timetable: ", err.message);
-
-      res.status(500).json({ message: "Internal Server Error" });
-    }
+    author = await userRepository
+      .createQueryBuilder("user")
+      .where("user.email = :email", { email: req.body.email })
+      .getOne();
   } catch (err: any) {
-    throw err;
+    // will replace the console.log with a logger when we have one
+    console.log("Error while querying for user: ", err.message);
+
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+
+  if (!author) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  // new timetable default properties
+  const name = "Untitled Timetable";
+  const degrees: DegreeEnum[] = author.degrees;
+  const isPrivate = false;
+  const isDraft = false;
+  const isArchived = false;
+  const acadYear = timetableJSON.metadata.acadYear;
+  const year: number = acadYear - author.batch + 1;
+  const semester = timetableJSON.metadata.semester;
+  const sections: Section[] = [];
+  const timings: string[] = [];
+  const examTimes: string[] = [];
+  const warnings: string[] = [];
+  const createdAt: Date = new Date();
+  const lastUpdated: Date = new Date();
+  const authorId: string = author.id;
+
+  try {
+    await timetableRepository
+      .createQueryBuilder()
+      .insert()
+      .into(Timetable)
+      .values({
+        authorId,
+        name,
+        degrees,
+        private: isPrivate,
+        draft: isDraft,
+        archived: isArchived,
+        acadYear,
+        semester,
+        year,
+        sections,
+        timings,
+        examTimes,
+        warnings,
+        createdAt,
+        lastUpdated,
+      })
+      .execute();
+
+    return res.status(201).json({ message: "Timetable created successfully" });
+  } catch (err: any) {
+    // will replace the console.log with a logger when we have one
+    console.log("Error while creating timetable: ", err.message);
+
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
