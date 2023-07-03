@@ -97,23 +97,7 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
     return res.status(404).json({ message: "timetable not found" });
   }
 
-  let owns = false;
-
-  try {
-    owns =
-      (await timetableRepository
-        .createQueryBuilder("timetable")
-        .where("timetable.id = :id", { id: timetable.id })
-        .andWhere("timetable.author = :author", { author: author.id })
-        .getCount()) > 0;
-  } catch (err: any) {
-    // will replace the console.log with a logger when we have one
-    console.log("Error while checking user owns timetable: ", err.message);
-
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-
-  if (!owns) {
+  if (timetable.authorId !== author.id) {
     return res.status(403).json({ message: "user does not own timetable" });
   }
 
