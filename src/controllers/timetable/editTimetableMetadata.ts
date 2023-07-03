@@ -58,6 +58,10 @@ export const editTimetableMetadataValidator = validate(dataSchema);
 export const editTimetableMetadata = async (req: Request, res: Response) => {
   let author: User | null = null;
 
+  const name: string = req.body.name;
+  const isPrivate: boolean = req.body.isPrivate;
+  const isDraft: boolean = req.body.isDraft;
+
   try {
     author = await userRepository
       .createQueryBuilder("user")
