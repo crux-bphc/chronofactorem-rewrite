@@ -14,7 +14,9 @@ services:
       retries: 3
 
   backend:
-    build: .
+    build:
+      context: .
+      dockerfile: ./docker/prod/Dockerfile
     env_file:
       - .env
     depends_on:
@@ -22,6 +24,8 @@ services:
         condition: service_healthy
     ports:
       - "${PORT}:${PORT}"
+    profiles:
+      - "prod"
 
   ingestion:
     command: ["dumb-init", "node", "build/ingest.js"]
