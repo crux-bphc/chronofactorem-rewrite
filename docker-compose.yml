@@ -25,9 +25,7 @@ services:
     volumes:
       - ./patches:/usr/local/app/patches
       - ./src:/usr/local/app/src
-      - ./package.json:/usr/local/app/package.json
       - ./tsconfig.json:/usr/local/app/tsconfig.json
-      - ./pnpm-lock.yaml:/usr/local/app/pnpm-lock.yaml
     ports:
       - "${PORT}:${PORT}"
 
