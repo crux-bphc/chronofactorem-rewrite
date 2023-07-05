@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction } from "express";
 import bodyParser from "body-parser";
 import { Request, Response } from "express";
 import { AppDataSource } from "./db";
@@ -36,7 +36,7 @@ AppDataSource.initialize()
     app.listen(env.PORT);
 
     // Error handling
-    app.use((err: any, req: Request, res: Response) => {
+    app.use((err: any, req: Request, res: Response, _: NextFunction) => {
       console.log(err);
       res.status(err.status || 500).send(err.stack);
     });

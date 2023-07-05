@@ -1,3 +1,4 @@
+/** @type {import("eslint").Linter.Config} */
 /* eslint-env node */
 module.exports = {
   extends: [
@@ -14,6 +15,7 @@ module.exports = {
       "warn", // or "error"
       {
         varsIgnorePattern: "^_",
+        argsIgnorePattern: "^_",
       },
     ],
   },

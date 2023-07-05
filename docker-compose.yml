@@ -13,8 +13,26 @@ services:
       timeout: 30s
       retries: 3
 
-  backend:
-    build: .
+  backend-dev:
+    build:
+      context: .
+      dockerfile: ./docker/dev/Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./patches:/usr/local/app/patches
+      - ./src:/usr/local/app/src
+      - ./tsconfig.json:/usr/local/app/tsconfig.json
+    ports:
+      - "${PORT}:${PORT}"
+
+  backend-prod:
+    build:
+      context: .
+      dockerfile: ./docker/prod/Dockerfile
     env_file:
       - .env
     depends_on:
@@ -22,6 +40,8 @@ services:
         condition: service_healthy
     ports:
       - "${PORT}:${PORT}"
+    profiles:
+      - "prod"
 
   ingestion:
     command: ["dumb-init", "node", "build/ingest.js"]
