@@ -5,7 +5,7 @@ import { getCourseByIdValidator } from "../controllers/course/getCourseById";
 
 const courseRouter = express.Router();
 
-courseRouter.get("/:id", getCourseByIdValidator, getCourseById);
 courseRouter.get("/", getAllCourses);
+courseRouter.get("/:id", getCourseByIdValidator, getCourseById);
 
 export default courseRouter;
