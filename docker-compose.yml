@@ -81,7 +81,7 @@ services:
       - "ingestion"
 
   backend-testing:
-    command: ["pnpm", "jest", "--runInBand"]
+    command: ["pnpm", "jest", "--runInBand", "--verbose"]
     build:
       context: .
       dockerfile: ./docker/dev/Dockerfile
