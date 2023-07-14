@@ -25,6 +25,12 @@ export const getCourseById = async (req: Request, res: Response) => {
     const course = await courseRepository
       .createQueryBuilder("course")
       .where("course.id = :id", { id })
+      .leftJoinAndSelect(
+        "course.sections",
+        "section",
+        "section.course = :courseId",
+        { courseId: id }
+      )
       .getOne();
 
     if (!course) {
