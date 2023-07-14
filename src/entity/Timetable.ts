@@ -10,24 +10,9 @@ import {
   JoinTable,
   JoinColumn,
 } from "typeorm";
-import {
-  DegreeEnum,
-  ApprovedDegreeList,
-  NamedDegreeZodList,
-} from "../types/degrees";
+import { DegreeEnum, ApprovedDegreeList } from "../types/degrees";
 import { User } from "./User";
 import { Section } from "./Section";
-import { z } from "zod";
-import {
-  addNameToString,
-  namedBooleanType,
-  namedISOTimestampType,
-  namedNonEmptyStringType,
-  namedSemesterType,
-  namedTimetableIDType,
-  namedUUIDType,
-  namedYearType,
-} from "../types/zodFieldTypes";
 
 @Entity()
 export class Timetable {
@@ -100,24 +85,3 @@ export class Timetable {
   })
   lastUpdated!: Date;
 }
-
-export const namedTimetableType = (name?: string) =>
-  z.object({
-    id: namedTimetableIDType(name),
-    authorId: namedUUIDType(addNameToString("authorId", name)),
-    name: namedNonEmptyStringType(addNameToString("name", name)),
-    degrees: NamedDegreeZodList(name),
-    private: namedBooleanType(addNameToString("private", name)),
-    draft: namedBooleanType(addNameToString("draft", name)),
-    archived: namedBooleanType(addNameToString("archived", name)),
-    year: namedYearType(addNameToString("year", name)),
-    acadYear: namedYearType(addNameToString("acadYear", name)),
-    semester: namedSemesterType(name),
-    timings: namedNonEmptyStringType(addNameToString("timings", name)),
-    examTimes: namedNonEmptyStringType(addNameToString("examTimes", name)),
-    warnings: namedNonEmptyStringType(addNameToString("warnings", name)),
-    createdAt: namedISOTimestampType(addNameToString("createdAt", name)),
-    lastUpdated: namedISOTimestampType(addNameToString("lastUpdated", name)),
-  });
-
-export const timetableType = namedTimetableType();

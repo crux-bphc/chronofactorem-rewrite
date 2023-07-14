@@ -6,21 +6,8 @@ import {
   CreateDateColumn,
   Index,
 } from "typeorm";
-import {
-  DegreeEnum,
-  ApprovedDegreeList,
-  NamedDegreeZodList,
-} from "../types/degrees";
+import { DegreeEnum, ApprovedDegreeList } from "../types/degrees";
 import { Timetable } from "./Timetable";
-import { z } from "zod";
-import {
-  addNameToString,
-  namedEmailType,
-  namedISOTimestampType,
-  namedNonEmptyStringType,
-  namedUUIDType,
-  namedYearType,
-} from "../types/zodFieldTypes";
 
 @Entity()
 export class User {
@@ -54,15 +41,3 @@ export class User {
   })
   createdAt!: Date;
 }
-
-export const namedUserType = (name?: string) =>
-  z.object({
-    id: namedUUIDType(name),
-    email: namedEmailType(name),
-    batch: namedYearType(addNameToString("batch", name)),
-    name: namedNonEmptyStringType(addNameToString("name", name)),
-    degrees: NamedDegreeZodList(name),
-    createdAt: namedISOTimestampType(addNameToString("createdAt", name)),
-  });
-
-export const userType = namedUserType();

@@ -7,16 +7,6 @@ import {
   OneToMany,
   Unique,
 } from "typeorm";
-import { z } from "zod";
-import {
-  addNameToString,
-  namedBooleanType,
-  namedISOTimestampType,
-  namedNonEmptyStringType,
-  namedSemesterType,
-  namedUUIDType,
-  namedYearType,
-} from "../types/zodFieldTypes";
 import { Section } from "./Section";
 
 @Entity()
@@ -63,28 +53,3 @@ export class Course {
   })
   createdAt!: Date;
 }
-
-export const namedCourseType = (name?: string) =>
-  z.object({
-    id: namedUUIDType(name),
-    code: namedNonEmptyStringType(addNameToString("code", name)),
-    name: namedNonEmptyStringType(addNameToString("name", name)),
-    midsemStartTime: namedISOTimestampType(
-      addNameToString("midsemStartTime", name)
-    ),
-    midsemEndTime: namedISOTimestampType(
-      addNameToString("midsemEndTime", name)
-    ),
-    compreStartTime: namedISOTimestampType(
-      addNameToString("compreStartTime", name)
-    ),
-    compreEndTime: namedISOTimestampType(
-      addNameToString("compreEndTime", name)
-    ),
-    archived: namedBooleanType(addNameToString("archived", name)),
-    acadYear: namedYearType(addNameToString("acadYear", name)),
-    semester: namedSemesterType(name),
-    createdAt: namedISOTimestampType(addNameToString("createdAt", name)),
-  });
-
-export const courseType = namedCourseType();

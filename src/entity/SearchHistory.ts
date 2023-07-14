@@ -4,13 +4,6 @@ import {
   Column,
   CreateDateColumn,
 } from "typeorm";
-import {
-  addNameToString,
-  namedISOTimestampType,
-  namedNonEmptyStringType,
-  namedUUIDType,
-} from "../types/zodFieldTypes";
-import { z } from "zod";
 
 @Entity()
 export class SearchHistory {
@@ -30,13 +23,3 @@ export class SearchHistory {
   })
   searchedAt!: Date;
 }
-
-export const namedSearchHistoryType = (name?: string) =>
-  z.object({
-    id: namedUUIDType(name),
-    userEmailHash: namedNonEmptyStringType(
-      addNameToString("user email hash", name)
-    ),
-    searchTerm: namedNonEmptyStringType(addNameToString("search term", name)),
-    searchedAt: namedISOTimestampType(addNameToString("searchedAt", name)),
-  });

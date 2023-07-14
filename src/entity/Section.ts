@@ -10,19 +10,10 @@ import {
 } from "typeorm";
 import {
   ApprovedSectionTypeList,
-  NamedSectionTypeZodEnum,
   SectionTypeEnum,
 } from "../types/sectionTypes";
 import { Course } from "./Course";
 import { Timetable } from "./Timetable";
-import {
-  addNameToString,
-  namedISOTimestampType,
-  namedIntegerType,
-  namedNonEmptyStringType,
-  namedUUIDType,
-} from "../types/zodFieldTypes";
-import { z } from "zod";
 
 @Entity()
 export class Section {
@@ -62,20 +53,3 @@ export class Section {
   })
   createdAt!: Date;
 }
-
-export const namedSectionType = (name?: string) =>
-  z.object({
-    id: namedUUIDType(name),
-    courseId: namedUUIDType(addNameToString("courseId", name)),
-    type: NamedSectionTypeZodEnum(name),
-    number: namedIntegerType(addNameToString("number", name)),
-    instructors: namedNonEmptyStringType(
-      addNameToString("instructors", name)
-    ).array(),
-    roomTime: namedNonEmptyStringType(
-      addNameToString("room-time", name)
-    ).array(),
-    createdAt: namedISOTimestampType(addNameToString("createdAt", name)),
-  });
-
-export const sectionType = namedSectionType();
