@@ -5,9 +5,15 @@ import { validate } from "../../utils/zodValidateRequest";
 
 const dataSchema = z.object({
   params: z.object({
-    id: z.coerce
-      .number()
-      .nonnegative({ message: "id must be a non-negative number" }),
+    id: z
+      .string({
+        invalid_type_error: "id not a string",
+        required_error: "id is a required path parameter",
+      })
+      .min(0, {
+        message: "id must be a non-empty string",
+      })
+      .uuid({ message: "id must be a valid uuid" }),
   }),
 });
 
