@@ -1,0 +1,424 @@
+{
+  "metadata": {
+    "acadYear": 2000,
+    "semester": 2
+  },
+  "courses": {
+    "TEST F110": {
+      "units": 1.0,
+      "course_name": "TEST COURSE 1",
+      "sections": {
+        "P1": {
+          "instructor": ["TEST INSTRUCTOR 1"],
+          "schedule": [
+            {
+              "room": "T100",
+              "days": ["T"],
+              "hours": [4, 5]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "13/03 9.30 - 11.00AM",
+          "compre": "08/05 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2000-03-13T04:00:00|2000-03-13T05:30:00",
+          "compre": "2000-05-08T04:00:00|2000-05-08T07:00:00"
+        }
+      ]
+    },
+    "TEST F111": {
+      "units": 3.0,
+      "course_name": "TEST COURSE 2",
+      "sections": {
+        "L1": {
+          "instructor": ["TEST INSTRUCTOR 2"],
+          "schedule": [
+            {
+              "room": "T101",
+              "days": ["M", "W", "F"],
+              "hours": [2]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "17/03 4.00 - 5.30PM",
+          "compre": "18/05 AN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2000-03-17T10:30:00|2000-03-17T12:00:00",
+          "compre": "2000-05-18T08:30:00|2000-05-18T11:30:00"
+        }
+      ]
+    },
+    "TEST F112": {
+      "units": 3.0,
+      "course_name": "TEST COURSE 3",
+      "sections": {
+        "L1": {
+          "instructor": ["TEST INSTRUCTOR 1", "TEST INSTRUCTOR 3"],
+          "schedule": [
+            {
+              "room": "T100",
+              "days": ["M", "W", "F"],
+              "hours": [9]
+            }
+          ]
+        },
+        "T1": {
+          "instructor": ["TEST INSTRUCTOR 1"],
+          "schedule": [
+            {
+              "room": "T101",
+              "days": ["W"],
+              "hours": [1]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "16/03 4.00 - 5.30PM",
+          "compre": "16/05 AN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2000-03-16T10:30:00|2000-03-16T12:00:00",
+          "compre": "2000-05-16T08:30:00|2000-05-16T11:30:00"
+        }
+      ]
+    },
+    "TEST F113": {
+      "units": 3.0,
+      "course_name": "TEST COURSE 4",
+      "sections": {
+        "L1": {
+          "instructor": ["TEST INSTRUCTOR 4"],
+          "schedule": [
+            {
+              "room": "T102",
+              "days": ["M", "W"],
+              "hours": [4]
+            },
+            {
+              "room": "T102",
+              "days": ["F"],
+              "hours": [5]
+            }
+          ]
+        },
+        "P1": {
+          "instructor": ["TEST INSTRUCTOR 5"],
+          "schedule": [
+            {
+              "room": "T102",
+              "days": ["Th"],
+              "hours": [8, 9]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "16/03 4.00 - 5.30PM",
+          "compre": "16/05 AN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2000-03-16T10:30:00|2000-03-16T12:00:00",
+          "compre": "2000-05-16T08:30:00|2000-05-16T11:30:00"
+        }
+      ]
+    },
+    "TEST F114": {
+      "units": 4.0,
+      "course_name": "TEST COURSE 5",
+      "sections": {
+        "L1": {
+          "instructor": ["TEST INSTRUCTOR 6", "TEST INSTRUCTOR 7"],
+          "schedule": [
+            {
+              "room": "T103",
+              "days": ["M", "W", "F"],
+              "hours": [3]
+            }
+          ]
+        },
+        "P1": {
+          "instructor": ["TEST INSTRUCTOR 7", "TEST INSTRUCTOR 6"],
+          "schedule": [
+            {
+              "room": "T103",
+              "days": ["S"],
+              "hours": [1, 2]
+            }
+          ]
+        },
+        "T1": {
+          "instructor": ["TEST INSTRUCTOR 7", "TEST INSTRUCTOR 6"],
+          "schedule": [
+            {
+              "room": "T103",
+              "days": ["T"],
+              "hours": [6]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "14/03 9.30 - 11.00AM",
+          "compre": "10/05 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2000-03-14T04:00:00|2000-03-14T05:30:00",
+          "compre": "2000-05-10T04:00:00|2000-05-10T07:00:00"
+        }
+      ]
+    },
+    "TEST F115": {
+      "units": 4.0,
+      "course_name": "TEST COURSE 6",
+      "sections": {
+        "L1": {
+          "instructor": ["TEST INSTRUCTOR 8", "TEST INSTRUCTOR 9"],
+          "schedule": [
+            {
+              "room": "T104",
+              "days": ["M", "W", "F"],
+              "hours": [3]
+            }
+          ]
+        },
+        "P1": {
+          "instructor": ["TEST INSTRUCTOR 9"],
+          "schedule": [
+            {
+              "room": "T105",
+              "days": ["Th"],
+              "hours": [7, 8, 9]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "13/03 11.30 - 1.00PM",
+          "compre": "08/05 AN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2000-03-13T06:00:00|2000-03-13T07:30:00",
+          "compre": "2000-05-08T08:30:00|2000-05-08T11:30:00"
+        }
+      ]
+    },
+    "TEST F116": {
+      "units": 3.0,
+      "course_name": "TEST COURSE 7",
+      "sections": {
+        "L1": {
+          "instructor": ["TEST INSTRUCTOR 10"],
+          "schedule": [
+            {
+              "room": "T106",
+              "days": ["Th"],
+              "hours": [8]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "17/03 2.00 - 3.30PM",
+          "compre": "18/05 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2000-03-17T08:30:00|2000-03-17T10:00:00",
+          "compre": "2000-05-18T04:00:00|2000-05-18T07:00:00"
+        }
+      ]
+    },
+    "TEST F117": {
+      "units": 3.0,
+      "course_name": "TEST COURSE 8",
+      "sections": {
+        "L1": {
+          "instructor": ["TEST INSTRUCTOR 11"],
+          "schedule": [
+            {
+              "room": "T107",
+              "days": ["F"],
+              "hours": [6]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "15/03 9.30 - 11.00AM",
+          "compre": "18/05 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2000-03-15T04:00:00|2000-03-15T05:30:00",
+          "compre": "2000-05-18T04:00:00|2000-05-18T07:00:00"
+        }
+      ]
+    },
+    "TEST F118": {
+      "units": 3.0,
+      "course_name": "TEST COURSE 9",
+      "sections": {
+        "L1": {
+          "instructor": ["TEST INSTRUCTOR 12"],
+          "schedule": [
+            {
+              "room": "T109",
+              "days": ["M", "W"],
+              "hours": [6, 7, 8]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "15/03 9.30 - 11.00AM",
+          "compre": "12/05 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2000-03-15T04:00:00|2000-03-15T05:30:00",
+          "compre": "2000-05-12T04:00:00|2000-05-12T07:00:00"
+        }
+      ]
+    },
+    "TEST F119": {
+      "units": 3.0,
+      "course_name": "TEST COURSE 10",
+      "sections": {
+        "L1": {
+          "instructor": ["TEST INSTRUCTOR 13"],
+          "schedule": [
+            {
+              "room": "T110",
+              "days": ["M", "W", "F"],
+              "hours": [4]
+            }
+          ]
+        },
+        "T1": {
+          "instructor": ["TEST INSTRUCTOR 14"],
+          "schedule": [
+            {
+              "room": "T110",
+              "days": ["F"],
+              "hours": [8]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "15/03 9.30 - 11.00AM",
+          "compre": "06/05 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2000-03-15T04:00:00|2000-03-15T05:30:00",
+          "compre": "2000-05-06T04:00:00|2000-05-06T07:00:00"
+        }
+      ]
+    },
+    "TEST F120": {
+      "units": 3.0,
+      "course_name": "TEST COURSE 11",
+      "sections": {
+        "L1": {
+          "instructor": ["TEST INSTRUCTOR 15", "TEST INSTRUCTOR 16"],
+          "schedule": [
+            {
+              "room": "T111",
+              "days": ["T", "Th", "S"],
+              "hours": [3]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "15/03 9.30 - 11.00AM",
+          "compre": "06/05 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2000-03-15T04:00:00|2000-03-15T05:30:00",
+          "compre": "2000-05-06T04:00:00|2000-05-06T07:00:00"
+        }
+      ]
+    },
+    "TEST F121": {
+      "units": 3.0,
+      "course_name": "TEST COURSE 12",
+      "sections": {
+        "L1": {
+          "instructor": ["TEST INSTRUCTOR 17"],
+          "schedule": [
+            {
+              "room": "T111",
+              "days": ["M"],
+              "hours": [3]
+            },
+            {
+              "room": "T113",
+              "days": ["T"],
+              "hours": [1]
+            },
+            {
+              "room": "T112",
+              "days": ["W"],
+              "hours": [15]
+            },
+            {
+              "room": "T113",
+              "days": ["S"],
+              "hours": [3]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "18/03 2.00 - 3.30PM",
+          "compre": "06/05 AN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2023-03-18T08:30:00|2023-03-18T10:00:00",
+          "compre": "2000-05-06T08:30:00|2000-05-06T11:30:00"
+        }
+      ]
+    }
+  }
+}

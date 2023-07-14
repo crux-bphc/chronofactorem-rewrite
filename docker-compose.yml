@@ -12,6 +12,24 @@ services:
       interval: 10s
       timeout: 30s
       retries: 3
+    profiles:
+      - "dev"
+      - "prod"
+      - "ingestion"
+
+  db-testing:
+    image: "postgres:15.3-bookworm"
+    env_file:
+      - .env.testing
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 30s
+      retries: 3
+    profiles:
+      - "testing"
 
   backend-dev:
     build:
@@ -28,6 +46,8 @@ services:
       - ./tsconfig.json:/usr/local/app/tsconfig.json
     ports:
       - "${PORT}:${PORT}"
+    profiles:
+      - "dev"
 
   backend-prod:
     build:
@@ -44,12 +64,37 @@ services:
       - "prod"
 
   ingestion:
-    command: ["dumb-init", "node", "build/ingest.js"]
-    build: .
+    command: ["pnpm", "ts-node", "src/ingest.ts"]
+    build:
+      context: .
+      dockerfile: ./docker/dev/Dockerfile
     env_file:
       - .env
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - ./patches:/usr/local/app/patches
+      - ./src:/usr/local/app/src
+      - ./tsconfig.json:/usr/local/app/tsconfig.json
     profiles:
       - "ingestion"
+
+  backend-testing:
+    command: ["pnpm", "jest", "--runInBand"]
+    build:
+      context: .
+      dockerfile: ./docker/dev/Dockerfile
+    env_file:
+      - .env.testing
+    depends_on:
+      db-testing:
+        condition: service_healthy
+    volumes:
+      - ./patches:/usr/local/app/patches
+      - ./src:/usr/local/app/src
+      - ./tsconfig.json:/usr/local/app/tsconfig.json
+      - ./jest.config.js:/usr/local/app/jest.config.js
+    tty: true
+    profiles:
+      - "testing"
