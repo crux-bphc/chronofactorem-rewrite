@@ -2,12 +2,11 @@ import { Request, Response } from "express";
 import { timetableRepository } from "../../repositories/timetableRepository";
 import { z } from "zod";
 import { validate } from "../../utils/zodValidateRequest";
+import { timetableIDType } from "../../types/zodFieldTypes";
 
 const dataSchema = z.object({
   params: z.object({
-    id: z.coerce
-      .number()
-      .nonnegative({ message: "id must be a non-negative number" }),
+    id: timetableIDType,
   }),
 });
 

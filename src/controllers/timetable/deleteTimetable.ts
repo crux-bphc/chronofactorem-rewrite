@@ -5,37 +5,15 @@ import { z } from "zod";
 import { validate } from "../../utils/zodValidateRequest";
 import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
+import { namedEmailType, timetableIDType } from "../../types/zodFieldTypes";
 
 const dataSchema = z.object({
   // auth temp replacement
   body: z.object({
-    email: z
-      .string({
-        invalid_type_error: "email not a string",
-        required_error: "email is a required body parameter",
-      })
-      .min(0, {
-        message: "email must be a non-empty string",
-      })
-      .regex(
-        /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i,
-        {
-          message: "email must be a valid email",
-        }
-      ),
+    email: namedEmailType("user"),
   }),
   params: z.object({
-    id: z.coerce
-      .number({
-        invalid_type_error: "id not a number",
-        required_error: "id is a required path parameter",
-      })
-      .positive({
-        message: "invalid id",
-      })
-      .int({
-        message: "invalid id",
-      }),
+    id: timetableIDType,
   }),
 });
 

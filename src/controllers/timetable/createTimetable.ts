@@ -8,24 +8,12 @@ import { Section } from "../../entity/Section";
 import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
 import timetableJSON from "../../timetable.json";
+import { namedEmailType } from "../../types/zodFieldTypes";
 
 // auth temp replacement
 const dataSchema = z.object({
   body: z.object({
-    email: z
-      .string({
-        invalid_type_error: "email not a string",
-        required_error: "email is a required path parameter",
-      })
-      .min(0, {
-        message: "email must be a non-empty string",
-      })
-      .regex(
-        /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i,
-        {
-          message: "email must be a valid email",
-        }
-      ),
+    email: namedEmailType("user"),
   }),
 });
 

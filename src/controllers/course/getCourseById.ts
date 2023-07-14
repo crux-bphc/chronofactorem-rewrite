@@ -2,18 +2,11 @@ import { Request, Response } from "express";
 import { courseRepository } from "../../repositories/courseRepository";
 import { z } from "zod";
 import { validate } from "../../utils/zodValidateRequest";
+import { namedUUIDType } from "../../types/zodFieldTypes";
 
 const dataSchema = z.object({
   params: z.object({
-    id: z
-      .string({
-        invalid_type_error: "id not a string",
-        required_error: "id is a required path parameter",
-      })
-      .min(0, {
-        message: "id must be a non-empty string",
-      })
-      .uuid({ message: "id must be a valid uuid" }),
+    id: namedUUIDType("course"),
   }),
 });
 
