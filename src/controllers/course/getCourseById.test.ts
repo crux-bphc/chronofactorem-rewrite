@@ -1,11 +1,11 @@
 import app from "../../app";
 import { AppDataSource } from "../../db";
-import { Course, courseType } from "../../entity/Course";
+import { Course } from "../../entity/Course";
 import { courseRepository } from "../../repositories/courseRepository";
 import timetableTestJSON from "../../tests/timetable.test.json";
 import supertest, { Response } from "supertest";
 import { randomUUID } from "crypto";
-import { sectionType } from "../../entity/Section";
+import { namedCourseWithSectionsType } from "../../entity/zod";
 
 const request = supertest(app);
 
@@ -51,12 +51,8 @@ describe("Test getCourseById", () => {
       });
 
       test("Test if course is valid", () => {
-        expect(() => courseType.parse(response?.body)).not.toThrow();
-      });
-
-      test("Test if course sections are valid", () => {
         expect(() =>
-          sectionType.array().min(0).parse(response?.body.sections)
+          namedCourseWithSectionsType("course").parse(response?.body)
         ).not.toThrow();
       });
     });

@@ -1,6 +1,7 @@
 import app from "../../app";
 import { AppDataSource } from "../../db";
-import { Course, courseType } from "../../entity/Course";
+import { Course } from "../../entity/Course";
+import { namedCourseType } from "../../entity/zod";
 import { courseRepository } from "../../repositories/courseRepository";
 import timetableTestJSON from "../../tests/timetable.test.json";
 import supertest, { Response } from "supertest";
@@ -55,7 +56,10 @@ describe("Test getAllCourses", () => {
 
       test("Test if all courses are valid", () => {
         expect(() =>
-          courseType.array().min(0).parse(response?.body)
+          namedCourseType("course")
+            .array()
+            .min(1, { message: "courses missing" })
+            .parse(response?.body)
         ).not.toThrow();
       });
     });
