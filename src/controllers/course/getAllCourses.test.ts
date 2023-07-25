@@ -39,29 +39,27 @@ describe("Test getAllCourses", () => {
   });
 
   describe("Test getAllCourses 200", () => {
-    describe("Test response", () => {
-      let response: Response | null = null;
+    let response: Response | null = null;
 
-      it("Make API call", async () => {
-        response = await request.get("/course/");
-      });
+    it("Make API call", async () => {
+      response = await request.get("/course/");
+    });
 
-      test("Test if returns truthy response", () => {
-        expect(response?.body).not.toHaveLength(0);
-      });
+    test("Test if returns truthy response", () => {
+      expect(response?.body).not.toHaveLength(0);
+    });
 
-      test("Test if returns response status 200", () => {
-        expect(response?.status).toEqual(200);
-      });
+    test("Test if returns response status 200", () => {
+      expect(response?.status).toEqual(200);
+    });
 
-      test("Test if all courses are valid", () => {
-        expect(() =>
-          courseType
-            .array()
-            .min(1, { message: "courses missing" })
-            .parse(response?.body)
-        ).not.toThrow();
-      });
+    test("Test if all courses are valid", () => {
+      expect(() =>
+        courseType
+          .array()
+          .min(1, { message: "courses missing" })
+          .parse(response?.body)
+      ).not.toThrow();
     });
   });
 });

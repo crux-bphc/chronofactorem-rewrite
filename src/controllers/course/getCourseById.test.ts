@@ -35,26 +35,24 @@ describe("Test getCourseById", () => {
   });
 
   describe("Test getCourseById 200", () => {
-    describe("Test response", () => {
-      let response: Response | null = null;
+    let response: Response | null = null;
 
-      it("Make API call", async () => {
-        response = await request.get(`/course/${randomCourse?.id}`);
-      });
+    it("Make API call", async () => {
+      response = await request.get(`/course/${randomCourse?.id}`);
+    });
 
-      test("Test if returns truthy response", () => {
-        expect(response?.body).toBeTruthy();
-      });
+    test("Test if returns truthy response", () => {
+      expect(response?.body).toBeTruthy();
+    });
 
-      test("Test if returns response status 200", () => {
-        expect(response?.status).toEqual(200);
-      });
+    test("Test if returns response status 200", () => {
+      expect(response?.status).toEqual(200);
+    });
 
-      test("Test if course is valid", () => {
-        expect(() =>
-          namedCourseWithSectionsType("course").parse(response?.body)
-        ).not.toThrow();
-      });
+    test("Test if course is valid", () => {
+      expect(() =>
+        namedCourseWithSectionsType("course").parse(response?.body)
+      ).not.toThrow();
     });
   });
 
