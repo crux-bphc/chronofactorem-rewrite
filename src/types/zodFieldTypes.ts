@@ -70,7 +70,7 @@ export const booleanType = namedBooleanType();
 export const namedIntegerType = (name?: string) =>
   z.coerce
     .number({
-      invalid_type_error: addNameToString("is not a number", name),
+      invalid_type_error: addNameToString("not a number", name),
       required_error: addNameToString("is required", name),
     })
     .int({
