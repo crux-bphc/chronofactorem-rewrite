@@ -17,100 +17,114 @@ import { NamedSectionTypeZodEnum } from "../types/sectionTypes";
 export const namedCourseType = (name?: string) =>
   z
     .object({
-      id: namedUUIDType(name),
-      code: namedNonEmptyStringType(addNameToString("code", name)),
-      name: namedNonEmptyStringType(addNameToString("name", name)),
+      id: namedUUIDType(addNameToString("course", name)),
+      code: namedNonEmptyStringType(addNameToString("course code", name)),
+      name: namedNonEmptyStringType(addNameToString("course name", name)),
       midsemStartTime: namedISOTimestampType(
-        addNameToString("midsemStartTime", name)
+        addNameToString("course midsemStartTime", name)
       ),
       midsemEndTime: namedISOTimestampType(
-        addNameToString("midsemEndTime", name)
+        addNameToString("course midsemEndTime", name)
       ),
       compreStartTime: namedISOTimestampType(
-        addNameToString("compreStartTime", name)
+        addNameToString("course compreStartTime", name)
       ),
       compreEndTime: namedISOTimestampType(
-        addNameToString("compreEndTime", name)
+        addNameToString("course compreEndTime", name)
       ),
-      archived: namedBooleanType(addNameToString("archived", name)),
-      acadYear: namedYearType(addNameToString("acadYear", name)),
-      semester: namedSemesterType(name),
-      createdAt: namedISOTimestampType(addNameToString("createdAt", name)),
+      archived: namedBooleanType(addNameToString("course archived", name)),
+      acadYear: namedYearType(addNameToString("course acadYear", name)),
+      semester: namedSemesterType(addNameToString("course", name)),
+      createdAt: namedISOTimestampType(
+        addNameToString("course createdAt", name)
+      ),
     })
-    .strict({ message: addNameToString("has extra fields", name) });
+    .strict({ message: addNameToString("course has extra fields", name) });
 
 export const namedSearchHistoryType = (name?: string) =>
   z
     .object({
-      id: namedUUIDType(name),
+      id: namedUUIDType(addNameToString("search history", name)),
       userEmailHash: namedNonEmptyStringType(
-        addNameToString("user email hash", name)
+        addNameToString("search history user email hash", name)
       ),
-      searchTerm: namedNonEmptyStringType(addNameToString("search term", name)),
-      searchedAt: namedISOTimestampType(addNameToString("searchedAt", name)),
+      searchTerm: namedNonEmptyStringType(
+        addNameToString("search history search term", name)
+      ),
+      searchedAt: namedISOTimestampType(
+        addNameToString("search history searchedAt", name)
+      ),
     })
-    .strict({ message: addNameToString("has extra fields", name) });
+    .strict({
+      message: addNameToString("search history has extra fields", name),
+    });
 
 export const namedSectionType = (name?: string) =>
   z
     .object({
-      id: namedUUIDType(name),
-      courseId: namedUUIDType(addNameToString("courseId", name)),
-      type: NamedSectionTypeZodEnum(name),
-      number: namedIntegerType(addNameToString("number", name)),
+      id: namedUUIDType(addNameToString("section", name)),
+      courseId: namedUUIDType(addNameToString("section courseId", name)),
+      type: NamedSectionTypeZodEnum(addNameToString("section", name)),
+      number: namedIntegerType(addNameToString("section number", name)),
       instructors: namedNonEmptyStringType(
-        addNameToString("instructors", name)
+        addNameToString("section instructors", name)
       ).array(),
       roomTime: namedNonEmptyStringType(
-        addNameToString("room-time", name)
+        addNameToString("section room-time", name)
       ).array(),
-      createdAt: namedISOTimestampType(addNameToString("createdAt", name)),
+      createdAt: namedISOTimestampType(
+        addNameToString("section createdAt", name)
+      ),
     })
-    .strict({ message: addNameToString("has extra fields", name) });
+    .strict({ message: addNameToString("section has extra fields", name) });
 
 export const namedTimetableType = (name?: string) =>
   z
     .object({
-      id: namedTimetableIDType(name),
-      authorId: namedUUIDType(addNameToString("authorId", name)),
-      name: namedNonEmptyStringType(addNameToString("name", name)),
-      degrees: NamedDegreeZodList(name),
-      private: namedBooleanType(addNameToString("private", name)),
-      draft: namedBooleanType(addNameToString("draft", name)),
-      archived: namedBooleanType(addNameToString("archived", name)),
-      year: namedYearType(addNameToString("year", name)),
-      acadYear: namedYearType(addNameToString("acadYear", name)),
-      semester: namedSemesterType(name),
+      id: namedTimetableIDType(addNameToString("timetable", name)),
+      authorId: namedUUIDType(addNameToString("timetable authorId", name)),
+      name: namedNonEmptyStringType(addNameToString("timetable name", name)),
+      degrees: NamedDegreeZodList(addNameToString("timetable", name)),
+      private: namedBooleanType(addNameToString("timetable private", name)),
+      draft: namedBooleanType(addNameToString("timetable draft", name)),
+      archived: namedBooleanType(addNameToString("timetable archived", name)),
+      year: namedYearType(addNameToString("timetable year", name)),
+      acadYear: namedYearType(addNameToString("timetable acadYear", name)),
+      semester: namedSemesterType(addNameToString("timetable", name)),
       timings: namedNonEmptyStringType(
-        addNameToString("timings", name)
+        addNameToString("timetable timings", name)
       ).array(),
       examTimes: namedNonEmptyStringType(
-        addNameToString("examTimes", name)
+        addNameToString("timetable examTimes", name)
       ).array(),
       warnings: namedNonEmptyStringType(
-        addNameToString("warnings", name)
+        addNameToString("timetable warnings", name)
       ).array(),
-      createdAt: namedISOTimestampType(addNameToString("createdAt", name)),
-      lastUpdated: namedISOTimestampType(addNameToString("lastUpdated", name)),
+      createdAt: namedISOTimestampType(
+        addNameToString("timetable createdAt", name)
+      ),
+      lastUpdated: namedISOTimestampType(
+        addNameToString("timetable lastUpdated", name)
+      ),
     })
-    .strict({ message: addNameToString("has extra fields", name) });
+    .strict({ message: addNameToString("timtebale has extra fields", name) });
 
 export const namedUserType = (name?: string) =>
   z
     .object({
-      id: namedUUIDType(name),
-      email: namedEmailType(name),
-      batch: namedYearType(addNameToString("batch", name)),
-      name: namedNonEmptyStringType(addNameToString("name", name)),
-      degrees: NamedDegreeZodList(name),
-      createdAt: namedISOTimestampType(addNameToString("createdAt", name)),
+      id: namedUUIDType(addNameToString("user", name)),
+      email: namedEmailType(addNameToString("user", name)),
+      batch: namedYearType(addNameToString("user batch", name)),
+      name: namedNonEmptyStringType(addNameToString("user name", name)),
+      degrees: NamedDegreeZodList(addNameToString("user", name)),
+      createdAt: namedISOTimestampType(addNameToString("user createdAt", name)),
     })
-    .strict({ message: addNameToString("has extra fields", name) });
+    .strict({ message: addNameToString("user has extra fields", name) });
 
 export const namedSectionWithCourseType = (name?: string) =>
   z
     .object({
-      course: namedCourseType(addNameToString("course", name)),
+      course: namedCourseType(addNameToString("section course", name)),
     })
     .merge(namedSectionType(name));
 
@@ -118,7 +132,7 @@ export const namedSectionWithTimetablesType = (name?: string) =>
   z
     .object({
       timetables: namedTimetableType(
-        addNameToString("timetables", name)
+        addNameToString("section timetables", name)
       ).array(),
     })
     .merge(namedSectionType(name));
@@ -127,7 +141,7 @@ export const namedSectionWithCourseAndTimetablesType = (name?: string) =>
   z
     .object({
       timetables: namedTimetableType(
-        addNameToString("timetables", name)
+        addNameToString("section timetables", name)
       ).array(),
     })
     .merge(namedSectionWithCourseType(name));
@@ -135,9 +149,11 @@ export const namedSectionWithCourseAndTimetablesType = (name?: string) =>
 export const namedTimetableWithSectionsType = (name?: string) =>
   z
     .object({
-      sections: namedSectionType(addNameToString("sections", name))
+      sections: namedSectionType(addNameToString("timetable sections", name))
         .array()
-        .min(1, { message: addNameToString("sections missing", name) }),
+        .min(1, {
+          message: addNameToString("timetable sections missing", name),
+        }),
     })
     .merge(namedTimetableType(name));
 
@@ -145,7 +161,7 @@ export const namedUserWithTimetablesType = (name?: string) =>
   z
     .object({
       timetables: namedTimetableType(
-        addNameToString("timetables", name)
+        addNameToString("user timetables", name)
       ).array(),
     })
     .merge(namedUserType(name));
@@ -153,9 +169,9 @@ export const namedUserWithTimetablesType = (name?: string) =>
 export const namedCourseWithSectionsType = (name?: string) =>
   z
     .object({
-      sections: namedSectionType(addNameToString("sections", name))
+      sections: namedSectionType(addNameToString("course sections", name))
         .array()
-        .min(1, { message: addNameToString("sections missing", name) }),
+        .min(1, { message: addNameToString("course sections missing", name) }),
     })
     .merge(namedCourseType(name));
 
