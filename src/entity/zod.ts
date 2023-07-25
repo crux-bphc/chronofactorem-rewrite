@@ -81,9 +81,15 @@ export const namedTimetableType = (name?: string) =>
       year: namedYearType(addNameToString("year", name)),
       acadYear: namedYearType(addNameToString("acadYear", name)),
       semester: namedSemesterType(name),
-      timings: namedNonEmptyStringType(addNameToString("timings", name)),
-      examTimes: namedNonEmptyStringType(addNameToString("examTimes", name)),
-      warnings: namedNonEmptyStringType(addNameToString("warnings", name)),
+      timings: namedNonEmptyStringType(
+        addNameToString("timings", name)
+      ).array(),
+      examTimes: namedNonEmptyStringType(
+        addNameToString("examTimes", name)
+      ).array(),
+      warnings: namedNonEmptyStringType(
+        addNameToString("warnings", name)
+      ).array(),
       createdAt: namedISOTimestampType(addNameToString("createdAt", name)),
       lastUpdated: namedISOTimestampType(addNameToString("lastUpdated", name)),
     })
