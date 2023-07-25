@@ -71,6 +71,7 @@ export const namedIntegerType = (name?: string) =>
   z.coerce
     .number({
       invalid_type_error: addNameToString("is not a number", name),
+      required_error: addNameToString("is required", name),
     })
     .int({
       message: addNameToString("is an invalid integer", name),
@@ -81,6 +82,7 @@ export const namedYearType = (name?: string) =>
   z.coerce
     .number({
       invalid_type_error: addNameToString("year is not a number", name),
+      required_error: addNameToString("year is required", name),
     })
     .positive({
       message: addNameToString("is an invalid year", name),
@@ -94,6 +96,7 @@ export const namedSemesterType = (name?: string) =>
   z.coerce
     .number({
       invalid_type_error: addNameToString("semester is not a number", name),
+      required_error: addNameToString("semester is required", name),
     })
     .int({
       message: addNameToString("semester is not an integer", name),
