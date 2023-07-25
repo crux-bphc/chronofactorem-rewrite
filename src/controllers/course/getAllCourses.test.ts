@@ -29,7 +29,7 @@ describe("Test getAllCourses", () => {
   });
 
   test("Test if database contains non-zero courses", () => {
-    expect(allCourses).toBeTruthy();
+    expect(allCourses?.size).toBeGreaterThan(0);
   });
 
   test("Test if database contains all courses from JSON", () => {
