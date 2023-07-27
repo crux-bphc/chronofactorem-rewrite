@@ -4,7 +4,11 @@ import { Request, Response } from "express";
 import { getClient } from "../../config/authClient";
 import { userRepository } from "../../repositories/userRepository";
 import { DegreeEnum } from "../../types/degrees";
-import { Session, UserData } from "../../types/auth";
+import {
+  FinishedUserSession,
+  UnfinishedUserSession,
+  UserData,
+} from "../../types/auth";
 import { env } from "../../config/server";
 import { User } from "../../entity/User";
 
@@ -69,24 +73,28 @@ export async function authCallback(req: Request, res: Response) {
       // obtaining userInfo from the access_token code
       const userInfo = await client.userinfo(access_token as string | TokenSet);
 
-      const userData: Session = {
-        name: userInfo.name,
-        email: userInfo.email,
-      };
-
       // tokenSet.claims() returns validated information contained upon accessing the token
       const tokenExpiryTime = tokenSet.claims().exp;
 
       // defines maxAge to be the time when the session cookie expires
       const maxAge = tokenExpiryTime * 1000 - Date.now(); // converts into milliseconds
 
-      // setting the cookie
-      res.cookie("session", userData, { maxAge: maxAge, httpOnly: true });
+      const userData: UnfinishedUserSession = {
+        name: userInfo.name,
+        email: userInfo.email,
+        maxAge: maxAge,
+      };
 
-      return res.status(200).json({
-        success: true,
-        message: "user session has started",
+      // setting the cookie
+      res.cookie("session", userData, {
+        maxAge: maxAge,
+        httpOnly: true,
+        domain: "localhost",
+        secure: true,
+        sameSite: "none",
       });
+
+      res.redirect("http://localhost:5173/getDegrees?year=3");
     }
   } catch (err: any) {
     // If user exists on database, redirect them to frontpage, if not
@@ -117,7 +125,7 @@ export async function getDegrees(req: Request, res: Response) {
     // the user: name, email and degrees is stored on the database
 
     // gets userInfo as part of session
-    const session: Session = req.cookies["session"];
+    const session: UnfinishedUserSession = req.cookies["session"];
 
     const degrees: DegreeEnum[] = req.body.degrees;
 
@@ -154,7 +162,7 @@ export async function getDegrees(req: Request, res: Response) {
       });
     }
 
-    userRepository
+    const createdUser = await userRepository
       .createQueryBuilder()
       .insert()
       .into(User)
@@ -167,6 +175,23 @@ export async function getDegrees(req: Request, res: Response) {
       })
       .execute();
 
+    res.clearCookie("session");
+
+    const finishedUserData: FinishedUserSession = {
+      name: session.name,
+      email: session.email,
+      id: createdUser.identifiers[0].id,
+    };
+
+    res.cookie("session", finishedUserData, {
+      maxAge: session.maxAge,
+      httpOnly: true,
+      domain: "localhost",
+      secure: true,
+      sameSite: "none",
+    });
+
+    // reset session and set ID as well
     res.json({
       success: true,
     });
