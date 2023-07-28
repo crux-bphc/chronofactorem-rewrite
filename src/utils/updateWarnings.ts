@@ -1,10 +1,10 @@
 import { Section } from "../entity/Section";
-import { SectionTypeList } from "../types/sectionTypes";
+import { sectionTypeList } from "../types/sectionTypes";
 
 export const updateSectionWarnings = (
   courseCode: string,
   section: Section,
-  requiredSectionTypes: SectionTypeList,
+  requiredSectionTypes: sectionTypeList,
   isAdded: boolean,
   warnings: string[]
 ) => {

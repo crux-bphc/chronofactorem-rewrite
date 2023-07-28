@@ -3,35 +3,15 @@ import { userRepository } from "../../repositories/userRepository";
 import { validate } from "../../utils/zodValidateRequest";
 import { z } from "zod";
 import { User } from "../../entity/User";
+import { namedEmailType, namedUUIDType } from "../../types/zodFieldTypes";
 
 const dataSchema = z.object({
   params: z.object({
-    id: z
-      .string({
-        invalid_type_error: "id not a string",
-        required_error: "id is a required path parameter",
-      })
-      .min(0, {
-        message: "id must be a non-empty string",
-      })
-      .uuid({ message: "id must be a valid uuid" }),
+    id: namedUUIDType("user"),
   }),
   // auth temp replacement
   query: z.object({
-    authEmail: z
-      .string({
-        invalid_type_error: "authEmail not a string",
-        required_error: "authEmail is a required path parameter",
-      })
-      .min(0, {
-        message: "authEmail must be a non-empty string",
-      })
-      .regex(
-        /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i,
-        {
-          message: "authEmail must be a valid email",
-        }
-      ),
+    authEmail: namedEmailType("user"),
   }),
 });
 

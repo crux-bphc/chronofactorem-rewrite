@@ -1,7 +1,8 @@
 import { z } from "zod";
+import { addNameToString } from "./zodFieldTypes";
 
 // !!! IMPORTANT: THIS IS THE SOURCE OF TRUTH FOR DEGREES
-export const ApprovedDegreeList = [
+export const approvedDegreeList = [
   "A1",
   "A2",
   "A3",
@@ -17,7 +18,7 @@ export const ApprovedDegreeList = [
   "B5",
 ] as const;
 
-export const ApprovedBEDegreeList = [
+export const approvedBEDegreeList = [
   "A1",
   "A2",
   "A3",
@@ -27,43 +28,77 @@ export const ApprovedBEDegreeList = [
   "AA",
 ] as const;
 
-export const ApprovedMScDegreeList = ["B1", "B2", "B3", "B4", "B5"] as const;
+export const approvedMScDegreeList = ["B1", "B2", "B3", "B4", "B5"] as const;
 
-export const ApprovedBPharmDegreeList = ["A5"] as const;
+export const approvedBPharmDegreeList = ["A5"] as const;
 
-export const DegreeZodEnum = z.enum(ApprovedDegreeList);
-export const BEDegreeZodEnum = z.enum(ApprovedBEDegreeList);
-export const MScDegreeZodEnum = z.enum(ApprovedMScDegreeList);
-export const BPharmDegreeZodEnum = z.enum(ApprovedBPharmDegreeList);
+export const namedDegreeZodEnum = (name?: string) =>
+  z.enum(approvedDegreeList, {
+    required_error: addNameToString("degree is required", name),
+    invalid_type_error: addNameToString("degree is not valid", name),
+  });
+export const degreeZodEnum = namedDegreeZodEnum();
 
-export const DegreeZodList = DegreeZodEnum.array();
-export const BEDegreeZodList = BEDegreeZodEnum.array();
-export const MScDegreeZodList = MScDegreeZodEnum.array();
-export const BPharmDegreeZodList = BPharmDegreeZodEnum.array();
+export const namedBEDegreeZodEnum = (name?: string) =>
+  z.enum(approvedBEDegreeList, {
+    required_error: addNameToString("BE degree is required", name),
+    invalid_type_error: addNameToString("BE degree is not valid", name),
+  });
+export const beDegreeZodEnum = namedBEDegreeZodEnum();
 
-export type DegreeEnum = z.infer<typeof DegreeZodEnum>;
-export type BEDegreeEnum = z.infer<typeof BEDegreeZodEnum>;
-export type MScDegreeEnum = z.infer<typeof MScDegreeZodEnum>;
-export type BPharmDegreeEnum = z.infer<typeof BPharmDegreeZodEnum>;
+export const namedMScDegreeZodEnum = (name?: string) =>
+  z.enum(approvedMScDegreeList, {
+    required_error: addNameToString("MSc degree is required", name),
+    invalid_type_error: addNameToString("MSc degree is not valid", name),
+  });
+export const mscDegreeZodEnum = namedMScDegreeZodEnum();
 
-export type DegreeList = z.infer<typeof DegreeZodList>;
-export type BEDegreeList = z.infer<typeof BEDegreeZodList>;
-export type MScDegreeList = z.infer<typeof MScDegreeZodList>;
-export type BPharmDegreeList = z.infer<typeof BPharmDegreeZodList>;
+export const namedBPharmDegreeZodEnum = (name?: string) =>
+  z.enum(approvedBPharmDegreeList, {
+    required_error: addNameToString("BPharm degree is required", name),
+    invalid_type_error: addNameToString("BPharm degree is not valid", name),
+  });
+export const bpharmDegreeZodEnum = namedBPharmDegreeZodEnum();
 
-export const isAValidDegree = (degree: string): degree is DegreeEnum => {
-  return ApprovedDegreeList.includes(degree as DegreeEnum);
+export const namedDegreeZodList = (name?: string) =>
+  namedDegreeZodEnum(name).array();
+export const degreeZodList = namedDegreeZodList();
+
+export const namedBEDegreeZodList = (name?: string) =>
+  namedBEDegreeZodEnum(name).array();
+export const beDegreeZodList = namedBEDegreeZodList();
+
+export const namedMScDegreeZodList = (name?: string) =>
+  namedMScDegreeZodEnum(name).array();
+export const mscDegreeZodList = namedMScDegreeZodList();
+
+export const namedBPharmDegreeZodList = (name?: string) =>
+  namedBPharmDegreeZodEnum(name).array();
+export const bpharmDegreeZodList = namedBPharmDegreeZodList();
+
+export type degreeEnum = z.infer<typeof degreeZodEnum>;
+export type beDegreeEnum = z.infer<typeof beDegreeZodEnum>;
+export type mscDegreeEnum = z.infer<typeof mscDegreeZodEnum>;
+export type bpharmDegreeEnum = z.infer<typeof bpharmDegreeZodEnum>;
+
+export type degreeList = z.infer<typeof degreeZodList>;
+export type beDegreeList = z.infer<typeof beDegreeZodList>;
+export type mscDegreeList = z.infer<typeof mscDegreeZodList>;
+export type bpharmDegreeList = z.infer<typeof bpharmDegreeZodList>;
+
+export const isAValidDegree = (degree: string): degree is degreeEnum => {
+  return approvedDegreeList.includes(degree as degreeEnum);
 };
-export const isAValidBEDegree = (degree: string): degree is BEDegreeEnum => {
-  return ApprovedBEDegreeList.includes(degree as BEDegreeEnum);
+export const isAValidBEDegree = (degree: string): degree is beDegreeEnum => {
+  return approvedBEDegreeList.includes(degree as beDegreeEnum);
 };
-export const isAValidMScDegree = (degree: string): degree is MScDegreeEnum => {
-  return ApprovedMScDegreeList.includes(degree as MScDegreeEnum);
+export const isAValidMScDegree = (degree: string): degree is mscDegreeEnum => {
+  return approvedMScDegreeList.includes(degree as mscDegreeEnum);
 };
 export const isAValidBPharmDegree = (
   degree: string
-): degree is BPharmDegreeEnum => {
-  return ApprovedBPharmDegreeList.includes(degree as BPharmDegreeEnum);
+): degree is bpharmDegreeEnum => {
+  return approvedBPharmDegreeList.includes(degree as bpharmDegreeEnum);
 };
 
 export const isAValidDegreeCombination = (degrees: string[]): boolean => {

@@ -10,48 +10,21 @@ import { userRepository } from "../../repositories/userRepository";
 import { Course } from "../../entity/Course";
 import { courseRepository } from "../../repositories/courseRepository";
 import { updateSectionWarnings } from "../../utils/updateWarnings";
-import { SectionTypeList } from "../../types/sectionTypes";
+import { sectionTypeList } from "../../types/sectionTypes";
+import {
+  namedEmailType,
+  namedUUIDType,
+  timetableIDType,
+} from "../../types/zodFieldTypes";
 
 const dataSchema = z.object({
   body: z.object({
     // auth temp replacement
-    email: z
-      .string({
-        invalid_type_error: "email not a string",
-        required_error: "email is a required path parameter",
-      })
-      .min(0, {
-        message: "email must be a non-empty string",
-      })
-      .regex(
-        /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i,
-        {
-          message: "email must be a valid email",
-        }
-      ),
-
-    sectionId: z
-      .string({
-        invalid_type_error: "id not a string",
-        required_error: "id is a required parameter",
-      })
-      .min(0, {
-        message: "id must be a non-empty string",
-      })
-      .uuid({ message: "id must be a valid uuid" }),
+    email: namedEmailType("user"),
+    sectionId: namedUUIDType("section"),
   }),
   params: z.object({
-    id: z.coerce
-      .number({
-        invalid_type_error: "id not a number",
-        required_error: "id is a required path parameter",
-      })
-      .positive({
-        message: "invalid id",
-      })
-      .int({
-        message: "invalid id",
-      }),
+    id: timetableIDType,
   }),
 });
 
@@ -168,7 +141,7 @@ export const removeSection = async (req: Request, res: Response) => {
     });
   }
 
-  let sectionTypes: SectionTypeList = [];
+  let sectionTypes: sectionTypeList = [];
 
   try {
     const sectionTypeHolders = await sectionRepository

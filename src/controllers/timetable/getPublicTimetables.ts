@@ -5,57 +5,28 @@ import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
 import { z } from "zod";
 import { validate } from "../../utils/zodValidateRequest";
-import { DegreeList, DegreeZodList } from "../../types/degrees";
+import { degreeList, namedDegreeZodList } from "../../types/degrees";
 
 import { isAValidDegreeCombination } from "../../types/degrees";
+import {
+  namedCollegeYearType,
+  namedEmailType,
+  namedSemesterType,
+} from "../../types/zodFieldTypes";
 
 const dataSchema = z.object({
   query: z.object({
     // temp auth replacement
-    email: z
-      .string({
-        invalid_type_error: "email not a string",
-        required_error: "email is a required path parameter",
+    email: namedEmailType("user"),
+    year: namedCollegeYearType("search").optional(),
+    sem: namedSemesterType("search").optional(),
+    branch: namedDegreeZodList("search branch")
+      .min(1, {
+        message:
+          "search branch must be a non-empty array of valid degree strings",
       })
-      .min(0, {
-        message: "email must be a non-empty string",
-      })
-      .regex(
-        /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i,
-        {
-          message: "email must be a valid email",
-        }
-      ),
-
-    year: z.coerce
-      .number({
-        invalid_type_error: "year is not a number",
-      })
-      .positive({
-        message: "invalid year",
-      })
-      .int({
-        message: "invalid year",
-      })
-      .optional(),
-
-    sem: z.coerce
-      .number({
-        invalid_type_error: "sem is not a number",
-      })
-      .gte(1, {
-        message: "invalid sem number (can only be 1 or 2)",
-      })
-      .lte(2, {
-        message: "invalid sem number (can only be 1 or 2)",
-      })
-      .optional(),
-
-    branch: DegreeZodList.min(1, {
-      message: "branch must be a non-empty array of valid degree strings",
-    })
       .max(2, {
-        message: "branch may not contain more than two elements",
+        message: "search branch may not contain more than two elements",
       })
       .optional(),
   }),
@@ -83,7 +54,7 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const branch: DegreeList = req.query.branch as DegreeList;
+    const branch: degreeList = req.query.branch as degreeList;
     const year: number = parseInt(req.query.year as string);
     const sem: number = parseInt(req.query.sem as string);
     const isPrivate = false;

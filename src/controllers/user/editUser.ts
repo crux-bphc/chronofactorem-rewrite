@@ -3,40 +3,31 @@ import { userRepository } from "../../repositories/userRepository";
 import { validate } from "../../utils/zodValidateRequest";
 import { z } from "zod";
 import {
-  DegreeList,
-  DegreeZodList,
+  degreeList,
+  namedDegreeZodList,
   isAValidDegreeCombination,
 } from "../../types/degrees";
+import { namedEmailType } from "../../types/zodFieldTypes";
 
 // auth temp replacement
 const dataSchema = z.object({
   body: z.object({
-    email: z
-      .string({
-        invalid_type_error: "email not a string",
-        required_error: "email is a required path parameter",
+    email: namedEmailType("user"),
+    degrees: namedDegreeZodList("user")
+      .min(1, {
+        message:
+          "user degrees must be a non-empty array of valid degree strings",
       })
-      .min(0, {
-        message: "email must be a non-empty string",
-      })
-      .regex(
-        /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i,
-        {
-          message: "email must be a valid email",
-        }
-      ),
-    degrees: DegreeZodList.min(1, {
-      message: "degrees must be a non-empty array of valid degree strings",
-    }).max(2, {
-      message: "degrees may not contain more than two elements",
-    }),
+      .max(2, {
+        message: "user degrees may not contain more than two elements",
+      }),
   }),
 });
 
 export const editUserValidator = validate(dataSchema);
 
 export const editUser = async (req: Request, res: Response) => {
-  const degrees: DegreeList = req.body.degrees;
+  const degrees: degreeList = req.body.degrees;
 
   if (degrees.length === 2 && !isAValidDegreeCombination(degrees)) {
     return res.status(400).json({

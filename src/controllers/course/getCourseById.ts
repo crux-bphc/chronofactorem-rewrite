@@ -2,12 +2,11 @@ import { Request, Response } from "express";
 import { courseRepository } from "../../repositories/courseRepository";
 import { z } from "zod";
 import { validate } from "../../utils/zodValidateRequest";
+import { namedUUIDType } from "../../types/zodFieldTypes";
 
 const dataSchema = z.object({
   params: z.object({
-    id: z.coerce
-      .number()
-      .nonnegative({ message: "id must be a non-negative number" }),
+    id: namedUUIDType("course"),
   }),
 });
 
@@ -19,6 +18,12 @@ export const getCourseById = async (req: Request, res: Response) => {
     const course = await courseRepository
       .createQueryBuilder("course")
       .where("course.id = :id", { id })
+      .leftJoinAndSelect(
+        "course.sections",
+        "section",
+        "section.course = :courseId",
+        { courseId: id }
+      )
       .getOne();
 
     if (!course) {

@@ -1,18 +1,26 @@
 import { z } from "zod";
+import { addNameToString } from "./zodFieldTypes";
 
 // !!! IMPORTANT: THIS IS THE SOURCE OF TRUTH FOR SECTION TYPES
-export const ApprovedSectionTypeList = ["L", "P", "T"] as const;
+export const approvedSectionTypeList = ["L", "P", "T"] as const;
 
-export const SectionTypeZodEnum = z.enum(ApprovedSectionTypeList);
+export const namedSectionTypeZodEnum = (name?: string) =>
+  z.enum(approvedSectionTypeList, {
+    required_error: addNameToString("section type is required", name),
+    invalid_type_error: addNameToString("section type is not valid", name),
+  });
+export const sectionTypeZodEnum = namedSectionTypeZodEnum();
 
-export const SectionTypeZodList = SectionTypeZodEnum.array();
+export const namedSectionTypeZodList = (name?: string) =>
+  namedSectionTypeZodEnum(name).array();
+export const sectionTypeZodList = namedSectionTypeZodList();
 
-export type SectionTypeEnum = z.infer<typeof SectionTypeZodEnum>;
+export type sectionTypeEnum = z.infer<typeof sectionTypeZodEnum>;
 
-export type SectionTypeList = z.infer<typeof SectionTypeZodList>;
+export type sectionTypeList = z.infer<typeof sectionTypeZodList>;
 
 export const isAValidSectionType = (
   degree: string
-): degree is SectionTypeEnum => {
-  return ApprovedSectionTypeList.includes(degree as SectionTypeEnum);
+): degree is sectionTypeEnum => {
+  return approvedSectionTypeList.includes(degree as sectionTypeEnum);
 };

@@ -5,51 +5,23 @@ import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
 import { z } from "zod";
 import { validate } from "../../utils/zodValidateRequest";
+import {
+  namedBooleanType,
+  namedEmailType,
+  namedNonEmptyStringType,
+  timetableIDType,
+} from "../../types/zodFieldTypes";
 
 const dataSchema = z.object({
   // auth temp replacement
   body: z.object({
-    email: z
-      .string({
-        invalid_type_error: "email not a string",
-        required_error: "email is a required body parameter",
-      })
-      .min(0, {
-        message: "email must be a non-empty string",
-      })
-      .regex(
-        /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i,
-        {
-          message: "email must be a valid email",
-        }
-      ),
-    name: z
-      .string({
-        invalid_type_error: "name not a string",
-        required_error: "name is a required body parameter",
-      })
-      .min(0, { message: "name must be a non-empty string" }),
-    isPrivate: z.boolean({
-      invalid_type_error: "isPrivate not a boolean",
-      required_error: "isPrivate is a required body parameter",
-    }),
-    isDraft: z.boolean({
-      invalid_type_error: "isDraft not a boolean",
-      required_error: "isDraft is a required body parameter",
-    }),
+    email: namedEmailType("user"),
+    name: namedNonEmptyStringType("timetable name"),
+    isPrivate: namedBooleanType("timetable isPrivate"),
+    isDraft: namedBooleanType("timetable isDraft"),
   }),
   params: z.object({
-    id: z.coerce
-      .number({
-        invalid_type_error: "id not a number",
-        required_error: "id is a required path parameter",
-      })
-      .positive({
-        message: "invalid id",
-      })
-      .int({
-        message: "invalid id",
-      }),
+    id: timetableIDType,
   }),
 });
 
