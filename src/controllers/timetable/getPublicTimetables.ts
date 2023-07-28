@@ -5,22 +5,22 @@ import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
 import { z } from "zod";
 import { validate } from "../../utils/zodValidateRequest";
-import { DegreeList, NamedDegreeZodList } from "../../types/degrees";
+import { degreeList, namedDegreeZodList } from "../../types/degrees";
 
 import { isAValidDegreeCombination } from "../../types/degrees";
 import {
+  namedCollegeYearType,
   namedEmailType,
   namedSemesterType,
-  namedYearType,
 } from "../../types/zodFieldTypes";
 
 const dataSchema = z.object({
   query: z.object({
     // temp auth replacement
     email: namedEmailType("user"),
-    year: namedYearType("search").optional(),
+    year: namedCollegeYearType("search").optional(),
     sem: namedSemesterType("search").optional(),
-    branch: NamedDegreeZodList("search branch")
+    branch: namedDegreeZodList("search branch")
       .min(1, {
         message:
           "search branch must be a non-empty array of valid degree strings",
@@ -54,7 +54,7 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const branch: DegreeList = req.query.branch as DegreeList;
+    const branch: degreeList = req.query.branch as degreeList;
     const year: number = parseInt(req.query.year as string);
     const sem: number = parseInt(req.query.sem as string);
     const isPrivate = false;

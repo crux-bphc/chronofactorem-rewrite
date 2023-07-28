@@ -85,12 +85,30 @@ export const namedYearType = (name?: string) =>
       required_error: addNameToString("year is required", name),
     })
     .positive({
-      message: addNameToString("is an invalid year", name),
+      message: addNameToString("year is an invalid year", name),
     })
     .int({
-      message: addNameToString("is an invalid year", name),
-    });
+      message: addNameToString("year is an invalid year", name),
+    })
+    .lte(3000)
+    .gte(2000);
 export const yearType = namedYearType();
+
+export const namedCollegeYearType = (name?: string) =>
+  z.coerce
+    .number({
+      invalid_type_error: addNameToString("college year is not a number", name),
+      required_error: addNameToString("college year is required", name),
+    })
+    .positive({
+      message: addNameToString("college year is an invalid year", name),
+    })
+    .int({
+      message: addNameToString("college year is an invalid year", name),
+    })
+    .lte(6)
+    .gte(1);
+export const collegeYearType = namedCollegeYearType();
 
 export const namedSemesterType = (name?: string) =>
   z.coerce
@@ -118,11 +136,13 @@ export const semesterType = namedSemesterType();
 export const namedISOTimestampType = (name?: string) =>
   z
     .string({
-      invalid_type_error: addNameToString("not a string", name),
-      required_error: addNameToString("is required", name),
+      invalid_type_error: addNameToString("time not a string", name),
+      required_error: addNameToString("time is required", name),
     })
-    .min(1, { message: addNameToString("must be a non-empty string", name) })
+    .min(1, {
+      message: addNameToString("time must be a non-empty string", name),
+    })
     .datetime({
-      message: "must be a valid ISO timestamp",
+      message: "time must be a valid ISO timestamp",
     });
 export const isoTimestampType = namedISOTimestampType();

@@ -3,7 +3,7 @@ import { timetableRepository } from "../../repositories/timetableRepository";
 import { Timetable } from "../../entity/Timetable";
 import { z } from "zod";
 import { validate } from "../../utils/zodValidateRequest";
-import { DegreeEnum } from "../../types/degrees";
+import { degreeEnum } from "../../types/degrees";
 import { Section } from "../../entity/Section";
 import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
@@ -40,7 +40,7 @@ export const createTimetable = async (req: Request, res: Response) => {
 
   // new timetable default properties
   const name = "Untitled Timetable";
-  const degrees: DegreeEnum[] = author.degrees;
+  const degrees: degreeEnum[] = author.degrees;
   const isPrivate = false;
   const isDraft = false;
   const isArchived = false;

@@ -9,8 +9,8 @@ import {
   JoinColumn,
 } from "typeorm";
 import {
-  ApprovedSectionTypeList,
-  SectionTypeEnum,
+  approvedSectionTypeList,
+  sectionTypeEnum,
 } from "../types/sectionTypes";
 import { Course } from "./Course";
 import { Timetable } from "./Timetable";
@@ -30,9 +30,9 @@ export class Section {
 
   @Column({
     type: "enum",
-    enum: ApprovedSectionTypeList,
+    enum: approvedSectionTypeList,
   })
-  type!: SectionTypeEnum;
+  type!: sectionTypeEnum;
 
   @ManyToMany(() => Timetable, (timetable) => timetable.sections)
   timetables!: Timetable[];

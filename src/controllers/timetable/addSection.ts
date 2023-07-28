@@ -6,7 +6,7 @@ import { validate } from "../../utils/zodValidateRequest";
 import { Section } from "../../entity/Section";
 import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
-import { SectionTypeList } from "../../types/sectionTypes";
+import { sectionTypeList } from "../../types/sectionTypes";
 import { sectionRepository } from "../../repositories/sectionRepository";
 import {
   checkForClassHoursClash,
@@ -130,7 +130,7 @@ export const addSection = async (req: Request, res: Response) => {
     });
   }
 
-  let sectionTypes: SectionTypeList = [];
+  let sectionTypes: sectionTypeList = [];
 
   try {
     const sectionTypeHolders = await sectionRepository

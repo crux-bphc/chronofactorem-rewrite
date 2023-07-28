@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   addNameToString,
   namedBooleanType,
+  namedCollegeYearType,
   namedEmailType,
   namedISOTimestampType,
   namedIntegerType,
@@ -11,8 +12,8 @@ import {
   namedUUIDType,
   namedYearType,
 } from "../types/zodFieldTypes";
-import { NamedDegreeZodList } from "../types/degrees";
-import { NamedSectionTypeZodEnum } from "../types/sectionTypes";
+import { namedDegreeZodList } from "../types/degrees";
+import { namedSectionTypeZodEnum } from "../types/sectionTypes";
 
 export const namedCourseType = (name?: string) =>
   z
@@ -64,7 +65,7 @@ export const namedSectionType = (name?: string) =>
     .object({
       id: namedUUIDType(addNameToString("section", name)),
       courseId: namedUUIDType(addNameToString("section courseId", name)),
-      type: NamedSectionTypeZodEnum(addNameToString("section", name)),
+      type: namedSectionTypeZodEnum(addNameToString("section", name)),
       number: namedIntegerType(addNameToString("section number", name)),
       instructors: namedNonEmptyStringType(
         addNameToString("section instructors", name)
@@ -84,11 +85,13 @@ export const namedTimetableType = (name?: string) =>
       id: namedTimetableIDType(addNameToString("timetable", name)),
       authorId: namedUUIDType(addNameToString("timetable authorId", name)),
       name: namedNonEmptyStringType(addNameToString("timetable name", name)),
-      degrees: NamedDegreeZodList(addNameToString("timetable", name)),
+      degrees: namedDegreeZodList(addNameToString("timetable", name)),
       private: namedBooleanType(addNameToString("timetable private", name)),
       draft: namedBooleanType(addNameToString("timetable draft", name)),
       archived: namedBooleanType(addNameToString("timetable archived", name)),
-      year: namedYearType(addNameToString("timetable year", name)),
+      year: namedCollegeYearType(
+        addNameToString("timetable college year", name)
+      ),
       acadYear: namedYearType(addNameToString("timetable acadYear", name)),
       semester: namedSemesterType(addNameToString("timetable", name)),
       timings: namedNonEmptyStringType(
@@ -116,7 +119,7 @@ export const namedUserType = (name?: string) =>
       email: namedEmailType(addNameToString("user", name)),
       batch: namedYearType(addNameToString("user batch", name)),
       name: namedNonEmptyStringType(addNameToString("user name", name)),
-      degrees: NamedDegreeZodList(addNameToString("user", name)),
+      degrees: namedDegreeZodList(addNameToString("user", name)),
       createdAt: namedISOTimestampType(addNameToString("user createdAt", name)),
     })
     .strict({ message: addNameToString("user has extra fields", name) });

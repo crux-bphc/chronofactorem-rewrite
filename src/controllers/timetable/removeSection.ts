@@ -10,7 +10,7 @@ import { userRepository } from "../../repositories/userRepository";
 import { Course } from "../../entity/Course";
 import { courseRepository } from "../../repositories/courseRepository";
 import { updateSectionWarnings } from "../../utils/updateWarnings";
-import { SectionTypeList } from "../../types/sectionTypes";
+import { sectionTypeList } from "../../types/sectionTypes";
 import {
   namedEmailType,
   namedUUIDType,
@@ -141,7 +141,7 @@ export const removeSection = async (req: Request, res: Response) => {
     });
   }
 
-  let sectionTypes: SectionTypeList = [];
+  let sectionTypes: sectionTypeList = [];
 
   try {
     const sectionTypeHolders = await sectionRepository
