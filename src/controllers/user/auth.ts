@@ -139,7 +139,7 @@ export async function getDegrees(req: Request, res: Response) {
     let batch;
     if (userData.email != undefined) {
       batch = userData.email.match(/^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/)
-        ? userData.email.slice(3, 5)
+        ? userData.email.slice(1, 5)
         : "0000";
     } else {
       batch = "0000";
