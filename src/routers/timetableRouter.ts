@@ -33,12 +33,12 @@ import {
 const timetableRouter = express.Router();
 
 timetableRouter.post("/create", createTimeTableValidator, createTimetable);
-timetableRouter.get("/:id", getTimetableByIdValidator, getTimetableById);
 timetableRouter.get(
   "/getPublic",
   getPublicTimetablesValidator,
   getPublicTimetables
 );
+timetableRouter.get("/:id", getTimetableByIdValidator, getTimetableById);
 timetableRouter.post("/:id/delete", deleteTimeTableValidator, deleteTimetable);
 timetableRouter.post("/:id/add", addSectionValidator, addSection);
 timetableRouter.post("/:id/remove", removeSectionValidator, removeSection);
