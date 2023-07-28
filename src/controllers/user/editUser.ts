@@ -3,8 +3,8 @@ import { userRepository } from "../../repositories/userRepository";
 import { validate } from "../../utils/zodValidateRequest";
 import { z } from "zod";
 import {
-  DegreeList,
-  NamedDegreeZodList,
+  degreeList,
+  namedDegreeZodList,
   isAValidDegreeCombination,
 } from "../../types/degrees";
 import { namedEmailType } from "../../types/zodFieldTypes";
@@ -13,7 +13,7 @@ import { namedEmailType } from "../../types/zodFieldTypes";
 const dataSchema = z.object({
   body: z.object({
     email: namedEmailType("user"),
-    degrees: NamedDegreeZodList("user")
+    degrees: namedDegreeZodList("user")
       .min(1, {
         message:
           "user degrees must be a non-empty array of valid degree strings",
@@ -27,7 +27,7 @@ const dataSchema = z.object({
 export const editUserValidator = validate(dataSchema);
 
 export const editUser = async (req: Request, res: Response) => {
-  const degrees: DegreeList = req.body.degrees;
+  const degrees: degreeList = req.body.degrees;
 
   if (degrees.length === 2 && !isAValidDegreeCombination(degrees)) {
     return res.status(400).json({

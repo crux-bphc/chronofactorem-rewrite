@@ -3,7 +3,7 @@ import { generators } from "openid-client";
 import { Request, Response } from "express";
 import { getClient } from "../../config/authClient";
 import { userRepository } from "../../repositories/userRepository";
-import { DegreeEnum } from "../../types/degrees";
+import { degreeEnum } from "../../types/degrees";
 import { Session, UserData } from "../../types/auth";
 import { env } from "../../config/server";
 import { User } from "../../entity/User";
@@ -119,7 +119,7 @@ export async function getDegrees(req: Request, res: Response) {
     // gets userInfo as part of session
     const session: Session = req.cookies["session"];
 
-    const degrees: DegreeEnum[] = req.body.degrees;
+    const degrees: degreeEnum[] = req.body.degrees;
 
     const userData: UserData = {
       name: session.name,

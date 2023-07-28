@@ -6,7 +6,7 @@ import {
   CreateDateColumn,
   Index,
 } from "typeorm";
-import { DegreeEnum, ApprovedDegreeList } from "../types/degrees";
+import { degreeEnum, approvedDegreeList } from "../types/degrees";
 import { Timetable } from "./Timetable";
 
 @Entity()
@@ -27,9 +27,9 @@ export class User {
   @Column({
     type: "enum",
     array: true,
-    enum: ApprovedDegreeList,
+    enum: approvedDegreeList,
   })
-  degrees!: DegreeEnum[];
+  degrees!: degreeEnum[];
 
   @OneToMany(() => Timetable, (timetable) => timetable.author)
   timetables!: Timetable[];

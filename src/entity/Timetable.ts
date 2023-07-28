@@ -10,7 +10,7 @@ import {
   JoinTable,
   JoinColumn,
 } from "typeorm";
-import { DegreeEnum, ApprovedDegreeList } from "../types/degrees";
+import { degreeEnum, approvedDegreeList } from "../types/degrees";
 import { User } from "./User";
 import { Section } from "./Section";
 
@@ -33,9 +33,9 @@ export class Timetable {
   @Column({
     type: "enum",
     array: true,
-    enum: ApprovedDegreeList,
+    enum: approvedDegreeList,
   })
-  degrees!: DegreeEnum[];
+  degrees!: degreeEnum[];
 
   @Column({ type: "boolean", default: true })
   private!: boolean;
