@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   addNameToString,
   namedBooleanType,
+  namedCollegeYearType,
   namedEmailType,
   namedISOTimestampType,
   namedIntegerType,
@@ -88,7 +89,9 @@ export const namedTimetableType = (name?: string) =>
       private: namedBooleanType(addNameToString("timetable private", name)),
       draft: namedBooleanType(addNameToString("timetable draft", name)),
       archived: namedBooleanType(addNameToString("timetable archived", name)),
-      year: namedYearType(addNameToString("timetable year", name)),
+      year: namedCollegeYearType(
+        addNameToString("timetable college year", name)
+      ),
       acadYear: namedYearType(addNameToString("timetable acadYear", name)),
       semester: namedSemesterType(addNameToString("timetable", name)),
       timings: namedNonEmptyStringType(

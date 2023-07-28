@@ -9,16 +9,16 @@ import { DegreeList, NamedDegreeZodList } from "../../types/degrees";
 
 import { isAValidDegreeCombination } from "../../types/degrees";
 import {
+  namedCollegeYearType,
   namedEmailType,
   namedSemesterType,
-  namedYearType,
 } from "../../types/zodFieldTypes";
 
 const dataSchema = z.object({
   query: z.object({
     // temp auth replacement
     email: namedEmailType("user"),
-    year: namedYearType("search").optional(),
+    year: namedCollegeYearType("search").optional(),
     sem: namedSemesterType("search").optional(),
     branch: NamedDegreeZodList("search branch")
       .min(1, {
