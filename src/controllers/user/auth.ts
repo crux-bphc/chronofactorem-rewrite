@@ -10,6 +10,7 @@ import {
   UserData,
 } from "../../types/auth";
 import { env } from "../../config/server";
+import timetableJSON from "../../timetable.json";
 import { User } from "../../entity/User";
 
 // On any route, when checking if a user is logged in, check for the cookie
@@ -94,7 +95,23 @@ export async function authCallback(req: Request, res: Response) {
         sameSite: "none",
       });
 
-      res.redirect("http://localhost:5173/getDegrees?year=3");
+      // slices mail to obtain batch
+      let batch;
+      if (userData.email != undefined) {
+        batch = userData.email.match(/^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/)
+          ? userData.email.slice(1, 5)
+          : "0000";
+      } else {
+        batch = "0000";
+      }
+      // batch is set to 0000 if it's a non-student email, like hpc@hyderabad.bits-hyderabad.ac.in
+      // or undefined
+
+      res.redirect(
+        `http://localhost:5173/getDegrees?year=${
+          timetableJSON.metadata.acadYear - parseInt(batch) + 1
+        }`
+      );
     }
   } catch (err: any) {
     // If user exists on database, redirect them to frontpage, if not
