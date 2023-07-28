@@ -136,11 +136,13 @@ export const semesterType = namedSemesterType();
 export const namedISOTimestampType = (name?: string) =>
   z
     .string({
-      invalid_type_error: addNameToString("not a string", name),
-      required_error: addNameToString("is required", name),
+      invalid_type_error: addNameToString("time not a string", name),
+      required_error: addNameToString("time is required", name),
     })
-    .min(1, { message: addNameToString("must be a non-empty string", name) })
+    .min(1, {
+      message: addNameToString("time must be a non-empty string", name),
+    })
     .datetime({
-      message: "must be a valid ISO timestamp",
+      message: "time must be a valid ISO timestamp",
     });
 export const isoTimestampType = namedISOTimestampType();
