@@ -91,7 +91,7 @@ export const namedYearType = (name?: string) =>
       message: addNameToString("year is an invalid year", name),
     })
     .lte(3000)
-    .gte(2000);
+    .gte(1900);
 export const yearType = namedYearType();
 
 export const namedCollegeYearType = (name?: string) =>
