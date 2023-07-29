@@ -1,11 +1,8 @@
-import { z } from "zod";
 import app from "../../app";
 import { AppDataSource } from "../../db";
 import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
 import supertest, { Response } from "supertest";
-import { Timetable } from "../../entity/Timetable";
-import { timetableRepository } from "../../repositories/timetableRepository";
 
 const request = supertest(app);
 
