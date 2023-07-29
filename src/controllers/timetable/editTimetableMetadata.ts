@@ -74,6 +74,18 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
   }
 
   try {
+    const currentState = timetable.private && timetable.draft;
+    const numSections = await timetableRepository
+      .createQueryBuilder("timetable")
+      .innerJoinAndSelect("timetable.sections", "sections")
+      .where("timetable.id = :id", { id: timetable.id })
+      .getCount();
+
+    if (currentState && numSections == 0 && isDraft == false) {
+      return res.status(400).json({
+        message: "Cannot make a timetable public without any sections",
+      });
+    }
     await timetableRepository
       .createQueryBuilder("timetable")
       .update()
