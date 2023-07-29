@@ -77,7 +77,7 @@ export const removeSection = async (req: Request, res: Response) => {
   }
 
   if (!timetable.draft) {
-    return res.status(403).json({ message: "timetable is not a draft" });
+    return res.status(418).json({ message: "timetable is not a draft" });
   }
 
   let section: Section | null = null;
