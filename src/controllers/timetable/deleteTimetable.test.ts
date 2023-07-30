@@ -68,7 +68,7 @@ describe("Test deleteTimetable", () => {
             name: "Test Timetable",
             authorId: uuids[i],
             degrees: testUsers[i].degrees,
-            private: false,
+            private: true,
             draft: true,
             archived: false,
             acadYear: 2022,
