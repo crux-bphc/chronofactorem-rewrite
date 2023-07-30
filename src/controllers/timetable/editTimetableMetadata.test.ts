@@ -227,8 +227,10 @@ describe("Test editTimetableMetadata", () => {
         .leftJoin("user.timetables", "timetable")
         .select(["user", "timetable"])
         .getMany();
-      expect(updatedUsers[0].timetables[0].private).toEqual(!userData[0].timetables[0].private);
-      expect(updatedUsers[0].timetables[0].draft).toEqual(!userData[0].timetables[0].draft);
+      const newTimetable = updatedUsers[0].timetables[0];
+      const oldTimetable = userData[0].timetables[0];
+      expect(newTimetable.private).toEqual(!oldTimetable.private);
+      expect(newTimetable.draft).toEqual(!oldTimetable.draft);
     });
   });
 });
