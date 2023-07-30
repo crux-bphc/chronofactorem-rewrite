@@ -18,7 +18,7 @@ describe("Test Get User Details", () => {
   const userId_1 = "91cc080c-78fe-4dcd-bb52-fb08fec7ec2a";
   const userId_2 = "e5906ce0-bb21-42ee-9250-458b983e8a84";
 
-  const userEmail_1 = "f12345678@hyderabad.bits-pilani.ac.in"
+  const userEmail_1 = "f12345678@hyderabad.bits-pilani.ac.in";
 
   let response: Response | null = null;
 
@@ -32,7 +32,7 @@ describe("Test Get User Details", () => {
   };
 
   it("Add test users", async () => {
-    userRepository
+    await userRepository
       .createQueryBuilder()
       .insert()
       .into(User)
@@ -57,11 +57,12 @@ describe("Test Get User Details", () => {
       });
     });
 
-    test("Test if the same user is returned" , () => {
-      const { createdAt, ...responseUserWithoutCreatedAt } = response?.body as User;
-  
+    test("Test if the same user is returned", () => {
+      const { createdAt: _, ...responseUserWithoutCreatedAt } =
+        response?.body as User;
+
       expect(responseUserWithoutCreatedAt).toEqual(testUser_1);
-    })
+    });
 
     test("Test if returns status 200", () => {
       expect(response?.status).toEqual(200);
@@ -112,5 +113,4 @@ describe("Test Get User Details", () => {
       expect(response?.status).toEqual(400);
     });
   });
-
 });
