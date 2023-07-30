@@ -4,6 +4,8 @@ import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
 import supertest, { Response } from "supertest";
 import { degreeEnum } from "../../types/degrees";
+import { Timetable } from "../../entity/Timetable";
+import { timetableRepository } from "../../repositories/timetableRepository";
 
 const request = supertest(app);
 
@@ -21,15 +23,16 @@ describe("Test createTimetable", () => {
       batch: 2021,
       name: "UVW XYZ",
       degrees: ["A7"] as degreeEnum[],
-      email: "f20210000@hyderabad.bits-pilani.ac.in",
+      email: "f202100000@hyderabad.bits-pilani.ac.in",
     },
     {
       batch: 2022,
       name: "ABC DEF",
       degrees: ["B3", "A7"] as degreeEnum[],
-      email: "f20220000@hyderabad.bits-pilani.ac.in",
+      email: "f202200000@hyderabad.bits-pilani.ac.in",
     },
   ];
+  let uuids: string[] = [];
 
   describe("Create test data", () => {
     it("Create test users", async () => {
@@ -44,6 +47,13 @@ describe("Test createTimetable", () => {
           })
           .execute();
       }
+    });
+    it("Store test user uuids", async () => {
+      const users = await userRepository
+        .createQueryBuilder("user")
+        .orderBy("user.batch")
+        .getMany();
+      uuids = users.map((user) => user.id);
     });
   });
 
@@ -121,9 +131,10 @@ describe("Test createTimetable", () => {
 
   describe("Test createTimetable 200 (as single degree student)", () => {
     let response: Response | null = null;
+    let timetable: Timetable | null = null;
     it("Make API call", async () => {
       response = await request.post("/timetable/create").send({
-        email: "f20210000@hyderabad.bits-pilani.ac.in",
+        email: "f202100000@hyderabad.bits-pilani.ac.in",
       });
     });
 
@@ -137,14 +148,23 @@ describe("Test createTimetable", () => {
 
     test("Test if response error is correct", () => {
       expect(response?.body.message).toEqual("Timetable created successfully");
+    });
+
+    test("Test if timetable is created", async () => {
+      timetable = await timetableRepository
+        .createQueryBuilder("timetable")
+        .where("timetable.authorId = :id", { id: uuids[0] })
+        .getOne();
+      expect(timetable).toBeTruthy();
     });
   });
 
   describe("Test createTimetable 200 (as dual degree student)", () => {
     let response: Response | null = null;
+    let timetable: Timetable | null = null;
     it("Make API call", async () => {
       response = await request.post("/timetable/create").send({
-        email: "f20220000@hyderabad.bits-pilani.ac.in",
+        email: "f202200000@hyderabad.bits-pilani.ac.in",
       });
     });
 
@@ -158,6 +178,14 @@ describe("Test createTimetable", () => {
 
     test("Test if response error is correct", () => {
       expect(response?.body.message).toEqual("Timetable created successfully");
+    });
+
+    test("Test if timetable is created", async () => {
+      timetable = await timetableRepository
+        .createQueryBuilder("timetable")
+        .where("timetable.authorId = :id", { id: uuids[1] })
+        .getOne();
+      expect(timetable).toBeTruthy();
     });
   });
 });
