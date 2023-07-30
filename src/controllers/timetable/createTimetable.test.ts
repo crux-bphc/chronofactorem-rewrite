@@ -134,6 +134,10 @@ describe("Test createTimetable", () => {
     test("Test if returns status 201", () => {
       expect(response?.status).toEqual(201);
     });
+
+    test("Test if response error is correct", () => {
+      expect(response?.body.message).toEqual("Timetable created successfully");
+    });
   });
 
   describe("Test createTimetable 200 (as dual degree student)", () => {
@@ -150,6 +154,10 @@ describe("Test createTimetable", () => {
 
     test("Test if returns status 201", () => {
       expect(response?.status).toEqual(201);
+    });
+
+    test("Test if response error is correct", () => {
+      expect(response?.body.message).toEqual("Timetable created successfully");
     });
   });
 });
