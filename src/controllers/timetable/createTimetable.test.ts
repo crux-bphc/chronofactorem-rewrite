@@ -119,7 +119,7 @@ describe("Test createTimetable", () => {
     });
   });
 
-  describe("Test createTimetable as single degree student", () => {
+  describe("Test createTimetable 200 (as single degree student)", () => {
     let response: Response | null = null;
     it("Make API call", async () => {
       response = await request.post("/timetable/create").send({
@@ -136,7 +136,7 @@ describe("Test createTimetable", () => {
     });
   });
 
-  describe("Test createTimetable as dual degree student", () => {
+  describe("Test createTimetable 200 (as dual degree student)", () => {
     let response: Response | null = null;
     it("Make API call", async () => {
       response = await request.post("/timetable/create").send({
