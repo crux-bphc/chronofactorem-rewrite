@@ -129,7 +129,7 @@ describe("Test createTimetable", () => {
     });
   });
 
-  describe("Test createTimetable 200 (as single degree student)", () => {
+  describe("Test createTimetable 201 (as single degree student)", () => {
     let response: Response | null = null;
     let timetable: Timetable | null = null;
     it("Make API call", async () => {
@@ -146,7 +146,7 @@ describe("Test createTimetable", () => {
       expect(response?.status).toEqual(201);
     });
 
-    test("Test if response error is correct", () => {
+    test("Test if response message is correct", () => {
       expect(response?.body.message).toEqual("Timetable created successfully");
     });
 
@@ -159,7 +159,7 @@ describe("Test createTimetable", () => {
     });
   });
 
-  describe("Test createTimetable 200 (as dual degree student)", () => {
+  describe("Test createTimetable 201 (as dual degree student)", () => {
     let response: Response | null = null;
     let timetable: Timetable | null = null;
     it("Make API call", async () => {
@@ -176,7 +176,7 @@ describe("Test createTimetable", () => {
       expect(response?.status).toEqual(201);
     });
 
-    test("Test if response error is correct", () => {
+    test("Test if response message is correct", () => {
       expect(response?.body.message).toEqual("Timetable created successfully");
     });
 
