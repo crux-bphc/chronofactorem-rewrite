@@ -200,7 +200,7 @@ export async function getDegrees(req: Request, res: Response) {
     const session: UnfinishedUserSession = req.cookies["session"];
 
     if (
-      !namedDegreeZodList("user").safeParse(req.body.degrees).success ||
+      !namedDegreeZodList("user").min(1).safeParse(req.body.degrees).success ||
       (req.body.degrees.length === 2 &&
         !isAValidDegreeCombination(req.body.degrees))
     ) {
