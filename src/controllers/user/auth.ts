@@ -243,8 +243,8 @@ export async function getDegrees(req: Request, res: Response) {
     });
 
     if (user) {
-      return res.status(200).json({
-        message: "User already exists",
+      return res.status(400).json({
+        message: "user already exists",
       });
     }
 
