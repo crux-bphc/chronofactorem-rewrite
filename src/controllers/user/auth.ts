@@ -56,10 +56,7 @@ export async function manageAuthRedirect(req: Request, res: Response) {
 export async function authCallback(req: Request, res: Response) {
   try {
     if (req.cookies["session"]) {
-      return res.json({
-        authenticated: true,
-        message: "user is logged in",
-      });
+      res.redirect(env.FRONTEND_URL);
     } else {
       // sets session cookie
 
@@ -203,7 +200,7 @@ export async function getDegrees(req: Request, res: Response) {
     const session: UnfinishedUserSession = req.cookies["session"];
 
     if (
-      !namedDegreeZodList("user").safeParse(req.body.degrees).success ||
+      !namedDegreeZodList("user").min(1).safeParse(req.body.degrees).success ||
       (req.body.degrees.length === 2 &&
         !isAValidDegreeCombination(req.body.degrees))
     ) {
