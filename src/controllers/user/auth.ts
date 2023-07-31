@@ -3,11 +3,16 @@ import { generators } from "openid-client";
 import { Request, Response } from "express";
 import { getClient } from "../../config/authClient";
 import { userRepository } from "../../repositories/userRepository";
-import { degreeEnum } from "../../types/degrees";
+import {
+  degreeList,
+  isAValidDegreeCombination,
+  namedDegreeZodList,
+} from "../../types/degrees";
 import {
   FinishedUserSession,
+  SignUpUserData,
   UnfinishedUserSession,
-  UserData,
+  ZodUnfinishedUserSession,
 } from "../../types/auth";
 import { env } from "../../config/server";
 import timetableJSON from "../../timetable.json";
@@ -80,38 +85,78 @@ export async function authCallback(req: Request, res: Response) {
       // defines maxAge to be the time when the session cookie expires
       const maxAge = tokenExpiryTime * 1000 - Date.now(); // converts into milliseconds
 
+      if (userInfo.name === undefined || userInfo.email === undefined) {
+        return res.status(500).json({
+          message: "error while authenticating",
+          error: "incomplete information returned by OAuth provider",
+        });
+      }
       const userData: UnfinishedUserSession = {
         name: userInfo.name,
         email: userInfo.email,
         maxAge: maxAge,
       };
 
-      // setting the cookie
-      res.cookie("session", userData, {
-        maxAge: maxAge,
-        httpOnly: true,
-        domain: "localhost",
-        secure: true,
-        sameSite: "none",
-      });
+      const existingUser = await userRepository
+        .createQueryBuilder()
+        .select()
+        .where("email = :email", {
+          email: userData.email,
+        })
+        .getOne();
 
-      // slices mail to obtain batch
-      let batch;
-      if (userData.email != undefined) {
-        batch = userData.email.match(/^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/)
-          ? userData.email.slice(1, 5)
-          : "0000";
+      if (existingUser) {
+        const finishedUserData: FinishedUserSession = {
+          name: existingUser.name,
+          email: existingUser.email,
+          id: existingUser.id,
+        };
+
+        // reset session and set ID as well
+        res.clearCookie("userInfo");
+        res.clearCookie("session");
+        res.cookie("session", finishedUserData, {
+          maxAge: maxAge,
+          httpOnly: true,
+          domain: "localhost",
+          secure: true,
+          sameSite: "none",
+        });
+        res.cookie("userInfo", finishedUserData, {
+          maxAge: maxAge,
+        });
+
+        res.redirect(env.FRONTEND_URL);
       } else {
-        batch = "0000";
-      }
-      // batch is set to 0000 if it's a non-student email, like hpc@hyderabad.bits-hyderabad.ac.in
-      // or undefined
+        // setting the cookie
+        res.cookie("session", userData, {
+          maxAge: maxAge,
+          httpOnly: true,
+          domain: "localhost",
+          secure: true,
+          sameSite: "none",
+        });
 
-      res.redirect(
-        `http://localhost:5173/getDegrees?year=${
-          timetableJSON.metadata.acadYear - parseInt(batch) + 1
-        }`
-      );
+        // slices mail to obtain batch
+        let batch;
+        if (userData.email != undefined) {
+          batch = userData.email.match(
+            /^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/
+          )
+            ? userData.email.slice(1, 5)
+            : "0000";
+        } else {
+          batch = "0000";
+        }
+        // batch is set to 0000 if it's a non-student email, like hpc@hyderabad.bits-hyderabad.ac.in
+        // or undefined
+
+        res.redirect(
+          `${env.FRONTEND_URL}/getDegrees?year=${
+            timetableJSON.metadata.acadYear - parseInt(batch) + 1
+          }`
+        );
+      }
     }
   } catch (err: any) {
     // If user exists on database, redirect them to frontpage, if not
@@ -142,11 +187,35 @@ export async function getDegrees(req: Request, res: Response) {
     // the user: name, email and degrees is stored on the database
 
     // gets userInfo as part of session
+    if (req.cookies["session"] === undefined) {
+      return res.status(401).json({
+        message: "cannot set degrees",
+        error: "user session expired",
+      });
+    } else if (
+      !ZodUnfinishedUserSession.safeParse(req.cookies["session"]).success
+    ) {
+      return res.status(401).json({
+        message: "cannot set degrees",
+        error: "user session malformed",
+      });
+    }
     const session: UnfinishedUserSession = req.cookies["session"];
 
-    const degrees: degreeEnum[] = req.body.degrees;
+    if (
+      !namedDegreeZodList("user").safeParse(req.body.degrees).success ||
+      (req.body.degrees.length === 2 &&
+        !isAValidDegreeCombination(req.body.degrees))
+    ) {
+      return res.status(400).json({
+        message: "cannot set degrees",
+        error: "invalid set of degrees passed",
+      });
+    }
 
-    const userData: UserData = {
+    const degrees: degreeList = req.body.degrees;
+
+    const userData: SignUpUserData = {
       name: session.name,
       email: session.email,
       degrees: degrees,
@@ -192,6 +261,7 @@ export async function getDegrees(req: Request, res: Response) {
       })
       .execute();
 
+    res.clearCookie("userInfo");
     res.clearCookie("session");
 
     const finishedUserData: FinishedUserSession = {
@@ -207,6 +277,9 @@ export async function getDegrees(req: Request, res: Response) {
       secure: true,
       sameSite: "none",
     });
+    res.cookie("userInfo", finishedUserData, {
+      maxAge: session.maxAge,
+    });
 
     // reset session and set ID as well
     res.json({
@@ -216,6 +289,7 @@ export async function getDegrees(req: Request, res: Response) {
     return res.status(500).json({
       success: false,
       message: "failed to register",
+      error: JSON.stringify(error),
     });
   }
 }
@@ -223,6 +297,7 @@ export async function getDegrees(req: Request, res: Response) {
 // this function deletes the session cookie to log out
 export async function logout(req: Request, res: Response) {
   res.clearCookie("session");
+  res.clearCookie("userInfo");
   return res.json({
     authenticated: false,
     message: "user logged out",

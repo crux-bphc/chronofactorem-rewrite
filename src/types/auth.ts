@@ -1,23 +1,34 @@
 /*
 These are the types that facilitate authentication
 */
-import { degreeEnum } from "./degrees";
+import { z } from "zod";
+import { namedDegreeZodList } from "./degrees";
+import {
+  namedEmailType,
+  namedIntegerType,
+  namedNonEmptyStringType,
+  namedUUIDType,
+} from "./zodFieldTypes";
 
 // interface for userdata to be stored in the session cookie and for validating the type of session cookie
-export interface UnfinishedUserSession {
-  name: string | undefined;
-  email: string | undefined;
-  maxAge: number;
-}
+export const ZodUnfinishedUserSession = z.object({
+  name: namedNonEmptyStringType("name"),
+  email: namedEmailType(),
+  maxAge: namedIntegerType("maxAge"),
+});
 
-export interface FinishedUserSession {
-  name: string | undefined;
-  email: string | undefined;
-  id: string;
-}
+export type UnfinishedUserSession = z.infer<typeof ZodUnfinishedUserSession>;
 
-export interface UserData {
-  name: string | undefined;
-  email: string | undefined;
-  degrees: degreeEnum[];
-}
+export const ZodFinishedUserSession = z.object({
+  name: namedNonEmptyStringType("name"),
+  email: namedEmailType(),
+  id: namedUUIDType("user id"),
+});
+export type FinishedUserSession = z.infer<typeof ZodFinishedUserSession>;
+
+export const ZodSignUpUserData = z.object({
+  name: namedNonEmptyStringType("name"),
+  email: namedEmailType(),
+  degrees: namedDegreeZodList("user"),
+});
+export type SignUpUserData = z.infer<typeof ZodSignUpUserData>;
