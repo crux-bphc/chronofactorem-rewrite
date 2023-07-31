@@ -47,7 +47,7 @@ export const checkForExamHoursClash = (
   // key: start time, value: { courseCode, end time }
   const examTimesMap = new Map<Date, { courseCode: string; end: Date }>();
   for (const examTime of examTimes) {
-    const [course, start, end] = examTime.split("|");
+    const [course, _, start, end] = examTime.split("|");
     courseCodes.add(course);
     examTimesMap.set(new Date(start), {
       courseCode: course,
