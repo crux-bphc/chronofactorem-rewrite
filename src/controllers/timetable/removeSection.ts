@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { validate } from "../../utils/zodValidateRequest";
+import { validate } from "../../middleware/zodValidateRequest";
 import { Request, Response } from "express";
 import { Section } from "../../entity/Section";
 import { Timetable } from "../../entity/Timetable";
@@ -11,16 +11,10 @@ import { Course } from "../../entity/Course";
 import { courseRepository } from "../../repositories/courseRepository";
 import { updateSectionWarnings } from "../../utils/updateWarnings";
 import { sectionTypeList } from "../../types/sectionTypes";
-import {
-  namedEmailType,
-  namedUUIDType,
-  timetableIDType,
-} from "../../types/zodFieldTypes";
+import { namedUUIDType, timetableIDType } from "../../types/zodFieldTypes";
 
 const dataSchema = z.object({
   body: z.object({
-    // auth temp replacement
-    email: namedEmailType("user"),
     sectionId: namedUUIDType("section"),
   }),
   params: z.object({
@@ -33,14 +27,13 @@ export const removeSectionValidator = validate(dataSchema);
 export const removeSection = async (req: Request, res: Response) => {
   const timetableId = parseInt(req.params.id);
   const sectionId = req.body.sectionId;
-  const email = req.body.email;
 
   let author: User | null = null;
 
   try {
     author = await userRepository
       .createQueryBuilder("user")
-      .where("user.email = :email", { email: email })
+      .where("user.id = :id", { id: req.session?.id })
       .getOne();
   } catch (err: any) {
     // will replace the console.log with a logger when we have one

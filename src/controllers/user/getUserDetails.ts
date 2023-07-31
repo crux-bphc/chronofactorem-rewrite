@@ -1,17 +1,13 @@
 import { Request, Response } from "express";
 import { userRepository } from "../../repositories/userRepository";
-import { validate } from "../../utils/zodValidateRequest";
+import { validate } from "../../middleware/zodValidateRequest";
 import { z } from "zod";
 import { User } from "../../entity/User";
-import { namedEmailType, namedUUIDType } from "../../types/zodFieldTypes";
+import { namedUUIDType } from "../../types/zodFieldTypes";
 
 const dataSchema = z.object({
   params: z.object({
     id: namedUUIDType("user"),
-  }),
-  // auth temp replacement
-  query: z.object({
-    authEmail: namedEmailType("user"),
   }),
 });
 
@@ -19,7 +15,6 @@ export const getUserDetailsValidator = validate(dataSchema);
 
 export const getUserDetails = async (req: Request, res: Response) => {
   const id = req.params.id;
-  const email = req.query.authEmail;
   let user: User | null = null;
 
   try {
@@ -28,9 +23,9 @@ export const getUserDetails = async (req: Request, res: Response) => {
       .leftJoin(
         "user.timetables",
         "timetable",
-        "(user.email <> :email and timetable.private = :private and timetable.draft = :draft) or (user.email = :email)",
+        "(user.id <> :id and timetable.private = :private and timetable.draft = :draft) or (user.id = :id)",
         {
-          email: email,
+          id: req.session?.id,
           draft: false,
           private: false,
         }

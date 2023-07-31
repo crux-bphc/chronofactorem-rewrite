@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { courseRepository } from "../../repositories/courseRepository";
 import { z } from "zod";
-import { validate } from "../../utils/zodValidateRequest";
+import { validate } from "../../middleware/zodValidateRequest";
 import { namedUUIDType } from "../../types/zodFieldTypes";
 
 const dataSchema = z.object({

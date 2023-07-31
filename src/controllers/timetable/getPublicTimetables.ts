@@ -4,20 +4,17 @@ import { timetableRepository } from "../../repositories/timetableRepository";
 import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
 import { z } from "zod";
-import { validate } from "../../utils/zodValidateRequest";
+import { validate } from "../../middleware/zodValidateRequest";
 import { degreeList, namedDegreeZodList } from "../../types/degrees";
 
 import { isAValidDegreeCombination } from "../../types/degrees";
 import {
   namedCollegeYearType,
-  namedEmailType,
   namedSemesterType,
 } from "../../types/zodFieldTypes";
 
 const dataSchema = z.object({
   query: z.object({
-    // temp auth replacement
-    email: namedEmailType("user"),
     year: namedCollegeYearType("search").optional(),
     sem: namedSemesterType("search").optional(),
     branch: namedDegreeZodList("search branch")
@@ -41,7 +38,7 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
       // get user email from the cookie later, for now it's passed as a query param
       user = await userRepository
         .createQueryBuilder("user")
-        .where("user.email = :email", { email: req.query.email })
+        .where("user.id = :id", { id: req.session?.id })
         .getOne();
     } catch (err: any) {
       // will replace the console.log with a logger when we have one

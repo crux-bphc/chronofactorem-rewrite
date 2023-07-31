@@ -7,13 +7,20 @@ import timetableRouter from "./routers/timetableRouter";
 import "dotenv/config";
 import courseRouter from "./routers/courseRouter";
 import cookieParser from "cookie-parser";
+import cors from "cors";
+import { env } from "./config/server";
 
 // create express app
 const app = express();
 
 // to parse cookies
 app.use(cookieParser());
-
+app.use(
+  cors({
+    credentials: true,
+    origin: env.FRONTEND_URL,
+  })
+);
 app.use(bodyParser.json());
 
 // register express routers from defined application routers

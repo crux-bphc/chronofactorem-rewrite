@@ -4,18 +4,15 @@ import { timetableRepository } from "../../repositories/timetableRepository";
 import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
 import { z } from "zod";
-import { validate } from "../../utils/zodValidateRequest";
+import { validate } from "../../middleware/zodValidateRequest";
 import {
   namedBooleanType,
-  namedEmailType,
   namedNonEmptyStringType,
   timetableIDType,
 } from "../../types/zodFieldTypes";
 
 const dataSchema = z.object({
-  // auth temp replacement
   body: z.object({
-    email: namedEmailType("user"),
     name: namedNonEmptyStringType("timetable name"),
     isPrivate: namedBooleanType("timetable isPrivate"),
     isDraft: namedBooleanType("timetable isDraft"),
@@ -37,7 +34,7 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
   try {
     author = await userRepository
       .createQueryBuilder("user")
-      .where("user.email = :email", { email: req.body.email })
+      .where("user.id = :id", { id: req.session?.id })
       .getOne();
   } catch (err: any) {
     // will replace the console.log with a logger when we have one

@@ -4,10 +4,11 @@ import {
   getUserDetails,
   getUserDetailsValidator,
 } from "../controllers/user/getUserDetails";
+import { authenticate } from "../middleware/auth";
 
 const userRouter = express.Router();
 
-userRouter.get("/:id", getUserDetailsValidator, getUserDetails);
-userRouter.post("/edit", editUserValidator, editUser);
+userRouter.get("/:id", authenticate, getUserDetailsValidator, getUserDetails);
+userRouter.post("/edit", authenticate, editUserValidator, editUser);
 
 export default userRouter;

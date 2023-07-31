@@ -13,6 +13,7 @@ export const serverSchema = z.object({
   POSTGRES_DB: z.string().min(1),
   DB_HOST: z.string().min(1),
   PROD_URL: z.string().url().min(1),
+  FRONTEND_URL: z.string().url().min(1),
   PORT: z.coerce.number().default(3000),
   GOOGLE_CLIENT_ID: z
     .string()
