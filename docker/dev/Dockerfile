@@ -7,6 +7,8 @@ RUN npm install -g pnpm
 COPY --chown=node:node patches ./patches
 COPY package.json ./
 COPY pnpm-lock.yaml ./
+COPY tsconfig.json ./
+COPY nodemon.json ./
 
 RUN pnpm fetch
 RUN pnpm install -r --offline
