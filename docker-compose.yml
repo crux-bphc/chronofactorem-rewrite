@@ -12,6 +12,8 @@ services:
       interval: 10s
       timeout: 30s
       retries: 3
+    volumes:
+      - ./data:/var/lib/postgresql/data
     profiles:
       - "dev"
       - "prod"
@@ -23,6 +25,8 @@ services:
       - .env.testing
     ports:
       - "5432:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB}"]
       interval: 10s
