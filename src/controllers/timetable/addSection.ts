@@ -221,10 +221,10 @@ export const addSection = async (req: Request, res: Response) => {
                 ...timetable.examTimes,
                 `${
                   course.code
-                }|${course.midsemStartTime.toISOString()}|${course.midsemEndTime.toISOString()}`,
+                }|MIDSEM|${course.midsemStartTime.toISOString()}|${course.midsemEndTime.toISOString()}`,
                 `${
                   course.code
-                }|${course.compreStartTime.toISOString()}|${course.compreEndTime.toISOString()}`,
+                }|COMPRE|${course.compreStartTime.toISOString()}|${course.compreEndTime.toISOString()}`,
               ],
             })
             .where("timetable.id = :id", { id: timetable.id })
