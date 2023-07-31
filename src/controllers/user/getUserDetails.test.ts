@@ -29,7 +29,7 @@ describe("Test Get User Details", () => {
     name: "UVW XYZ",
     degrees: ["A7"] as degreeEnum[],
     email: "f20210000@hyderabad.bits-pilani.ac.in",
-    timetables: []
+    timetables: [],
   };
 
   it("Create test data", async () => {
@@ -59,8 +59,8 @@ describe("Test Get User Details", () => {
     });
 
     test("Test if returns truthy response", () => {
-       expect(response?.body).toBeTruthy();
-     });
+      expect(response?.body).toBeTruthy();
+    });
 
     test("Test if the same user is returned", () => {
       const { createdAt: _, ...responseUserWithoutCreatedAt } =
@@ -85,8 +85,8 @@ describe("Test Get User Details", () => {
     });
 
     test("Test if returns truthy response", () => {
-       expect(response?.body).toBeTruthy();
-     });
+      expect(response?.body).toBeTruthy();
+    });
 
     test("Test if returns status 404", () => {
       expect(response?.status).toEqual(404);
@@ -104,8 +104,8 @@ describe("Test Get User Details", () => {
     });
 
     test("Test if returns truthy response", () => {
-       expect(response?.body).toBeTruthy();
-     });
+      expect(response?.body).toBeTruthy();
+    });
 
     test("Test if returns status 400", () => {
       expect(response?.status).toEqual(400);
@@ -123,8 +123,8 @@ describe("Test Get User Details", () => {
     });
 
     test("Test if returns truthy response", () => {
-       expect(response?.body).toBeTruthy();
-     });
+      expect(response?.body).toBeTruthy();
+    });
 
     test("Test if returns status 400", () => {
       expect(response?.status).toEqual(400);
