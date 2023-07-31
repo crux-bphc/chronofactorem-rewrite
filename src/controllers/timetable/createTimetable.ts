@@ -41,8 +41,8 @@ export const createTimetable = async (req: Request, res: Response) => {
   // new timetable default properties
   const name = "Untitled Timetable";
   const degrees: degreeEnum[] = author.degrees;
-  const isPrivate = false;
-  const isDraft = false;
+  const isPrivate = true;
+  const isDraft = true;
   const isArchived = false;
   const acadYear = timetableJSON.metadata.acadYear;
   const year: number = acadYear - author.batch + 1;
@@ -56,7 +56,7 @@ export const createTimetable = async (req: Request, res: Response) => {
   const authorId: string = author.id;
 
   try {
-    await timetableRepository
+    const createdTimetable = await timetableRepository
       .createQueryBuilder()
       .insert()
       .into(Timetable)
@@ -79,7 +79,10 @@ export const createTimetable = async (req: Request, res: Response) => {
       })
       .execute();
 
-    return res.status(201).json({ message: "Timetable created successfully" });
+    return res.status(201).json({
+      message: "Timetable created successfully",
+      id: createdTimetable.identifiers[0].id,
+    });
   } catch (err: any) {
     // will replace the console.log with a logger when we have one
     console.log("Error while creating timetable: ", err.message);
