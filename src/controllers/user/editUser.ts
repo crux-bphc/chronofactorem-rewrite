@@ -7,12 +7,9 @@ import {
   namedDegreeZodList,
   isAValidDegreeCombination,
 } from "../../types/degrees";
-import { namedEmailType } from "../../types/zodFieldTypes";
 
-// auth temp replacement
 const dataSchema = z.object({
   body: z.object({
-    email: namedEmailType("user"),
     degrees: namedDegreeZodList("user")
       .min(1, {
         message:
@@ -43,7 +40,7 @@ export const editUser = async (req: Request, res: Response) => {
           .createQueryBuilder()
           .update("user")
           .set({ degrees })
-          .where("email = :email", { email: req.body.email })
+          .where("id = :id", { email: req.session?.id })
           .returning("*")
           .execute()
           .then((response) => {
