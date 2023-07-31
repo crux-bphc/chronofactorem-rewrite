@@ -46,8 +46,8 @@ export const getUserDetails = async (req: Request, res: Response) => {
         "timetable.year",
         "timetable.acadYear",
         "timetable.semester",
-        "timetable.created_at",
-        "timetable.last_updated",
+        "timetable.createdAt",
+        "timetable.lastUpdated",
       ])
       .where("user.id = :id", { id })
       .getOne();
