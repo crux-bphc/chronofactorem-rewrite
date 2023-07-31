@@ -189,7 +189,7 @@ export const addSection = async (req: Request, res: Response) => {
   );
 
   const newTimes: string[] = section.roomTime.map(
-    (time) => course?.code + ":" + time.split(":")[1] + time.split(":")[2]
+    (time) => course?.code + ":" + time.split(":")[2] + time.split(":")[3]
   );
 
   try {

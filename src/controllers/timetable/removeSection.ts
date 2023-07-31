@@ -166,7 +166,7 @@ export const removeSection = async (req: Request, res: Response) => {
   }
 
   const classTimings = section.roomTime.map((time) => {
-    return time.split(":")[1] + time.split(":")[2];
+    return time.split(":")[2] + time.split(":")[3];
   });
 
   timetable.timings = timetable.timings.filter((time) => {
