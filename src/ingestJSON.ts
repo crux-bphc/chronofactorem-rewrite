@@ -262,7 +262,7 @@ export const ingestJSON = async (
             for (let k = 0; k < scheduleObjs[j].days.length; k++) {
               for (let l = 0; l < scheduleObjs[j].hours.length; l++) {
                 roomTimes.push(
-                  `${scheduleObjs[j].room}:${scheduleObjs[j].days[k]}:${scheduleObjs[j].hours[l]}`
+                  `${courseValues[i].code}:${scheduleObjs[j].room}:${scheduleObjs[j].days[k]}:${scheduleObjs[j].hours[l]}`
                 );
               }
             }
