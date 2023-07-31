@@ -3,6 +3,7 @@ import { AppDataSource } from "../../db";
 import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
 import supertest, { Response } from "supertest";
+import { degreeEnum } from "../../types/degrees";
 
 const request = supertest(app);
 
@@ -22,16 +23,16 @@ describe("Test Get User Details", () => {
 
   let response: Response | null = null;
 
-  const testUser_1: Partial<User> = {
+  const testUser_1 = {
     id: userId_1,
-    name: "Test User 1",
-    email: userEmail_1,
-    batch: 1234,
-    degrees: ["A1"],
-    timetables: [],
+    batch: 2021,
+    name: "UVW XYZ",
+    degrees: ["A7"] as degreeEnum[],
+    email: "f20210000@hyderabad.bits-pilani.ac.in",
+    timetables: []
   };
 
-  it("Add test users", async () => {
+  it("Create test data", async () => {
     await userRepository
       .createQueryBuilder()
       .insert()
@@ -57,6 +58,10 @@ describe("Test Get User Details", () => {
       });
     });
 
+    test("Test if returns truthy response", () => {
+       expect(response?.body).toBeTruthy();
+     });
+
     test("Test if the same user is returned", () => {
       const { createdAt: _, ...responseUserWithoutCreatedAt } =
         response?.body as User;
@@ -79,6 +84,10 @@ describe("Test Get User Details", () => {
       });
     });
 
+    test("Test if returns truthy response", () => {
+       expect(response?.body).toBeTruthy();
+     });
+
     test("Test if returns status 404", () => {
       expect(response?.status).toEqual(404);
     });
@@ -94,6 +103,10 @@ describe("Test Get User Details", () => {
       });
     });
 
+    test("Test if returns truthy response", () => {
+       expect(response?.body).toBeTruthy();
+     });
+
     test("Test if returns status 400", () => {
       expect(response?.status).toEqual(400);
     });
@@ -108,6 +121,10 @@ describe("Test Get User Details", () => {
         authEmail: userEmail,
       });
     });
+
+    test("Test if returns truthy response", () => {
+       expect(response?.body).toBeTruthy();
+     });
 
     test("Test if returns status 400", () => {
       expect(response?.status).toEqual(400);
