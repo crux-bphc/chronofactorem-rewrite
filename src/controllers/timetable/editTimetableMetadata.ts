@@ -56,6 +56,7 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
   try {
     timetable = await timetableRepository
       .createQueryBuilder("timetable")
+      .leftJoinAndSelect("timetable.sections", "section")
       .where("timetable.id = :id", { id })
       .getOne();
   } catch (err: any) {
@@ -69,23 +70,24 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
     return res.status(404).json({ message: "timetable not found" });
   }
 
+  const currentState = timetable.private && timetable.draft;
+  const numSections = timetable.sections.length;
+
+  if (
+    currentState &&
+    numSections == 0 &&
+    (isDraft == false || isPrivate == false)
+  ) {
+    return res.status(400).json({
+      message: "Cannot make a timetable public without any sections",
+    });
+  }
+
   if (timetable.authorId !== author.id) {
     return res.status(403).json({ message: "user does not own timetable" });
   }
 
   try {
-    const currentState = timetable.private && timetable.draft;
-    const numSections = await timetableRepository
-      .createQueryBuilder("timetable")
-      .innerJoinAndSelect("timetable.sections", "sections")
-      .where("timetable.id = :id", { id: timetable.id })
-      .getCount();
-
-    if (currentState && numSections == 0 && isDraft == false) {
-      return res.status(400).json({
-        message: "Cannot make a timetable public without any sections",
-      });
-    }
     await timetableRepository
       .createQueryBuilder("timetable")
       .update()
