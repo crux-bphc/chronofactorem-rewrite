@@ -7,14 +7,14 @@ import { namedUUIDType } from "../../types/zodFieldTypes";
 
 const dataSchema = z.object({
   params: z.object({
-    id: namedUUIDType("user"),
+    id: namedUUIDType("user").optional(),
   }),
 });
 
 export const getUserDetailsValidator = validate(dataSchema);
 
 export const getUserDetails = async (req: Request, res: Response) => {
-  const id = req.params.id;
+  const id = req.params.id ?? req.session?.id;
   let user: User | null = null;
 
   try {
