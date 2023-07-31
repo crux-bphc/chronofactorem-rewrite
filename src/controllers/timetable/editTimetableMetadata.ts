@@ -28,6 +28,26 @@ const dataSchema = z.object({
 export const editTimetableMetadataValidator = validate(dataSchema);
 
 export const editTimetableMetadata = async (req: Request, res: Response) => {
+  const id: number = parseInt(req.params.id);
+
+  let timetable: Timetable | null = null;
+
+  try {
+    timetable = await timetableRepository
+      .createQueryBuilder("timetable")
+      .where("timetable.id = :id", { id })
+      .getOne();
+  } catch (err: any) {
+    // will replace the console.log with a logger when we have one
+    console.log("Error while querying timetable: ", err.message);
+
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+
+  if (!timetable) {
+    return res.status(404).json({ message: "timetable not found" });
+  }
+
   let author: User | null = null;
 
   const name: string = req.body.name;
@@ -47,26 +67,6 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
 
   if (!author) {
     return res.status(401).json({ message: "unregistered user" });
-  }
-
-  const id: number = parseInt(req.params.id);
-
-  let timetable: Timetable | null = null;
-
-  try {
-    timetable = await timetableRepository
-      .createQueryBuilder("timetable")
-      .where("timetable.id = :id", { id })
-      .getOne();
-  } catch (err: any) {
-    // will replace the console.log with a logger when we have one
-    console.log("Error while querying timetable: ", err.message);
-
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-
-  if (!timetable) {
-    return res.status(404).json({ message: "timetable not found" });
   }
 
   if (timetable.authorId !== author.id) {
