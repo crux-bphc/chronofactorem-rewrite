@@ -8,6 +8,7 @@ import "dotenv/config";
 import courseRouter from "./routers/courseRouter";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { env } from "./config/server";
 
 // create express app
 const app = express();
@@ -17,7 +18,7 @@ app.use(cookieParser());
 app.use(
   cors({
     credentials: true,
-    origin: "http://localhost:5173",
+    origin: env.FRONTEND_URL,
   })
 );
 app.use(bodyParser.json());
