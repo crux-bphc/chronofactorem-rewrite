@@ -1,0 +1,24 @@
+name: Host a staging instance of the API
+
+on: workflow_dispatch
+
+jobs:
+  staging:
+    name: Build and deploy to staging
+    runs-on: ubuntu-latest
+    steps:
+      - name: ssh into machine, and clone repo
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /home/ubuntu/clones
+            cd chronofactorem-rewrite
+            git reset --hard HEAD
+            git pull
+            docker compose --profile ingestion down
+            docker compose --profile prod down
+            docker compose --profile prod up --build
