@@ -115,7 +115,10 @@ export async function authCallback(req: Request, res: Response) {
         res.cookie("session", finishedUserData, {
           maxAge: maxAge,
           httpOnly: true,
-          domain: "localhost",
+          domain: env.FRONTEND_URL.replace("https://", "").replace(
+            "http://",
+            ""
+          ),
           secure: true,
           sameSite: "none",
         });
@@ -129,7 +132,10 @@ export async function authCallback(req: Request, res: Response) {
         res.cookie("session", userData, {
           maxAge: maxAge,
           httpOnly: true,
-          domain: "localhost",
+          domain: env.FRONTEND_URL.replace("https://", "").replace(
+            "http://",
+            ""
+          ),
           secure: true,
           sameSite: "none",
         });
@@ -270,7 +276,7 @@ export async function getDegrees(req: Request, res: Response) {
     res.cookie("session", finishedUserData, {
       maxAge: session.maxAge,
       httpOnly: true,
-      domain: "localhost",
+      domain: env.FRONTEND_URL.replace("https://", "").replace("http://", ""),
       secure: true,
       sameSite: "none",
     });
