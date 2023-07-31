@@ -79,7 +79,7 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
     (isDraft === false || isPrivate === false)
   ) {
     return res.status(400).json({
-      message: "Cannot make a timetable public without any sections",
+      message: "cannot make a timetable public without any sections",
     });
   }
 
