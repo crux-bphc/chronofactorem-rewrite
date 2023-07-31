@@ -21,4 +21,4 @@ jobs:
             git pull
             docker compose --profile ingestion down
             docker compose --profile prod down
-            docker compose --profile prod up --build
+            docker compose --profile prod up --build -d
