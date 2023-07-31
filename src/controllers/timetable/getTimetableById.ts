@@ -18,6 +18,7 @@ export const getTimetableById = async (req: Request, res: Response) => {
 
     const timetable = await timetableRepository
       .createQueryBuilder("timetable")
+      .leftJoinAndSelect("timetable.sections", "section")
       .where("timetable.id = :id", { id })
       .getOne();
 
