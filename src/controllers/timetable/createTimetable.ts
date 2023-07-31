@@ -1,23 +1,11 @@
 import { Request, Response } from "express";
 import { timetableRepository } from "../../repositories/timetableRepository";
 import { Timetable } from "../../entity/Timetable";
-import { z } from "zod";
-import { validate } from "../../middleware/zodValidateRequest";
 import { degreeEnum } from "../../types/degrees";
 import { Section } from "../../entity/Section";
 import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
 import timetableJSON from "../../timetable.json";
-import { namedEmailType } from "../../types/zodFieldTypes";
-
-// auth temp replacement
-const dataSchema = z.object({
-  body: z.object({
-    email: namedEmailType("user"),
-  }),
-});
-
-export const createTimeTableValidator = validate(dataSchema);
 
 export const createTimetable = async (req: Request, res: Response) => {
   let author: User | null = null;
@@ -25,7 +13,7 @@ export const createTimetable = async (req: Request, res: Response) => {
   try {
     author = await userRepository
       .createQueryBuilder("user")
-      .where("user.email = :email", { email: req.body.email })
+      .where("user.id = :id", { id: req.session?.id })
       .getOne();
   } catch (err: any) {
     // will replace the console.log with a logger when we have one
