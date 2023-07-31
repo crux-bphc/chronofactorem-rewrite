@@ -56,10 +56,7 @@ export async function manageAuthRedirect(req: Request, res: Response) {
 export async function authCallback(req: Request, res: Response) {
   try {
     if (req.cookies["session"]) {
-      return res.json({
-        authenticated: true,
-        message: "user is logged in",
-      });
+      res.redirect(env.FRONTEND_URL);
     } else {
       // sets session cookie
 
