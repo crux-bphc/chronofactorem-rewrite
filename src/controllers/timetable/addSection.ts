@@ -79,6 +79,10 @@ export const addSection = async (req: Request, res: Response) => {
     return res.status(403).json({ message: "user does not own timetable" });
   }
 
+  if (!timetable.draft) {
+    return res.status(418).json({ message: "timetable is not a draft" });
+  }
+
   let section: Section | null = null;
 
   try {
@@ -185,7 +189,7 @@ export const addSection = async (req: Request, res: Response) => {
   );
 
   const newTimes: string[] = section.roomTime.map(
-    (time) => course?.code + ":" + time.split(":")[1] + time.split(":")[2]
+    (time) => course?.code + ":" + time.split(":")[2] + time.split(":")[3]
   );
 
   try {

@@ -76,6 +76,10 @@ export const removeSection = async (req: Request, res: Response) => {
     return res.status(403).json({ message: "user does not own timetable" });
   }
 
+  if (!timetable.draft) {
+    return res.status(418).json({ message: "timetable is not a draft" });
+  }
+
   let section: Section | null = null;
 
   try {
@@ -162,7 +166,7 @@ export const removeSection = async (req: Request, res: Response) => {
   }
 
   const classTimings = section.roomTime.map((time) => {
-    return time.split(":")[1] + time.split(":")[2];
+    return time.split(":")[2] + time.split(":")[3];
   });
 
   timetable.timings = timetable.timings.filter((time) => {
