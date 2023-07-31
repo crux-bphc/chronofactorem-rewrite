@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { validate } from "../../utils/zodValidateRequest";
+import { validate } from "../../middleware/zodValidateRequest";
 import { Request, Response } from "express";
 import { Section } from "../../entity/Section";
 import { Timetable } from "../../entity/Timetable";

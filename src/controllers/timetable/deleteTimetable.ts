@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { timetableRepository } from "../../repositories/timetableRepository";
 import { Timetable } from "../../entity/Timetable";
 import { z } from "zod";
-import { validate } from "../../utils/zodValidateRequest";
+import { validate } from "../../middleware/zodValidateRequest";
 import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
 import { namedEmailType, timetableIDType } from "../../types/zodFieldTypes";

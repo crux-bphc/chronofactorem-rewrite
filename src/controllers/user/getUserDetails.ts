@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { userRepository } from "../../repositories/userRepository";
-import { validate } from "../../utils/zodValidateRequest";
+import { validate } from "../../middleware/zodValidateRequest";
 import { z } from "zod";
 import { User } from "../../entity/User";
 import { namedEmailType, namedUUIDType } from "../../types/zodFieldTypes";

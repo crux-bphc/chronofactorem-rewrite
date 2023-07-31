@@ -4,7 +4,7 @@ import { timetableRepository } from "../../repositories/timetableRepository";
 import { User } from "../../entity/User";
 import { userRepository } from "../../repositories/userRepository";
 import { z } from "zod";
-import { validate } from "../../utils/zodValidateRequest";
+import { validate } from "../../middleware/zodValidateRequest";
 import {
   namedBooleanType,
   namedEmailType,
