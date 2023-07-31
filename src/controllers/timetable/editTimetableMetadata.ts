@@ -70,12 +70,9 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
     return res.status(404).json({ message: "timetable not found" });
   }
 
-  const currentState = timetable.private && timetable.draft;
-  const numSections = timetable.sections.length;
-
   if (
-    currentState &&
-    numSections === 0 &&
+    timetable.draft &&
+    timetable.sections.length === 0 &&
     (isDraft === false || isPrivate === false)
   ) {
     return res.status(400).json({
