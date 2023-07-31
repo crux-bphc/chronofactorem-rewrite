@@ -17,7 +17,7 @@ export const checkForClassHoursClash = (
   }
 
   const newTimes = newRoomTimes.map((roomTime) => {
-    const [_, day, hour] = roomTime.split(":");
+    const [_, __, day, hour] = roomTime.split(":");
     return day + hour;
   });
 
