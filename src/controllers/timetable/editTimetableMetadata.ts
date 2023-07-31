@@ -56,6 +56,7 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
   try {
     timetable = await timetableRepository
       .createQueryBuilder("timetable")
+      .leftJoinAndSelect("timetable.sections", "section")
       .where("timetable.id = :id", { id })
       .getOne();
   } catch (err: any) {
@@ -67,6 +68,16 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
 
   if (!timetable) {
     return res.status(404).json({ message: "timetable not found" });
+  }
+
+  if (
+    timetable.draft &&
+    timetable.sections.length === 0 &&
+    (isDraft === false || isPrivate === false)
+  ) {
+    return res.status(400).json({
+      message: "cannot publish empty timetable",
+    });
   }
 
   if (timetable.authorId !== author.id) {
