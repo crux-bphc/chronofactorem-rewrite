@@ -6,7 +6,7 @@ services:
     env_file:
       - .env
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "${PGPORT}:${PGPORT}"
     healthcheck:
       test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB}"]
       interval: 10s
