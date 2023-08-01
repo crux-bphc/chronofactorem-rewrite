@@ -11,6 +11,7 @@ export const serverSchema = z.object({
   POSTGRES_USER: z.string().min(1),
   POSTGRES_PASSWORD: z.string().min(1),
   POSTGRES_DB: z.string().min(1),
+  POSTGRES_PORT: z.coerce.number().default(5432),
   DB_HOST: z.string().min(1),
   PROD_URL: z.string().url().min(1),
   FRONTEND_URL: z.string().url().min(1),

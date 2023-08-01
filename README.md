@@ -16,6 +16,7 @@ POSTGRES_USER="chrono"
 PGUSER="chrono" # should be same as POSTGRES_USER
 POSTGRES_PASSWORD="aSBrbm93IHdoYXQgeW91IGFyZQ=="
 POSTGRES_DB="chrono" # should be same as POSTGRES_USER for some reason
+POSTGRES_PORT=5432
 DB_HOST="db"
 NODE_ENV="development"
 PROD_URL="http://localhost:3000"
