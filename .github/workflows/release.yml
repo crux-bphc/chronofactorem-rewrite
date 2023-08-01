@@ -1,10 +1,13 @@
-name: Host a staging instance of the API
+name: Host a new release of the API
 
-on: workflow_dispatch
+on:
+  release:
+    types:
+      - published
 
 jobs:
-  staging:
-    name: Build and deploy to staging
+  release:
+    name: Build and deploy to prod
     runs-on: ubuntu-latest
     steps:
       - name: ssh into machine, and clone repo
@@ -16,7 +19,7 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             cd /home/ubuntu/clones
-            cd chronofactorem-rewrite-staging
+            cd chronofactorem-rewrite-prod
             git reset --hard HEAD
             git pull
             docker compose --profile ingestion down
