@@ -299,7 +299,14 @@ export async function getDegrees(req: Request, res: Response) {
 
 // this function deletes the session cookie to log out
 export async function logout(req: Request, res: Response) {
-  res.clearCookie("session");
+  res.clearCookie("session", {
+    httpOnly: true,
+    domain: env.FRONTEND_URL.replace("https://", "")
+      .replace("http://", "")
+      .split(":")[0],
+    secure: true,
+    sameSite: "none",
+  });
   res.clearCookie("userInfo");
   return res.json({
     authenticated: false,
