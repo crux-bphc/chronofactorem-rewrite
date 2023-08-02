@@ -15,10 +15,17 @@ const app = express();
 
 // to parse cookies
 app.use(cookieParser());
+const frontendIsHTTPS = env.FRONTEND_URL.includes("https://");
 app.use(
   cors({
     credentials: true,
-    origin: env.FRONTEND_URL,
+    origin: [
+      env.FRONTEND_URL,
+      env.FRONTEND_URL.replace(
+        frontendIsHTTPS ? "https://" : "http://",
+        frontendIsHTTPS ? "https://www." : "http://www."
+      ),
+    ],
   })
 );
 app.use(bodyParser.json());
