@@ -185,7 +185,7 @@ export const addSection = async (req: Request, res: Response) => {
     (time) => course?.code + ":" + time.split(":")[2] + time.split(":")[3]
   );
 
-  let newExamTimes = timetable.examTimes;
+  const newExamTimes = timetable.examTimes;
   if (course.midsemStartTime !== null && course.midsemEndTime !== null) {
     newExamTimes.push(
       `${
