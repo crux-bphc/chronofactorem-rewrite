@@ -46,6 +46,9 @@ export const namedTimetableIDType = (name?: string) =>
     })
     .int({
       message: addNameToString("timetable id is an invalid id", name),
+    })
+    .max(2147483647, {
+      message: addNameToString("timetable id is an invalid id", name),
     });
 
 export const timetableIDType = namedTimetableIDType();
