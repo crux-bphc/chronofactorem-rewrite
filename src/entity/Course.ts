@@ -25,16 +25,16 @@ export class Course {
   @OneToMany(() => Section, (section) => section.course)
   sections!: Section[];
 
-  @Column({ name: "midsem_start_time", type: "timestamptz" })
+  @Column({ name: "midsem_start_time", type: "timestamptz", nullable: true })
   midsemStartTime!: Date;
 
-  @Column({ name: "midsem_end_time", type: "timestamptz" })
+  @Column({ name: "midsem_end_time", type: "timestamptz", nullable: true })
   midsemEndTime!: Date;
 
-  @Column({ name: "compre_start_time", type: "timestamptz" })
+  @Column({ name: "compre_start_time", type: "timestamptz", nullable: true })
   compreStartTime!: Date;
 
-  @Column({ name: "compre_end_time", type: "timestamptz" })
+  @Column({ name: "compre_end_time", type: "timestamptz", nullable: true })
   compreEndTime!: Date;
 
   @Column({ type: "boolean", default: false })

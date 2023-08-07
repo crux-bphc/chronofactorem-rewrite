@@ -5,8 +5,8 @@ import { Timetable } from "./entity/Timetable";
 import { QueryRunner } from "typeorm";
 
 interface ExamJSON {
-  midsem: string;
-  compre: string;
+  midsem: string | null;
+  compre: string | null;
 }
 interface ScheduleJSON {
   room: string;
@@ -221,18 +221,22 @@ export const ingestJSON = async (
 
     console.log("constructing courses...");
     const courseValues = Object.keys(courses).map((courseCode) => {
-      const midsemTimes = courses[courseCode].exams_iso[0].midsem.split("|");
-      const compreTimes = courses[courseCode].exams_iso[0].compre.split("|");
+      const midsemTimes = courses[courseCode].exams_iso[0].midsem;
+      const compreTimes = courses[courseCode].exams_iso[0].compre;
       return {
         code: courseCode,
         name: courses[courseCode].course_name,
         acadYear: year,
         semester: semester,
         archived: false,
-        midsemStartTime: new Date(midsemTimes[0]),
-        midsemEndTime: new Date(midsemTimes[1]),
-        compreStartTime: new Date(compreTimes[0]),
-        compreEndTime: new Date(compreTimes[1]),
+        midsemStartTime: midsemTimes
+          ? new Date(midsemTimes.split("|")[0])
+          : null,
+        midsemEndTime: midsemTimes ? new Date(midsemTimes.split("|")[1]) : null,
+        compreStartTime: compreTimes
+          ? new Date(compreTimes.split("|")[0])
+          : null,
+        compreEndTime: compreTimes ? new Date(compreTimes.split("|")[1]) : null,
       } as QueryDeepPartialEntity<Course>;
     });
 
