@@ -64,43 +64,47 @@ export const checkForExamHoursClash = (
     };
   }
 
-  const newMidsemStartTime = newCourse.midsemStartTime;
-  const newMidsemEndTime = newCourse.midsemEndTime;
+  if (newCourse.midsemStartTime !== null && newCourse.midsemEndTime !== null) {
+    const newMidsemStartTime = newCourse.midsemStartTime;
+    const newMidsemEndTime = newCourse.midsemEndTime;
 
-  for (const [key, value] of examTimesMap) {
-    const { courseCode, end } = value;
-    const start = key;
-    if (
-      (newMidsemStartTime <= start && newMidsemEndTime >= start) ||
-      (newMidsemStartTime <= end && newMidsemEndTime >= end) ||
-      (newMidsemStartTime >= start && newMidsemEndTime <= end)
-    ) {
-      return {
-        clash: true,
-        exam: "midsem",
-        course: courseCode,
-        sameCourse: false,
-      };
+    for (const [key, value] of examTimesMap) {
+      const { courseCode, end } = value;
+      const start = key;
+      if (
+        (newMidsemStartTime <= start && newMidsemEndTime >= start) ||
+        (newMidsemStartTime <= end && newMidsemEndTime >= end) ||
+        (newMidsemStartTime >= start && newMidsemEndTime <= end)
+      ) {
+        return {
+          clash: true,
+          exam: "midsem",
+          course: courseCode,
+          sameCourse: false,
+        };
+      }
     }
   }
 
-  const newCompreStartTime = newCourse.compreStartTime;
-  const newCompreEndTime = newCourse.compreEndTime;
+  if (newCourse.compreStartTime !== null && newCourse.compreEndTime !== null) {
+    const newCompreStartTime = newCourse.compreStartTime;
+    const newCompreEndTime = newCourse.compreEndTime;
 
-  for (const [key, value] of examTimesMap) {
-    const { courseCode, end } = value;
-    const start = key;
-    if (
-      (newCompreStartTime <= start && newCompreEndTime >= start) ||
-      (newCompreStartTime <= end && newCompreEndTime >= end) ||
-      (newCompreStartTime >= start && newCompreEndTime <= end)
-    ) {
-      return {
-        clash: true,
-        exam: "compre",
-        course: courseCode,
-        sameCourse: false,
-      };
+    for (const [key, value] of examTimesMap) {
+      const { courseCode, end } = value;
+      const start = key;
+      if (
+        (newCompreStartTime <= start && newCompreEndTime >= start) ||
+        (newCompreStartTime <= end && newCompreEndTime >= end) ||
+        (newCompreStartTime >= start && newCompreEndTime <= end)
+      ) {
+        return {
+          clash: true,
+          exam: "compre",
+          course: courseCode,
+          sameCourse: false,
+        };
+      }
     }
   }
 

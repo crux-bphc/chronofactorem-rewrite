@@ -185,6 +185,22 @@ export const addSection = async (req: Request, res: Response) => {
     (time) => course?.code + ":" + time.split(":")[2] + time.split(":")[3]
   );
 
+  const newExamTimes = timetable.examTimes;
+  if (course.midsemStartTime !== null && course.midsemEndTime !== null) {
+    newExamTimes.push(
+      `${
+        course.code
+      }|MIDSEM|${course.midsemStartTime.toISOString()}|${course.midsemEndTime.toISOString()}`
+    );
+  }
+  if (course.compreStartTime !== null && course.compreEndTime !== null) {
+    newExamTimes.push(
+      `${
+        course.code
+      }|COMPRE|${course.compreStartTime.toISOString()}|${course.compreEndTime.toISOString()}`
+    );
+  }
+
   try {
     await timetableRepository.manager.transaction(
       async (transactionalEntityManager) => {
@@ -217,15 +233,7 @@ export const addSection = async (req: Request, res: Response) => {
             .createQueryBuilder()
             .update(Timetable)
             .set({
-              examTimes: [
-                ...timetable.examTimes,
-                `${
-                  course.code
-                }|MIDSEM|${course.midsemStartTime.toISOString()}|${course.midsemEndTime.toISOString()}`,
-                `${
-                  course.code
-                }|COMPRE|${course.compreStartTime.toISOString()}|${course.compreEndTime.toISOString()}`,
-              ],
+              examTimes: newExamTimes,
             })
             .where("timetable.id = :id", { id: timetable.id })
             .execute();
