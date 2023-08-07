@@ -4,6 +4,34 @@
 		"semester": 1
 	},
 	"courses": {
+		"AN F311": {
+			"units": 3.0,
+			"course_name": "PRINCIPLES OF\nAERODYNAMICS",
+			"sections": {
+				"L1": {
+					"instructor": ["PARDHA SARADHI GURUG"],
+					"schedule": [
+						{
+							"room": "G205",
+							"days": ["M", "W", "F"],
+							"hours": [8]
+						}
+					]
+				}
+			},
+			"exams": [
+				{
+					"midsem": "14/10 - 4.00 - 5.30PM",
+					"compre": "21/12 AN"
+				}
+			],
+			"exams_iso": [
+				{
+					"midsem": "2023-10-14T10:30:00|2023-10-14T12:00:00",
+					"compre": "2023-12-21T08:30:00|2023-12-21T11:30:00"
+				}
+			]
+		},
 		"AN F313": {
 			"units": 3.0,
 			"course_name": "FLIGHT MECHANICS AND\nCONTROLS",
