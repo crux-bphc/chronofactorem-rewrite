@@ -17,6 +17,16 @@
               "hours": [4, 5]
             }
           ]
+        },
+        "P2": {
+          "instructor": ["TEST INSTRUCTOR 69"],
+          "schedule": [
+            {
+              "room": "T100",
+              "days": ["F"],
+              "hours": [2]
+            }
+          ]
         }
       },
       "exams": [
