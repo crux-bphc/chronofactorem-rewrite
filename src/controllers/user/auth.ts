@@ -17,6 +17,8 @@ import {
 import { env } from "../../config/server";
 import timetableJSON from "../../timetable.json";
 import { User } from "../../entity/User";
+import jwt from "jsonwebtoken";
+import { createHash } from "crypto";
 
 // On any route, when checking if a user is logged in, check for the cookie
 // in cookiestorage on the server, using -
@@ -31,20 +33,16 @@ const code_verifier = generators.codeVerifier();
 // redirects to the redirect URL for signing in
 export async function manageAuthRedirect(req: Request, res: Response) {
   try {
-    if (req.cookies["session"]) {
-      return res.redirect(`${env.PROD_URL}/auth/callback`);
-    } else {
-      const client = await getClient();
-      const code_challenge = generators.codeChallenge(code_verifier);
+    const client = await getClient();
+    const code_challenge = generators.codeChallenge(code_verifier);
 
-      const authRedirect = client.authorizationUrl({
-        scope: "openid email profile",
-        code_challenge,
-        code_challenge_method: "S256",
-      });
+    const authRedirect = client.authorizationUrl({
+      scope: "openid email profile",
+      code_challenge,
+      code_challenge_method: "S256",
+    });
 
-      return res.redirect(authRedirect);
-    }
+    return res.redirect(authRedirect);
   } catch (err: any) {
     return res.status(500).json({
       message: "authentication failure",
@@ -55,109 +53,113 @@ export async function manageAuthRedirect(req: Request, res: Response) {
 // starts a session after validating access_token
 export async function authCallback(req: Request, res: Response) {
   try {
-    if (req.cookies["session"]) {
-      res.redirect(env.FRONTEND_URL);
-    } else {
-      // sets session cookie
+    // sets session cookie
+    const client = await getClient();
+    const params = client.callbackParams(req);
 
-      const client = await getClient();
-      const params = client.callbackParams(req);
+    // tokenSet contains the refresh_token and access_token codes
+    const tokenSet = await client.callback(
+      `${env.PROD_URL}/auth/callback`,
+      params,
+      { code_verifier }
+    );
 
-      // tokenSet contains the refresh_token and access_token codes
-      const tokenSet = await client.callback(
-        `${env.PROD_URL}/auth/callback`,
-        params,
-        { code_verifier }
-      );
+    // obtaining the access_token from tokenSet
+    const access_token = tokenSet.access_token;
 
-      // obtaining the access_token from tokenSet
-      const access_token = tokenSet.access_token;
+    // obtaining userInfo from the access_token code
+    const userInfo = await client.userinfo(access_token as string | TokenSet);
 
-      // obtaining userInfo from the access_token code
-      const userInfo = await client.userinfo(access_token as string | TokenSet);
+    // tokenSet.claims() returns validated information contained upon accessing the token
+    const tokenExpiryTime = tokenSet.claims().exp;
 
-      // tokenSet.claims() returns validated information contained upon accessing the token
-      const tokenExpiryTime = tokenSet.claims().exp;
+    // defines maxAge to be the time when the session cookie expires
+    const maxAge = tokenExpiryTime * 1000 - Date.now(); // converts into milliseconds
 
-      // defines maxAge to be the time when the session cookie expires
-      const maxAge = tokenExpiryTime * 1000 - Date.now(); // converts into milliseconds
+    if (userInfo.name === undefined || userInfo.email === undefined) {
+      return res.status(500).json({
+        message: "error while authenticating",
+        error: "incomplete information returned by OAuth provider",
+      });
+    }
+    const userData: UnfinishedUserSession = {
+      name: userInfo.name,
+      email: userInfo.email,
+      maxAge: maxAge,
+    };
 
-      if (userInfo.name === undefined || userInfo.email === undefined) {
-        return res.status(500).json({
-          message: "error while authenticating",
-          error: "incomplete information returned by OAuth provider",
-        });
-      }
-      const userData: UnfinishedUserSession = {
-        name: userInfo.name,
-        email: userInfo.email,
-        maxAge: maxAge,
+    const existingUser = await userRepository
+      .createQueryBuilder()
+      .select()
+      .where("email = :email", {
+        email: userData.email,
+      })
+      .getOne();
+
+    if (existingUser) {
+      const fingerprint = Math.random().toString(36).substring(2);
+
+      const finishedUserData: FinishedUserSession = {
+        name: existingUser.name,
+        email: existingUser.email,
+        id: existingUser.id,
+        fingerprint: createHash("sha256")
+          .update(fingerprint)
+          .digest("base64url"),
       };
 
-      const existingUser = await userRepository
-        .createQueryBuilder()
-        .select()
-        .where("email = :email", {
-          email: userData.email,
-        })
-        .getOne();
-
-      if (existingUser) {
-        const finishedUserData: FinishedUserSession = {
-          name: existingUser.name,
-          email: existingUser.email,
-          id: existingUser.id,
-        };
-
-        // reset session and set ID as well
-        res.clearCookie("userInfo");
-        res.clearCookie("session");
-        res.cookie("session", finishedUserData, {
-          maxAge: maxAge,
-          httpOnly: true,
-          domain: env.FRONTEND_URL.replace("https://", "")
-            .replace("http://", "")
-            .split(":")[0],
-          secure: true,
-          sameSite: "none",
-        });
-        res.cookie("userInfo", finishedUserData, {
-          maxAge: maxAge,
-        });
-
-        res.redirect(env.FRONTEND_URL);
-      } else {
-        // setting the cookie
-        res.cookie("session", userData, {
-          maxAge: maxAge,
-          httpOnly: true,
-          domain: env.FRONTEND_URL.replace("https://", "")
-            .replace("http://", "")
-            .split(":")[0],
-          secure: true,
-          sameSite: "none",
-        });
-
-        // slices mail to obtain batch
-        let batch;
-        if (userData.email != undefined) {
-          batch = userData.email.match(
-            /^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/
-          )
-            ? userData.email.slice(1, 5)
-            : "0000";
-        } else {
-          batch = "0000";
+      const token = jwt.sign(
+        finishedUserData,
+        Buffer.from(env.JWT_PRIVATE_KEY, "base64"),
+        {
+          algorithm: "RS256",
+          expiresIn: maxAge,
         }
-        // batch is set to 0000 if it's a non-student email, like hpc@hyderabad.bits-hyderabad.ac.in
-        // or undefined
+      );
 
-        res.redirect(
-          `${env.FRONTEND_URL}/getDegrees?year=${
-            timetableJSON.metadata.acadYear - parseInt(batch) + 1
-          }`
-        );
+      res.cookie("__secure-fingerprint", fingerprint, {
+        maxAge: maxAge,
+        httpOnly: true,
+        domain: env.FRONTEND_URL.replace("https://", "")
+          .replace("http://", "")
+          .split(":")[0],
+        secure: true,
+        sameSite: "lax",
+      });
+
+      res.json({
+        success: true,
+        token: token,
+      });
+    } else {
+      // setting the cookie
+      res.cookie("session", userData, {
+        maxAge: maxAge,
+        httpOnly: true,
+        domain: env.FRONTEND_URL.replace("https://", "")
+          .replace("http://", "")
+          .split(":")[0],
+        secure: true,
+        sameSite: "lax",
+      });
+
+      // slices mail to obtain batch
+      let batch;
+      if (userData.email != undefined) {
+        batch = userData.email.match(/^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/)
+          ? userData.email.slice(1, 5)
+          : "0000";
+      } else {
+        batch = "0000";
       }
+      // batch is set to 0000 if it's a non-student email, like hpc@hyderabad.bits-hyderabad.ac.in
+      // or undefined
+
+      res.redirect(
+        `${env.FRONTEND_URL}/getDegrees?year=${
+          timetableJSON.metadata.acadYear - parseInt(batch) + 1
+        }`
+      );
     }
   } catch (err: any) {
     // If user exists on database, redirect them to frontpage, if not
@@ -262,33 +264,41 @@ export async function getDegrees(req: Request, res: Response) {
       })
       .execute();
 
-    res.clearCookie("userInfo");
-    res.clearCookie("session");
+    const fingerprint = Math.random().toString(36).substring(2);
 
     const finishedUserData: FinishedUserSession = {
       name: session.name,
       email: session.email,
       id: createdUser.identifiers[0].id,
+      fingerprint: createHash("sha256").update(fingerprint).digest("base64url"),
     };
+    console.log(Buffer.from(env.JWT_PRIVATE_KEY, "base64").toString("utf8"));
+    const token = jwt.sign(
+      finishedUserData,
+      Buffer.from(env.JWT_PRIVATE_KEY, "base64"),
+      {
+        algorithm: "RS256",
+        expiresIn: session.maxAge,
+      }
+    );
 
-    res.cookie("session", finishedUserData, {
+    res.cookie("__secure-fingerprint", fingerprint, {
       maxAge: session.maxAge,
       httpOnly: true,
       domain: env.FRONTEND_URL.replace("https://", "")
         .replace("http://", "")
         .split(":")[0],
       secure: true,
-      sameSite: "none",
-    });
-    res.cookie("userInfo", finishedUserData, {
-      maxAge: session.maxAge,
+      sameSite: "lax",
     });
 
     // reset session and set ID as well
     res.json({
       success: true,
+      token: token,
     });
   } catch (error: any) {
+    console.error(error);
     return res.status(500).json({
       success: false,
       message: "failed to register",
@@ -305,9 +315,8 @@ export async function logout(req: Request, res: Response) {
       .replace("http://", "")
       .split(":")[0],
     secure: true,
-    sameSite: "none",
+    sameSite: "lax",
   });
-  res.clearCookie("userInfo");
   return res.json({
     authenticated: false,
     message: "user logged out",

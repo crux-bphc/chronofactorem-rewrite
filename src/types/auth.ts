@@ -23,6 +23,7 @@ export const ZodFinishedUserSession = z.object({
   name: namedNonEmptyStringType("name"),
   email: namedEmailType(),
   id: namedUUIDType("user id"),
+  fingerprint: namedNonEmptyStringType("fingerprint"),
 });
 export type FinishedUserSession = z.infer<typeof ZodFinishedUserSession>;
 
