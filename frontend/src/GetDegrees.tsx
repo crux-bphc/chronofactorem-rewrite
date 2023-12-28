@@ -79,12 +79,12 @@ function GetDegrees() {
     <>
       <div className="flex bg-slate-950 h-screen w-full justify-center">
         <div className="flex flex-col items-center pt-48">
-          <h1 className="scroll-m-20 text-xl tracking-tight lg:text-2xl text-slate-50">
+          <h1 className="scroll-m-20 text-xl tracking-tight lg:text-2xl text-slate-50 text-center mx-4">
             {`Select your degree${
               firstDegree?.includes("B") && year >= 2 ? "s" : ""
             } so we can help build your timetable:`}
           </h1>
-          <div className="flex">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Select onValueChange={setFirstDegree}>
               <SelectTrigger className="w-84 bg-slate-800 border-slate-700 focus:ring-slate-800 focus:ring-offset-slate-800 text-slate-50 mt-4">
                 <SelectValue placeholder="Select a degree" />
@@ -120,7 +120,7 @@ function GetDegrees() {
 
             {firstDegree?.includes("B") && year >= 2 && (
               <Select onValueChange={setSecondDegree}>
-                <SelectTrigger className="w-84 mx-4 bg-slate-800 border-slate-700 focus:ring-slate-800 focus:ring-offset-slate-800 text-slate-50 mt-4">
+                <SelectTrigger className="w-84 bg-slate-800 border-slate-700 focus:ring-slate-800 focus:ring-offset-slate-800 text-slate-50 mt-4">
                   <SelectValue placeholder="Select a degree" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-700 border-slate-600 text-slate-50">
