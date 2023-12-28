@@ -1,4 +1,4 @@
-name: Host a staging instance of the API
+name: Host a staging instance of ChronoFactorem
 
 on: workflow_dispatch
 
