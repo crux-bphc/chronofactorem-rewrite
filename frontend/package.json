@@ -1,0 +1,41 @@
+{
+	"name": "chronofactorem-rewrite-frontend",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc && vite build",
+		"preview": "vite preview"
+	},
+	"dependencies": {
+		"@radix-ui/react-toast": "^1.1.5",
+		"@tanstack/react-query": "^5.15.0",
+		"@tanstack/react-query-devtools": "^5.15.0",
+		"@tanstack/react-router": "^1.0.0",
+		"@tanstack/router-devtools": "^1.0.0",
+		"axios": "^1.6.3",
+		"class-variance-authority": "^0.7.0",
+		"clsx": "^2.0.0",
+		"lucide": "^0.302.0",
+		"lucide-react": "^0.302.0",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
+		"tailwind-merge": "^2.2.0",
+		"tailwindcss-animate": "^1.0.7",
+		"zod": "^3.22.4"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.4.1",
+		"@types/node": "^20.10.5",
+		"@types/react": "^18.2.43",
+		"@types/react-dom": "^18.2.17",
+		"@vitejs/plugin-react-swc": "^3.5.0",
+		"autoprefixer": "^10.4.16",
+		"postcss": "^8.4.32",
+		"postcss-load-config": "^5.0.2",
+		"tailwindcss": "^3.4.0",
+		"typescript": "^5.2.2",
+		"vite": "^5.0.8"
+	}
+}
