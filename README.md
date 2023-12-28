@@ -2,12 +2,14 @@
 
 **NOTE:** Before contributing changes, we recommend you read the [Contributing Guide](./CONTRIBUTING.md)
 
+**NOTE:** ⚠️ If you have a development environment with latest commit at or before c288045, please read the [dev section](#dev) carefully. Old development environments are now broken.
+
 ## Steps for setup:
 
-1. Install [nvm](https://github.com/nvm-sh/nvm), and install Node v18.16.0 LTS using `nvm install v18.16.0`. If you're using a different node version manager, do the equivalent.
-2. Activate Node v18.16.0 using `nvm use v18.16.0`
+1. Install [nvm](https://github.com/nvm-sh/nvm), and install Node v20.10.0 LTS using `nvm install v20.10.0`. If you're using a different node version manager, do the equivalent.
+2. Activate Node v20.10.0 using `nvm use v20.10.0`
 3. Install pnpm, using `npm i -g pnpm`
-4. Install the packages in this repo by running `pnpm i` in the root of this repository.
+4. Install the packages in this repo by running `pnpm i` in the both the `backend` and `frontend` folders of this repository.
 
 Check [.env.example](./.env.example) for an example env file. It can be arbitrary, though we recommend using:
 
@@ -53,18 +55,24 @@ This project has 4 profiles as of now:
 
 ### Dev
 
-Running the project with the `dev` profile runs the project with `nodemon`, hot-reloading the running container as soon as you save changes to your code.
+Running the project with the `dev` profile runs the backend with `nodemon`, and creates a bind mount with vite on the frontend, hot-reloading the running containers as soon as you save changes to your code. More importantly, this also creates an `nginx` container that makes the frontend and backend the same host to allow easy integration of the two. The `NGINX_PORT` defines which port it opens up for development. The frontend will be available at `http://localhost:NGINX_PORT/` and the backend will be at `http://localhost:NGINX_PORT/api`.
+
+**NOTE:** Changes to the `package.json`, `pnpm-lock.yaml` obviously, will require container rebuilds, and since the frontend container caches dependencies for the `dev` profile, we highly recommend rebuilding the containers entirely using `docker compose --profile dev down` and `docker compose --profile dev up --build`.
 
 #### Containers in the `dev` profile
 
 - db
 - backend-dev
+- frontend-dev
+- nginx-dev
 
 **NOTE:** This same `db` container is used in `prod` and `ingestion`
 
 ### Prod
 
-Running the project with the `prod` profile compiles the code, and runs the container while replicating the exact process with which the project is hosted on our server. It is a good idea to test any PR with this profile before merging it. **In rare cases, what might work in `dev` might not work in `prod`.** Better safe than sorry!
+**NOTE:** As of this commit, prod containers for the frontend do not exist, and it is not verified whether or not the backend prod containers still work after the container reworking.
+
+Running the project with the `prod` profile compiles the backend code, and runs the container while replicating the exact process with which the project is hosted on our server. It is a good idea to test any PR with this profile before merging it. **In rare cases, what might work in `dev` might not work in `prod`.** Better safe than sorry!
 
 #### Containers in the `prod` profile
 
@@ -74,6 +82,8 @@ Running the project with the `prod` profile compiles the code, and runs the cont
 **NOTE:** This same `db` container is used in `dev` and `ingestion`
 
 ### Testing
+
+**NOTE:** As of this commit, prod/testing containers for the frontend do not exist, and it is not verified whether or not the backend testing containers still work after the container reworking.
 
 Running the project with the `testing` profile copies the project into the container like dev would, but runs tests instead of running the code with `nodemon`. Testing uses the environment variables from [.env.testing](./.env.testing).
 
@@ -89,6 +99,10 @@ Running the project with the `testing` profile copies the project into the conta
 **NOTE:** This `db-testing` container is NOT THE SAME as the one used in `prod`, `dev` and `ingestion`
 
 ### Ingestion
+
+**NOTE:** As of this commit, prod containers for the frontend do not exist, and it is not verified whether or not the backend testing containers still work after the container reworking.
+
+**NOTE:** As of c288045, there are known bugs in ingestion. The overwrite and archival ingestion code likely needs to be reworked.
 
 To import new courses, add a `timetable.json` file to the `src` folder, and run `docker compose --profile ingestion up --build`
 
