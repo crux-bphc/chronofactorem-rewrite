@@ -100,10 +100,6 @@ Running the project with the `testing` profile copies the project into the conta
 
 ### Ingestion
 
-**NOTE:** As of this commit, prod containers for the frontend do not exist, and it is not verified whether or not the backend testing containers still work after the container reworking.
-
-**NOTE:** As of c288045, there are known bugs in ingestion. The overwrite and archival ingestion code likely needs to be reworked.
-
 To import new courses, add a `timetable.json` file to the `src` folder, and run `docker compose --profile ingestion up --build`
 
 This marks all old courses as archived, and inserts new courses from the `timetable.json` file.
