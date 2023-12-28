@@ -48,3 +48,11 @@ jobs:
       - name: Run biomejs linter and formatter on backend
         run: pnpm biome ci .
         working-directory: "./backend"
+
+      - name: Install frontend dependencies
+        run: pnpm install
+        working-directory: "./frontend"
+
+      - name: Run biomejs linter and formatter on backend
+        run: pnpm biome ci .
+        working-directory: "./backend"
