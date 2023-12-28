@@ -1,4 +1,4 @@
-name: Lint code with ESLint and check formatting with Prettier
+name: Lint code with BiomeJS and check formatting with Prettier
 
 on:
   push:
@@ -18,13 +18,13 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18.16.0
+          node-version: 20.10.0
 
       - uses: pnpm/action-setup@v2
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 8.6.5
+          version: 8.13.1
           run_install: false
 
       - name: Get pnpm store directory
@@ -41,8 +41,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      - name: Install dependencies
+      - name: Install backend dependencies
         run: pnpm install
+        working-directory: "./backend"
 
-      - name: Run eslint
-        run: pnpm eslint . --ext .js,.jsx,.ts,.tsx
+      - name: Run biomejs linter and formatter on backend
+        run: pnpm biome ci .
+        working-directory: "./backend"
