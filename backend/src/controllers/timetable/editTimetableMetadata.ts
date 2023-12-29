@@ -9,7 +9,7 @@ import {
   namedBooleanType,
   namedNonEmptyStringType,
   timetableIDType,
-} from "../../types/zodFieldTypes";
+} from "../../../../lib";
 
 const dataSchema = z.object({
   body: z.object({

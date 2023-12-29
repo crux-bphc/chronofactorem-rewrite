@@ -6,7 +6,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { approvedDegreeList, degreeEnum } from "../types/degrees";
+import { approvedDegreeList, degreeEnum } from "../../../lib";
 import { Timetable } from "./Timetable";
 
 @Entity()

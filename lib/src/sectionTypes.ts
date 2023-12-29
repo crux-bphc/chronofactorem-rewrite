@@ -22,5 +22,5 @@ export type sectionTypeList = z.infer<typeof sectionTypeZodList>;
 export const isAValidSectionType = (
   degree: string,
 ): degree is sectionTypeEnum => {
-  return approvedSectionTypeList.includes(degree as sectionTypeEnum);
+  return (degree as sectionTypeEnum) in approvedSectionTypeList;
 };

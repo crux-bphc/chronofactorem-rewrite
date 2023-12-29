@@ -23,9 +23,16 @@
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
+    "esModuleInterop": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "references": [
+    { "path": "./tsconfig.node.json" },
+    {
+      "path": "../lib"
+    }
+  ]
 }

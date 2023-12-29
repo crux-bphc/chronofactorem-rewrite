@@ -6,7 +6,7 @@ import {
   degreeList,
   isAValidDegreeCombination,
   namedDegreeZodList,
-} from "../../types/degrees";
+} from "../../../../lib";
 
 const dataSchema = z.object({
   body: z.object({

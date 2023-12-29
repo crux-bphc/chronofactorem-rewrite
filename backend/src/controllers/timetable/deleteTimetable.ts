@@ -5,7 +5,7 @@ import { User } from "../../entity/User";
 import { validate } from "../../middleware/zodValidateRequest";
 import { timetableRepository } from "../../repositories/timetableRepository";
 import { userRepository } from "../../repositories/userRepository";
-import { timetableIDType } from "../../types/zodFieldTypes";
+import { timetableIDType } from "../../../../lib";
 
 const dataSchema = z.object({
   params: z.object({

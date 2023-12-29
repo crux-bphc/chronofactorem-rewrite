@@ -2,10 +2,7 @@ import fetch from "cross-fetch";
 import { Request, Response } from "express";
 import { z } from "zod";
 import { validate } from "../../middleware/zodValidateRequest";
-import {
-  namedIntegerType,
-  namedNonEmptyStringType,
-} from "../../types/zodFieldTypes";
+import { namedIntegerType, namedNonEmptyStringType } from "../../../../lib";
 
 const unenrollDataSchema = z.object({
   body: z.object({

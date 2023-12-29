@@ -5,13 +5,13 @@ import { User } from "../../entity/User";
 import { validate } from "../../middleware/zodValidateRequest";
 import { timetableRepository } from "../../repositories/timetableRepository";
 import { userRepository } from "../../repositories/userRepository";
-import { degreeList, namedDegreeZodList } from "../../types/degrees";
-
-import { isAValidDegreeCombination } from "../../types/degrees";
 import {
+  degreeList,
+  namedDegreeZodList,
+  isAValidDegreeCombination,
   namedCollegeYearType,
   namedSemesterType,
-} from "../../types/zodFieldTypes";
+} from "../../../../lib";
 
 const dataSchema = z.object({
   query: z.object({

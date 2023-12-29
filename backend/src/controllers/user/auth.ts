@@ -16,7 +16,7 @@ import {
   degreeList,
   isAValidDegreeCombination,
   namedDegreeZodList,
-} from "../../types/degrees";
+} from "../../../../lib";
 
 // On any route, when checking if a user is logged in, check for the cookie
 // in cookiestorage on the server, using -

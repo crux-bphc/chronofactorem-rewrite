@@ -1,5 +1,5 @@
 import { Section } from "../entity/Section";
-import { sectionTypeList } from "../types/sectionTypes";
+import { sectionTypeList } from "../../../lib";
 
 export const updateSectionWarnings = (
   courseCode: string,

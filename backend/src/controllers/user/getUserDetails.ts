@@ -3,7 +3,7 @@ import { z } from "zod";
 import { User } from "../../entity/User";
 import { validate } from "../../middleware/zodValidateRequest";
 import { userRepository } from "../../repositories/userRepository";
-import { namedUUIDType } from "../../types/zodFieldTypes";
+import { namedUUIDType } from "../../../../lib";
 
 const dataSchema = z.object({
   params: z.object({
