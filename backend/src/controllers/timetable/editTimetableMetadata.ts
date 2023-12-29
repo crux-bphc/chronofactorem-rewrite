@@ -73,6 +73,12 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
     return res.status(404).json({ message: "timetable not found" });
   }
 
+  if (timetable.archived && isDraft) {
+    return res
+      .status(418)
+      .json({ message: "archived timetable can not be a draft" });
+  }
+
   if (
     timetable.draft &&
     timetable.sections.length === 0 &&
