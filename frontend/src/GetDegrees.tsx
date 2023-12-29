@@ -12,16 +12,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { z } from "zod";
-
-const getDegreeSearchSchema = z.object({
-  year: z.number().min(1).max(5).catch(1),
-});
+// TODO: figure out why leaving out the `src` causes errors (mostly related to the whole CJS / ESM meme)
+import { collegeYearType } from "../../lib/src";
 
 const getDegreesRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "getDegrees",
   component: GetDegrees,
-  validateSearch: getDegreeSearchSchema,
+  validateSearch: z.object({ year: collegeYearType }),
 });
 
 function GetDegrees() {
