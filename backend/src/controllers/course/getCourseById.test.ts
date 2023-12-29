@@ -1,9 +1,9 @@
 import { randomUUID } from "crypto";
 import supertest, { Response } from "supertest";
+import { namedCourseWithSectionsType } from "../../../../lib";
 import app from "../../app";
 import { AppDataSource } from "../../db";
 import { Course } from "../../entity/Course";
-import { namedCourseWithSectionsType } from "../../../../lib";
 import { courseRepository } from "../../repositories/courseRepository";
 import timetableTestJSON from "../../tests/timetable.test.json";
 

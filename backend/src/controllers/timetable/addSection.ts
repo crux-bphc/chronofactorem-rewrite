@@ -1,5 +1,10 @@
 import { Request, Response } from "express";
 import { z } from "zod";
+import {
+  namedUUIDType,
+  sectionTypeList,
+  timetableIDType,
+} from "../../../../lib";
 import { Course } from "../../entity/Course";
 import { Section } from "../../entity/Section";
 import { Timetable } from "../../entity/Timetable";
@@ -9,11 +14,6 @@ import { courseRepository } from "../../repositories/courseRepository";
 import { sectionRepository } from "../../repositories/sectionRepository";
 import { timetableRepository } from "../../repositories/timetableRepository";
 import { userRepository } from "../../repositories/userRepository";
-import {
-  sectionTypeList,
-  namedUUIDType,
-  timetableIDType,
-} from "../../../../lib";
 import {
   checkForClassHoursClash,
   checkForExamHoursClash,

@@ -1,17 +1,17 @@
 import { Request, Response } from "express";
 import { z } from "zod";
+import {
+  degreeList,
+  isAValidDegreeCombination,
+  namedCollegeYearType,
+  namedDegreeZodList,
+  namedSemesterType,
+} from "../../../../lib";
 import { Timetable } from "../../entity/Timetable";
 import { User } from "../../entity/User";
 import { validate } from "../../middleware/zodValidateRequest";
 import { timetableRepository } from "../../repositories/timetableRepository";
 import { userRepository } from "../../repositories/userRepository";
-import {
-  degreeList,
-  namedDegreeZodList,
-  isAValidDegreeCombination,
-  namedCollegeYearType,
-  namedSemesterType,
-} from "../../../../lib";
 
 const dataSchema = z.object({
   query: z.object({

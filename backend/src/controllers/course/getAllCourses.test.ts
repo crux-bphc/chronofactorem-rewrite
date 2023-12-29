@@ -1,8 +1,8 @@
 import supertest, { Response } from "supertest";
+import { courseType } from "../../../../lib";
 import app from "../../app";
 import { AppDataSource } from "../../db";
 import { Course } from "../../entity/Course";
-import { courseType } from "../../../../lib";
 import { courseRepository } from "../../repositories/courseRepository";
 import timetableTestJSON from "../../tests/timetable.test.json";
 
