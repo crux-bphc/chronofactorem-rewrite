@@ -37,16 +37,16 @@ services:
 
   backend-dev:
     build:
-      context: ./backend
-      dockerfile: ./docker/dev/Dockerfile
+      context: ./
+      dockerfile: ./backend/docker/dev/Dockerfile
     env_file:
       - .env
     depends_on:
       db:
         condition: service_healthy
     volumes:
-      - ./backend/src:/usr/local/app/src
-      - ./backend/tsconfig.json:/usr/local/app/tsconfig.json
+      - ./backend/src:/usr/local/app/backend/src
+      - ./backend/tsconfig.json:/usr/local/app/backend/tsconfig.json
     ports:
       - "${BACKEND_PORT}:${BACKEND_PORT}"
     profiles:
@@ -54,8 +54,8 @@ services:
 
   backend-prod:
     build:
-      context: ./backend
-      dockerfile: ./docker/prod/Dockerfile
+      context: ./
+      dockerfile: ./backend/docker/prod/Dockerfile
     env_file:
       - .env
     depends_on:
@@ -69,8 +69,8 @@ services:
   ingestion:
     command: ["pnpm", "ts-node", "src/ingest.ts"]
     build:
-      context: ./backend
-      dockerfile: ./docker/dev/Dockerfile
+      context: ./
+      dockerfile: ./backend/docker/dev/Dockerfile
     env_file:
       - .env
     depends_on:
@@ -85,8 +85,8 @@ services:
   backend-testing:
     command: ["pnpm", "jest", "--runInBand", "--verbose"]
     build:
-      context: ./backend
-      dockerfile: ./docker/dev/Dockerfile
+      context: ./
+      dockerfile: ./backend/docker/dev/Dockerfile
     env_file:
       - .env.testing
     depends_on:
@@ -103,19 +103,19 @@ services:
   frontend-dev:
     init: true
     build:
-      context: ./frontend/
-      dockerfile: ./docker/dev/Dockerfile
+      context: ./
+      dockerfile: ./frontend/docker/dev/Dockerfile
     env_file:
       - .env
     volumes:
       - type: bind
         source: ./frontend
-        target: /usr/local/app
+        target: /usr/local/app/frontend
       - type: volume
-        target: /usr/local/app/node_modules
+        target: /usr/local/app/frontend/node_modules
       - type: bind
         source: ./frontend/vite.config.ts
-        target: /usr/local/app/vite.config.ts
+        target: /usr/local/app/frontend/vite.config.ts
     ports:
       - "${FRONTEND_PORT}:${FRONTEND_PORT}"
     profiles:
