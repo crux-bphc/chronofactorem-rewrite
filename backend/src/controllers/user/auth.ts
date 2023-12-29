@@ -1,6 +1,11 @@
 import { Request, Response } from "express";
 import { TokenSet } from "openid-client";
 import { generators } from "openid-client";
+import {
+  degreeList,
+  isAValidDegreeCombination,
+  namedDegreeZodList,
+} from "../../../../lib";
 import { getClient } from "../../config/authClient";
 import { env } from "../../config/server";
 import { User } from "../../entity/User";
@@ -12,11 +17,6 @@ import {
   UnfinishedUserSession,
   ZodUnfinishedUserSession,
 } from "../../types/auth";
-import {
-  degreeList,
-  isAValidDegreeCombination,
-  namedDegreeZodList,
-} from "../../types/degrees";
 
 // On any route, when checking if a user is logged in, check for the cookie
 // in cookiestorage on the server, using -

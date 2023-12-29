@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "lib": ["es5", "es6"],
-    "target": "es5",
+    "lib": ["ES2020"],
+    "target": "ES2020",
     "downlevelIteration": true,
     "module": "commonjs",
     "moduleResolution": "node",
@@ -13,5 +13,10 @@
     "sourceMap": true,
     "strict": true,
     "typeRoots": ["src/types/*/**", "./node_modules/@types"]
-  }
+  },
+  "references": [
+    {
+      "path": "../lib"
+    }
+  ]
 }

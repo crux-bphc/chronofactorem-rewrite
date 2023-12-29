@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
 import { z } from "zod";
+import {
+  namedBooleanType,
+  namedNonEmptyStringType,
+  timetableIDType,
+} from "../../../../lib";
 import { Timetable } from "../../entity/Timetable";
 import { User } from "../../entity/User";
 import { validate } from "../../middleware/zodValidateRequest";
 import { timetableRepository } from "../../repositories/timetableRepository";
 import { userRepository } from "../../repositories/userRepository";
-import {
-  namedBooleanType,
-  namedNonEmptyStringType,
-  timetableIDType,
-} from "../../types/zodFieldTypes";
 
 const dataSchema = z.object({
   body: z.object({

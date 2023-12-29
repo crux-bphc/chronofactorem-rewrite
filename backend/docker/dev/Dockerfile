@@ -1,15 +1,30 @@
 FROM node:20.10.0-slim
 ENV NODE_ENV development
-WORKDIR /usr/local/app
+WORKDIR /usr/local/app/backend
 
 RUN npm install -g pnpm
 
-COPY package.json ./
-COPY pnpm-lock.yaml ./
-COPY tsconfig.json ./
-COPY nodemon.json ./
+COPY ./backend/package.json ./
+COPY ./backend/pnpm-lock.yaml ./
+COPY ./backend/tsconfig.json ./
+COPY ./backend/nodemon.json ./
 
 RUN pnpm fetch
 RUN pnpm install -r --offline
+
+WORKDIR /usr/local/app/lib
+
+COPY ./lib/package.json ./
+COPY ./lib/pnpm-lock.yaml ./
+COPY ./lib/tsconfig.json ./
+
+RUN pnpm fetch
+RUN pnpm install -r --offline
+
+COPY ./lib/src /usr/local/app/lib/src
+
+RUN pnpm tsc --build
+
+WORKDIR /usr/local/app/backend
 
 CMD ["pnpm", "nodemon", "src/index.ts"]

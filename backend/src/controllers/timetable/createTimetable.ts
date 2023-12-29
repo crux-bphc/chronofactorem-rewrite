@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
+import { degreeEnum } from "../../../../lib";
 import { Section } from "../../entity/Section";
 import { Timetable } from "../../entity/Timetable";
 import { User } from "../../entity/User";
 import { timetableRepository } from "../../repositories/timetableRepository";
 import { userRepository } from "../../repositories/userRepository";
 import timetableJSON from "../../timetable.json";
-import { degreeEnum } from "../../types/degrees";
 
 export const createTimetable = async (req: Request, res: Response) => {
   let author: User | null = null;
