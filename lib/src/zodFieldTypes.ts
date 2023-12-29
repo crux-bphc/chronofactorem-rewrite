@@ -26,8 +26,7 @@ export const namedEmailType = (name?: string) =>
     .min(1, {
       message: addNameToString("email must be a non-empty string", name),
     })
-    .regex(
-      /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i,
+    .email(
       {
         message: addNameToString("email must be a valid email", name),
       },
