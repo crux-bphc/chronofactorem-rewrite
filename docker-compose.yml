@@ -77,8 +77,8 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./backend/src:/usr/local/app/src
-      - ./backend/tsconfig.json:/usr/local/app/tsconfig.json
+      - ./backend/src:/usr/local/app/backend/src
+      - ./backend/tsconfig.json:/usr/local/app/backend/tsconfig.json
     profiles:
       - "ingestion"
 
