@@ -26,6 +26,7 @@ const dataSchema = z.object({
         message: "search branch may not contain more than two elements",
       })
       .optional(),
+    archived: z.union([z.literal("true"), z.literal("false")]).optional(),
   }),
 });
 
@@ -54,6 +55,7 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
     const branch: degreeList = req.query.branch as degreeList;
     const year: number = parseInt(req.query.year as string);
     const sem: number = parseInt(req.query.sem as string);
+    const archived: boolean = (req.query.archived as string) === "true";
     const isPrivate = false;
 
     let queryBuilder = timetableRepository
@@ -92,6 +94,12 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
     if (sem) {
       queryBuilder = queryBuilder.andWhere("timetable.semester = :sem", {
         sem,
+      });
+    }
+
+    if (!archived) {
+      queryBuilder = queryBuilder.andWhere("timetable.archived = :archived", {
+        archived,
       });
     }
 
