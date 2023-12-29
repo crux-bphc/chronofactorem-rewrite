@@ -46,6 +46,12 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
     return res.status(401).json({ message: "unregistered user" });
   }
 
+  if (isDraft && !isPrivate) {
+    return res
+      .status(400)
+      .json({ message: "draft timetable can not be public" });
+  }
+
   const id: number = parseInt(req.params.id);
 
   let timetable: Timetable | null = null;
