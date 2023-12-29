@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { z } from "zod";
+import { namedUUIDType } from "../../../../lib";
 import { validate } from "../../middleware/zodValidateRequest";
 import { courseRepository } from "../../repositories/courseRepository";
-import { namedUUIDType } from "../../types/zodFieldTypes";
 
 const dataSchema = z.object({
   params: z.object({
