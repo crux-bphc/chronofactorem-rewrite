@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { validate } from "../../middleware/zodValidateRequest";
-import { userRepository } from "../../repositories/userRepository";
 import {
   degreeList,
   isAValidDegreeCombination,
   namedDegreeZodList,
 } from "../../../../lib";
+import { validate } from "../../middleware/zodValidateRequest";
+import { userRepository } from "../../repositories/userRepository";
 
 const dataSchema = z.object({
   body: z.object({

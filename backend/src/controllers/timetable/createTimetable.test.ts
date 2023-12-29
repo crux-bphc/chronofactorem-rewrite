@@ -1,11 +1,11 @@
 import supertest, { Response } from "supertest";
+import { degreeEnum } from "../../../../lib";
 import app from "../../app";
 import { AppDataSource } from "../../db";
 import { Timetable } from "../../entity/Timetable";
 import { User } from "../../entity/User";
 import { timetableRepository } from "../../repositories/timetableRepository";
 import { userRepository } from "../../repositories/userRepository";
-import { degreeEnum } from "../../../../lib";
 
 const request = supertest(app);
 
