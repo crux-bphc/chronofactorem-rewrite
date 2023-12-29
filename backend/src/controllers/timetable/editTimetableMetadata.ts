@@ -73,6 +73,10 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
     return res.status(404).json({ message: "timetable not found" });
   }
 
+  if (timetable.authorId !== author.id) {
+    return res.status(403).json({ message: "user does not own timetable" });
+  }
+
   if (
     timetable.draft &&
     timetable.sections.length === 0 &&
@@ -90,10 +94,6 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
     return res.status(400).json({
       message: "cannot publish timetable with warnings",
     });
-  }
-
-  if (timetable.authorId !== author.id) {
-    return res.status(403).json({ message: "user does not own timetable" });
   }
 
   try {
