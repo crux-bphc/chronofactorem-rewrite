@@ -9,7 +9,7 @@
 1. Install [nvm](https://github.com/nvm-sh/nvm), and install Node v20.10.0 LTS using `nvm install v20.10.0`. If you're using a different node version manager, do the equivalent.
 2. Activate Node v20.10.0 using `nvm use v20.10.0`
 3. Install pnpm, using `npm i -g pnpm`
-4. Install the packages in this repo by running `pnpm i` in the both the `backend` and `frontend` folders of this repository.
+4. Install the packages in this repo by running `pnpm i` in the the `backend`, `lib` and `frontend` folders of this repository.
 
 Check [.env.example](./.env.example) for an example env file. It can be arbitrary, though we recommend using:
 
@@ -47,7 +47,7 @@ This project has 4 profiles as of now:
 
 1. Run `docker compose --profile PROFILE down` to stop, and delete any containers in the profile named PROFILE.
 
-   **NOTE:** Adding a `-v` flag at the end of this command deletes all existing data in the database, add this argument if you want to reset data.
+   **NOTE:** Adding a `-v` flag at the end of this command deletes only the node_modules cache for the `frontend-dev` container. If you want to clear database data, you will have to delete the `backend/data` folder. Deleting this usually requires root permissions.
 
 2. Run `docker compose --profile PROFILE up --build` to build and run all containers in the profile named PROFILE.
 
@@ -57,7 +57,7 @@ This project has 4 profiles as of now:
 
 Running the project with the `dev` profile runs the backend with `nodemon`, and creates a bind mount with vite on the frontend, hot-reloading the running containers as soon as you save changes to your code. More importantly, this also creates an `nginx` container that makes the frontend and backend the same host to allow easy integration of the two. The `NGINX_PORT` defines which port it opens up for development. The frontend will be available at `http://localhost:NGINX_PORT/` and the backend will be at `http://localhost:NGINX_PORT/api`.
 
-**NOTE:** Changes to the `package.json`, `pnpm-lock.yaml` obviously, will require container rebuilds, and since the frontend container caches dependencies for the `dev` profile, we highly recommend rebuilding the containers entirely using `docker compose --profile dev down` and `docker compose --profile dev up --build`.
+**NOTE:** Changes to the `package.json`, `pnpm-lock.yaml` obviously, will require container rebuilds, and since the frontend container caches dependencies for the `dev` profile, we highly recommend rebuilding the containers entirely using `docker compose --profile dev down` and `docker compose --profile dev up --build`. Additionally, **any changes to code in the `lib` directory will also require a container rebuild**, due to the current state of `nodemon` not supporting external reference-based builds, see https://github.com/TypeStrong/ts-node/issues/897.
 
 #### Containers in the `dev` profile
 
@@ -87,7 +87,7 @@ Running the project with the `prod` profile compiles the backend code, and runs 
 
 Running the project with the `testing` profile copies the project into the container like dev would, but runs tests instead of running the code with `nodemon`. Testing uses the environment variables from [.env.testing](./.env.testing).
 
-**NOTE:** For `testing`, the tests insert test courses from [timetable.test.json](./src/tests/timetable.test.json), runs the necessary tests, and then removes these test courses. For safety, it also clears the db before inserting these test courses, just like an auto-flushing toilet would. Two flushes: once before you start using it, and once after you're done.
+**NOTE:** For `testing`, the tests insert test courses from [timetable.test.json](./src/backend/tests/timetable.test.json), runs the necessary tests, and then removes these test courses. For safety, it also clears the db before inserting these test courses, just like an auto-flushing toilet would. Two flushes: once before you start using it, and once after you're done.
 
 **NOTE:** This replicates the base environment of `dev`, not `prod`. So, unit tests running fine doesn't guarantee that the project will run fine in prod. It is better to sanity check this separately. This failure to replicate the `prod` env is due to how `ts-jest` runs tests for TypeScript files. (It transforms .ts files instead of transpiling them using some tool like Babel). The `prod` base environment assumes a kind of two-staged "build and then run" build, which is not possible because of `ts-jest`.
 
