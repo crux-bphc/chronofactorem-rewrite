@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { z } from "zod";
 import { validate } from "../../middleware/zodValidateRequest";
 import { timetableRepository } from "../../repositories/timetableRepository";
-import { timetableIDType } from "../../types/zodFieldTypes";
+import { timetableIDType } from "../../../../lib";
 
 const dataSchema = z.object({
   params: z.object({

@@ -9,8 +9,11 @@ import { courseRepository } from "../../repositories/courseRepository";
 import { sectionRepository } from "../../repositories/sectionRepository";
 import { timetableRepository } from "../../repositories/timetableRepository";
 import { userRepository } from "../../repositories/userRepository";
-import { sectionTypeList } from "../../types/sectionTypes";
-import { namedUUIDType, timetableIDType } from "../../types/zodFieldTypes";
+import {
+  sectionTypeList,
+  namedUUIDType,
+  timetableIDType,
+} from "../../../../lib";
 import {
   checkForClassHoursClash,
   checkForExamHoursClash,

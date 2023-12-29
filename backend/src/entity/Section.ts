@@ -8,10 +8,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import {
-  approvedSectionTypeList,
-  sectionTypeEnum,
-} from "../types/sectionTypes";
+import { approvedSectionTypeList, sectionTypeEnum } from "../../../lib";
 import { Course } from "./Course";
 import { Timetable } from "./Timetable";
 

@@ -10,7 +10,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { approvedDegreeList, degreeEnum } from "../types/degrees";
+import { approvedDegreeList, degreeEnum } from "../../../lib";
 import { Section } from "./Section";
 import { User } from "./User";
 

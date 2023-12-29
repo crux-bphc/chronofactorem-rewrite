@@ -2,13 +2,13 @@
 These are the types that facilitate authentication
 */
 import { z } from "zod";
-import { namedDegreeZodList } from "./degrees";
 import {
+  namedDegreeZodList,
   namedEmailType,
   namedIntegerType,
   namedNonEmptyStringType,
   namedUUIDType,
-} from "./zodFieldTypes";
+} from "../../../lib";
 
 // interface for userdata to be stored in the session cookie and for validating the type of session cookie
 export const ZodUnfinishedUserSession = z.object({

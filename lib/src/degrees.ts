@@ -87,18 +87,18 @@ export type mscDegreeList = z.infer<typeof mscDegreeZodList>;
 export type bpharmDegreeList = z.infer<typeof bpharmDegreeZodList>;
 
 export const isAValidDegree = (degree: string): degree is degreeEnum => {
-  return approvedDegreeList.includes(degree as degreeEnum);
+  return (degree as degreeEnum) in approvedDegreeList;
 };
 export const isAValidBEDegree = (degree: string): degree is beDegreeEnum => {
-  return approvedBEDegreeList.includes(degree as beDegreeEnum);
+  return (degree as beDegreeEnum) in approvedBEDegreeList;
 };
 export const isAValidMScDegree = (degree: string): degree is mscDegreeEnum => {
-  return approvedMScDegreeList.includes(degree as mscDegreeEnum);
+  return (degree as mscDegreeEnum) in approvedMScDegreeList;
 };
 export const isAValidBPharmDegree = (
   degree: string,
 ): degree is bpharmDegreeEnum => {
-  return approvedBPharmDegreeList.includes(degree as bpharmDegreeEnum);
+  return (degree as bpharmDegreeEnum) in approvedBPharmDegreeList;
 };
 
 export const isAValidDegreeCombination = (degrees: string[]): boolean => {

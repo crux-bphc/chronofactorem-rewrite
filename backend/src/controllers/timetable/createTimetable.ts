@@ -5,7 +5,7 @@ import { User } from "../../entity/User";
 import { timetableRepository } from "../../repositories/timetableRepository";
 import { userRepository } from "../../repositories/userRepository";
 import timetableJSON from "../../timetable.json";
-import { degreeEnum } from "../../types/degrees";
+import { degreeEnum } from "../../../../lib";
 
 export const createTimetable = async (req: Request, res: Response) => {
   let author: User | null = null;
