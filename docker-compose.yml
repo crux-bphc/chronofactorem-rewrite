@@ -13,7 +13,7 @@ services:
       timeout: 30s
       retries: 3
     volumes:
-      - ./data:/var/lib/postgresql/data
+      - ./backend/data:/var/lib/postgresql/data
     profiles:
       - "dev"
       - "prod"
@@ -26,7 +26,7 @@ services:
     ports:
       - "${PGPORT}:${PGPORT}"
     volumes:
-      - ./data:/var/lib/postgresql/data
+      - ./backend/data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB}"]
       interval: 10s
@@ -37,7 +37,7 @@ services:
 
   backend-dev:
     build:
-      context: .
+      context: ./backend
       dockerfile: ./docker/dev/Dockerfile
     env_file:
       - .env
@@ -45,17 +45,16 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./patches:/usr/local/app/patches
-      - ./src:/usr/local/app/src
-      - ./tsconfig.json:/usr/local/app/tsconfig.json
+      - ./backend/src:/usr/local/app/src
+      - ./backend/tsconfig.json:/usr/local/app/tsconfig.json
     ports:
-      - "${PORT}:${PORT}"
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
     profiles:
       - "dev"
 
   backend-prod:
     build:
-      context: .
+      context: ./backend
       dockerfile: ./docker/prod/Dockerfile
     env_file:
       - .env
@@ -63,14 +62,14 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "${PORT}:${PORT}"
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
     profiles:
       - "prod"
 
   ingestion:
     command: ["pnpm", "ts-node", "src/ingest.ts"]
     build:
-      context: .
+      context: ./backend
       dockerfile: ./docker/dev/Dockerfile
     env_file:
       - .env
@@ -78,16 +77,15 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./patches:/usr/local/app/patches
-      - ./src:/usr/local/app/src
-      - ./tsconfig.json:/usr/local/app/tsconfig.json
+      - ./backend/src:/usr/local/app/src
+      - ./backend/tsconfig.json:/usr/local/app/tsconfig.json
     profiles:
       - "ingestion"
 
   backend-testing:
     command: ["pnpm", "jest", "--runInBand", "--verbose"]
     build:
-      context: .
+      context: ./backend
       dockerfile: ./docker/dev/Dockerfile
     env_file:
       - .env.testing
@@ -95,10 +93,45 @@ services:
       db-testing:
         condition: service_healthy
     volumes:
-      - ./patches:/usr/local/app/patches
-      - ./src:/usr/local/app/src
-      - ./tsconfig.json:/usr/local/app/tsconfig.json
-      - ./jest.config.js:/usr/local/app/jest.config.js
+      - ./backend/src:/usr/local/app/src
+      - ./backend/tsconfig.json:/usr/local/app/tsconfig.json
+      - ./backend/jest.config.js:/usr/local/app/jest.config.js
     tty: true
     profiles:
       - "testing"
+
+  frontend-dev:
+    init: true
+    build:
+      context: ./frontend/
+      dockerfile: ./docker/dev/Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - type: bind
+        source: ./frontend
+        target: /usr/local/app
+      - type: volume
+        target: /usr/local/app/node_modules
+      - type: bind
+        source: ./frontend/vite.config.ts
+        target: /usr/local/app/vite.config.ts
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+    profiles:
+      - "dev"
+
+  nginx-dev:
+    image: "nginx:1.25.3-alpine-slim"
+    depends_on:
+      - frontend-dev
+      - backend-dev
+    env_file:
+      - .env
+    volumes:
+      - ./nginx.dev.conf:/etc/nginx/nginx.conf
+      - ./logs/nginx:/usr/log/
+    ports:
+      - "${NGINX_PORT}:80"
+    profiles:
+      - "dev"
