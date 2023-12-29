@@ -54,6 +54,7 @@ export const ingestJSON = async (
     const forceOverwrite = process.argv[2] && process.argv[2] === "--overwrite";
     let archivedCoursesUpdateCount = 0;
     let archivedTimetablesUpdateCount = 0;
+    let archivedTimetablesDeleteCount = 0;
 
     const latestCourse = await queryRunner.manager
       .createQueryBuilder(Course, "course")
@@ -155,7 +156,7 @@ export const ingestJSON = async (
       archivedCoursesUpdateCount = archivedCoursesUpdateResult.affected ?? 0;
       console.log("marked old courses as archived!");
 
-      console.log("marking all old timetables as archived...");
+      console.log("marking all old non-draft timetables as archived...");
       const archivedTimetablesUpdateResult = await queryRunner.manager
         .createQueryBuilder()
         .update(Timetable)
@@ -164,10 +165,30 @@ export const ingestJSON = async (
         .andWhere("semester = :semester", {
           semester: latestCourse.semester,
         })
+        .andWhere("draft = :draft", {
+          draft: false,
+        })
         .execute();
       archivedTimetablesUpdateCount =
         archivedTimetablesUpdateResult.affected ?? 0;
-      console.log("marked old timetables as archived!");
+      console.log("marked old non-draft timetables as archived!");
+
+      console.log("deleting all old draft timetables...");
+      const archiveDeletedTimetablesUpdateResult = await queryRunner.manager
+        .createQueryBuilder()
+        .delete()
+        .from(Timetable)
+        .where("acad_year = :year", { year: latestCourse.acadYear })
+        .andWhere("semester = :semester", {
+          semester: latestCourse.semester,
+        })
+        .andWhere("draft = :draft", {
+          draft: true,
+        })
+        .execute();
+      archivedTimetablesDeleteCount =
+        archiveDeletedTimetablesUpdateResult.affected ?? 0;
+      console.log("deleted old draft timetables!");
 
       console.log("checking if all existing courses are archived...");
       const allCoursesCountResult = await queryRunner.manager
@@ -304,6 +325,9 @@ export const ingestJSON = async (
     console.log("================= SUMMARY =================");
     console.log(`courses archived: ${archivedCoursesUpdateCount}`);
     console.log(`timetables archived: ${archivedTimetablesUpdateCount}`);
+    console.log(
+      `timetables deleted while archiving: ${archivedTimetablesDeleteCount}`,
+    );
     console.log(`courses inserted: ${courseInsertResult.identifiers.length}`);
     console.log(`sections inserted: ${sectionInsertResult.identifiers.length}`);
     const endhrTime = process.hrtime();
