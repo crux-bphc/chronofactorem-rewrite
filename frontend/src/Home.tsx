@@ -116,7 +116,7 @@ function Home() {
   const [isPrivate, setIsPrivate] = useState(true);
 
   if (userQueryResult.isFetching) {
-    <span>Loading...</span>;
+    return <span>Loading...</span>;
   }
 
   if (userQueryResult.isError) {
