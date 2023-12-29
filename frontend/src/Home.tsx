@@ -3,7 +3,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { z } from "zod";
-import { userWithTimetablesType } from "../../lib";
+import { userWithTimetablesType, timetableType } from "../../lib";
 import { useToast } from "./components/ui/use-toast";
 import { rootRoute, router } from "./main";
 import { Button } from "./components/ui/button";
@@ -24,9 +24,32 @@ const fetchUserDetails = async (): Promise<
   return response.data;
 };
 
+type Timetable = z.infer<typeof timetableType>;
+
+const filterTimetables = (timetables: Timetable[]) => {
+  const publicTimetables: Timetable[] = [];
+  const privateTimetables: Timetable[] = [];
+  const draftTimetables: Timetable[] = [];
+
+  for (const timetable of timetables) {
+    if (timetable.draft) {
+      draftTimetables.push(timetable);
+    } else if (timetable.private) {
+      privateTimetables.push(timetable);
+    } else {
+      publicTimetables.push(timetable);
+    }
+  }
+
+  return { publicTimetables, privateTimetables, draftTimetables };
+};
+
 const userQueryOptions = queryOptions({
   queryKey: ["user"],
   queryFn: () => fetchUserDetails(),
+  select: (data) => {
+    return filterTimetables(data.timetables);
+  },
 });
 
 const indexRoute = new Route({
@@ -152,6 +175,11 @@ function Home() {
           >
             Private
           </Button>
+        </div>
+        <div className="pt-16">
+          {isPrivate
+            ? JSON.stringify(userQueryResult.data?.privateTimetables)
+            : JSON.stringify(userQueryResult.data?.publicTimetables)}
         </div>
       </main>
     </>
