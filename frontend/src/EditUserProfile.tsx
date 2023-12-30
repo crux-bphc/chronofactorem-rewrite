@@ -1,6 +1,4 @@
-import { queryOptions, useQuery, useMutation } from "@tanstack/react-query";
-import { ErrorComponent, Route } from "@tanstack/react-router";
-import { rootRoute, router } from "./main";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -10,13 +8,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { ToastAction } from "@/components/ui/toast";
-import { useToast } from "./components/ui/use-toast";
-import { useState } from "react";
+import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
+import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
-import { userWithTimetablesType } from "../../lib";
+import { useState } from "react";
 import { z } from "zod";
+import { userWithTimetablesType } from "../../lib";
+import { useToast } from "./components/ui/use-toast";
+import { rootRoute, router } from "./main";
 
 const fetchUserDetails = async (): Promise<
   z.infer<typeof userWithTimetablesType>
