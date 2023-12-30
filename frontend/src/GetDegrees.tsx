@@ -19,6 +19,13 @@ import axios, { AxiosError } from "axios";
 import { useToast } from "@/components/ui/use-toast";
 import { queryOptions, useMutation } from "@tanstack/react-query";
 
+/*
+Although users are always redirected to /getDegrees after login, we don't want to show them the page if they've already filled it out.
+Since the user is actually created in the DB only after they properly fill out their degrees, we check if they exist in the DB by querying /api/user. 
+If this succeeds, they have already filled this out and so we redirect them away to /.
+If they have not filled out their degrees, they will not exist in the DB and so /api/user will return a 401 response. 
+Then, we do nothing (no error toasts) and just let them fill out their degrees.
+*/
 const fetchUserDetails = async (): Promise<
   z.infer<typeof userWithTimetablesType>
 > => {
@@ -55,6 +62,7 @@ const getDegreesRoute = new Route({
           error.response &&
           error.response.status === 401
         ) {
+          // The one exception to doing nothing is if they don't have a valid session cookie (from Google OAuth)
           if (error.response.data.error === "user session expired") {
             router.navigate({ to: "/" });
           }
