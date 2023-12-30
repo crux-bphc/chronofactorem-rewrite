@@ -7,9 +7,9 @@ import {
 } from "@tanstack/react-router";
 import React from "react";
 import ReactDOM from "react-dom/client";
+import getDegreesRoute from "./GetDegrees";
 import indexRoute from "./Home";
 import loginRoute from "./Login";
-import getDegreesRoute from "./GetDegrees";
 import RootComponent from "./RootComponent";
 import "./index.css";
 

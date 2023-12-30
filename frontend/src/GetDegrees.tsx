@@ -1,5 +1,4 @@
-import { ErrorComponent, Route } from "@tanstack/react-router";
-import { rootRoute, router } from "./main";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -9,15 +8,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import { ToastAction } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
+import { queryOptions, useMutation } from "@tanstack/react-query";
+import { ErrorComponent, Route } from "@tanstack/react-router";
+import axios, { AxiosError } from "axios";
 import { useState } from "react";
 import { z } from "zod";
 // TODO: figure out why leaving out the `src` causes errors (mostly related to the whole CJS / ESM meme)
 import { collegeYearType, userWithTimetablesType } from "../../lib/src";
-import { ToastAction } from "@/components/ui/toast";
-import axios, { AxiosError } from "axios";
-import { useToast } from "@/components/ui/use-toast";
-import { queryOptions, useMutation } from "@tanstack/react-query";
+import { rootRoute, router } from "./main";
 
 /*
 Although users are always redirected to /getDegrees after login, we don't want to show them the page if they've already filled it out.
