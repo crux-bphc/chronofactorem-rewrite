@@ -186,7 +186,7 @@ function Home() {
   if (userQueryResult.isSuccess) {
     return (
       <>
-        <main className="bg-primary min-h-screen text-primary-foreground px-8 py-20 md:px-20 lg:px-20 xl:px-48">
+        <main className="bg-background min-h-screen text-foreground py-20 px-16">
           <h1 className="text-5xl font-bold uppercase text-center">
             My Timetables
           </h1>
