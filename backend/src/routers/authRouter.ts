@@ -5,6 +5,7 @@ import {
   getDegrees,
   logout,
   manageAuthRedirect,
+  checkAuthStatus,
 } from "../controllers/user/auth";
 
 const authRouter = express.Router();
@@ -28,5 +29,7 @@ authRouter.get("/callback", authCallback);
 authRouter.post("/submit", getDegrees);
 
 authRouter.get("/logout", logout);
+
+authRouter.get("/check", checkAuthStatus);
 
 export default authRouter;
