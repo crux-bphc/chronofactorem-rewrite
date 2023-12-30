@@ -1,5 +1,5 @@
-import { Route, useNavigate } from "@tanstack/react-router";
-import { rootRoute } from "./main";
+import { ErrorComponent, Route } from "@tanstack/react-router";
+import { rootRoute, router } from "./main";
 import {
   Select,
   SelectContent,
@@ -13,20 +13,143 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { z } from "zod";
 // TODO: figure out why leaving out the `src` causes errors (mostly related to the whole CJS / ESM meme)
-import { collegeYearType } from "../../lib/src";
+import { collegeYearType, userWithTimetablesType } from "../../lib/src";
+import { ToastAction } from "@/components/ui/toast";
+import axios, { AxiosError } from "axios";
+import { useToast } from "@/components/ui/use-toast";
+import { queryOptions, useMutation } from "@tanstack/react-query";
+
+const fetchUserDetails = async (): Promise<
+  z.infer<typeof userWithTimetablesType>
+> => {
+  const response = await axios.get<z.infer<typeof userWithTimetablesType>>(
+    "/api/user",
+    {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json ",
+      },
+    },
+  );
+  return response.data;
+};
+
+const userQueryOptions = queryOptions({
+  queryKey: ["user"],
+  queryFn: () => fetchUserDetails(),
+});
 
 const getDegreesRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "getDegrees",
-  component: GetDegrees,
   validateSearch: z.object({ year: collegeYearType }),
+  loader: ({ context: { queryClient } }) =>
+    queryClient.ensureQueryData(userQueryOptions).catch((error) => {
+      if (
+        error instanceof AxiosError &&
+        error.response &&
+        error.response.status === 401
+      ) {
+        router.navigate({
+          to: "/login",
+        });
+      }
+    }),
+  component: GetDegrees,
+  errorComponent: ({ error }) => {
+    const { toast } = useToast();
+
+    if (error instanceof AxiosError) {
+      if (error.response) {
+        switch (error.response.status) {
+          case 404:
+            toast({
+              title: "Error",
+              description:
+                "message" in error.response.data
+                  ? error.response.data.message
+                  : "API returned 404",
+              variant: "destructive",
+              action: (
+                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                    Report
+                  </a>
+                </ToastAction>
+              ),
+            });
+            break;
+          case 500:
+            toast({
+              title: "Server Error",
+              description:
+                "message" in error.response.data
+                  ? error.response.data.message
+                  : "API returned 500",
+              variant: "destructive",
+              action: (
+                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                    Report
+                  </a>
+                </ToastAction>
+              ),
+            });
+            break;
+
+          default:
+            toast({
+              title: "Unknown Error",
+              description:
+                "message" in error.response.data
+                  ? error.response.data.message
+                  : `API returned ${error.response.status}`,
+              variant: "destructive",
+              action: (
+                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                    Report
+                  </a>
+                </ToastAction>
+              ),
+            });
+        }
+      } else {
+        // Fallback to the default ErrorComponent
+        return <ErrorComponent error={error} />;
+      }
+    }
+  },
 });
 
 function GetDegrees() {
-  const navigate = useNavigate({ from: "/getDegrees" });
   const { year } = getDegreesRoute.useSearch();
   const [firstDegree, setFirstDegree] = useState<string | null>(null);
   const [secondDegree, setSecondDegree] = useState<string | null>(null);
+
+  const mutation = useMutation({
+    mutationFn: (body: { degrees: (string | null)[] }) => {
+      return axios.post("/api/auth/submit", body, {
+        headers: { "Content-Type": "application/json" },
+      });
+    },
+    onSuccess: () => {
+      router.navigate({ to: "/" });
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError && error.response) {
+        if (error.response.status === 401) {
+          router.navigate({ to: "/login" });
+        } else if (error.response.status === 400) {
+          alert(`Error: ${error.message}`);
+        } else if (error.response.status === 500) {
+          alert(`Server error: ${error.message}`);
+        } else {
+          alert(`Server error: ${error.message}`);
+        }
+      }
+    },
+  });
 
   const handleSubmit = async () => {
     if (firstDegree) {
@@ -42,31 +165,7 @@ function GetDegrees() {
             : [firstDegree]
           : [firstDegree];
 
-      const response = await fetch("/api/auth/submit", {
-        method: "POST",
-        body: JSON.stringify({
-          degrees: degrees,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        mode: "cors",
-        credentials: "include",
-      });
-
-      const json = await response.json();
-
-      if (response.status === 200) {
-        navigate({ to: "/" });
-      } else if (response.status === 401) {
-        navigate({ to: "/login" });
-      } else if (response.status === 400) {
-        alert(`Error: ${json.message}`);
-      } else if (response.status === 500) {
-        alert(`Server error: ${json.message}`);
-      } else {
-        alert(`Server error: ${json.message}`);
-      }
+      mutation.mutate({ degrees });
     } else {
       alert("Select your degree!");
     }
