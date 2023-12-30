@@ -55,7 +55,9 @@ const getDegreesRoute = new Route({
           error.response &&
           error.response.status === 401
         ) {
-          // do nothing
+          if (error.response.data.error === "user session expired") {
+            router.navigate({ to: "/" });
+          }
         }
       }),
   component: GetDegrees,
