@@ -1,4 +1,4 @@
-name: Lint code with BiomeJS and check formatting with Prettier
+name: Lint code and check formatting with BiomeJS
 
 on:
   push:
