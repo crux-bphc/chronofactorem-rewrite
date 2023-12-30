@@ -1,12 +1,19 @@
 import { ToastAction } from "@/components/ui/toast";
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import {
+  queryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { z } from "zod";
 import { userWithTimetablesType, timetableType } from "../../lib";
-import { useToast } from "./components/ui/use-toast";
+import { toast, useToast } from "./components/ui/use-toast";
 import { rootRoute, router } from "./main";
 import TimetableCard from "./components/TimetableCard";
+import { Button } from "./components/ui/button";
+import { CalendarX2 } from "lucide-react";
 
 const fetchUserDetails = async (): Promise<
   z.infer<typeof userWithTimetablesType>
@@ -168,6 +175,29 @@ const indexRoute = new Route({
 
 function Home() {
   const userQueryResult = useQuery(userQueryOptions);
+  const queryClient = useQueryClient();
+  const createMutation = useMutation({
+    mutationFn: () => {
+      return axios.post<{ message: string; id: number }>(
+        "/api/timetable/create",
+      );
+    },
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      // TODO: Navigate to the newly created page
+      console.log(response.data.id);
+    },
+    onError: (error) => {
+      // TODO: Discuss about error handling
+      if (error instanceof AxiosError) {
+        toast({
+          title: "Error",
+          description: error.response?.data.message,
+          variant: "destructive",
+        });
+      }
+    },
+  });
 
   if (userQueryResult.isFetching) {
     return <span>Loading...</span>;
@@ -186,29 +216,51 @@ function Home() {
   }
 
   if (userQueryResult.isSuccess) {
+    const { draftTimetables, privateTimetables, publicTimetables } =
+      userQueryResult.data;
+
     return (
       <>
         <main className="bg-background min-h-screen text-foreground py-20 px-16">
           <h1 className="text-5xl font-bold text-center sm:text-left">
             My Timetables
           </h1>
+          {draftTimetables.length === 0 &&
+            privateTimetables.length === 0 &&
+            publicTimetables.length === 0 && (
+              <>
+                <div className="bg-secondary mt-10 text-center flex flex-col items-center justify-center gap-8 py-16 rounded-lg">
+                  <span>
+                    <CalendarX2 className="h-32 w-32" />
+                  </span>
+                  <h2 className="text-3xl">It's empty in here.</h2>
+                  <Button
+                    className="text-2xl py-6 px-10 font-bold"
+                    onClick={() => createMutation.mutate()}
+                  >
+                    Create Timetable
+                  </Button>
+                </div>
+              </>
+            )}
+
           <div>
             {renderTimetableSection(
               "Draft Timetables:",
-              userQueryResult.data?.draftTimetables,
+              draftTimetables,
               false, // the value of isPrivate shouldn't matter here
               true,
             )}
 
             {renderTimetableSection(
               "Private Timetables:",
-              userQueryResult.data?.privateTimetables,
+              privateTimetables,
               true,
             )}
 
             {renderTimetableSection(
               "Public Timetables:",
-              userQueryResult.data?.publicTimetables,
+              publicTimetables,
               false,
             )}
           </div>
