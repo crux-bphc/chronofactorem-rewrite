@@ -293,7 +293,7 @@ function GetDegrees() {
           </Button>
         </div>
       </div>
-      <span className="fixed bottom-0 bg-slate-800 w-full text-center py-1 text-md lg:text-lg text-slate-400">
+      <span className="fixed bottom-0 bg-slate-800 w-full text-center py-1 text-xs md:px-0 px-8 tracking-tight md:text-lg text-slate-400">
         Powered by CRUx: The Programming and Computing Club of BITS Hyderabad
       </span>
     </>
