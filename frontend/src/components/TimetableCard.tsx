@@ -84,7 +84,16 @@ function TimetableCard({ timetable, isPrivate, isDraft }: Props) {
       </CardContent>
       <CardFooter className="flex justify-end gap-2 mt-auto">
         {!isDraft && (
-          <Button variant="outline">
+          <Button
+            variant="outline"
+            onClick={() =>
+              editMutation.mutate({
+                name: timetable.name,
+                isPrivate: !isPrivate,
+                isDraft: timetable.draft,
+              })
+            }
+          >
             Make {isPrivate ? "Public" : "Private"}
           </Button>
         )}
