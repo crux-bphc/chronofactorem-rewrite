@@ -26,6 +26,8 @@ const dataSchema = z.object({
         message: "search branch may not contain more than two elements",
       })
       .optional(),
+    // This type definition for archived is not ideal, but boolean() doesn't work directly as the param is read as a string, and coercing it to boolean makes all values pass the check, rendering this check useless. Thus, this is the current solution
+    archived: z.union([z.literal("true"), z.literal("false")]).optional(),
   }),
 });
 
@@ -54,6 +56,8 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
     const branch: degreeList = req.query.branch as degreeList;
     const year: number = parseInt(req.query.year as string);
     const sem: number = parseInt(req.query.sem as string);
+    // note that if archived is not passed as a param, (req.query.archived as string) evaluates to the string "undefined"
+    const archived: boolean = (req.query.archived as string) === "true";
     const isPrivate = false;
 
     let queryBuilder = timetableRepository
@@ -92,6 +96,12 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
     if (sem) {
       queryBuilder = queryBuilder.andWhere("timetable.semester = :sem", {
         sem,
+      });
+    }
+
+    if (!archived) {
+      queryBuilder = queryBuilder.andWhere("timetable.archived = :archived", {
+        archived,
       });
     }
 

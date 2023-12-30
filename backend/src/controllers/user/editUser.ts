@@ -40,7 +40,7 @@ export const editUser = async (req: Request, res: Response) => {
           .createQueryBuilder()
           .update("user")
           .set({ degrees })
-          .where("id = :id", { email: req.session?.id })
+          .where("id = :id", { id: req.session?.id })
           .returning("*")
           .execute()
           .then((response) => {
