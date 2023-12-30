@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
-import { TokenSet } from "openid-client";
-import { generators } from "openid-client";
+import { TokenSet, generators } from "openid-client";
 import {
   degreeList,
   isAValidDegreeCombination,
@@ -15,6 +14,7 @@ import {
   FinishedUserSession,
   SignUpUserData,
   UnfinishedUserSession,
+  ZodFinishedUserSession,
   ZodUnfinishedUserSession,
 } from "../../types/auth";
 
@@ -310,4 +310,66 @@ export async function logout(req: Request, res: Response) {
     authenticated: false,
     message: "user logged out",
   });
+}
+
+// checks whether user is not logged in, logged in but hasn't finished selecting degrees, or properly logged in
+export async function checkAuthStatus(req: Request, res: Response) {
+  try {
+    if (req.cookies.session === undefined) {
+      return res.json({
+        message: "user not logged in",
+      });
+    }
+
+    if (ZodUnfinishedUserSession.safeParse(req.cookies.session).success) {
+      const session: UnfinishedUserSession = req.cookies.session;
+
+      const user = await userRepository
+        .createQueryBuilder()
+        .select()
+        .where("email = :email", {
+          email: session.email,
+        })
+        .getOne();
+
+      if (user) {
+        // reset session
+        res.clearCookie("userInfo");
+        res.clearCookie("session");
+
+        return res.json({
+          message: "user not logged in",
+        });
+      }
+
+      const batch = session.email.match(
+        /^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/,
+      )
+        ? session.email.slice(1, 5)
+        : "0000";
+
+      return res.status(400).json({
+        message: "user needs to get degrees",
+        redirect: `/getDegrees?year=${
+          timetableJSON.metadata.acadYear - parseInt(batch) + 1
+        }`,
+      });
+    }
+
+    if (ZodFinishedUserSession.safeParse(req.cookies.session).success) {
+      return res
+        .status(400)
+        .json({ message: "user is logged in", redirect: "/" });
+    }
+
+    return res.status(401).json({
+      message: "cannot verify auth status",
+      error: "user session malformed",
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: JSON.stringify(error),
+    });
+  }
 }

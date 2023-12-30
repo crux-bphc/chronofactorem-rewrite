@@ -2,6 +2,7 @@ import * as express from "express";
 import { Request, Response } from "express";
 import {
   authCallback,
+  checkAuthStatus,
   getDegrees,
   logout,
   manageAuthRedirect,
@@ -28,5 +29,7 @@ authRouter.get("/callback", authCallback);
 authRouter.post("/submit", getDegrees);
 
 authRouter.get("/logout", logout);
+
+authRouter.get("/check", checkAuthStatus);
 
 export default authRouter;
