@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
-import { TokenSet } from "openid-client";
-import { generators } from "openid-client";
+import { TokenSet, generators } from "openid-client";
 import {
   degreeList,
   isAValidDegreeCombination,

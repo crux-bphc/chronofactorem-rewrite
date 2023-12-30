@@ -1,13 +1,13 @@
+import { ToastAction } from "@radix-ui/react-toast";
+import { queryOptions } from "@tanstack/react-query";
 import { ErrorComponent, Route } from "@tanstack/react-router";
+import axios, { AxiosError } from "axios";
 import { AtSign } from "lucide-react";
+import { z } from "zod";
 import { ModeToggle } from "./components/mode-toggle";
 import { Button } from "./components/ui/button";
-import { rootRoute, router } from "./main";
-import { queryOptions } from "@tanstack/react-query";
-import axios, { AxiosError } from "axios";
-import { ToastAction } from "@radix-ui/react-toast";
 import { useToast } from "./components/ui/use-toast";
-import { z } from "zod";
+import { rootRoute, router } from "./main";
 
 const userAuthStatusType = z.object({
   message: z.string(),
