@@ -77,6 +77,12 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
     return res.status(403).json({ message: "user does not own timetable" });
   }
 
+  if (timetable.archived && isDraft) {
+    return res
+      .status(418)
+      .json({ message: "archived timetable can not be a draft" });
+  }
+
   if (
     timetable.draft &&
     timetable.sections.length === 0 &&

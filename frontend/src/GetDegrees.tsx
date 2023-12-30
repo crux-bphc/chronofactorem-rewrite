@@ -19,6 +19,13 @@ import axios, { AxiosError } from "axios";
 import { useToast } from "@/components/ui/use-toast";
 import { queryOptions, useMutation } from "@tanstack/react-query";
 
+/*
+Although users are always redirected to /getDegrees after login, we don't want to show them the page if they've already filled it out.
+Since the user is actually created in the DB only after they properly fill out their degrees, we check if they exist in the DB by querying /api/user. 
+If this succeeds, they have already filled this out and so we redirect them away to /.
+If they have not filled out their degrees, they will not exist in the DB and so /api/user will return a 401 response. 
+Then, we do nothing (no error toasts) and just let them fill out their degrees.
+*/
 const fetchUserDetails = async (): Promise<
   z.infer<typeof userWithTimetablesType>
 > => {
@@ -26,7 +33,6 @@ const fetchUserDetails = async (): Promise<
     "/api/user",
     {
       headers: {
-        "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json ",
       },
     },
@@ -44,17 +50,23 @@ const getDegreesRoute = new Route({
   path: "getDegrees",
   validateSearch: z.object({ year: collegeYearType }),
   loader: ({ context: { queryClient } }) =>
-    queryClient.ensureQueryData(userQueryOptions).catch((error) => {
-      if (
-        error instanceof AxiosError &&
-        error.response &&
-        error.response.status === 401
-      ) {
-        router.navigate({
-          to: "/login",
-        });
-      }
-    }),
+    queryClient
+      .ensureQueryData(userQueryOptions)
+      .then(() => {
+        router.navigate({ to: "/" });
+      })
+      .catch((error) => {
+        if (
+          error instanceof AxiosError &&
+          error.response &&
+          error.response.status === 401
+        ) {
+          // The one exception to doing nothing is if they don't have a valid session cookie (from Google OAuth)
+          if (error.response.data.error === "user session expired") {
+            router.navigate({ to: "/" });
+          }
+        }
+      }),
   component: GetDegrees,
   errorComponent: ({ error }) => {
     const { toast } = useToast();
@@ -126,6 +138,7 @@ function GetDegrees() {
   const { year } = getDegreesRoute.useSearch();
   const [firstDegree, setFirstDegree] = useState<string | null>(null);
   const [secondDegree, setSecondDegree] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const mutation = useMutation({
     mutationFn: (body: { degrees: (string | null)[] }) => {
@@ -141,11 +154,53 @@ function GetDegrees() {
         if (error.response.status === 401) {
           router.navigate({ to: "/login" });
         } else if (error.response.status === 400) {
-          alert(`Error: ${error.message}`);
+          toast({
+            title: "Error",
+            description:
+              "message" in error.response.data
+                ? error.response.data.message
+                : "API returned 400",
+            variant: "destructive",
+            action: (
+              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                  Report
+                </a>
+              </ToastAction>
+            ),
+          });
         } else if (error.response.status === 500) {
-          alert(`Server error: ${error.message}`);
+          toast({
+            title: "Server Error",
+            description:
+              "message" in error.response.data
+                ? error.response.data.message
+                : "API returned 500",
+            variant: "destructive",
+            action: (
+              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                  Report
+                </a>
+              </ToastAction>
+            ),
+          });
         } else {
-          alert(`Server error: ${error.message}`);
+          toast({
+            title: "Unknown Error",
+            description:
+              "message" in error.response.data
+                ? error.response.data.message
+                : `API returned ${error.response.status}`,
+            variant: "destructive",
+            action: (
+              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                  Report
+                </a>
+              </ToastAction>
+            ),
+          });
         }
       }
     },
@@ -154,38 +209,40 @@ function GetDegrees() {
   const handleSubmit = async () => {
     if (firstDegree) {
       if (firstDegree?.includes("B") && year >= 2 && secondDegree === null) {
-        alert("Select your second degree!");
+        toast({
+          title: "Select your second degree!",
+          variant: "destructive",
+        });
         return;
       }
-
       const degrees =
-        firstDegree?.includes("B") && year >= 2
-          ? secondDegree !== "A0"
-            ? [firstDegree, secondDegree]
-            : [firstDegree]
+        firstDegree?.includes("B") && year >= 2 && secondDegree !== "A0"
+          ? [firstDegree, secondDegree]
           : [firstDegree];
-
       mutation.mutate({ degrees });
     } else {
-      alert("Select your degree!");
+      toast({
+        title: "Select your degree!",
+        variant: "destructive",
+      });
     }
   };
 
   return (
     <>
-      <div className="flex bg-slate-950 h-screen w-full justify-center">
+      <div className="flex bg-background h-screen w-full justify-center">
         <div className="flex flex-col items-center pt-48">
-          <h1 className="scroll-m-20 text-xl tracking-tight lg:text-2xl text-slate-50 text-center mx-4">
+          <h1 className="scroll-m-20 text-xl tracking-tight lg:text-2xl text-foreground text-center mx-4">
             {`Select your degree${
               firstDegree?.includes("B") && year >= 2 ? "s" : ""
             } so we can help build your timetable:`}
           </h1>
           <div className="flex flex-col sm:flex-row gap-2">
             <Select onValueChange={setFirstDegree}>
-              <SelectTrigger className="w-84 bg-slate-800 border-slate-700 focus:ring-slate-800 focus:ring-offset-slate-800 text-slate-50 mt-4">
+              <SelectTrigger className="w-84 bg-muted border-primary-foreground focus:ring-muted focus:ring-offset-muted text-foreground mt-4">
                 <SelectValue placeholder="Select a degree" />
               </SelectTrigger>
-              <SelectContent className="bg-slate-700 border-slate-600 text-slate-50">
+              <SelectContent className="bg-primary-foreground border-muted text-foreground">
                 <SelectGroup>
                   <SelectLabel>Single Degrees</SelectLabel>
                   <SelectItem value="A1">A1: B.E. Chemical</SelectItem>
@@ -216,10 +273,10 @@ function GetDegrees() {
 
             {firstDegree?.includes("B") && year >= 2 && (
               <Select onValueChange={setSecondDegree}>
-                <SelectTrigger className="w-84 bg-slate-800 border-slate-700 focus:ring-slate-800 focus:ring-offset-slate-800 text-slate-50 mt-4">
+                <SelectTrigger className="w-84 bg-muted border-primary-foreground focus:ring-muted focus:ring-offset-muted text-foreground mt-4">
                   <SelectValue placeholder="Select a degree" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-700 border-slate-600 text-slate-50">
+                <SelectContent className="bg-primary-foreground border-muted text-foreground">
                   <SelectGroup>
                     <SelectLabel>Single Degrees</SelectLabel>
                     {/* A0 is used for single degree MSc people since empty string denotes no selection */}
@@ -247,14 +304,14 @@ function GetDegrees() {
             )}
           </div>
           <Button
-            className="w-fit mt-6 bg-slate-800 font-bold hover:bg-slate-700 transition ease-in-out"
+            className="w-fit mt-6 bg-muted font-bold hover:bg-primary-foreground transition ease-in-out text-foreground"
             onClick={handleSubmit}
           >
             Submit
           </Button>
         </div>
       </div>
-      <span className="fixed bottom-0 bg-slate-800 w-full text-center py-1 text-md lg:text-lg text-slate-400">
+      <span className="fixed bottom-0 bg-muted w-full text-center py-1 text-xs md:px-0 px-8 tracking-tight md:text-lg text-muted-foreground">
         Powered by CRUx: The Programming and Computing Club of BITS Hyderabad
       </span>
     </>
