@@ -10,6 +10,9 @@ import {
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Edit2, Trash } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios, { AxiosError } from "axios";
+import { useToast } from "./ui/use-toast";
 
 type Props = {
   timetable: z.infer<typeof timetableType>;
@@ -18,6 +21,28 @@ type Props = {
 };
 
 function TimetableCard({ timetable, isPrivate, isDraft }: Props) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: () => {
+      return axios.post(`/api/timetable/${timetable.id}/delete`);
+    },
+    onSuccess: () => {
+      return queryClient.invalidateQueries({ queryKey: ["user"] });
+    },
+    onError: (error) => {
+      // TODO: Discuss about error handling
+      if (error instanceof AxiosError) {
+        toast({
+          title: "Error",
+          description: error.response?.data.message,
+          variant: "destructive",
+        });
+      }
+    },
+  });
+
   return (
     <Card className="min-h-60 flex flex-col min-w-80 shadow-lg">
       <CardHeader className="pb-2">
@@ -43,7 +68,11 @@ function TimetableCard({ timetable, isPrivate, isDraft }: Props) {
         <Button variant="ghost" className="rounded-full p-3">
           <Edit2 />
         </Button>
-        <Button variant="ghost" className="rounded-full p-3">
+        <Button
+          variant="ghost"
+          className="rounded-full p-3"
+          onClick={() => deleteMutation.mutate()}
+        >
           <Trash />
         </Button>
       </CardFooter>
