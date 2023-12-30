@@ -137,15 +137,58 @@ function GetDegrees() {
       router.navigate({ to: "/" });
     },
     onError: (error) => {
+      const { toast } = useToast();
       if (error instanceof AxiosError && error.response) {
         if (error.response.status === 401) {
           router.navigate({ to: "/login" });
         } else if (error.response.status === 400) {
-          alert(`Error: ${error.message}`);
+          toast({
+            title: "Error",
+            description:
+              "message" in error.response.data
+                ? error.response.data.message
+                : "API returned 400",
+            variant: "destructive",
+            action: (
+              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                  Report
+                </a>
+              </ToastAction>
+            ),
+          });
         } else if (error.response.status === 500) {
-          alert(`Server error: ${error.message}`);
+          toast({
+            title: "Server Error",
+            description:
+              "message" in error.response.data
+                ? error.response.data.message
+                : "API returned 500",
+            variant: "destructive",
+            action: (
+              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                  Report
+                </a>
+              </ToastAction>
+            ),
+          });
         } else {
-          alert(`Server error: ${error.message}`);
+          toast({
+            title: "Unknown Error",
+            description:
+              "message" in error.response.data
+                ? error.response.data.message
+                : `API returned ${error.response.status}`,
+            variant: "destructive",
+            action: (
+              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                  Report
+                </a>
+              </ToastAction>
+            ),
+          });
         }
       }
     },
