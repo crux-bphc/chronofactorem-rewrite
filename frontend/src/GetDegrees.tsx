@@ -223,19 +223,19 @@ function GetDegrees() {
 
   return (
     <>
-      <div className="flex bg-slate-950 h-screen w-full justify-center">
+      <div className="flex bg-background h-screen w-full justify-center">
         <div className="flex flex-col items-center pt-48">
-          <h1 className="scroll-m-20 text-xl tracking-tight lg:text-2xl text-slate-50 text-center mx-4">
+          <h1 className="scroll-m-20 text-xl tracking-tight lg:text-2xl text-foreground text-center mx-4">
             {`Select your degree${
               firstDegree?.includes("B") && year >= 2 ? "s" : ""
             } so we can help build your timetable:`}
           </h1>
           <div className="flex flex-col sm:flex-row gap-2">
             <Select onValueChange={setFirstDegree}>
-              <SelectTrigger className="w-84 bg-slate-800 border-slate-700 focus:ring-slate-800 focus:ring-offset-slate-800 text-slate-50 mt-4">
+              <SelectTrigger className="w-84 bg-muted border-primary-foreground focus:ring-muted focus:ring-offset-muted text-foreground mt-4">
                 <SelectValue placeholder="Select a degree" />
               </SelectTrigger>
-              <SelectContent className="bg-slate-700 border-slate-600 text-slate-50">
+              <SelectContent className="bg-primary-foreground border-muted text-foreground">
                 <SelectGroup>
                   <SelectLabel>Single Degrees</SelectLabel>
                   <SelectItem value="A1">A1: B.E. Chemical</SelectItem>
@@ -266,10 +266,10 @@ function GetDegrees() {
 
             {firstDegree?.includes("B") && year >= 2 && (
               <Select onValueChange={setSecondDegree}>
-                <SelectTrigger className="w-84 bg-slate-800 border-slate-700 focus:ring-slate-800 focus:ring-offset-slate-800 text-slate-50 mt-4">
+                <SelectTrigger className="w-84 bg-muted border-primary-foreground focus:ring-muted focus:ring-offset-muted text-foreground mt-4">
                   <SelectValue placeholder="Select a degree" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-700 border-slate-600 text-slate-50">
+                <SelectContent className="bg-primary-foreground border-muted text-foreground">
                   <SelectGroup>
                     <SelectLabel>Single Degrees</SelectLabel>
                     {/* A0 is used for single degree MSc people since empty string denotes no selection */}
@@ -297,14 +297,14 @@ function GetDegrees() {
             )}
           </div>
           <Button
-            className="w-fit mt-6 bg-slate-800 font-bold hover:bg-slate-700 transition ease-in-out text-slate-50"
+            className="w-fit mt-6 bg-muted font-bold hover:bg-primary-foreground transition ease-in-out text-foreground"
             onClick={handleSubmit}
           >
             Submit
           </Button>
         </div>
       </div>
-      <span className="fixed bottom-0 bg-slate-800 w-full text-center py-1 text-xs md:px-0 px-8 tracking-tight md:text-lg text-slate-400">
+      <span className="fixed bottom-0 bg-muted w-full text-center py-1 text-xs md:px-0 px-8 tracking-tight md:text-lg text-muted-foreground">
         Powered by CRUx: The Programming and Computing Club of BITS Hyderabad
       </span>
     </>
