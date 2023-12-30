@@ -43,6 +43,29 @@ function TimetableCard({ timetable, isPrivate, isDraft }: Props) {
     },
   });
 
+  const editMutation = useMutation({
+    mutationFn: (body: {
+      name: string;
+      isPrivate: boolean;
+      isDraft: boolean;
+    }) => {
+      return axios.post(`/api/timetable/${timetable.id}/edit`, body);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+    },
+    onError: (error) => {
+      // TODO: Discuss about error handling
+      if (error instanceof AxiosError) {
+        toast({
+          title: "Error",
+          description: error.response?.data.message,
+          variant: "destructive",
+        });
+      }
+    },
+  });
+
   return (
     <Card className="min-h-60 flex flex-col min-w-80 shadow-lg">
       <CardHeader className="pb-2">
@@ -65,7 +88,17 @@ function TimetableCard({ timetable, isPrivate, isDraft }: Props) {
             Make {isPrivate ? "Public" : "Private"}
           </Button>
         )}
-        <Button variant="ghost" className="rounded-full p-3">
+        <Button
+          variant="ghost"
+          className="rounded-full p-3"
+          onClick={() =>
+            editMutation.mutate({
+              name: timetable.name,
+              isPrivate: timetable.private,
+              isDraft: true,
+            })
+          }
+        >
           <Edit2 />
         </Button>
         <Button
