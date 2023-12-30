@@ -200,14 +200,10 @@ function GetDegrees() {
         alert("Select your second degree!");
         return;
       }
-
       const degrees =
-        firstDegree?.includes("B") && year >= 2
-          ? secondDegree !== "A0"
-            ? [firstDegree, secondDegree]
-            : [firstDegree]
+        firstDegree?.includes("B") && year >= 2 && secondDegree !== "A0"
+          ? [firstDegree, secondDegree]
           : [firstDegree];
-
       mutation.mutate({ degrees });
     } else {
       alert("Select your degree!");
