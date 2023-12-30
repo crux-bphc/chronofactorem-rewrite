@@ -289,7 +289,7 @@ function GetDegrees() {
             )}
           </div>
           <Button
-            className="w-fit mt-6 bg-slate-800 font-bold hover:bg-slate-700 transition ease-in-out"
+            className="w-fit mt-6 bg-slate-800 font-bold hover:bg-slate-700 transition ease-in-out text-slate-50"
             onClick={handleSubmit}
           >
             Submit
