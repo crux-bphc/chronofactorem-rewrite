@@ -99,31 +99,18 @@ export const ingestJSON = async (
             return;
           }
 
-          // Else, delete old courses
+          // Else, delete old timetables and courses
           console.log(
             "WARNING: overwriting will wipe all courses, sections, and timetables for that combination of academic year and semester",
           );
-          console.log(
-            `deleting courses from academic year ${latestCourse.acadYear} and semester ${latestCourse.semester}...`,
-          );
+
           console.log(
             "You have 30 seconds to rethink what you're about to do...",
           );
           await new Promise((resolve) => {
             setTimeout(resolve, 30000);
           });
-          const deletedCourseResult = await queryRunner.manager
-            .createQueryBuilder()
-            .delete()
-            .from(Course)
-            .where("acad_year = :year", { year: latestCourse.acadYear })
-            .andWhere("semester = :semester", {
-              semester: latestCourse.semester,
-            })
-            .execute();
-          console.log(
-            `deleted ${deletedCourseResult.affected} courses from academic year ${latestCourse.acadYear} and semester ${latestCourse.semester}!`,
-          );
+
           console.log(
             `deleting timetables from academic year ${latestCourse.acadYear} and semester ${latestCourse.semester}...`,
           );
@@ -138,6 +125,22 @@ export const ingestJSON = async (
             .execute();
           console.log(
             `deleted ${deletedTimetableResult.affected} timetables from academic year ${latestCourse.acadYear} and semester ${latestCourse.semester}!`,
+          );
+
+          console.log(
+            `deleting courses from academic year ${latestCourse.acadYear} and semester ${latestCourse.semester}...`,
+          );
+          const deletedCourseResult = await queryRunner.manager
+            .createQueryBuilder()
+            .delete()
+            .from(Course)
+            .where("acad_year = :year", { year: latestCourse.acadYear })
+            .andWhere("semester = :semester", {
+              semester: latestCourse.semester,
+            })
+            .execute();
+          console.log(
+            `deleted ${deletedCourseResult.affected} courses from academic year ${latestCourse.acadYear} and semester ${latestCourse.semester}!`,
           );
         }
       }
