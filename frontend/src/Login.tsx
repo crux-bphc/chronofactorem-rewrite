@@ -1,13 +1,110 @@
-import { Route } from "@tanstack/react-router";
+import { ErrorComponent, Route } from "@tanstack/react-router";
 import { AtSign } from "lucide-react";
 import { ModeToggle } from "./components/mode-toggle";
 import { Button } from "./components/ui/button";
-import { rootRoute } from "./main";
+import { rootRoute, router } from "./main";
+import { queryOptions } from "@tanstack/react-query";
+import axios, { AxiosError } from "axios";
+import { ToastAction } from "@radix-ui/react-toast";
+import { useToast } from "./components/ui/use-toast";
+import { z } from "zod";
+
+const userAuthStatusType = z.object({
+  message: z.string(),
+  redirect: z.string().optional(),
+  error: z.string().optional(),
+});
+
+const fetchUserAuthStatus = async (): Promise<
+  z.infer<typeof userAuthStatusType>
+> => {
+  const response = await axios.get("/api/auth/check", {
+    headers: {
+      "Content-Type": "application/json ",
+    },
+  });
+  return response.data;
+};
+
+const authStatusQueryOptions = queryOptions({
+  queryKey: ["authStatusCheck"],
+  queryFn: () => fetchUserAuthStatus(),
+});
 
 const loginRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "login",
+  loader: ({ context: { queryClient } }) =>
+    queryClient.ensureQueryData(authStatusQueryOptions).catch((error) => {
+      if (error instanceof AxiosError && error.response) {
+        if (error.response.status === 400) {
+          router.navigate({
+            to: error.response.data.redirect,
+          });
+        }
+      }
+
+      throw error;
+    }),
   component: Login,
+  errorComponent: ({ error }) => {
+    const { toast } = useToast();
+
+    if (error instanceof AxiosError) {
+      if (error.response) {
+        switch (error.response.status) {
+          case 401:
+            toast({
+              title: "Error",
+              description: `${error.response.data.message}; ${error.response.data.error}`,
+              variant: "destructive",
+              action: (
+                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                    Report
+                  </a>
+                </ToastAction>
+              ),
+            });
+            break;
+          case 500:
+            toast({
+              title: "Server Error",
+              description: `${error.response.data.message}; ${error.response.data.error}`,
+              variant: "destructive",
+              action: (
+                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                    Report
+                  </a>
+                </ToastAction>
+              ),
+            });
+            break;
+
+          default:
+            toast({
+              title: "Unknown Error",
+              description:
+                "message" in error.response.data
+                  ? error.response.data.message
+                  : `API returned ${error.response.status}`,
+              variant: "destructive",
+              action: (
+                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                    Report
+                  </a>
+                </ToastAction>
+              ),
+            });
+        }
+      } else {
+        // Fallback to the default ErrorComponent
+        return <ErrorComponent error={error} />;
+      }
+    }
+  },
 });
 
 function Login() {
