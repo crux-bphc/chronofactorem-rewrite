@@ -6,6 +6,7 @@ import { z } from "zod";
 import { userWithTimetablesType, timetableType } from "../../lib";
 import { useToast } from "./components/ui/use-toast";
 import { rootRoute, router } from "./main";
+import TimetableCard from "./components/TimetableCard";
 
 const fetchUserDetails = async (): Promise<
   z.infer<typeof userWithTimetablesType>
@@ -40,6 +41,37 @@ const filterTimetables = (timetables: Timetable[]) => {
   }
 
   return { publicTimetables, privateTimetables, draftTimetables };
+};
+
+const renderTimetableSection = (
+  title: string,
+  timetables: Timetable[],
+  isPrivate: boolean,
+  isDraft = false,
+) => {
+  return (
+    <>
+      <section className="pt-8 px-4">
+        <h2 className="text-3xl">{title}</h2>
+        <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 pt-4">
+          {timetables.length <= 0 ? (
+            <p className="text-xl col-span-full text-center">
+              No timetables to show
+            </p>
+          ) : (
+            timetables.map((timetable) => (
+              <TimetableCard
+                key={timetable.id}
+                timetable={timetable}
+                isPrivate={isPrivate}
+                isDraft={isDraft}
+              />
+            ))
+          )}
+        </div>
+      </section>
+    </>
+  );
 };
 
 const userQueryOptions = queryOptions({
@@ -151,15 +183,37 @@ function Home() {
     );
   }
 
-  return (
-    <>
-      <main className="bg-primary min-h-screen text-slate-50 w-screen px-9 pt-20 xl:px-96">
-        <h1 className="text-5xl font-bold uppercase text-center">
-          My Timetables
-        </h1>
-      </main>
-    </>
-  );
+  if (userQueryResult.isSuccess) {
+    return (
+      <>
+        <main className="bg-primary min-h-screen text-primary-foreground px-8 py-20 md:px-20 lg:px-20 xl:px-48">
+          <h1 className="text-5xl font-bold uppercase text-center">
+            My Timetables
+          </h1>
+          <div>
+            {renderTimetableSection(
+              "Private Timetables:",
+              userQueryResult.data?.privateTimetables,
+              true,
+            )}
+
+            {renderTimetableSection(
+              "Public Timetables:",
+              userQueryResult.data?.publicTimetables,
+              false,
+            )}
+
+            {renderTimetableSection(
+              "Draft Timetables:",
+              userQueryResult.data?.draftTimetables,
+              false, // the value of isPrivate shouldn't matter here
+              true,
+            )}
+          </div>
+        </main>
+      </>
+    );
+  }
 }
 
 export default indexRoute;
