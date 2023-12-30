@@ -33,7 +33,6 @@ const fetchUserDetails = async (): Promise<
     "/api/user",
     {
       headers: {
-        "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json ",
       },
     },
