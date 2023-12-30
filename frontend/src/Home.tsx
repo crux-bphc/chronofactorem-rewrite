@@ -49,11 +49,13 @@ const renderTimetableSection = (
   isPrivate: boolean,
   isDraft = false,
 ) => {
+  if (timetables.length === 0) return null;
+
   return (
     <>
-      <section className="pt-8 px-4">
-        <h2 className="text-3xl">{title}</h2>
-        <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 pt-4">
+      <section className="pt-8">
+        <h2 className="text-3xl font-bold">{title}</h2>
+        <div className="flex flex-wrap gap-8 pt-4">
           {timetables.length <= 0 ? (
             <p className="text-xl col-span-full text-center">
               No timetables to show
@@ -187,10 +189,17 @@ function Home() {
     return (
       <>
         <main className="bg-background min-h-screen text-foreground py-20 px-16">
-          <h1 className="text-5xl font-bold uppercase text-center">
+          <h1 className="text-5xl font-bold text-center sm:text-left">
             My Timetables
           </h1>
           <div>
+            {renderTimetableSection(
+              "Draft Timetables:",
+              userQueryResult.data?.draftTimetables,
+              false, // the value of isPrivate shouldn't matter here
+              true,
+            )}
+
             {renderTimetableSection(
               "Private Timetables:",
               userQueryResult.data?.privateTimetables,
@@ -201,13 +210,6 @@ function Home() {
               "Public Timetables:",
               userQueryResult.data?.publicTimetables,
               false,
-            )}
-
-            {renderTimetableSection(
-              "Draft Timetables:",
-              userQueryResult.data?.draftTimetables,
-              false, // the value of isPrivate shouldn't matter here
-              true,
             )}
           </div>
         </main>

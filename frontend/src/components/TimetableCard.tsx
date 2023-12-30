@@ -19,7 +19,7 @@ type Props = {
 
 function TimetableCard({ timetable, isPrivate, isDraft }: Props) {
   return (
-    <Card className="min-w-fit max-w-sm min-h-60 flex flex-col">
+    <Card className="min-h-60 flex flex-col min-w-80 shadow-lg">
       <CardHeader className="pb-2">
         <CardTitle className="text-2xl">{timetable.name}</CardTitle>
       </CardHeader>
@@ -40,10 +40,10 @@ function TimetableCard({ timetable, isPrivate, isDraft }: Props) {
             Make {isPrivate ? "Public" : "Private"}
           </Button>
         )}
-        <Button variant="ghost">
+        <Button variant="ghost" className="rounded-full p-3">
           <Edit2 />
         </Button>
-        <Button variant="ghost">
+        <Button variant="ghost" className="rounded-full p-3">
           <Trash />
         </Button>
       </CardFooter>
