@@ -6,8 +6,6 @@ import { z } from "zod";
 import { userWithTimetablesType, timetableType } from "../../lib";
 import { useToast } from "./components/ui/use-toast";
 import { rootRoute, router } from "./main";
-import { Button } from "./components/ui/button";
-import { useState } from "react";
 
 const fetchUserDetails = async (): Promise<
   z.infer<typeof userWithTimetablesType>
@@ -136,7 +134,6 @@ const indexRoute = new Route({
 
 function Home() {
   const userQueryResult = useQuery(userQueryOptions);
-  const [isPrivate, setIsPrivate] = useState(true);
 
   if (userQueryResult.isFetching) {
     return <span>Loading...</span>;
@@ -160,27 +157,6 @@ function Home() {
         <h1 className="text-5xl font-bold uppercase text-center">
           My Timetables
         </h1>
-        <div className="flex gap-4 p-4 justify-center lg:justify-normal">
-          <Button
-            variant={!isPrivate ? "secondary" : "default"}
-            className="text-lg"
-            onClick={() => setIsPrivate(false)}
-          >
-            Public
-          </Button>
-          <Button
-            variant={isPrivate ? "secondary" : "default"}
-            className="text-lg"
-            onClick={() => setIsPrivate(true)}
-          >
-            Private
-          </Button>
-        </div>
-        <div className="pt-16">
-          {isPrivate
-            ? JSON.stringify(userQueryResult.data?.privateTimetables)
-            : JSON.stringify(userQueryResult.data?.publicTimetables)}
-        </div>
       </main>
     </>
   );
