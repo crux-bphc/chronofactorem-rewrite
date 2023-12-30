@@ -44,17 +44,20 @@ const getDegreesRoute = new Route({
   path: "getDegrees",
   validateSearch: z.object({ year: collegeYearType }),
   loader: ({ context: { queryClient } }) =>
-    queryClient.ensureQueryData(userQueryOptions).catch((error) => {
-      if (
-        error instanceof AxiosError &&
-        error.response &&
-        error.response.status === 401
-      ) {
-        router.navigate({
-          to: "/login",
-        });
-      }
-    }),
+    queryClient
+      .ensureQueryData(userQueryOptions)
+      .then(() => {
+        router.navigate({ to: "/" });
+      })
+      .catch((error) => {
+        if (
+          error instanceof AxiosError &&
+          error.response &&
+          error.response.status === 401
+        ) {
+          // do nothing
+        }
+      }),
   component: GetDegrees,
   errorComponent: ({ error }) => {
     const { toast } = useToast();
