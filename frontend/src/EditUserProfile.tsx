@@ -256,41 +256,9 @@ function EditUserProfile() {
                 </SelectGroup>
               </SelectContent>
             </Select>
-            {firstDegree.includes("B") && secondDegree === null && (
-              <Select onValueChange={setSecondDegree}>
+            {firstDegree.includes("B") && (
+              <Select onValueChange={setSecondDegree} value={secondDegree ?? undefined}>
                 <SelectTrigger className="w-84 sm:mx-4 bg-slate-800 border-slate-700 focus:ring-slate-800 focus:ring-offset-slate-800 text-slate-50 mt-2">
-                  <SelectValue placeholder="Select a degree" />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-700 border-slate-600 text-slate-50">
-                  <SelectGroup>
-                    <SelectLabel>Single Degrees</SelectLabel>
-                    {/* A0 is used for single degree MSc people since empty string denotes no selection */}
-                    <SelectItem value="A0">
-                      None (Single degree M.Sc.)
-                    </SelectItem>
-                    <SelectItem value="A1">A1: B.E. Chemical</SelectItem>
-                    <SelectItem value="A2">A2: B.E. Civil</SelectItem>
-                    <SelectItem value="A3">
-                      A3: B.E. Electrical & Electronics
-                    </SelectItem>
-                    <SelectItem value="A4">A4: B.E. Mechanical</SelectItem>
-                    <SelectItem value="A7">
-                      A7: B.E. Computer Science
-                    </SelectItem>
-                    <SelectItem value="A8">
-                      A8: B.E. Electronics & Instrumentation
-                    </SelectItem>
-                    <SelectItem value="AA">
-                      AA: B.E. Electronics & Communication
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            )}
-
-            {firstDegree.includes("B") && secondDegree !== null && (
-              <Select onValueChange={setSecondDegree} value={secondDegree}>
-                <SelectTrigger className="w-84 lg:mx-4 bg-slate-800 border-slate-700 focus:ring-slate-800 focus:ring-offset-slate-800 text-slate-50 mt-2">
                   <SelectValue placeholder="Select a degree" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-700 border-slate-600 text-slate-50">
