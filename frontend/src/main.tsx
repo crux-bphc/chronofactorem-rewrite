@@ -9,6 +9,7 @@ import ReactDOM from "react-dom/client";
 import indexRoute from "./Home";
 import loginRoute from "./Login";
 import getDegreesRoute from "./GetDegrees";
+import editUserProfileRoute from "./EditUserProfile";
 import RootComponent from "./RootComponent";
 import "./index.css";
 
@@ -24,6 +25,7 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
   getDegreesRoute,
+  editUserProfileRoute
 ]);
 
 export const router = new Router({
