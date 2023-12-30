@@ -188,12 +188,13 @@ function EditUserProfile() {
       return;
     }
 
-    const degrees =
-      secondDegree !== null
+    const degrees = firstDegree.includes("B")
+      ? secondDegree !== null
         ? secondDegree !== "A0"
           ? [firstDegree, secondDegree]
           : [firstDegree]
-        : [firstDegree];
+        : [firstDegree]
+      : [firstDegree];
 
     mutation.mutate({ degrees });
   };
