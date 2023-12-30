@@ -131,6 +131,8 @@ function EditUserProfile() {
       : null,
   );
 
+  const { toast } = useToast();
+
   const mutation = useMutation({
     mutationFn: (body: { degrees: (string | null)[] }) => {
       return axios.post("/api/user/edit", body, {
@@ -144,12 +146,71 @@ function EditUserProfile() {
       if (error instanceof AxiosError && error.response) {
         if (error.response.status === 401) {
           router.navigate({ to: "/login" });
-        } else if (error.response.status === 400) {
-          alert(`Error: ${error.message}`);
+        }
+        if (error.response.status === 400) {
+          toast({
+            title: "Error",
+            description:
+              "message" in error.response.data
+                ? error.response.data.message
+                : "API returned 400",
+            variant: "destructive",
+            action: (
+              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                  Report
+                </a>
+              </ToastAction>
+            ),
+          });
+        } else if (error.response.status === 404) {
+          toast({
+            title: "Error",
+            description:
+              "message" in error.response.data
+                ? error.response.data.message
+                : "API returned 404",
+            variant: "destructive",
+            action: (
+              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                  Report
+                </a>
+              </ToastAction>
+            ),
+          });
         } else if (error.response.status === 500) {
-          alert(`Server error: ${error.message}`);
+          toast({
+            title: "Server Error",
+            description:
+              "message" in error.response.data
+                ? error.response.data.message
+                : "API returned 500",
+            variant: "destructive",
+            action: (
+              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                  Report
+                </a>
+              </ToastAction>
+            ),
+          });
         } else {
-          alert(`Server error: ${error.message}`);
+          toast({
+            title: "Unknown Error",
+            description:
+              "message" in error.response.data
+                ? error.response.data.message
+                : `API returned ${error.response.status}`,
+            variant: "destructive",
+            action: (
+              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                  Report
+                </a>
+              </ToastAction>
+            ),
+          });
         }
       }
     },
@@ -202,8 +263,7 @@ function EditUserProfile() {
   if (userQueryResult.data === undefined) {
     return (
       <span>
-        Unexpected error: userQueryResult.data is undefined. Please
-        report this{" "}
+        Unexpected error: userQueryResult.data is undefined. Please report this{" "}
         <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
           here
         </a>
