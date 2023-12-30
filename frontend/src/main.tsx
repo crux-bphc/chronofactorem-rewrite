@@ -1,3 +1,4 @@
+import { ThemeProvider } from "@/components/theme-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Router,
@@ -10,7 +11,6 @@ import indexRoute from "./Home";
 import loginRoute from "./Login";
 import RootComponent from "./RootComponent";
 import "./index.css";
-import { ThemeProvider } from "@/components/theme-provider";
 
 const queryClient = new QueryClient();
 

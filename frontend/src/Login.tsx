@@ -1,8 +1,8 @@
 import { Route } from "@tanstack/react-router";
 import { AtSign } from "lucide-react";
-import { rootRoute } from "./main";
-import { Button } from "./components/ui/button";
 import { ModeToggle } from "./components/mode-toggle";
+import { Button } from "./components/ui/button";
+import { rootRoute } from "./main";
 
 const loginRoute = new Route({
   getParentRoute: () => rootRoute,
