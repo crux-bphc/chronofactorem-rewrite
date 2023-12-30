@@ -131,6 +131,7 @@ function GetDegrees() {
   const { year } = getDegreesRoute.useSearch();
   const [firstDegree, setFirstDegree] = useState<string | null>(null);
   const [secondDegree, setSecondDegree] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const mutation = useMutation({
     mutationFn: (body: { degrees: (string | null)[] }) => {
@@ -142,7 +143,6 @@ function GetDegrees() {
       router.navigate({ to: "/" });
     },
     onError: (error) => {
-      const { toast } = useToast();
       if (error instanceof AxiosError && error.response) {
         if (error.response.status === 401) {
           router.navigate({ to: "/login" });
@@ -202,7 +202,10 @@ function GetDegrees() {
   const handleSubmit = async () => {
     if (firstDegree) {
       if (firstDegree?.includes("B") && year >= 2 && secondDegree === null) {
-        alert("Select your second degree!");
+        toast({
+          title: "Select your second degree!",
+          variant: "destructive",
+        });
         return;
       }
       const degrees =
@@ -211,7 +214,10 @@ function GetDegrees() {
           : [firstDegree];
       mutation.mutate({ degrees });
     } else {
-      alert("Select your degree!");
+      toast({
+        title: "Select your degree!",
+        variant: "destructive",
+      });
     }
   };
 
