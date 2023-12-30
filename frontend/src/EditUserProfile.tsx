@@ -122,22 +122,6 @@ const editUserProfileRoute = new Route({
 function EditUserProfile() {
   const userQueryResult = useQuery(userQueryOptions);
 
-  if (userQueryResult.isFetching) {
-    return <span>Loading...</span>;
-  }
-
-  if (userQueryResult.isError) {
-    return (
-      <span>
-        Unexpected error: {JSON.stringify(userQueryResult.error.message)} Please
-        report this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          here
-        </a>
-      </span>
-    );
-  }
-
   const [firstDegree, setFirstDegree] = useState<string>(
     userQueryResult.data.degrees[0],
   );
@@ -146,17 +130,6 @@ function EditUserProfile() {
       ? userQueryResult.data.degrees[1]
       : null,
   );
-
-  let batch;
-  if (userQueryResult.data.email !== undefined) {
-    batch = userQueryResult.data.email.match(
-      /^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/,
-    )
-      ? userQueryResult.data.email.slice(1, 5)
-      : "0000";
-  } else {
-    batch = "0000";
-  }
 
   const mutation = useMutation({
     mutationFn: (body: { degrees: (string | null)[] }) => {
@@ -182,6 +155,33 @@ function EditUserProfile() {
     },
   });
 
+  if (userQueryResult.isFetching) {
+    return <span>Loading...</span>;
+  }
+
+  if (userQueryResult.isError) {
+    return (
+      <span>
+        Unexpected error: {JSON.stringify(userQueryResult.error.message)} Please
+        report this{" "}
+        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+          here
+        </a>
+      </span>
+    );
+  }
+
+  let batch;
+  if (userQueryResult.data.email !== undefined) {
+    batch = userQueryResult.data.email.match(
+      /^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/,
+    )
+      ? userQueryResult.data.email.slice(1, 5)
+      : "0000";
+  } else {
+    batch = "0000";
+  }
+
   const handleSubmit = async () => {
     if (firstDegree.includes("B") && secondDegree === null) {
       alert("Select your second degree!");
@@ -206,7 +206,7 @@ function EditUserProfile() {
           <h1 className="scroll-m-20 text-3xl tracking-tight lg:text-6xl text-slate-50 lg:mb-12 mb-4 font-bold">
             Edit User Profile
           </h1>
-          <div className="rounded-full text-slate-50 bg-slate-500 lg:px-9 lg:py-6 lg:text-6xl px-7 py-4 text-4xl lg:h-28 lg:w-28 h-20 w-20 lg:mx-4 mx-2 lg:mt-4 lg:mb-8 mt-2 mt-4">
+          <div className="rounded-full text-slate-50 bg-slate-500 lg:text-6xl text-4xl lg:h-28 lg:w-28 h-20 w-20 flex justify-center items-center">
             <span>{userQueryResult.data.name[0]}</span>
           </div>
           <h3 className="scroll-m-20 text-xl tracking-tight lg:text-2xl text-slate-50 font-bold lg:mt-4 mt-2">
@@ -223,7 +223,7 @@ function EditUserProfile() {
               {batch}
             </h5>
           </div>
-          <div className="flex lg:flex-row flex-col">
+          <div className="flex sm:flex-row flex-col">
             <Select onValueChange={setFirstDegree} value={firstDegree}>
               <SelectTrigger className="w-84 bg-slate-800 border-slate-700 focus:ring-slate-800 focus:ring-offset-slate-800 text-slate-50 mt-2">
                 <SelectValue placeholder="Select a degree" />
@@ -258,7 +258,7 @@ function EditUserProfile() {
             </Select>
             {firstDegree.includes("B") && secondDegree === null && (
               <Select onValueChange={setSecondDegree}>
-                <SelectTrigger className="w-84 lg:mx-4 bg-slate-800 border-slate-700 focus:ring-slate-800 focus:ring-offset-slate-800 text-slate-50 mt-2">
+                <SelectTrigger className="w-84 sm:mx-4 bg-slate-800 border-slate-700 focus:ring-slate-800 focus:ring-offset-slate-800 text-slate-50 mt-2">
                   <SelectValue placeholder="Select a degree" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-700 border-slate-600 text-slate-50">
@@ -321,7 +321,7 @@ function EditUserProfile() {
             )}
           </div>
           <Button
-            className="w-fit mt-12 bg-slate-800 font-bold hover:bg-slate-700 transition ease-in-out"
+            className="w-fit mt-12 bg-muted font-bold hover:bg-primary-foreground transition ease-in-out text-foreground"
             onClick={handleSubmit}
           >
             Update Profile
