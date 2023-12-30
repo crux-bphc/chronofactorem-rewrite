@@ -199,6 +199,18 @@ function EditUserProfile() {
     mutation.mutate({ degrees });
   };
 
+  if (userQueryResult.data === undefined) {
+    return (
+      <span>
+        Unexpected error: userQueryResult.data is undefined. Please
+        report this{" "}
+        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+          here
+        </a>
+      </span>
+    );
+  }
+
   return (
     <>
       <div className="flex bg-slate-950 h-screen w-full justify-start">
@@ -257,7 +269,10 @@ function EditUserProfile() {
               </SelectContent>
             </Select>
             {firstDegree.includes("B") && (
-              <Select onValueChange={setSecondDegree} value={secondDegree ?? undefined}>
+              <Select
+                onValueChange={setSecondDegree}
+                value={secondDegree ?? undefined}
+              >
                 <SelectTrigger className="w-84 sm:mx-4 bg-slate-800 border-slate-700 focus:ring-slate-800 focus:ring-offset-slate-800 text-slate-50 mt-2">
                   <SelectValue placeholder="Select a degree" />
                 </SelectTrigger>
