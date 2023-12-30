@@ -317,7 +317,9 @@ export async function logout(req: Request, res: Response) {
 export async function checkAuthStatus(req: Request, res: Response) {
   try {
     if (req.cookies.session === undefined) {
-      return res.status(200);
+      return res.json({
+        message: "user not logged in",
+      });
     }
 
     if (ZodUnfinishedUserSession.safeParse(req.cookies.session).success) {
@@ -336,7 +338,9 @@ export async function checkAuthStatus(req: Request, res: Response) {
         res.clearCookie("userInfo");
         res.clearCookie("session");
 
-        return res.status(200);
+        return res.json({
+          message: "user not logged in",
+        });
       }
 
       const batch = session.email.match(
