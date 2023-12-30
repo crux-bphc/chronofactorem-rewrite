@@ -165,7 +165,7 @@ function EditUserProfile() {
       });
     },
     onSuccess: () => {
-      router.navigate({ to: "/" });
+      router.navigate({ to: "/", replace: true });
     },
     onError: (error) => {
       if (error instanceof AxiosError && error.response) {
