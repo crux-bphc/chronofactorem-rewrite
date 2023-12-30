@@ -2,10 +2,10 @@ import * as express from "express";
 import { Request, Response } from "express";
 import {
   authCallback,
+  checkAuthStatus,
   getDegrees,
   logout,
   manageAuthRedirect,
-  checkAuthStatus,
 } from "../controllers/user/auth";
 
 const authRouter = express.Router();
