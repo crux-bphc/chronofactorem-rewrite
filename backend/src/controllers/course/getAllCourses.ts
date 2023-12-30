@@ -1,11 +1,33 @@
 import { Request, Response } from "express";
+import { z } from "zod";
+import { Course } from "../../entity/Course";
+import { validate } from "../../middleware/zodValidateRequest";
 import { courseRepository } from "../../repositories/courseRepository";
 
+const dataSchema = z.object({
+  query: z.object({
+    // This type definition for archived is not ideal, but boolean() doesn't work directly as the param is read as a string, and coercing it to boolean makes all values pass the check, rendering this check useless. Thus, this is the current solution
+    archived: z.union([z.literal("true"), z.literal("false")]).optional(),
+  }),
+});
+
+export const getAllCoursesValidator = validate(dataSchema);
+
 export const getAllCourses = async (req: Request, res: Response) => {
+  // note that if archived is not passed as a param, (req.query.archived as string) evaluates to the string "undefined"
+  const archived: boolean = (req.query.archived as string) === "true";
+
   try {
-    const courses = await courseRepository
-      .createQueryBuilder("course")
-      .getMany();
+    let courses: Course[];
+
+    if (archived) {
+      courses = await courseRepository.createQueryBuilder("course").getMany();
+    } else {
+      courses = await courseRepository
+        .createQueryBuilder("course")
+        .where("course.archived = :archived", { archived: archived })
+        .getMany();
+    }
 
     if (courses.length === 0) {
       return res.status(404).json({ message: "Courses do not not exist" });

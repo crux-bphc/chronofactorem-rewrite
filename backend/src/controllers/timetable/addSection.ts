@@ -79,6 +79,10 @@ export const addSection = async (req: Request, res: Response) => {
     return res.status(418).json({ message: "timetable is not a draft" });
   }
 
+  if (timetable.archived) {
+    return res.status(418).json({ message: "timetable is archived" });
+  }
+
   let section: Section | null = null;
 
   try {
@@ -114,6 +118,10 @@ export const addSection = async (req: Request, res: Response) => {
 
   if (!course) {
     return res.status(404).json({ message: "course not found" });
+  }
+
+  if (course.archived) {
+    return res.status(418).json({ message: "course is archived" });
   }
 
   const classHourClashes = checkForClassHoursClash(timetable, section);
