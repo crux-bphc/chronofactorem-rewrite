@@ -81,7 +81,7 @@ export function TimetableGrid({
         <div />
       ) : (
         <div
-          className={`grid items-center pr-2 text-lg text-center font-bold ${
+          className={`grid items-center pr-2 text-lg text-center font-bold text-foreground/90 ${
             isVertical ? "grid-cols-6" : "grid-rows-6 mt-12"
           }`}
         >
@@ -93,7 +93,7 @@ export function TimetableGrid({
       <div className="flex flex-col w-full">
         {isVertical ? (
           <div
-            className={`grid items-center pr-2 text-lg text-center font-bold ${
+            className={`grid items-center pr-2 text-lg text-center font-bold text-foreground/90 ${
               isVertical ? "grid-cols-6" : "grid-rows-6 mt-12"
             }`}
           >
@@ -103,13 +103,13 @@ export function TimetableGrid({
           </div>
         ) : (
           <div
-            className={`grid justify-between text-md text-center text-slate-500 ${
+            className={`grid justify-between text-md text-center font-bold text-foreground/90 ${
               isVertical ? "grid-rows-11" : "grid-cols-11"
             } `}
           >
             {timings.map((e) => (
               <div className="mb-4 flex flex-col" key={e}>
-                <span className="text-slate-600">{e}</span>
+                <span>{e}</span>
               </div>
             ))}
           </div>
@@ -125,7 +125,7 @@ export function TimetableGrid({
                 <TooltipTrigger asChild>
                   {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
                   <div
-                    className={`bg-slate-900 border cursor-pointer transition duration-200 ease-in-out p-1.5 ${
+                    className={`bg-primary-foreground border cursor-pointer transition duration-200 ease-in-out text-foreground/65 p-1.5 ${
                       isVertical ? "" : "min-h-20"
                     }`}
                     onClick={() => {
@@ -133,7 +133,7 @@ export function TimetableGrid({
                     }}
                   >
                     <div
-                      className={`relative flex h-full text-xs sm:text-sm flex-col justify-end bg-slate-600 p-1.5 rounded gap-0.5 ${
+                      className={`relative flex h-full text-xs sm:text-sm flex-col justify-end bg-muted-foreground/30 p-1.5 rounded gap-0.5 ${
                         isVertical ? "" : ""
                       }`}
                     >
@@ -154,7 +154,7 @@ export function TimetableGrid({
                           {e.number}
                         </span>
                         <span
-                          className={`text-slate-300 text-start ${
+                          className={`opacity-90 text-start ${
                             isVertical ? "" : ""
                           }`}
                         >
@@ -164,13 +164,13 @@ export function TimetableGrid({
                     </div>
                   </div>
                 </TooltipTrigger>
-                <TooltipContent className="bg-slate-900 text-slate-50 border-slate-800">
+                <TooltipContent className="bg-primary-foreground text-foreground">
                   Double click to remove section
                 </TooltipContent>
               </Tooltip>
             ) : (
               <div
-                className={`bg-slate-900 border ${
+                className={`bg-primary-foreground border ${
                   isVertical ? "" : "min-h-20"
                 }`}
                 key={2 * i}
