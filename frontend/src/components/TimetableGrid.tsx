@@ -9,6 +9,8 @@ import { useMemo } from "react";
 export function TimetableGrid({
   isVertical,
   timetableDetailsSections,
+  handleUnitClick,
+  handleUnitDelete,
 }: {
   isVertical: boolean;
   timetableDetailsSections: {
@@ -20,6 +22,31 @@ export function TimetableGrid({
     number: number;
     instructors: string[];
   }[];
+  handleUnitClick: (
+    e: {
+      id: string;
+      name: string;
+      courseId: string;
+      room: string;
+      code: string;
+      type: string;
+      number: number;
+      instructors: string[];
+    } | null,
+    event: React.MouseEvent,
+  ) => void;
+  handleUnitDelete: (
+    e: {
+      id: string;
+      name: string;
+      courseId: string;
+      room: string;
+      code: string;
+      type: string;
+      number: number;
+      instructors: string[];
+    } | null,
+  ) => void;
 }) {
   const daysOfWeek = ["M", "T", "W", "Th", "F", "S"];
 
@@ -128,14 +155,13 @@ export function TimetableGrid({
                     className={`bg-primary-foreground border cursor-pointer transition duration-200 ease-in-out text-foreground/65 p-1.5 ${
                       isVertical ? "" : "min-h-20"
                     }`}
-                    onClick={() => {
-                      console.log(e);
-                    }}
+                    onClick={(event) => handleUnitClick(e, event)}
                   >
                     <div className="relative flex h-full text-xs sm:text-sm flex-col justify-end bg-muted-foreground/30 p-1.5 rounded gap-0.5">
                       <X
                         size={16}
                         className="absolute top-1 right-1 sm:visible invisible hover:stroke-[#EF4444]"
+                        onClick={() => handleUnitDelete(e)}
                       />
                       <span className="font-bold text-ellipsis overflow-hidden text-wrap tracking-tight">
                         {e.courseId}
