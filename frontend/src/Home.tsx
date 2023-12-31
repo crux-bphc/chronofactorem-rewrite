@@ -63,20 +63,14 @@ const renderTimetableSection = (
       <section className="pt-8">
         <h2 className="text-2xl md:text-3xl font-bold">{title}</h2>
         <div className="flex flex-col items-center justify-center sm:flex-row sm:flex-wrap gap-8 pt-4 md:justify-normal">
-          {timetables.length <= 0 ? (
-            <p className="text-xl col-span-full text-center">
-              No timetables to show
-            </p>
-          ) : (
-            timetables.map((timetable) => (
-              <TimetableCard
-                key={timetable.id}
-                timetable={timetable}
-                isPrivate={isPrivate}
-                isDraft={isDraft}
-              />
-            ))
-          )}
+          {timetables.map((timetable) => (
+            <TimetableCard
+              key={timetable.id}
+              timetable={timetable}
+              isPrivate={isPrivate}
+              isDraft={isDraft}
+            />
+          ))}
         </div>
       </section>
     </>
