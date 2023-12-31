@@ -1,3 +1,13 @@
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ToastAction } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
 import {
   queryOptions,
   useMutation,
@@ -6,20 +16,10 @@ import {
 } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
+import { Info, LogOut, Pencil, Plus } from "lucide-react";
 import { z } from "zod";
 import { userWithTimetablesType } from "../../../lib";
-import { LogOut, Pencil, Info, Plus } from "lucide-react";
 import { router } from "../main";
-import { ToastAction } from "@/components/ui/toast";
-import { useToast } from "@/components/ui/use-toast";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu";
 import { ModeToggle } from "./mode-toggle";
 
 const fetchUserDetails = async (): Promise<
