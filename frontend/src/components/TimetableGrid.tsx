@@ -132,11 +132,7 @@ export function TimetableGrid({
                       console.log(e);
                     }}
                   >
-                    <div
-                      className={`relative flex h-full text-xs sm:text-sm flex-col justify-end bg-muted-foreground/30 p-1.5 rounded gap-0.5 ${
-                        isVertical ? "" : ""
-                      }`}
-                    >
+                    <div className="relative flex h-full text-xs sm:text-sm flex-col justify-end bg-muted-foreground/30 p-1.5 rounded gap-0.5">
                       <X
                         size={16}
                         className="absolute top-1 right-1 sm:visible invisible hover:stroke-[#EF4444]"
@@ -153,13 +149,7 @@ export function TimetableGrid({
                           {e.type}
                           {e.number}
                         </span>
-                        <span
-                          className={`opacity-90 text-start ${
-                            isVertical ? "" : ""
-                          }`}
-                        >
-                          {e.room}
-                        </span>
+                        <span className="opacity-90 text-start">{e.room}</span>
                       </div>
                     </div>
                   </div>
