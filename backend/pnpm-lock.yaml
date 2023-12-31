@@ -20,6 +20,9 @@ dependencies:
   '@types/jest':
     specifier: ^29.5.11
     version: 29.5.11
+  '@types/jsonwebtoken':
+    specifier: ^9.0.5
+    version: 9.0.5
   '@types/node':
     specifier: ^20.10.5
     version: 20.10.5
@@ -73,9 +76,6 @@ devDependencies:
   '@types/eslint':
     specifier: ^8.56.0
     version: 8.56.0
-  '@types/jsonwebtoken':
-    specifier: ^9.0.5
-    version: 9.0.5
   '@typescript-eslint/eslint-plugin':
     specifier: ^6.16.0
     version: 6.16.0(@typescript-eslint/parser@6.16.0)(eslint@8.56.0)(typescript@5.3.3)
@@ -1120,7 +1120,7 @@ packages:
     resolution: {integrity: sha512-VRLSGzik+Unrup6BsouBeHsf4d1hOEgYWTm/7Nmw1sXoN1+tRly/Gy/po3yeahnP4jfnQWWAhQAqcNfH7ngOkA==}
     dependencies:
       '@types/node': 20.10.5
-    dev: true
+    dev: false
 
   /@types/mime@1.3.5:
     resolution: {integrity: sha512-/pyBZWSLD2n0dcHE3hq8s8ZvcETHtEuF+3E7XVt0Ig2nvsVQXdghHVcEkIWjy9A0wKfTn97a/PSDYohKIlnP/w==}
