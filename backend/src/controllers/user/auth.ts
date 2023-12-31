@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { TokenSet, generators } from "openid-client";
 import {
   degreeList,
+  getBatchFromEmail,
   isAValidDegreeCombination,
   namedDegreeZodList,
 } from "../../../../lib";
@@ -148,17 +149,7 @@ export async function authCallback(req: Request, res: Response) {
         clearAuthCookies(res);
         setAuthCookies(res, token, fingerprint, maxAge);
 
-        // slices mail to obtain batch
-        let batch;
-        if (userData.email !== undefined) {
-          batch = userData.email.match(
-            /^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/,
-          )
-            ? userData.email.slice(1, 5)
-            : "0000";
-        } else {
-          batch = "0000";
-        }
+        const batch = getBatchFromEmail(userData.email);
         // batch is set to 0000 if it's a non-student email, like hpc@hyderabad.bits-hyderabad.ac.in
         // or undefined
 
@@ -253,16 +244,7 @@ export async function getDegrees(req: Request, res: Response) {
     };
 
     // slices mail to obtain batch
-    let batch;
-    if (userData.email !== undefined) {
-      batch = userData.email.match(/^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/)
-        ? userData.email.slice(1, 5)
-        : "0000";
-    } else {
-      batch = "0000";
-    }
-    // batch is set to 0000 if it's a non-student email, like hpc@hyderabad.bits-hyderabad.ac.in
-    // or undefined
+    const batch = getBatchFromEmail(userData.email);
 
     // converts name to title case
     const name = toTitleCase(userData.name);
@@ -362,11 +344,7 @@ export async function checkAuthStatus(req: Request, res: Response) {
         });
       }
 
-      const batch = sessionData.email.match(
-        /^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/,
-      )
-        ? sessionData.email.slice(1, 5)
-        : "0000";
+      const batch = getBatchFromEmail(sessionData.email);
 
       return res.json({
         message: "user needs to get degrees",
