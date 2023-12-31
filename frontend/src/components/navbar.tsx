@@ -157,7 +157,7 @@ export function NavBar() {
   }
 
   return (
-    <div className="flex w-full justify-between shadow-lg">
+    <div className="flex flex-row w-full justify-between shadow-lg">
       <div className="flex items-center">
         <Link to="/">
           <div className="hidden md:flex">
@@ -196,11 +196,11 @@ export function NavBar() {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div className="rounded-full text-foreground bg-accent p-1 px-3 text-xl h-fit lg:mx-8 mx-4 mt-4">
+            <div className="rounded-full text-foreground bg-accent p-1 px-3 text-xl h-fit lg:mx-8 mx-2 mt-4">
               <span>{userQueryResult.data.name[0]}</span>
             </div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
+          <DropdownMenuContent className="lg:w-56 w-fit">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuItem asChild>
               <Link to="/editProfile">
