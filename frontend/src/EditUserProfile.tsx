@@ -27,7 +27,7 @@ const fetchUserDetails = async (): Promise<
       headers: {
         "Content-Type": "application/json ",
       },
-    },
+    }
   );
   return response.data;
 };
@@ -51,6 +51,8 @@ const editUserProfileRoute = new Route({
           to: "/login",
         });
       }
+
+      throw error;
     }),
   component: EditUserProfile,
   errorComponent: ({ error }) => {
@@ -122,13 +124,15 @@ const editUserProfileRoute = new Route({
 function EditUserProfile() {
   const userQueryResult = useQuery(userQueryOptions);
 
-  const [firstDegree, setFirstDegree] = useState<string>(
-    userQueryResult.data.degrees[0],
+  const [firstDegree, setFirstDegree] = useState<string | null>(
+    userQueryResult.data?.degrees?.[0] ?? null
   );
   const [secondDegree, setSecondDegree] = useState<string | null>(
-    userQueryResult.data.degrees.length > 1
-      ? userQueryResult.data.degrees[1]
-      : null,
+    userQueryResult.data
+      ? userQueryResult.data.degrees.length > 1
+        ? userQueryResult.data.degrees[1]
+        : null
+      : null
   );
 
   const { toast } = useToast();
@@ -220,11 +224,20 @@ function EditUserProfile() {
     return <span>Loading...</span>;
   }
 
-  if (userQueryResult.isError) {
+  if (
+    userQueryResult.isError ||
+    userQueryResult.data === undefined ||
+    firstDegree === null
+  ) {
     return (
       <span>
-        Unexpected error: {JSON.stringify(userQueryResult.error.message)} Please
-        report this{" "}
+        Unexpected error:{" "}
+        {JSON.stringify(
+          userQueryResult.error
+            ? userQueryResult.error.message
+            : "user query result is undefined"
+        )}{" "}
+        Please report this{" "}
         <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
           here
         </a>
@@ -235,7 +248,7 @@ function EditUserProfile() {
   let batch;
   if (userQueryResult.data.email !== undefined) {
     batch = userQueryResult.data.email.match(
-      /^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/,
+      /^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/
     )
       ? userQueryResult.data.email.slice(1, 5)
       : "0000";
