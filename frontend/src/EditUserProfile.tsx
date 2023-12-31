@@ -27,7 +27,7 @@ const fetchUserDetails = async (): Promise<
       headers: {
         "Content-Type": "application/json ",
       },
-    }
+    },
   );
   return response.data;
 };
@@ -125,14 +125,14 @@ function EditUserProfile() {
   const userQueryResult = useQuery(userQueryOptions);
 
   const [firstDegree, setFirstDegree] = useState<string | null>(
-    userQueryResult.data?.degrees?.[0] ?? null
+    userQueryResult.data?.degrees?.[0] ?? null,
   );
   const [secondDegree, setSecondDegree] = useState<string | null>(
     userQueryResult.data
       ? userQueryResult.data.degrees.length > 1
         ? userQueryResult.data.degrees[1]
         : null
-      : null
+      : null,
   );
 
   const { toast } = useToast();
@@ -235,7 +235,7 @@ function EditUserProfile() {
         {JSON.stringify(
           userQueryResult.error
             ? userQueryResult.error.message
-            : "user query result is undefined"
+            : "user query result is undefined",
         )}{" "}
         Please report this{" "}
         <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
@@ -248,7 +248,7 @@ function EditUserProfile() {
   let batch;
   if (userQueryResult.data.email !== undefined) {
     batch = userQueryResult.data.email.match(
-      /^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/
+      /^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/,
     )
       ? userQueryResult.data.email.slice(1, 5)
       : "0000";
