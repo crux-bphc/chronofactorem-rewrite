@@ -324,7 +324,7 @@ export async function checkAuthStatus(req: Request, res: Response) {
       req.cookies.session === undefined ||
       req.cookies.fingerprint === undefined
     ) {
-      return res.json({
+      return res.status(401).json({
         message: "user not logged in",
       });
     }
@@ -338,7 +338,7 @@ export async function checkAuthStatus(req: Request, res: Response) {
       typeof sessionData === "string" ||
       sessionData.fingerprintHash !== hashFingerprint(fingerprintCookie)
     ) {
-      return res.json({
+      return res.status(401).json({
         message: "user session malformed",
         error: "user session malformed",
       });
@@ -357,8 +357,7 @@ export async function checkAuthStatus(req: Request, res: Response) {
       if (user) {
         // reset session
         clearAuthCookies(res);
-
-        return res.json({
+        return res.status(401).json({
           message: "user not logged in",
         });
       }
@@ -369,7 +368,7 @@ export async function checkAuthStatus(req: Request, res: Response) {
         ? sessionData.email.slice(1, 5)
         : "0000";
 
-      return res.status(400).json({
+      return res.json({
         message: "user needs to get degrees",
         redirect: `/getDegrees?year=${
           timetableJSON.metadata.acadYear - parseInt(batch) + 1
@@ -378,9 +377,7 @@ export async function checkAuthStatus(req: Request, res: Response) {
     }
 
     if (ZodFinishedUserSession.safeParse(sessionData).success) {
-      return res
-        .status(400)
-        .json({ message: "user is logged in", redirect: "/" });
+      return res.json({ message: "user is logged in", redirect: "/" });
     }
 
     return res.status(401).json({
