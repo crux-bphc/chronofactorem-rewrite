@@ -273,34 +273,34 @@ function EditUserProfile() {
 
   return (
     <>
-      <div className="flex bg-slate-950 h-screen w-full justify-start">
+      <div className="flex bg-background h-screen w-full justify-start">
         <div className="flex flex-col lg:pt-28 pt-20 lg:mx-60 mx-12">
-          <h1 className="scroll-m-20 text-3xl tracking-tight lg:text-6xl text-slate-50 lg:mb-12 mb-4 font-bold">
+          <h1 className="scroll-m-20 text-3xl tracking-tight lg:text-6xl text-foreground lg:mb-12 mb-4 font-bold">
             Edit User Profile
           </h1>
-          <div className="rounded-full text-slate-50 bg-slate-500 lg:text-6xl text-4xl lg:h-28 lg:w-28 h-20 w-20 flex justify-center items-center">
+          <div className="rounded-full text-foreground bg-accent lg:text-6xl text-4xl lg:h-28 lg:w-28 h-20 w-20 flex justify-center items-center">
             <span>{userQueryResult.data.name[0]}</span>
           </div>
-          <h3 className="scroll-m-20 text-xl tracking-tight lg:text-2xl text-slate-50 font-bold lg:mt-4 mt-2">
+          <h3 className="scroll-m-20 text-xl tracking-tight lg:text-2xl text-foreground font-bold lg:mt-4 mt-2">
             {userQueryResult.data.name}
           </h3>
-          <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-slate-50">
+          <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-foreground">
             {userQueryResult.data.email}
           </h5>
           <div className="flex">
-            <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-slate-50 mt-4 mb-4 font-bold">
+            <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-foregroun mt-4 mb-4 font-bold">
               Batch:
             </h5>
-            <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-slate-50 mt-4 mb-2 mx-2">
+            <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-foreground mt-4 mb-2 mx-2">
               {batch}
             </h5>
           </div>
           <div className="flex sm:flex-row flex-col">
             <Select onValueChange={setFirstDegree} value={firstDegree}>
-              <SelectTrigger className="w-84 bg-slate-800 border-slate-700 focus:ring-slate-800 focus:ring-offset-slate-800 text-slate-50 mt-2">
+              <SelectTrigger className="w-84 bg-muted border-primary-foreground focus:ring-muted focus:ring-offset-muted text-foreground mt-2">
                 <SelectValue placeholder="Select a degree" />
               </SelectTrigger>
-              <SelectContent className="bg-slate-700 border-slate-600 text-slate-50">
+              <SelectContent className="bg-primary-foreground border-muted text-foreground">
                 <SelectGroup>
                   <SelectLabel>Single Degrees</SelectLabel>
                   <SelectItem value="A1">A1: B.E. Chemical</SelectItem>
@@ -333,10 +333,10 @@ function EditUserProfile() {
                 onValueChange={setSecondDegree}
                 value={secondDegree ?? undefined}
               >
-                <SelectTrigger className="w-84 sm:mx-4 bg-slate-800 border-slate-700 focus:ring-slate-800 focus:ring-offset-slate-800 text-slate-50 mt-2">
+                <SelectTrigger className="w-84 sm:mx-4 bg-muted border-primary-foreground focus:ring-muted focus:ring-offset-muted text-foreground mt-2">
                   <SelectValue placeholder="Select a degree" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-700 border-slate-600 text-slate-50">
+                <SelectContent className="bg-primary-foreground border-muted text-foreground">
                   <SelectGroup>
                     <SelectLabel>Single Degrees</SelectLabel>
                     {/* A0 is used for single degree MSc people since empty string denotes no selection */}
@@ -371,7 +371,7 @@ function EditUserProfile() {
           </Button>
         </div>
       </div>
-      <span className="fixed bottom-0 bg-slate-800 w-full text-center py-1 text-md lg:text-lg text-slate-400">
+      <span className="fixed bottom-0 bg-muted w-full text-center py-1 text-md lg:text-lg text-muted-foreground">
         Powered by CRUx: The Programming and Computing Club of BITS Hyderabad
       </span>
     </>
