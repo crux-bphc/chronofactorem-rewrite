@@ -139,8 +139,7 @@ export function TimetableGrid({
                     >
                       <X
                         size={16}
-                        color="#EF4444"
-                        className="absolute top-1 right-1 sm:visible invisible"
+                        className="absolute top-1 right-1 sm:visible invisible hover:stroke-[#EF4444]"
                       />
                       <span className="font-bold text-ellipsis overflow-hidden text-wrap tracking-tight">
                         {e.courseId}
