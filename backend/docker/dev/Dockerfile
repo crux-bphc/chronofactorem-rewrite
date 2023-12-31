@@ -7,7 +7,6 @@ RUN npm install -g pnpm
 COPY ./backend/package.json ./
 COPY ./backend/pnpm-lock.yaml ./
 COPY ./backend/tsconfig.json ./
-COPY ./backend/nodemon.json ./
 
 RUN pnpm fetch
 RUN pnpm install -r --offline
@@ -23,8 +22,6 @@ RUN pnpm install -r --offline
 
 COPY ./lib/src /usr/local/app/lib/src
 
-RUN pnpm tsc --build
-
 WORKDIR /usr/local/app/backend
 
-CMD ["pnpm", "nodemon", "src/index.ts"]
+CMD ["pnpm", "tsx", "watch", "--clear-screen=false", "src/index.ts"]

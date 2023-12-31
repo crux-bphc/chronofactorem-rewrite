@@ -67,7 +67,7 @@ services:
       - "prod"
 
   ingestion:
-    command: ["pnpm", "ts-node", "src/ingest.ts"]
+    command: ["pnpm", "tsx", "src/ingest.ts"]
     build:
       context: ./
       dockerfile: ./backend/docker/dev/Dockerfile

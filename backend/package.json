@@ -19,6 +19,7 @@
     "ts-node": "10.9.2"
   },
   "dependencies": {
+    "tsx": "^4.7.0",
     "@types/body-parser": "^1.19.5",
     "@types/cookie-parser": "^1.4.6",
     "@types/cors": "^2.8.17",
@@ -40,7 +41,7 @@
     "zod": "^3.22.4"
   },
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "typeorm": "typeorm-ts-node-commonjs"
+    "start": "tsx src/index.ts",
+    "typeorm": "typeorm-ts-node-esm"
   }
 }
