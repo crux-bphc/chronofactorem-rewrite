@@ -9,7 +9,6 @@ import axios, { AxiosError } from "axios";
 import { z } from "zod";
 import { userWithTimetablesType } from "../../../lib";
 import { LogOut, Pencil, Info, Plus } from "lucide-react";
-import ViteSvg from "../../public/vite.svg";
 import { router } from "../main";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
