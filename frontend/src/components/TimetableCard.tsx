@@ -103,7 +103,7 @@ function TimetableCard({ timetable, isPrivate, isDraft }: Props) {
           onClick={() =>
             editMutation.mutate({
               name: timetable.name,
-              isPrivate: timetable.private,
+              isPrivate: false,
               isDraft: true,
             })
           }
