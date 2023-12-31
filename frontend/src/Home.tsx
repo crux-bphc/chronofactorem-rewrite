@@ -99,6 +99,8 @@ const indexRoute = new Route({
           to: "/login",
         });
       }
+
+      throw error;
     }),
   component: Home,
   errorComponent: ({ error }) => {
