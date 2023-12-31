@@ -12,7 +12,6 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^20.10.5",
-    "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },
   "dependencies": {
