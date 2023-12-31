@@ -155,7 +155,7 @@ export function TimetableGrid({
                   </div>
                 </TooltipTrigger>
                 <TooltipContent className="bg-primary-foreground text-foreground">
-                  Double click to remove section
+                  {e.name}
                 </TooltipContent>
               </Tooltip>
             ) : (
