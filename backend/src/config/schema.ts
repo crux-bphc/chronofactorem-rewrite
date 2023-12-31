@@ -20,6 +20,8 @@ export const serverSchema = z.object({
     .string()
     .regex(/^\d+-[a-z0-9]+\.apps\.googleusercontent\.com$/),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
+  JWT_PRIVATE_KEY: z.string().min(1),
+  JWT_PUBLIC_KEY: z.string().min(1),
   FRONTEND_PORT: z.coerce.number().default(5173),
   NGINX_PORT: z.coerce.number().default(80),
 });
