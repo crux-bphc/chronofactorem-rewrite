@@ -6,7 +6,7 @@ import {
   getDegrees,
   logout,
   manageAuthRedirect,
-} from "../controllers/user/auth";
+} from "../controllers/user/auth.js";
 
 const authRouter = express.Router();
 

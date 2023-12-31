@@ -1,5 +1,5 @@
-import { AppDataSource } from "./db";
-import { courseRepository } from "./repositories/courseRepository";
+import { AppDataSource } from "./db.js";
+import { courseRepository } from "./repositories/courseRepository.js";
 import timetableTestJSON from "./tests/timetable.test.json";
 
 beforeAll(async () => {

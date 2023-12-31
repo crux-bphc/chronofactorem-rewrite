@@ -2,7 +2,7 @@
   "name": "chronofactorem-rewrite",
   "version": "0.0.1",
   "description": "A rewrite of our ChronoFactorem project",
-  "type": "commonjs",
+  "type": "module",
   "devDependencies": {
     "@biomejs/biome": "1.4.1",
     "@types/eslint": "^8.56.0",

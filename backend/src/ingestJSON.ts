@@ -1,8 +1,6 @@
 import { QueryRunner } from "typeorm";
-import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
-import { Course } from "./entity/Course";
-import { Section } from "./entity/Section";
-import { Timetable } from "./entity/Timetable";
+import { sectionTypeEnum } from "../../lib/src/index.js";
+import { Course, Section, Timetable } from "./entity/entities.js";
 
 interface ExamJSON {
   midsem: string | null;
@@ -246,7 +244,7 @@ export const ingestJSON = async (
 
     const courses = timetableJSON.courses as CoursesJSON;
 
-    const sectionValues = [] as QueryDeepPartialEntity<Section>[];
+    const sectionValues = [];
 
     console.log("constructing courses...");
     const courseValues = Object.keys(courses).map((courseCode) => {
@@ -260,13 +258,17 @@ export const ingestJSON = async (
         archived: false,
         midsemStartTime: midsemTimes
           ? new Date(midsemTimes.split("|")[0])
-          : null,
-        midsemEndTime: midsemTimes ? new Date(midsemTimes.split("|")[1]) : null,
+          : undefined,
+        midsemEndTime: midsemTimes
+          ? new Date(midsemTimes.split("|")[1])
+          : undefined,
         compreStartTime: compreTimes
           ? new Date(compreTimes.split("|")[0])
-          : null,
-        compreEndTime: compreTimes ? new Date(compreTimes.split("|")[1]) : null,
-      } as QueryDeepPartialEntity<Course>;
+          : undefined,
+        compreEndTime: compreTimes
+          ? new Date(compreTimes.split("|")[1])
+          : undefined,
+      };
     });
 
     console.log("inserting courses...");
@@ -307,10 +309,10 @@ export const ingestJSON = async (
           instructors:
             courses[courseValues[i].code as string].sections[courseSectionCode]
               .instructor,
-          type: courseSectionCode.slice(0, 1),
+          type: courseSectionCode.slice(0, 1) as sectionTypeEnum,
           number: parseInt(courseSectionCode.slice(1)),
           roomTime: roomTimes,
-        } as QueryDeepPartialEntity<Section>);
+        });
       }
     }
 

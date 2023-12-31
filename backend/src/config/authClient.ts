@@ -1,5 +1,5 @@
 import { BaseClient, Issuer } from "openid-client";
-import { env } from "./server";
+import { env } from "./server.js";
 
 let client: BaseClient | null = null;
 

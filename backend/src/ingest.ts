@@ -1,7 +1,7 @@
 import "dotenv/config";
-import { AppDataSource } from "./db";
-import { ingestJSON } from "./ingestJSON";
-import timetableJSON from "./timetable.json";
+import { AppDataSource } from "./db.js";
+import { ingestJSON } from "./ingestJSON.js";
+import timetableJSON from "./timetable.json" with { type: "json" };
 
 AppDataSource.initialize()
   .then(async () => {
