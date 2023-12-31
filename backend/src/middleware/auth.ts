@@ -1,5 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { FinishedUserSession, ZodFinishedUserSession } from "../types/auth";
+import { ZodFinishedUserSession } from "../types/auth";
+import jwt from "jsonwebtoken";
+import { env } from "../config/server";
+import { createHash } from "crypto";
 
 export const authenticate = async (
   req: Request,
@@ -7,22 +10,54 @@ export const authenticate = async (
   next: NextFunction,
 ) => {
   try {
-    if (req.cookies.session === undefined) {
+    if (
+      req.cookies.session === undefined ||
+      req.cookies.fingerprint === undefined
+    ) {
       return res.status(401).json({
         message: "unauthorized",
         error: "user session expired",
       });
     }
-    if (!ZodFinishedUserSession.safeParse(req.cookies.session).success) {
+
+    const sessionCookie = req.cookies.session;
+    const fingerprintCookie = req.cookies.fingerprint;
+
+    const sessionData = jwt.verify(
+      sessionCookie,
+      Buffer.from(env.JWT_PUBLIC_KEY, "base64"),
+      {
+        algorithms: ["RS256"],
+      },
+    );
+
+    if (typeof sessionData === "string") {
+      return res.status(401).json({
+        message: "user session malformed",
+        error: "user session malformed",
+      });
+    }
+
+    if (
+      sessionData.fingerprintHash !==
+      createHash("sha256").update(fingerprintCookie).digest("base64url")
+    ) {
+      return res.status(401).json({
+        message: "user session malformed",
+        error: "user fingerprint malformed",
+      });
+    }
+
+    const parsedSession = ZodFinishedUserSession.safeParse(sessionData);
+    if (!parsedSession.success) {
       return res.status(401).json({
         message: "unauthorized",
         error: "user session malformed",
       });
     }
-    const session: FinishedUserSession = req.cookies.session;
-    req.session = session;
+    req.session = parsedSession.data;
     return next();
   } catch (error) {
-    return res.status(400).json(error);
+    return res.status(500).json(JSON.stringify(error));
   }
 };
