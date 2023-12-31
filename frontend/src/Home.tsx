@@ -61,8 +61,8 @@ const renderTimetableSection = (
   return (
     <>
       <section className="pt-8">
-        <h2 className="text-3xl font-bold">{title}</h2>
-        <div className="flex flex-wrap gap-8 pt-4">
+        <h2 className="text-2xl md:text-3xl font-bold">{title}</h2>
+        <div className="flex flex-col items-center justify-center sm:flex-row sm:flex-wrap gap-8 pt-4 md:justify-normal">
           {timetables.length <= 0 ? (
             <p className="text-xl col-span-full text-center">
               No timetables to show
@@ -221,8 +221,8 @@ function Home() {
 
     return (
       <>
-        <main className="bg-background min-h-screen text-foreground py-20 px-16">
-          <h1 className="text-5xl font-bold text-center sm:text-left">
+        <main className="bg-background min-h-screen text-foreground py-20 px-10 md:px-16">
+          <h1 className="text-3xl font-bold text-center sm:text-left md:text-4xl">
             My Timetables
           </h1>
           {draftTimetables.length === 0 &&
@@ -231,11 +231,11 @@ function Home() {
               <>
                 <div className="bg-secondary mt-10 text-center flex flex-col items-center justify-center gap-8 py-16 rounded-lg">
                   <span>
-                    <CalendarX2 className="h-32 w-32" />
+                    <CalendarX2 className="h-24 w-24 md:h-32 md:w-32" />
                   </span>
-                  <h2 className="text-3xl">It's empty in here.</h2>
+                  <h2 className="text-xl sm:text-2xl">It's empty in here.</h2>
                   <Button
-                    className="text-2xl py-6 px-10 font-bold"
+                    className="text-lg sm:text-2xl py-6 px-10 font-bold"
                     onClick={() => createMutation.mutate()}
                   >
                     Create Timetable

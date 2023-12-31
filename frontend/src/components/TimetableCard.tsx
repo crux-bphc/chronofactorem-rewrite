@@ -69,7 +69,7 @@ function TimetableCard({ timetable, isPrivate, isDraft }: Props) {
   return (
     <Card className="min-h-60 flex flex-col min-w-80 shadow-lg">
       <CardHeader className="pb-2">
-        <CardTitle className="text-2xl">{timetable.name}</CardTitle>
+        <CardTitle className="text-xl md:text-2xl">{timetable.name}</CardTitle>
       </CardHeader>
       <CardContent>
         <Badge variant="default" className="w-fit">
@@ -112,7 +112,7 @@ function TimetableCard({ timetable, isPrivate, isDraft }: Props) {
         </Button>
         <Button
           variant="ghost"
-          className="rounded-full p-3"
+          className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
           onClick={() => deleteMutation.mutate()}
         >
           <Trash />
