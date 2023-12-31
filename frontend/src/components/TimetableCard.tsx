@@ -1,5 +1,10 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios, { AxiosError } from "axios";
+import { Edit2, Trash } from "lucide-react";
 import { z } from "zod";
 import { timetableType } from "../../../lib";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
 import {
   Card,
   CardContent,
@@ -7,11 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
-import { Edit2, Trash } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios, { AxiosError } from "axios";
 import { useToast } from "./ui/use-toast";
 
 type Props = {

@@ -7,13 +7,13 @@ import {
 } from "@tanstack/react-query";
 import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
+import { CalendarX2 } from "lucide-react";
 import { z } from "zod";
-import { userWithTimetablesType, timetableType } from "../../lib";
-import { toast, useToast } from "./components/ui/use-toast";
-import { rootRoute, router } from "./main";
+import { timetableType, userWithTimetablesType } from "../../lib";
 import TimetableCard from "./components/TimetableCard";
 import { Button } from "./components/ui/button";
-import { CalendarX2 } from "lucide-react";
+import { toast, useToast } from "./components/ui/use-toast";
+import { rootRoute, router } from "./main";
 
 const fetchUserDetails = async (): Promise<
   z.infer<typeof userWithTimetablesType>
