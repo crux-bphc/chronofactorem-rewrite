@@ -130,51 +130,28 @@ export function NavBar() {
     },
   });
 
-  if (userQueryResult.isFetching) {
-    return <span>Loading...</span>;
-  }
-
-  if (userQueryResult.isError) {
-    return (
-      <span>
-        Unexpected error: {JSON.stringify(userQueryResult.error.message)} Please
-        report this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          here
-        </a>
-      </span>
-    );
-  }
-
-  if (userQueryResult.data === undefined) {
-    return (
-      <span>
-        Unexpected error: userQueryResult.data is undefined. Please report this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          here
-        </a>
-      </span>
-    );
-  }
-
-  return (
+  const renderNavbarBasedOnQueryFetch = (
+    userQueryResultData: typeof userQueryResult.data,
+  ) => (
     <div className="flex flex-row w-full justify-between shadow-lg">
       <div className="flex items-center">
-        <Link to="/">
+        <Link to={userQueryResultData ? "/" : undefined}>
           <div className="hidden md:flex">
             <h1 className="scroll-m-20 cursor-pointer text-2xl font-extrabold tracking-tight lg:text-3xl m-4 text-foreground">
-              ChronoFactorem<sup>™</sup>
+              ChronoFactorem
             </h1>
           </div>
           <div className="flex md:hidden">
             <h1 className="scroll-m-20 cursor-pointer text-2xl font-extrabold tracking-tight lg:text-3xl m-4 text-foreground">
-              Chrono<sup>™</sup>
+              Chrono
             </h1>
           </div>
         </Link>
         <Button
           className="text-green-200 w-fit text-xl p-4 ml-4 bg-green-900 hover:bg-green-800"
-          onClick={() => createMutation.mutate()}
+          onClick={
+            userQueryResultData ? () => createMutation.mutate() : undefined
+          }
         >
           <div className="hidden md:flex">Create a timetable</div>
           <div className="flex md:hidden">
@@ -182,7 +159,8 @@ export function NavBar() {
           </div>
         </Button>
         <Link
-          to="/about"
+          // Comment out for now because the route doesn't exist
+          // to={userQueryResultData ? "/about" : undefined}
           className="text-primary py-2 px-4 ml-4 text-lg rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out"
         >
           <div className="hidden md:flex">About</div>
@@ -198,13 +176,15 @@ export function NavBar() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div className="rounded-full text-foreground bg-accent p-1 px-3 text-xl h-fit lg:mx-8 mx-2 mt-4">
-              <span>{userQueryResult.data.name[0]}</span>
+              <span>
+                {userQueryResultData ? userQueryResultData.name[0] : " "}
+              </span>
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="lg:w-56 w-fit">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuItem asChild>
-              <Link to="/editProfile">
+              <Link to={userQueryResultData ? "/editProfile" : undefined}>
                 <Pencil className="mr-2 h-4 w-4" />
                 <span>Edit Profile</span>
               </Link>
@@ -213,7 +193,7 @@ export function NavBar() {
               asChild
               className="focus:bg-destructive/90 focus:text-destructive-foreground cursor-pointer"
             >
-              <Link to="/login">
+              <Link to={userQueryResultData ? "/login" : undefined}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </Link>
@@ -223,4 +203,29 @@ export function NavBar() {
       </div>
     </div>
   );
+  if (userQueryResult.isFetching) {
+    return renderNavbarBasedOnQueryFetch(undefined);
+  }
+  if (userQueryResult.isError) {
+    return (
+      <span>
+        Unexpected error: {JSON.stringify(userQueryResult.error.message)} Please
+        report this{" "}
+        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+          here
+        </a>
+      </span>
+    );
+  }
+  if (userQueryResult.data === undefined) {
+    return (
+      <span>
+        Unexpected error: userQueryResult.data is undefined. Please report this{" "}
+        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+          here
+        </a>
+      </span>
+    );
+  }
+  return renderNavbarBasedOnQueryFetch(userQueryResult.data);
 }
