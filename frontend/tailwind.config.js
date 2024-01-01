@@ -7,9 +7,7 @@ module.exports = {
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
   ],
-  safelist: [
-    {pattern: /grid-(rows|cols)-([1-9]|1[0-1])/,},
-  ],
+  safelist: [{ pattern: /grid-(rows|cols)-([1-9]|1[0-1])/ }],
   prefix: "",
   theme: {
     container: {
