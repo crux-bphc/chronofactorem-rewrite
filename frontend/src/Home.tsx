@@ -13,7 +13,8 @@ import { timetableType, userWithTimetablesType } from "../../lib/src/index";
 import TimetableCard from "./components/TimetableCard";
 import { Button } from "./components/ui/button";
 import { toast, useToast } from "./components/ui/use-toast";
-import { rootRoute, router } from "./main";
+import { router } from "./main";
+import authenticatedRoute from "./AuthenticatedRoute";
 
 const fetchUserDetails = async (): Promise<
   z.infer<typeof userWithTimetablesType>
@@ -84,7 +85,7 @@ const userQueryOptions = queryOptions({
 });
 
 const indexRoute = new Route({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authenticatedRoute,
   path: "/",
   loader: ({ context: { queryClient } }) =>
     queryClient.ensureQueryData(userQueryOptions).catch((error) => {
