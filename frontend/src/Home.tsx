@@ -10,11 +10,11 @@ import axios, { AxiosError } from "axios";
 import { CalendarX2 } from "lucide-react";
 import { z } from "zod";
 import { timetableType, userWithTimetablesType } from "../../lib/src/index";
+import authenticatedRoute from "./AuthenticatedRoute";
 import TimetableCard from "./components/TimetableCard";
 import { Button } from "./components/ui/button";
 import { toast, useToast } from "./components/ui/use-toast";
 import { router } from "./main";
-import authenticatedRoute from "./AuthenticatedRoute";
 
 const fetchUserDetails = async (): Promise<
   z.infer<typeof userWithTimetablesType>
