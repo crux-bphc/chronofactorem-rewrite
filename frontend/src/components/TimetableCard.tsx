@@ -23,7 +23,7 @@ import { ToastAction } from "@/components/ui/toast";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
-import { Edit2, Trash } from "lucide-react";
+import { Edit2, Eye, EyeOff, Trash } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import { timetableType } from "../../../lib/src/index";
@@ -222,7 +222,10 @@ function TimetableCard({ timetable }: Props) {
   return (
     <Card className="min-h-60 flex flex-col min-w-80 shadow-lg">
       <CardHeader className="pb-2">
-        <CardTitle className="text-xl md:text-2xl">{timetable.name}</CardTitle>
+        <CardTitle className="text-xl md:text-2xl flex justify-between items-center">
+          {timetable.name}
+          {timetable.archived && (timetable.private ? <EyeOff /> : <Eye />)}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <Badge variant="default" className="w-fit">
