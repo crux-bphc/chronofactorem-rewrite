@@ -51,9 +51,10 @@ export function NavBar() {
         "/api/timetable/create",
       );
     },
-    onSuccess: (response) => {
+    onSuccess: (_response) => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
-      router.navigate({ to: `/edit/${response.data.id}` });
+      // Comment out for now because the route doesn't exist
+      // router.navigate({ to: `/edit/${response.data.id}` });
     },
     onError: (error) => {
       if (error instanceof AxiosError && error.response) {
