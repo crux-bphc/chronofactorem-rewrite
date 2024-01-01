@@ -102,6 +102,24 @@ export function TimetableGrid({
       }
     }
 
+    const minDisplayCols = 9;
+    let nonNullColumns = 11;
+    for (let j = 10; j >= minDisplayCols; j--) {
+      let flag = true;
+      for (let i = 0; i < 6; i++) {
+        if ((isVertical ? grid[j * 6 + i] : grid[i * 11 + j]) !== null) {
+          flag = false;
+          break;
+        }
+      }
+      if (flag) {
+        nonNullColumns = j;
+      } else {
+        break;
+      }
+    }
+    setDisplayCols(nonNullColumns);
+
     return grid;
   }, [timetableDetailsSections, isVertical]);
 
