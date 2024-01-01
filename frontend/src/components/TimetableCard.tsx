@@ -8,13 +8,25 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ToastAction } from "@/components/ui/toast";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { Edit2, Trash } from "lucide-react";
+import { useState } from "react";
 import { z } from "zod";
-import { timetableType } from "../../../lib";
+import { timetableType } from "../../../lib/src/index";
 import { router } from "../main";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -25,6 +37,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
+import { Switch } from "./ui/switch";
 import { useToast } from "./ui/use-toast";
 
 type Props = {
@@ -36,6 +49,11 @@ type Props = {
 function TimetableCard({ timetable, isPrivate, isDraft }: Props) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  const [timetableName, setTimetableName] = useState<null | string>(null);
+  const [timetableVisibility, setTimetableVisibility] = useState<
+    null | boolean
+  >(null);
 
   const deleteMutation = useMutation({
     mutationFn: () => {
@@ -234,19 +252,75 @@ function TimetableCard({ timetable, isPrivate, isDraft }: Props) {
             Make {isPrivate ? "Public" : "Private"}
           </Button>
         )}
-        <Button
-          variant="ghost"
-          className="rounded-full p-3"
-          onClick={() =>
-            editMutation.mutate({
-              name: timetable.name,
-              isPrivate: true,
-              isDraft: true,
-            })
-          }
-        >
-          <Edit2 />
-        </Button>
+
+        {!timetable.archived ? (
+          <Button
+            variant="ghost"
+            className="rounded-full p-3"
+            onClick={() =>
+              editMutation.mutate({
+                name: timetable.name,
+                isPrivate: true,
+                isDraft: true,
+              })
+            }
+          >
+            <Edit2 />
+          </Button>
+        ) : (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="ghost" className="rounded-full p-3">
+                <Edit2 />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Edit Archived Timetable</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name" className="text-right">
+                    Name
+                  </Label>
+                  <Input
+                    id="name"
+                    value={timetableName ?? timetable.name}
+                    onChange={(e) => setTimetableName(e.target.value)}
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="mx-auto">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="visibility"
+                      checked={timetableVisibility ?? timetable.private}
+                      onCheckedChange={setTimetableVisibility}
+                    />
+                    <Label htmlFor="visibility">Private</Label>
+                  </div>
+                </div>
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button
+                    type="submit"
+                    onClick={() => {
+                      editMutation.mutate({
+                        name: timetableName ?? timetable.name,
+                        isPrivate: timetableVisibility ?? timetable.private,
+                        isDraft: false,
+                      });
+                    }}
+                  >
+                    Save changes
+                  </Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
+
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button
