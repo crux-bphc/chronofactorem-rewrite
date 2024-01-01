@@ -4,7 +4,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { X } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 export function TimetableGrid({
   isVertical,
@@ -64,6 +64,9 @@ export function TimetableGrid({
     "6 - 7",
   ];
 
+  const [displayRows, setDisplayRows] = useState(6);
+  const [displayCols, setDisplayCols] = useState(11);
+
   const timetableGrid = useMemo(() => {
     const grid: ({
       id: string;
@@ -109,7 +112,9 @@ export function TimetableGrid({
       ) : (
         <div
           className={`grid items-center pr-2 text-lg text-center font-bold text-foreground/90 ${
-            isVertical ? "grid-cols-6" : "grid-rows-6 mt-12"
+            isVertical
+              ? `grid-cols-${displayRows}`
+              : `grid-rows-${displayRows} mt-12`
           }`}
         >
           {daysOfWeek.map((e) => (
@@ -121,7 +126,9 @@ export function TimetableGrid({
         {isVertical ? (
           <div
             className={`grid items-center pr-2 text-lg text-center font-bold text-foreground/90 ${
-              isVertical ? "grid-cols-6" : "grid-rows-6 mt-12"
+              isVertical
+                ? `grid-cols-${displayRows}`
+                : `grid-rows-${displayRows} mt-12`
             }`}
           >
             {daysOfWeek.map((e) => (
@@ -131,7 +138,9 @@ export function TimetableGrid({
         ) : (
           <div
             className={`grid justify-between text-md text-center font-bold text-foreground/90 ${
-              isVertical ? "grid-rows-11" : "grid-cols-11"
+              isVertical
+                ? `grid-rows-${displayCols}`
+                : `grid-cols-${displayCols}`
             } `}
           >
             {timings.map((e) => (
@@ -143,7 +152,9 @@ export function TimetableGrid({
         )}
         <div
           className={`grid w-full ${
-            isVertical ? "grid-cols-6 grid-rows-11" : "grid-cols-11 grid-rows-6"
+            isVertical
+              ? `grid-cols-${displayRows} grid-rows-${displayCols}`
+              : `grid-cols-${displayCols} grid-rows-${displayRows}`
           }`}
         >
           {timetableGrid.map((e, i) =>
