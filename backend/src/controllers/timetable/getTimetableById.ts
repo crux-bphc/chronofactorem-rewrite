@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { timetableIDType } from "../../../../lib";
-import { validate } from "../../middleware/zodValidateRequest";
-import { timetableRepository } from "../../repositories/timetableRepository";
+import { timetableIDType } from "../../../../lib/src/index.js";
+import { validate } from "../../middleware/zodValidateRequest.js";
+import { timetableRepository } from "../../repositories/timetableRepository.js";
 
 const dataSchema = z.object({
   params: z.object({

@@ -1,4 +1,4 @@
-name: Lint code with BiomeJS and check formatting with Prettier
+name: Lint code and check formatting with BiomeJS
 
 on:
   push:
@@ -53,6 +53,6 @@ jobs:
         run: pnpm install
         working-directory: "./frontend"
 
-      - name: Run biomejs linter and formatter on backend
+      - name: Run biomejs linter and formatter on frontend
         run: pnpm biome ci .
-        working-directory: "./backend"
+        working-directory: "./frontend"

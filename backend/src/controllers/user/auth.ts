@@ -1,22 +1,22 @@
 import { Request, Response } from "express";
-import { TokenSet } from "openid-client";
-import { generators } from "openid-client";
+import { TokenSet, generators } from "openid-client";
 import {
   degreeList,
   isAValidDegreeCombination,
   namedDegreeZodList,
-} from "../../../../lib";
-import { getClient } from "../../config/authClient";
-import { env } from "../../config/server";
-import { User } from "../../entity/User";
-import { userRepository } from "../../repositories/userRepository";
-import timetableJSON from "../../timetable.json";
+} from "../../../../lib/src/index.js";
+import { getClient } from "../../config/authClient.js";
+import { env } from "../../config/server.js";
+import { User } from "../../entity/entities.js";
+import { userRepository } from "../../repositories/userRepository.js";
+import timetableJSON from "../../timetable.json" with { type: "json" };
 import {
   FinishedUserSession,
   SignUpUserData,
   UnfinishedUserSession,
+  ZodFinishedUserSession,
   ZodUnfinishedUserSession,
-} from "../../types/auth";
+} from "../../types/auth.js";
 
 // On any route, when checking if a user is logged in, check for the cookie
 // in cookiestorage on the server, using -
@@ -310,4 +310,66 @@ export async function logout(req: Request, res: Response) {
     authenticated: false,
     message: "user logged out",
   });
+}
+
+// checks whether user is not logged in, logged in but hasn't finished selecting degrees, or properly logged in
+export async function checkAuthStatus(req: Request, res: Response) {
+  try {
+    if (req.cookies.session === undefined) {
+      return res.json({
+        message: "user not logged in",
+      });
+    }
+
+    if (ZodUnfinishedUserSession.safeParse(req.cookies.session).success) {
+      const session: UnfinishedUserSession = req.cookies.session;
+
+      const user = await userRepository
+        .createQueryBuilder()
+        .select()
+        .where("email = :email", {
+          email: session.email,
+        })
+        .getOne();
+
+      if (user) {
+        // reset session
+        res.clearCookie("userInfo");
+        res.clearCookie("session");
+
+        return res.json({
+          message: "user not logged in",
+        });
+      }
+
+      const batch = session.email.match(
+        /^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/,
+      )
+        ? session.email.slice(1, 5)
+        : "0000";
+
+      return res.status(400).json({
+        message: "user needs to get degrees",
+        redirect: `/getDegrees?year=${
+          timetableJSON.metadata.acadYear - parseInt(batch) + 1
+        }`,
+      });
+    }
+
+    if (ZodFinishedUserSession.safeParse(req.cookies.session).success) {
+      return res
+        .status(400)
+        .json({ message: "user is logged in", redirect: "/" });
+    }
+
+    return res.status(401).json({
+      message: "cannot verify auth status",
+      error: "user session malformed",
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: JSON.stringify(error),
+    });
+  }
 }

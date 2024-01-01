@@ -9,7 +9,7 @@ import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { CalendarX2 } from "lucide-react";
 import { z } from "zod";
-import { timetableType, userWithTimetablesType } from "../../lib";
+import { timetableType, userWithTimetablesType } from "../../lib/src/index";
 import TimetableCard from "./components/TimetableCard";
 import { Button } from "./components/ui/button";
 import { toast, useToast } from "./components/ui/use-toast";

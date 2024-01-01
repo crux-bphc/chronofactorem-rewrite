@@ -4,12 +4,11 @@ import {
   namedBooleanType,
   namedNonEmptyStringType,
   timetableIDType,
-} from "../../../../lib";
-import { Timetable } from "../../entity/Timetable";
-import { User } from "../../entity/User";
-import { validate } from "../../middleware/zodValidateRequest";
-import { timetableRepository } from "../../repositories/timetableRepository";
-import { userRepository } from "../../repositories/userRepository";
+} from "../../../../lib/src/index.js";
+import { Timetable, User } from "../../entity/entities.js";
+import { validate } from "../../middleware/zodValidateRequest.js";
+import { timetableRepository } from "../../repositories/timetableRepository.js";
+import { userRepository } from "../../repositories/userRepository.js";
 
 const dataSchema = z.object({
   body: z.object({
@@ -75,6 +74,12 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
 
   if (timetable.authorId !== author.id) {
     return res.status(403).json({ message: "user does not own timetable" });
+  }
+
+  if (timetable.archived && isDraft) {
+    return res
+      .status(418)
+      .json({ message: "archived timetable can not be a draft" });
   }
 
   if (

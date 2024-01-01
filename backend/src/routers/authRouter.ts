@@ -2,10 +2,11 @@ import * as express from "express";
 import { Request, Response } from "express";
 import {
   authCallback,
+  checkAuthStatus,
   getDegrees,
   logout,
   manageAuthRedirect,
-} from "../controllers/user/auth";
+} from "../controllers/user/auth.js";
 
 const authRouter = express.Router();
 
@@ -28,5 +29,7 @@ authRouter.get("/callback", authCallback);
 authRouter.post("/submit", getDegrees);
 
 authRouter.get("/logout", logout);
+
+authRouter.get("/check", checkAuthStatus);
 
 export default authRouter;

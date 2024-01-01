@@ -7,6 +7,8 @@ import {
 } from "@tanstack/react-router";
 import React from "react";
 import ReactDOM from "react-dom/client";
+import editUserProfileRoute from "./EditUserProfile";
+import getDegreesRoute from "./GetDegrees";
 import indexRoute from "./Home";
 import loginRoute from "./Login";
 import RootComponent from "./RootComponent";
@@ -20,7 +22,12 @@ export const rootRoute = rootRouteWithContext<{
   component: RootComponent,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, loginRoute]);
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  loginRoute,
+  getDegreesRoute,
+  editUserProfileRoute,
+]);
 
 export const router = new Router({
   routeTree,

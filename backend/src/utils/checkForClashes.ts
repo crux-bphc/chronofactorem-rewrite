@@ -1,6 +1,4 @@
-import { Course } from "../entity/Course";
-import { Section } from "../entity/Section";
-import { Timetable } from "../entity/Timetable";
+import { Course, Section, Timetable } from "../entity/entities.js";
 
 export const checkForClassHoursClash = (
   timetable: Timetable,
