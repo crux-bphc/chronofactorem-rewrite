@@ -42,11 +42,9 @@ import { useToast } from "./ui/use-toast";
 
 type Props = {
   timetable: z.infer<typeof timetableType>;
-  isPrivate: boolean;
-  isDraft: boolean;
 };
 
-function TimetableCard({ timetable, isPrivate, isDraft }: Props) {
+function TimetableCard({ timetable }: Props) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -238,18 +236,18 @@ function TimetableCard({ timetable, isPrivate, isDraft }: Props) {
         </Badge>
       </CardContent>
       <CardFooter className="flex justify-end gap-2 mt-auto">
-        {!isDraft && (
+        {!timetable.draft && (
           <Button
             variant="outline"
             onClick={() =>
               editMutation.mutate({
                 name: timetable.name,
-                isPrivate: !isPrivate,
+                isPrivate: !timetable.private,
                 isDraft: timetable.draft,
               })
             }
           >
-            Make {isPrivate ? "Public" : "Private"}
+            Make {timetable.private ? "Public" : "Private"}
           </Button>
         )}
 

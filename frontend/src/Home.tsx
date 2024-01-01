@@ -50,12 +50,7 @@ const filterTimetables = (timetables: Timetable[]) => {
   return { publicTimetables, privateTimetables, draftTimetables };
 };
 
-const renderTimetableSection = (
-  title: string,
-  timetables: Timetable[],
-  isPrivate: boolean,
-  isDraft = false,
-) => {
+const renderTimetableSection = (title: string, timetables: Timetable[]) => {
   if (timetables.length === 0) return null;
 
   return (
@@ -64,12 +59,7 @@ const renderTimetableSection = (
         <h2 className="text-2xl md:text-3xl font-bold">{title}</h2>
         <div className="flex flex-col items-center justify-center sm:flex-row sm:flex-wrap gap-8 pt-4 md:justify-normal">
           {timetables.map((timetable) => (
-            <TimetableCard
-              key={timetable.id}
-              timetable={timetable}
-              isPrivate={isPrivate}
-              isDraft={isDraft}
-            />
+            <TimetableCard key={timetable.id} timetable={timetable} />
           ))}
         </div>
       </section>
@@ -303,24 +293,11 @@ function Home() {
             )}
 
           <div>
-            {renderTimetableSection(
-              "Draft Timetables:",
-              draftTimetables,
-              false, // the value of isPrivate shouldn't matter here
-              true,
-            )}
+            {renderTimetableSection("Draft Timetables:", draftTimetables)}
 
-            {renderTimetableSection(
-              "Private Timetables:",
-              privateTimetables,
-              true,
-            )}
+            {renderTimetableSection("Private Timetables:", privateTimetables)}
 
-            {renderTimetableSection(
-              "Public Timetables:",
-              publicTimetables,
-              false,
-            )}
+            {renderTimetableSection("Public Timetables:", publicTimetables)}
           </div>
         </main>
       </>
