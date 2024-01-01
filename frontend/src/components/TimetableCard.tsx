@@ -1,4 +1,15 @@
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { ToastAction } from "@/components/ui/toast";
+import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { Edit2, Trash } from "lucide-react";
@@ -236,13 +247,38 @@ function TimetableCard({ timetable, isPrivate, isDraft }: Props) {
         >
           <Edit2 />
         </Button>
-        <Button
-          variant="ghost"
-          className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
-          onClick={() => deleteMutation.mutate()}
-        >
-          <Trash />
-        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="ghost"
+              className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
+            >
+              <Trash />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="p-8">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-2xl">
+                Are you sure?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-destructive text-lg font-bold">
+                All your progress on this timetable will be lost, and
+                unrecoverable.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogPrimitive.Action asChild>
+                <Button
+                  variant="destructive"
+                  onClick={() => deleteMutation.mutate()}
+                >
+                  Delete
+                </Button>
+              </AlertDialogPrimitive.Action>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardFooter>
     </Card>
   );
