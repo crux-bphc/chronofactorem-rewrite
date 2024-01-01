@@ -1,7 +1,7 @@
+import { createHash } from "crypto";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { env } from "../config/server.js";
-import { createHash } from "crypto";
 import { ZodFinishedUserSession } from "../types/auth.js";
 
 export const authenticate = async (

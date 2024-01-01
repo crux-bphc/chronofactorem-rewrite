@@ -1,7 +1,7 @@
+import { createHash } from "crypto";
 import { Response } from "express";
 import jwt from "jsonwebtoken";
-import { createHash } from "crypto";
-import { env } from "../config/server";
+import { env } from "../config/server.js";
 
 export const clearAuthCookies = (res: Response) => {
   res.clearCookie("fingerprint", {
