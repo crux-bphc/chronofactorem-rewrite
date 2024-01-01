@@ -143,11 +143,13 @@ export function TimetableGrid({
                 : `grid-cols-${displayCols}`
             } `}
           >
-            {timings.map((e) => (
-              <div className="mb-4 flex flex-col" key={e}>
-                <span>{e}</span>
-              </div>
-            ))}
+            {timings
+              .filter((e, i) => i < displayCols)
+              .map((e) => (
+                <div className="mb-4 flex flex-col" key={e}>
+                  <span>{e}</span>
+                </div>
+              ))}
           </div>
         )}
         <div
@@ -157,53 +159,59 @@ export function TimetableGrid({
               : `grid-cols-${displayCols} grid-rows-${displayRows}`
           }`}
         >
-          {timetableGrid.map((e, i) =>
-            e !== null ? (
-              <Tooltip delayDuration={100} key={2 * i}>
-                <TooltipTrigger asChild>
-                  {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-                  <div
-                    className={`bg-primary-foreground border cursor-pointer transition duration-200 ease-in-out text-foreground/65 p-1.5 ${
-                      isVertical ? "" : "min-h-20"
-                    }`}
-                    onClick={(event) => handleUnitClick(e, event)}
-                  >
-                    <div className="relative flex h-full text-xs sm:text-sm flex-col justify-end bg-muted-foreground/30 p-1.5 rounded gap-0.5">
-                      <X
-                        size={16}
-                        className="absolute top-1 right-1 sm:visible invisible hover:stroke-[#EF4444]"
-                        onClick={() => handleUnitDelete(e)}
-                      />
-                      <span className="font-bold text-ellipsis overflow-hidden text-wrap tracking-tight">
-                        {e.courseId}
-                      </span>
-                      <div
-                        className={`flex flex-row justify-between ${
-                          isVertical ? "flex-col sm:flex-row" : ""
-                        }`}
-                      >
-                        <span className="font-bold">
-                          {e.type}
-                          {e.number}
+          {timetableGrid
+            .filter((e, i) =>
+              isVertical ? i < 6 * displayCols : i % 11 < displayCols,
+            )
+            .map((e, i) =>
+              e !== null ? (
+                <Tooltip delayDuration={100} key={2 * i}>
+                  <TooltipTrigger asChild>
+                    {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+                    <div
+                      className={`bg-primary-foreground border cursor-pointer transition duration-200 ease-in-out text-foreground/65 p-1.5 ${
+                        isVertical ? "" : "min-h-20"
+                      }`}
+                      onClick={(event) => handleUnitClick(e, event)}
+                    >
+                      <div className="relative flex h-full text-xs sm:text-sm flex-col justify-end bg-muted-foreground/30 p-1.5 rounded gap-0.5">
+                        <X
+                          size={16}
+                          className="absolute top-1 right-1 sm:visible invisible hover:stroke-[#EF4444]"
+                          onClick={() => handleUnitDelete(e)}
+                        />
+                        <span className="font-bold text-ellipsis overflow-hidden text-wrap tracking-tight">
+                          {e.courseId}
                         </span>
-                        <span className="opacity-90 text-start">{e.room}</span>
+                        <div
+                          className={`flex flex-row justify-between ${
+                            isVertical ? "flex-col sm:flex-row" : ""
+                          }`}
+                        >
+                          <span className="font-bold">
+                            {e.type}
+                            {e.number}
+                          </span>
+                          <span className="opacity-90 text-start">
+                            {e.room}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent className="bg-primary-foreground text-foreground">
-                  {e.name}
-                </TooltipContent>
-              </Tooltip>
-            ) : (
-              <div
-                className={`bg-primary-foreground border ${
-                  isVertical ? "" : "min-h-20"
-                }`}
-                key={2 * i}
-              />
-            ),
-          )}
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-primary-foreground text-foreground">
+                    {e.name}
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                <div
+                  className={`bg-primary-foreground border ${
+                    isVertical ? "" : "min-h-20"
+                  }`}
+                  key={2 * i}
+                />
+              ),
+            )}
           {/* {JSON.stringify(timetableDetails)} */}
         </div>
       </div>
