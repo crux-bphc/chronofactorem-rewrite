@@ -279,7 +279,7 @@ function Home() {
 
     return (
       <>
-        <main className="bg-background min-h-screen text-foreground py-20 px-10 md:px-16">
+        <main className="text-foreground py-6 md:py-12 px-10 md:px-16">
           <h1 className="text-3xl font-bold text-center sm:text-left md:text-4xl">
             My Timetables
           </h1>
