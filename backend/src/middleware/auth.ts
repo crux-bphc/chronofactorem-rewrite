@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { FinishedUserSession, ZodFinishedUserSession } from "../types/auth";
+import { FinishedUserSession, ZodFinishedUserSession } from "../types/auth.js";
 
 export const authenticate = async (
   req: Request,

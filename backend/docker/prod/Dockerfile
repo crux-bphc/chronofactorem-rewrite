@@ -43,9 +43,13 @@ ENV PATH="${PATH}:${PNPM_HOME}"
 
 RUN apt-get update && apt-get install -y --no-install-recommends dumb-init && apt-get clean && rm -rf /var/lib/apt/lists/*
 COPY --chown=node:node --from=build-stage /usr/src/app/backend/node_modules /usr/src/app/backend/node_modules
-COPY --chown=node:node --from=build-stage /usr/src/app/lib /usr/src/app/lib
+COPY --chown=node:node --from=build-stage /usr/src/app/lib/dist /usr/src/app/lib/src
+COPY --chown=node:node --from=build-stage /usr/src/app/lib/node_modules /usr/src/app/lib/node_modules
+COPY --chown=node:node --from=build-stage /usr/src/app/lib/package.json /usr/src/app/lib/package.json
 
 COPY --chown=node:node --from=build-stage /usr/src/app/backend/build /usr/src/app/backend/build
+COPY --chown=node:node --from=build-stage /usr/src/app/backend/package.json /usr/src/app/backend/package.json
 
 USER node
-CMD ["dumb-init", "node", "backend/build/index.js"]
+WORKDIR /usr/src/app/backend
+CMD ["dumb-init", "node", "--enable-source-maps", "build/index.js"]

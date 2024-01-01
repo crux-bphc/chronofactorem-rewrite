@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { Course } from "../../entity/Course";
-import { validate } from "../../middleware/zodValidateRequest";
-import { courseRepository } from "../../repositories/courseRepository";
+import { Course } from "../../entity/entities.js";
+import { validate } from "../../middleware/zodValidateRequest.js";
+import { courseRepository } from "../../repositories/courseRepository.js";
 
 const dataSchema = z.object({
   query: z.object({

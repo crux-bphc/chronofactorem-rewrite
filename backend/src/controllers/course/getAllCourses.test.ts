@@ -1,9 +1,9 @@
 import supertest, { Response } from "supertest";
-import { courseType } from "../../../../lib";
-import app from "../../app";
-import { AppDataSource } from "../../db";
-import { Course } from "../../entity/Course";
-import { courseRepository } from "../../repositories/courseRepository";
+import { courseType } from "../../../../lib/src/index.js";
+import app from "../../app.js";
+import { AppDataSource } from "../../db.js";
+import { Course } from "../../entity/entities.js";
+import { courseRepository } from "../../repositories/courseRepository.js";
 import timetableTestJSON from "../../tests/timetable.test.json";
 
 const request = supertest(app);

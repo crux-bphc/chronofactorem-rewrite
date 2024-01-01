@@ -1,7 +1,7 @@
-import "dotenv/config";
-import app from "./app";
-import { env } from "./config/server";
-import { AppDataSource } from "./db";
+// import "dotenv/config";
+import app from "./app.js";
+import { env } from "./config/server.js";
+import { AppDataSource } from "./db.js";
 
 AppDataSource.initialize()
   .then(async () => {

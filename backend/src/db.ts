@@ -1,11 +1,13 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import { env } from "./config/server";
-import { Course } from "./entity/Course";
-import { SearchHistory } from "./entity/SearchHistory";
-import { Section } from "./entity/Section";
-import { Timetable } from "./entity/Timetable";
-import { User } from "./entity/User";
+import { env } from "./config/server.js";
+import {
+  Course,
+  SearchHistory,
+  Section,
+  Timetable,
+  User,
+} from "./entity/entities.js";
 
 export const AppDataSource = new DataSource({
   type: "postgres",

@@ -1,6 +1,6 @@
 import { configDotenv } from "dotenv";
-import { AppDataSource } from "../db";
-import { ingestJSON } from "../ingestJSON";
+import { AppDataSource } from "../db.js";
+import { ingestJSON } from "../ingestJSON.js";
 import timetableTestJSON from "./timetable.test.json";
 
 module.exports = async () => {
