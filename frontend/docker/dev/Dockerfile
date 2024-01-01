@@ -28,6 +28,8 @@ RUN pnpm install -r --offline
 COPY ./lib/src /usr/local/app/lib/src
 
 RUN pnpm tsc --build
+RUN rm -rf src
+RUN mv dist src
 
 WORKDIR /usr/local/app/frontend
 

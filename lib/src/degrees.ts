@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { addNameToString } from "./zodFieldTypes";
+import { addNameToString } from "./zodFieldTypes.js";
 
 // !!! IMPORTANT: THIS IS THE SOURCE OF TRUTH FOR DEGREES
 export const approvedDegreeList = [

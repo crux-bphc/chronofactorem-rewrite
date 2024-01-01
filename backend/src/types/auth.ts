@@ -8,7 +8,7 @@ import {
   namedIntegerType,
   namedNonEmptyStringType,
   namedUUIDType,
-} from "../../../lib";
+} from "../../../lib/src/index.js";
 
 // interface for userdata to be stored in the session cookie and for validating the type of session cookie
 export const ZodUnfinishedUserSession = z.object({

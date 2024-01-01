@@ -5,7 +5,7 @@ import {
   checkAuthStatus,
   getDegrees,
   manageAuthRedirect,
-} from "../controllers/user/auth";
+} from "../controllers/user/auth.js";
 
 const authRouter = express.Router();
 

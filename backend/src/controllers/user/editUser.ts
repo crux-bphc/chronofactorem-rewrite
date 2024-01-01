@@ -4,9 +4,9 @@ import {
   degreeList,
   isAValidDegreeCombination,
   namedDegreeZodList,
-} from "../../../../lib";
-import { validate } from "../../middleware/zodValidateRequest";
-import { userRepository } from "../../repositories/userRepository";
+} from "../../../../lib/src/index.js";
+import { validate } from "../../middleware/zodValidateRequest.js";
+import { userRepository } from "../../repositories/userRepository.js";
 
 const dataSchema = z.object({
   body: z.object({

@@ -3,9 +3,10 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { z } from "zod";
-import { userWithTimetablesType } from "../../lib";
+import { userWithTimetablesType } from "../../lib/src/index";
+import authenticatedRoute from "./AuthenticatedRoute";
 import { useToast } from "./components/ui/use-toast";
-import { rootRoute, router } from "./main";
+import { router } from "./main";
 
 const fetchUserDetails = async (): Promise<
   z.infer<typeof userWithTimetablesType>
@@ -28,7 +29,7 @@ const userQueryOptions = queryOptions({
 });
 
 const indexRoute = new Route({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authenticatedRoute,
   path: "/",
   loader: ({ context: { queryClient } }) =>
     queryClient.ensureQueryData(userQueryOptions).catch((error) => {

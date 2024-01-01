@@ -1,4 +1,4 @@
-import { FinishedUserSession } from "../auth";
+import { FinishedUserSession } from "../auth.js";
 
 declare global {
   namespace Express {

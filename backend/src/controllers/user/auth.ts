@@ -5,28 +5,26 @@ import {
   getBatchFromEmail,
   isAValidDegreeCombination,
   namedDegreeZodList,
-} from "../../../../lib";
-import { getClient } from "../../config/authClient";
-import { env } from "../../config/server";
-import { User } from "../../entity/User";
-import { userRepository } from "../../repositories/userRepository";
-import timetableJSON from "../../timetable.json";
+} from "../../../../lib/src/index.js";
+import { getClient } from "../../config/authClient.js";
+import { env } from "../../config/server.js";
+import { User } from "../../entity/entities.js";
+import { userRepository } from "../../repositories/userRepository.js";
+import timetableJSON from "../../timetable.json" with { type: "json" };
 import {
   FinishedUserSession,
   SignUpUserData,
   UnfinishedUserSession,
   ZodFinishedUserSession,
   ZodUnfinishedUserSession,
-} from "../../types/auth";
+} from "../../types/auth.js";
 import {
   clearAuthCookies,
   hashFingerprint,
   setAuthCookies,
   signJWT,
   verifyJWT,
-} from "../../utils/authUtils";
-
-// TODO: fix this to use JWTs
+} from "../../utils/authUtils.js";
 
 // On any route, when checking if a user is logged in, check for the cookie
 // in cookiestorage on the server, using -

@@ -4,11 +4,11 @@ import cors from "cors";
 import "dotenv/config";
 import express, { NextFunction } from "express";
 import { Request, Response } from "express";
-import { env } from "./config/server";
-import authRouter from "./routers/authRouter";
-import courseRouter from "./routers/courseRouter";
-import timetableRouter from "./routers/timetableRouter";
-import userRouter from "./routers/userRouter";
+import { env } from "./config/server.js";
+import authRouter from "./routers/authRouter.js";
+import courseRouter from "./routers/courseRouter.js";
+import timetableRouter from "./routers/timetableRouter.js";
+import userRouter from "./routers/userRouter.js";
 
 // create express app
 const app = express();
