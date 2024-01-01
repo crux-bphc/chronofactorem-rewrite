@@ -36,9 +36,12 @@ const filterTimetables = (timetables: Timetable[]) => {
   const publicTimetables: Timetable[] = [];
   const privateTimetables: Timetable[] = [];
   const draftTimetables: Timetable[] = [];
+  const archivedTimetables: Timetable[] = [];
 
   for (const timetable of timetables) {
-    if (timetable.draft) {
+    if (timetable.archived) {
+      archivedTimetables.push(timetable);
+    } else if (timetable.draft) {
       draftTimetables.push(timetable);
     } else if (timetable.private) {
       privateTimetables.push(timetable);
@@ -47,7 +50,12 @@ const filterTimetables = (timetables: Timetable[]) => {
     }
   }
 
-  return { publicTimetables, privateTimetables, draftTimetables };
+  return {
+    publicTimetables,
+    privateTimetables,
+    draftTimetables,
+    archivedTimetables,
+  };
 };
 
 const renderTimetableSection = (title: string, timetables: Timetable[]) => {
@@ -264,8 +272,12 @@ function Home() {
   }
 
   if (userQueryResult.isSuccess) {
-    const { draftTimetables, privateTimetables, publicTimetables } =
-      userQueryResult.data;
+    const {
+      draftTimetables,
+      privateTimetables,
+      publicTimetables,
+      archivedTimetables,
+    } = userQueryResult.data;
 
     return (
       <>
@@ -275,7 +287,8 @@ function Home() {
           </h1>
           {draftTimetables.length === 0 &&
             privateTimetables.length === 0 &&
-            publicTimetables.length === 0 && (
+            publicTimetables.length === 0 &&
+            archivedTimetables.length === 0 && (
               <>
                 <div className="bg-secondary mt-10 text-center flex flex-col items-center justify-center gap-8 py-16 rounded-lg">
                   <span>
@@ -298,6 +311,8 @@ function Home() {
             {renderTimetableSection("Private Timetables:", privateTimetables)}
 
             {renderTimetableSection("Public Timetables:", publicTimetables)}
+
+            {renderTimetableSection("Archived Timetables:", archivedTimetables)}
           </div>
         </main>
       </>
