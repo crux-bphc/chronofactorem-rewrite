@@ -5,7 +5,8 @@ import axios, { AxiosError } from "axios";
 import { z } from "zod";
 import { userWithTimetablesType } from "../../lib/src/index";
 import { useToast } from "./components/ui/use-toast";
-import { rootRoute, router } from "./main";
+import { router } from "./main";
+import { authenticatedRoute } from "./AuthenticatedRoute";
 
 const fetchUserDetails = async (): Promise<
   z.infer<typeof userWithTimetablesType>
@@ -28,7 +29,7 @@ const userQueryOptions = queryOptions({
 });
 
 const indexRoute = new Route({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authenticatedRoute,
   path: "/",
   loader: ({ context: { queryClient } }) =>
     queryClient.ensureQueryData(userQueryOptions).catch((error) => {
