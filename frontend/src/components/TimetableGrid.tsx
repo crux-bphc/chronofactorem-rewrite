@@ -64,7 +64,7 @@ export function TimetableGrid({
     "6 - 7",
   ];
 
-  const [displayRows, setDisplayRows] = useState(6);
+  const displayRows = 6;
   const [displayCols, setDisplayCols] = useState(11);
 
   const timetableGrid = useMemo(() => {
@@ -162,7 +162,7 @@ export function TimetableGrid({
             } `}
           >
             {timings
-              .filter((e, i) => i < displayCols)
+              .filter((_, i) => i < displayCols)
               .map((e) => (
                 <div className="mb-4 flex flex-col" key={e}>
                   <span>{e}</span>
@@ -178,7 +178,7 @@ export function TimetableGrid({
           }`}
         >
           {timetableGrid
-            .filter((e, i) =>
+            .filter((_, i) =>
               isVertical ? i < 6 * displayCols : i % 11 < displayCols,
             )
             .map((e, i) =>
