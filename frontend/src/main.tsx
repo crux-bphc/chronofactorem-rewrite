@@ -13,6 +13,7 @@ import indexRoute from "./Home";
 import loginRoute from "./Login";
 import RootComponent from "./RootComponent";
 import "./index.css";
+import { sideMenuTestingRoute } from "./components/side-menu";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const routeTree = rootRoute.addChildren([
   loginRoute,
   getDegreesRoute,
   editUserProfileRoute,
+  sideMenuTestingRoute,
 ]);
 
 export const router = new Router({
