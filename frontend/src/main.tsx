@@ -7,13 +7,13 @@ import {
 } from "@tanstack/react-router";
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { authenticatedRoute } from "./AuthenticatedRoute";
+import editUserProfileRoute from "./EditUserProfile";
 import getDegreesRoute from "./GetDegrees";
+import indexRoute from "./Home";
 import loginRoute from "./Login";
 import RootComponent from "./RootComponent";
 import "./index.css";
-import { authenticatedRoute } from "./AuthenticatedRoute";
-import indexRoute from "./Home";
-import editUserProfileRoute from "./EditUserProfile";
 
 const queryClient = new QueryClient();
 

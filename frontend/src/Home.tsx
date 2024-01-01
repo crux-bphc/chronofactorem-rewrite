@@ -4,9 +4,9 @@ import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { z } from "zod";
 import { userWithTimetablesType } from "../../lib/src/index";
+import { authenticatedRoute } from "./AuthenticatedRoute";
 import { useToast } from "./components/ui/use-toast";
 import { router } from "./main";
-import { authenticatedRoute } from "./AuthenticatedRoute";
 
 const fetchUserDetails = async (): Promise<
   z.infer<typeof userWithTimetablesType>

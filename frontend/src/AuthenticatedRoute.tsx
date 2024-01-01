@@ -1,9 +1,9 @@
 import { Route, redirect } from "@tanstack/react-router";
-import { rootRoute } from "./main";
+import { Outlet } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { z } from "zod";
-import { Outlet } from "@tanstack/react-router";
 import { NavBar } from "./components/navbar";
+import { rootRoute } from "./main";
 
 const userAuthStatusType = z.object({
   message: z.string(),
