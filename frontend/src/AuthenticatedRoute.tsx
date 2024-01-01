@@ -11,7 +11,7 @@ const userAuthStatusType = z.object({
   error: z.string().optional(),
 });
 
-export const authenticatedRoute = new Route({
+const authenticatedRoute = new Route({
   id: "authenticated",
   getParentRoute: () => rootRoute,
   beforeLoad: async () => {
@@ -54,3 +54,5 @@ export const authenticatedRoute = new Route({
     );
   },
 });
+
+export default authenticatedRoute;

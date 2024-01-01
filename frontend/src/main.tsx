@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-router";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { authenticatedRoute } from "./AuthenticatedRoute";
+import authenticatedRoute from "./AuthenticatedRoute";
 import editUserProfileRoute from "./EditUserProfile";
 import getDegreesRoute from "./GetDegrees";
 import indexRoute from "./Home";

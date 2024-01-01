@@ -15,7 +15,7 @@ import axios, { AxiosError } from "axios";
 import { useState } from "react";
 import { z } from "zod";
 import { userWithTimetablesType } from "../../lib/src/index";
-import { authenticatedRoute } from "./AuthenticatedRoute";
+import authenticatedRoute from "./AuthenticatedRoute";
 import { useToast } from "./components/ui/use-toast";
 import { router } from "./main";
 
