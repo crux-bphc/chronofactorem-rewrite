@@ -18,7 +18,7 @@ import { Link } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { Info, LogOut, Pencil, Plus } from "lucide-react";
 import { z } from "zod";
-import { userWithTimetablesType } from "../../../lib";
+import { userWithTimetablesType } from "../../../lib/src/index";
 import { router } from "../main";
 import { ModeToggle } from "./mode-toggle";
 
