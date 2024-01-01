@@ -4,21 +4,18 @@ import {
   namedUUIDType,
   sectionTypeList,
   timetableIDType,
-} from "../../../../lib";
-import { Course } from "../../entity/Course";
-import { Section } from "../../entity/Section";
-import { Timetable } from "../../entity/Timetable";
-import { User } from "../../entity/User";
-import { validate } from "../../middleware/zodValidateRequest";
-import { courseRepository } from "../../repositories/courseRepository";
-import { sectionRepository } from "../../repositories/sectionRepository";
-import { timetableRepository } from "../../repositories/timetableRepository";
-import { userRepository } from "../../repositories/userRepository";
+} from "../../../../lib/src/index.js";
+import { Course, Section, Timetable, User } from "../../entity/entities.js";
+import { validate } from "../../middleware/zodValidateRequest.js";
+import { courseRepository } from "../../repositories/courseRepository.js";
+import { sectionRepository } from "../../repositories/sectionRepository.js";
+import { timetableRepository } from "../../repositories/timetableRepository.js";
+import { userRepository } from "../../repositories/userRepository.js";
 import {
   checkForClassHoursClash,
   checkForExamHoursClash,
-} from "../../utils/checkForClashes";
-import { updateSectionWarnings } from "../../utils/updateWarnings";
+} from "../../utils/checkForClashes.js";
+import { updateSectionWarnings } from "../../utils/updateWarnings.js";
 
 const dataSchema = z.object({
   body: z.object({

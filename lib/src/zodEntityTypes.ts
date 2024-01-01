@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { namedDegreeZodList } from "./degrees";
-import { namedSectionTypeZodEnum } from "./sectionTypes";
+import { namedDegreeZodList } from "./degrees.js";
+import { namedSectionTypeZodEnum } from "./sectionTypes.js";
 import {
   addNameToString,
   namedBooleanType,
@@ -13,7 +13,7 @@ import {
   namedTimetableIDType,
   namedUUIDType,
   namedYearType,
-} from "./zodFieldTypes";
+} from "./zodFieldTypes.js";
 
 export const namedCourseType = (name?: string) =>
   z

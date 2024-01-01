@@ -1,6 +1,0 @@
-{
-  "watch": ["src"],
-  "ext": "ts",
-  "exec": "NODE_ENV=development ts-node --files --project tsconfig.json src",
-  "inspect": true
-}

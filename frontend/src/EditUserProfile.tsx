@@ -14,7 +14,7 @@ import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { useState } from "react";
 import { z } from "zod";
-import { userWithTimetablesType } from "../../lib";
+import { userWithTimetablesType } from "../../lib/src/index";
 import { useToast } from "./components/ui/use-toast";
 import { rootRoute, router } from "./main";
 

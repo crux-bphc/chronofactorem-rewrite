@@ -1,11 +1,10 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { timetableIDType } from "../../../../lib";
-import { Timetable } from "../../entity/Timetable";
-import { User } from "../../entity/User";
-import { validate } from "../../middleware/zodValidateRequest";
-import { timetableRepository } from "../../repositories/timetableRepository";
-import { userRepository } from "../../repositories/userRepository";
+import { timetableIDType } from "../../../../lib/src/index.js";
+import { Timetable, User } from "../../entity/entities.js";
+import { validate } from "../../middleware/zodValidateRequest.js";
+import { timetableRepository } from "../../repositories/timetableRepository.js";
+import { userRepository } from "../../repositories/userRepository.js";
 
 const dataSchema = z.object({
   params: z.object({
