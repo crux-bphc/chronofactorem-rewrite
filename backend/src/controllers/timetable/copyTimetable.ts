@@ -6,7 +6,6 @@ import { userRepository } from "../../repositories/userRepository.js";
 import timetableJSON from "../../timetable.json" with { type: "json" };
 import { z } from "zod";
 import { validate } from "../../middleware/zodValidateRequest.js";
-import { time } from "console";
 
 const dataSchema = z.object({
   params: z.object({
