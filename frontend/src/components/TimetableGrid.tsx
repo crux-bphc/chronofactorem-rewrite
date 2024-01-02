@@ -131,7 +131,7 @@ export function TimetableGrid({
         <div />
       ) : (
         <div
-          className={`grid items-center pr-2 text-lg text-center font-bold text-foreground/90 ${
+          className={`grid items-center pr-2 text-lg text-center font-bold text-foreground/80 ${
             isVertical
               ? `grid-cols-${displayRows}`
               : `grid-rows-${displayRows} mt-12`
@@ -145,7 +145,7 @@ export function TimetableGrid({
       <div className="flex flex-col w-full">
         {isVertical ? (
           <div
-            className={`grid items-center pr-2 text-lg text-center font-bold text-foreground/90 ${
+            className={`grid items-center pr-2 text-lg text-center font-bold text-foreground/80 ${
               isVertical
                 ? `grid-cols-${displayRows}`
                 : `grid-rows-${displayRows} mt-12`
@@ -157,7 +157,7 @@ export function TimetableGrid({
           </div>
         ) : (
           <div
-            className={`grid justify-between text-md text-center font-bold text-foreground/90 ${
+            className={`grid justify-between text-md text-center font-bold text-foreground/80 ${
               isVertical
                 ? `grid-rows-${displayCols}`
                 : `grid-cols-${displayCols}`
@@ -189,7 +189,7 @@ export function TimetableGrid({
                   <TooltipTrigger asChild>
                     {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
                     <div
-                      className={`bg-primary-foreground border cursor-pointer transition duration-200 ease-in-out text-foreground/65 p-1.5 ${
+                      className={`bg-background border border-muted dark:border-muted/70 cursor-pointer transition duration-200 ease-in-out text-foreground/65 p-1.5 ${
                         isVertical ? "" : "min-h-20"
                       }`}
                       onClick={(event) => handleUnitClick(e, event)}
@@ -225,7 +225,7 @@ export function TimetableGrid({
                 </Tooltip>
               ) : (
                 <div
-                  className={`bg-primary-foreground border ${
+                  className={`bg-background border border-muted dark:border-muted/70 ${
                     isVertical ? "" : "min-h-20"
                   }`}
                   key={2 * i}
