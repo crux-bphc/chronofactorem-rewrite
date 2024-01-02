@@ -19,6 +19,10 @@ import {
 } from "../controllers/timetable/editTimetableMetadata.js";
 
 import {
+  copyTimetable,
+  copyTimetableValidator,
+} from "../controllers/timetable/copyTimetable.js";
+import {
   getPublicTimetables,
   getPublicTimetablesValidator,
 } from "../controllers/timetable/getPublicTimetables.js";
@@ -26,10 +30,6 @@ import {
   removeSection,
   removeSectionValidator,
 } from "../controllers/timetable/removeSection.js";
-import {
-  copyTimetable,
-  copyTimetableValidator,
-} from "../controllers/timetable/copyTimetable.js";
 import { authenticate } from "../middleware/auth.js";
 
 const timetableRouter = express.Router();

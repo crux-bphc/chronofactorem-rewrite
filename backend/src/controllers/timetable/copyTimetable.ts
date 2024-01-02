@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
+import { z } from "zod";
 import { degreeEnum, timetableIDType } from "../../../../lib/src/index.js";
 import { Section, Timetable, User } from "../../entity/entities.js";
+import { validate } from "../../middleware/zodValidateRequest.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { userRepository } from "../../repositories/userRepository.js";
 import timetableJSON from "../../timetable.json" with { type: "json" };
-import { z } from "zod";
-import { validate } from "../../middleware/zodValidateRequest.js";
 
 const dataSchema = z.object({
   params: z.object({
