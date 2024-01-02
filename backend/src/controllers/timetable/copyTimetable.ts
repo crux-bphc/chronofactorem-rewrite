@@ -76,6 +76,15 @@ export const copyTimetable = async (req: Request, res: Response) => {
       .json({ message: "timetable is archived. cannot copy old timetables" });
   }
 
+  if (copiedTimetable.private && copiedTimetable.authorId !== author.id) {
+    return res
+      .status(403)
+      .json({
+        message:
+          "timetable is private. cannot copy other user's private timetables",
+      });
+  }
+
   sections = copiedTimetable.sections;
   timings = copiedTimetable.timings;
   examTimes = copiedTimetable.examTimes;
