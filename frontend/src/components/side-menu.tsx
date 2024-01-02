@@ -1,3 +1,4 @@
+import CDCList from "@/../CDCs.json";
 import { rootRoute } from "@/main";
 import { useQuery } from "@tanstack/react-query";
 import { Route } from "@tanstack/react-router";
@@ -47,6 +48,65 @@ function SideMenu({
     () => currentCourseID !== null,
     [currentCourseID],
   );
+
+  const cdcs = useMemo(() => {
+    let cdcs: string[];
+    const courses: any[] = [];
+
+    const degree = (
+      timetable.degrees.length === 1
+        ? timetable.degrees[0]
+        : timetable.degrees.sort((a, b) => (b as any) - (a as any)).join("")
+    ) as keyof typeof CDCList;
+    const cdcListKey =
+      `${timetable.year}-${timetable.semester}` as keyof (typeof CDCList)[typeof degree];
+
+    if (degree in CDCList && cdcListKey in CDCList[degree]) {
+      cdcs = CDCList[degree][cdcListKey];
+    } else {
+      return [];
+    }
+
+    // Code based on temp frontend
+    for (let i = 0; i < cdcs.length; i++) {
+      if (cdcs[i].includes("/")) {
+        const [depts, codes] = cdcs[i].split(" ");
+        const options: string[] = [];
+        for (let j = 0; j < depts.split("/").length; j++) {
+          options.push(`${depts.split("/")[j]} ${codes.split("/")[j]}`);
+        }
+        const matchedCourses = courseDetails.filter((e) =>
+          options.includes(e.code),
+        );
+        if (matchedCourses.length < options.length) {
+          courses.push({
+            id: null,
+            type: "warning" as "warning" | "optional",
+            warning: `One CDC of ${options.join(", ")} not found`,
+          });
+        } else {
+          courses.push({
+            id: null,
+            type: "optional" as "warning" | "optional",
+            options: matchedCourses,
+          });
+        }
+      } else {
+        const matchedCourses = courseDetails.filter((e) => e.code === cdcs[i]);
+        if (matchedCourses.length === 1) {
+          courses.push(matchedCourses[0]);
+        } else {
+          courses.push({
+            id: null,
+            type: "warning" as "warning" | "optional",
+            warning: `CDC ${cdcs[i]} not found`,
+          });
+        }
+      }
+    }
+
+    return courses;
+  }, [timetable, courseDetails]);
 
   const currentCourseDetails = useQuery({
     queryKey: [currentCourseID],
@@ -147,15 +207,22 @@ function SideMenu({
     );
   }
 
-  if (isOnEditPage) {
-    return <></>;
-  }
-
   // Default case: user is on view page, and not in course details
   return (
     <div className="bg-secondary w-96">
       <Tabs value={currentTab}>
         <TabsList>
+          {isOnEditPage && (
+            <TabsTrigger value="CDCs" onClick={() => setCurrentTab("CDCs")}>
+              CDCs
+            </TabsTrigger>
+          )}
+          {isOnEditPage && (
+            <TabsTrigger value="search" onClick={() => setCurrentTab("search")}>
+              Search
+            </TabsTrigger>
+          )}
+
           <TabsTrigger
             value="currentCourses"
             onClick={() => setCurrentTab("currentCourses")}
@@ -166,6 +233,61 @@ function SideMenu({
             Exams
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="CDCs">
+          {cdcs
+            .filter((course) => course.id !== null)
+            .map((nonOptionalCourses) => {
+              const course = nonOptionalCourses as {
+                id: string;
+                code: string;
+                name: string;
+              };
+              return (
+                <Button
+                  onClick={() => {
+                    setCurrentCourse(course.id);
+                  }}
+                  key={course.id}
+                >
+                  <div className="flex">
+                    <span>{`${course.code}: ${course.name}`}</span>
+                    <ChevronRight />
+                  </div>
+                </Button>
+              );
+            })}
+          {cdcs
+            .filter(
+              (course) => course.id === null && course.type === "optional",
+            )
+            .map((optionalCourses) => {
+              const courseOptions = optionalCourses as {
+                id: null;
+                options: {
+                  id: string;
+                  code: string;
+                  name: string;
+                }[];
+              };
+
+              return courseOptions.options.map((course) => {
+                return (
+                  <Button
+                    onClick={() => {
+                      setCurrentCourse(course.id);
+                    }}
+                    key={course.id}
+                  >
+                    <div className="flex">
+                      <span>{`${course.code}: ${course.name}`}</span>
+                      <ChevronRight />
+                    </div>
+                  </Button>
+                );
+              });
+            })}
+        </TabsContent>
 
         <TabsContent value="currentCourses">
           {coursesInTimetable.map((course) => {
@@ -329,7 +451,7 @@ export const sideMenuTestingRoute = new Route({
       <div className="flex w-full">
         <SideMenu
           timetable={timetable.data}
-          isOnEditPage={false}
+          isOnEditPage={true}
           courseDetails={courseDetails.data}
         />
         <div />
