@@ -43,7 +43,7 @@ export const copyTimetable = async (req: Request, res: Response) => {
   const acadYear = timetableJSON.metadata.acadYear;
   const year: number = acadYear - author.batch + 1;
   const semester = timetableJSON.metadata.semester;
-  let sections: Section[] = [];
+  const sections: Section[] = [];
   let timings: string[] = [];
   let examTimes: string[] = [];
   let warnings: string[] = [];
@@ -83,7 +83,6 @@ export const copyTimetable = async (req: Request, res: Response) => {
     });
   }
 
-  sections = copiedTimetable.sections;
   timings = copiedTimetable.timings;
   examTimes = copiedTimetable.examTimes;
   warnings = copiedTimetable.warnings;
@@ -111,6 +110,24 @@ export const copyTimetable = async (req: Request, res: Response) => {
         lastUpdated,
       })
       .execute();
+    try {
+      let section: Section | null = null;
+      for (let i = 0; i < copiedTimetable.sections.length; i++) {
+        section = copiedTimetable.sections[i];
+        await timetableRepository
+          .createQueryBuilder()
+          .relation(Timetable, "sections")
+          .of(timetable.identifiers[0].id)
+          .add(section);
+      }
+    } catch (err: any) {
+      console.log(
+        "Error while copying sections into new timetable: ",
+        err.message,
+      );
+
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
 
     return res.status(201).json({
       message: "Timetable copied successfully",
