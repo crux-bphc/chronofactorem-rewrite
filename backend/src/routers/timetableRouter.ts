@@ -19,6 +19,10 @@ import {
 } from "../controllers/timetable/editTimetableMetadata.js";
 
 import {
+  copyTimetable,
+  copyTimetableValidator,
+} from "../controllers/timetable/copyTimetable.js";
+import {
   getPublicTimetables,
   getPublicTimetablesValidator,
 } from "../controllers/timetable/getPublicTimetables.js";
@@ -56,6 +60,12 @@ timetableRouter.post(
   authenticate,
   editTimetableMetadataValidator,
   editTimetableMetadata,
+);
+timetableRouter.post(
+  "/:id/copy",
+  authenticate,
+  copyTimetableValidator,
+  copyTimetable,
 );
 
 export default timetableRouter;
