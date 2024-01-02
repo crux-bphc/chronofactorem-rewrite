@@ -70,6 +70,12 @@ export const copyTimetable = async (req: Request, res: Response) => {
       .json({ message: "timetable to be copied not found" });
   }
 
+  if (copiedTimetable.archived) {
+    return res
+      .status(400)
+      .json({ message: "timetable is archived. cannot copy old timetables" });
+  }
+
   sections = copiedTimetable.sections;
   timings = copiedTimetable.timings;
   examTimes = copiedTimetable.examTimes;
