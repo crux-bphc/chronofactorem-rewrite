@@ -26,6 +26,10 @@ import {
   removeSection,
   removeSectionValidator,
 } from "../controllers/timetable/removeSection.js";
+import {
+  copyTimetable,
+  copyTimetableValidator,
+} from "../controllers/timetable/copyTimetable.js";
 import { authenticate } from "../middleware/auth.js";
 
 const timetableRouter = express.Router();
@@ -56,6 +60,12 @@ timetableRouter.post(
   authenticate,
   editTimetableMetadataValidator,
   editTimetableMetadata,
+);
+timetableRouter.post(
+  "/:id/copy",
+  authenticate,
+  copyTimetableValidator,
+  copyTimetable,
 );
 
 export default timetableRouter;
