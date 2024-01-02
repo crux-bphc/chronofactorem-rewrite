@@ -1,18 +1,18 @@
+import { rootRoute } from "@/main";
+import { useQuery } from "@tanstack/react-query";
+import { Route } from "@tanstack/react-router";
+import axios from "axios";
+import { ArrowLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { z } from "zod";
 import {
   courseType,
   courseWithSectionsType,
   sectionTypeZodEnum,
   timetableWithSectionsType,
 } from "../../../lib/src";
-import { Route } from "@tanstack/react-router";
-import { rootRoute } from "@/main";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { z } from "zod";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Button } from "./ui/button";
-import { ArrowLeft, ChevronRight } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 // TEMP, MAKE THIS THE EXPORT FOR THE FINAL VERSION
 function SideMenu({
