@@ -62,10 +62,12 @@ export function TimetableGrid({
     "4 - 5",
     "5 - 6",
     "6 - 7",
+    "7 - 8",
+    "8 - 9",
   ];
 
   const displayRows = 6;
-  const [displayCols, setDisplayCols] = useState(11);
+  const [displayCols, setDisplayCols] = useState(13);
 
   const timetableGrid = useMemo(() => {
     const grid: ({
@@ -77,7 +79,7 @@ export function TimetableGrid({
       type: string;
       number: number;
       instructors: string[];
-    } | null)[] = Array(11 * 6);
+    } | null)[] = Array(13 * 6);
     for (let i = 0; i < grid.length; i++) {
       grid[i] = null;
     }
@@ -88,7 +90,7 @@ export function TimetableGrid({
         const remainder = daysOfWeek.indexOf(day);
         const quotient = parseInt(hour) - 1;
         grid[
-          isVertical ? remainder + quotient * 6 : quotient + remainder * 11
+          isVertical ? remainder + quotient * 6 : quotient + remainder * 13
         ] = {
           id: timetableDetailsSections[i].id,
           courseId: timetableDetailsSections[i].courseId,
@@ -103,11 +105,11 @@ export function TimetableGrid({
     }
 
     const minDisplayCols = 9;
-    let nonNullColumns = 11;
-    for (let j = 10; j >= minDisplayCols; j--) {
+    let nonNullColumns = 13;
+    for (let j = 12; j >= minDisplayCols; j--) {
       let flag = true;
       for (let i = 0; i < 6; i++) {
-        if ((isVertical ? grid[j * 6 + i] : grid[i * 11 + j]) !== null) {
+        if ((isVertical ? grid[j * 6 + i] : grid[i * 13 + j]) !== null) {
           flag = false;
           break;
         }
@@ -163,8 +165,8 @@ export function TimetableGrid({
           >
             {timings
               .filter((_, i) => i < displayCols)
-              .map((e) => (
-                <div className="mb-4 flex flex-col" key={e}>
+              .map((e, i) => (
+                <div className="mb-4 flex flex-col" key={2 * i}>
                   <span>{e}</span>
                 </div>
               ))}
@@ -179,7 +181,7 @@ export function TimetableGrid({
         >
           {timetableGrid
             .filter((_, i) =>
-              isVertical ? i < 6 * displayCols : i % 11 < displayCols,
+              isVertical ? i < 6 * displayCols : i % 13 < displayCols,
             )
             .map((e, i) =>
               e !== null ? (
