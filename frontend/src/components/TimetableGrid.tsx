@@ -49,7 +49,6 @@ export function TimetableGrid({
   ) => void;
 }) {
   const daysOfWeek = ["M", "T", "W", "Th", "F", "S"];
-
   const timings = [
     "8 - 9",
     "9 - 10",
@@ -65,7 +64,6 @@ export function TimetableGrid({
     "7 - 8",
     "8 - 9",
   ];
-
   const displayRows = 6;
   const [displayCols, setDisplayCols] = useState(13);
 
@@ -141,11 +139,7 @@ export function TimetableGrid({
         </div>
       ) : (
         <div
-          className={`grid items-center mr-4 text-lg text-center font-bold text-foreground/80 ${
-            isVertical
-              ? `grid-cols-${displayRows}`
-              : `grid-rows-${displayRows} mt-12`
-          }`}
+          className={`grid grid-rows-${displayRows} items-center mr-4 mt-12 text-lg text-center font-bold text-foreground/80`}
         >
           {daysOfWeek.map((e) => (
             <span key={e}>{e}</span>
@@ -155,11 +149,7 @@ export function TimetableGrid({
       <div className="flex flex-col w-full">
         {isVertical ? (
           <div
-            className={`grid items-center pr-2 text-lg text-center font-bold text-foreground/80 ${
-              isVertical
-                ? `grid-cols-${displayRows}`
-                : `grid-rows-${displayRows} mt-12`
-            }`}
+            className={`grid grid-cols-${displayRows} items-center pr-2 text-lg text-center font-bold text-foreground/80 `}
           >
             {daysOfWeek.map((e) => (
               <span key={e}>{e}</span>
@@ -167,11 +157,7 @@ export function TimetableGrid({
           </div>
         ) : (
           <div
-            className={`grid justify-between text-md text-center font-bold text-foreground/80 ${
-              isVertical
-                ? `grid-rows-${displayCols}`
-                : `grid-cols-${displayCols}`
-            } `}
+            className={`grid grid-cols-${displayCols} justify-between text-md text-center font-bold text-foreground/80`}
           >
             {timings
               .filter((_, i) => i < displayCols)
@@ -200,7 +186,7 @@ export function TimetableGrid({
                     {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
                     <div
                       className={`bg-background border border-muted dark:border-muted/70 cursor-pointer transition duration-200 ease-in-out text-foreground/65 p-1.5 ${
-                        isVertical ? "" : "min-h-20"
+                        isVertical ? "min-h-20 sm:min-h-16" : "min-h-20"
                       }`}
                       onClick={(event) => handleUnitClick(e, event)}
                     >
@@ -214,8 +200,8 @@ export function TimetableGrid({
                           {e.courseId}
                         </span>
                         <div
-                          className={`flex flex-row justify-between ${
-                            isVertical ? "flex-col sm:flex-row" : ""
+                          className={`flex justify-between ${
+                            isVertical ? "flex-col sm:flex-row" : "flex-row"
                           }`}
                         >
                           <span className="font-bold">
@@ -236,7 +222,7 @@ export function TimetableGrid({
               ) : (
                 <div
                   className={`bg-background border border-muted dark:border-muted/70 ${
-                    isVertical ? "" : "min-h-20"
+                    isVertical ? "min-h-20 sm:min-h-16" : "min-h-20"
                   }`}
                   key={2 * i}
                 />
