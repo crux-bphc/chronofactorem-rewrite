@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
-import { GripHorizontal, GripVertical } from "lucide-react";
+import { Copy, Edit2, GripHorizontal, GripVertical, Trash } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import { courseType, timetableWithSectionsType } from "../../lib/src";
@@ -467,7 +467,7 @@ function EditTimetable() {
                     <span className="flex-none">{`${timetable.year}-${timetable.semester}`}</span>
                   </p>
                 </Badge>
-                <span>
+                <span className="text-muted-foreground">
                   <p className="text-sm font-bold inline">Last Updated: </p>
                   <p className="inline">
                     {new Date(timetable.lastUpdated).toLocaleString()}
@@ -475,21 +475,29 @@ function EditTimetable() {
                 </span>
               </span>
             </span>
-            <span className="flex justify-center items-center gap-4">
+            <span className="flex justify-center items-center gap-2">
               <Button
                 variant="ghost"
+                className="rounded-full p-3"
                 onClick={() => setIsVertical(!isVertical)}
               >
                 {isVertical ? <GripVertical /> : <GripHorizontal />}
               </Button>
-              <Button onClick={() => copyMutation.mutate()}>Copy</Button>
+              <Button
+                variant="ghost"
+                className="rounded-full p-3"
+                onClick={() => copyMutation.mutate()}
+              >
+                <Copy />
+              </Button>
               {userQueryResult.data.id ===
                 timetableQueryResult.data.authorId && (
                 <Button
-                  variant="destructive"
+                  variant="ghost"
+                  className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
                   onClick={() => deleteMutation.mutate()}
                 >
-                  Delete
+                  <Trash />
                 </Button>
               )}
             </span>
