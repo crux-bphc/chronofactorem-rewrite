@@ -23,7 +23,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
-import Spinner from "./spinner";
 
 // TEMP, MAKE THIS THE EXPORT FOR THE FINAL VERSION
 function SideMenu({
@@ -459,32 +458,48 @@ function SideMenu({
 
   // user is not in course details
   return (
-    <div className="bg-secondary w-96">
-      <Tabs value={currentTab}>
+    <div className="bg-secondary min-w-96">
+      <Tabs value={currentTab} className="py-2">
         <TabsList>
           {isOnEditPage && (
-            <TabsTrigger value="CDCs" onClick={() => setCurrentTab("CDCs")}>
+            <TabsTrigger
+              className="text-xl font-bold"
+              value="CDCs"
+              onClick={() => setCurrentTab("CDCs")}
+            >
               CDCs
             </TabsTrigger>
           )}
           {isOnEditPage && (
-            <TabsTrigger value="search" onClick={() => setCurrentTab("search")}>
+            <TabsTrigger
+              className="text-xl font-bold"
+              value="search"
+              onClick={() => setCurrentTab("search")}
+            >
               Search
             </TabsTrigger>
           )}
 
           <TabsTrigger
+            className="text-xl font-bold"
             value="currentCourses"
             onClick={() => setCurrentTab("currentCourses")}
           >
             Courses
           </TabsTrigger>
-          <TabsTrigger value="exams" onClick={() => setCurrentTab("exams")}>
+          <TabsTrigger
+            className="text-xl font-bold"
+            value="exams"
+            onClick={() => setCurrentTab("exams")}
+          >
             Exams
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="CDCs" className="gap-4 flex flex-col">
+        <TabsContent
+          value="CDCs"
+          className="border-muted-foreground/80 flex flex-col"
+        >
           {cdcs
             .filter((course) => course.id !== null)
             .map((nonOptionalCourses) => {
@@ -495,12 +510,14 @@ function SideMenu({
               };
               return (
                 <Button
+                  variant={"secondary"}
                   onClick={() => {
                     setCurrentCourse(course.id);
                   }}
                   key={course.id}
+                  className="rounded-none text-left py-8 bg-secondary dark:hover:bg-slate-700 hover:bg-slate-200"
                 >
-                  <div className="flex">
+                  <div className="flex justify-between w-full items-center">
                     <span>{`${course.code}: ${course.name}`}</span>
                     <ChevronRight />
                   </div>
@@ -539,18 +556,36 @@ function SideMenu({
             })}
         </TabsContent>
 
-        <TabsContent value="currentCourses" className="gap-4 flex flex-col">
+        <TabsContent value="currentCourses" className="flex flex-col">
           {coursesInTimetable.map((course) => {
             if (course === undefined) return <></>;
-
+            if (!isOnEditPage) {
+              return (
+                <>
+                  <div className="flex flex-col border-muted-foreground/70 rounded-md pl-3 py-2 border">
+                    <div className="flex">
+                      <span className="font-bold">{`${course.code}`}</span>
+                      <span>{`: ${course.name}`}</span>
+                    </div>
+                    <span className="text-muted-foreground">{`${timetable.sections
+                      .filter((section) => section.courseId === course.id)
+                      .map((section) => `${section.type}${section.number}`)
+                      .sort()
+                      .join(", ")}`}</span>
+                  </div>
+                </>
+              );
+            }
             return (
               <Button
+                variant={"secondary"}
                 onClick={() => {
                   setCurrentCourse(course.id);
                 }}
                 key={course.id}
+                className="rounded-none text-left py-8 bg-secondary dark:hover:bg-slate-700 hover:bg-slate-200"
               >
-                <div className="flex">
+                <div className="flex justify-between w-full items-center">
                   <span>{`${course.code}: ${course.name}`}</span>
                   <ChevronRight />
                 </div>
@@ -560,7 +595,7 @@ function SideMenu({
         </TabsContent>
 
         <TabsContent value="exams" className="flex flex-col">
-          <span className="text-xl font-bold pl-4 flex mb-2 mt-2">Midsems</span>
+          <span className="text-xl font-bold pl-4 flex mb-2">Midsems</span>
           {timetable.examTimes
             .filter((e) => e.includes("|MIDSEM|"))
             .map((e) => {
@@ -654,159 +689,156 @@ function SideMenu({
             ))}
         </TabsContent>
 
-        <TabsContent
-          value="search"
-          className="ring-slate-700 ring-offset-slate-700 bg-slate-800/40"
-        >
-          <div className="pt-1">
+        <TabsContent value="search">
+          <div className="px-4">
             <Input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search Courses"
-              className="mx-4 my-2 w-[22rem] text-md p-2 bg-slate-900/80 ring-slate-700 ring-offset-slate-700 border-slate-700/60"
+              className="text-md p-2"
             />
+          </div>
 
-            <div className="h-[calc(100vh-20rem)] overflow-y-auto">
-              {courseSearchResults.map((course) => (
-                // TODO - deal with this biome rule
-                // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
-                <div
-                  onClick={() => {
-                    if (!course.clashing) {
-                      setCurrentCourse(course.id);
-                    }
-                  }}
-                  key={course.id}
-                  className={`relative px-4 transition flex-col pt-4 flex duration-200 ease-in-out border-t-2 border-slate-700/60 ${
-                    course.clashing
-                      ? "text-slate-400"
-                      : "cursor-pointer hover:bg-slate-700 text-slate-50"
-                  }`}
-                >
-                  {course.clashing && (
-                    <div className="absolute left-0 top-8 py-1 bg-slate-900/80 text-center w-full">
-                      <span className="text-slate-200 font-medium text-md">
-                        Clashing with{" "}
-                        {course.clashing
-                          .map((x) => {
-                            const [code, exam] = x.split("|");
-                            return `${code}'s ${exam.toLowerCase()}`;
-                          })
-                          .join(", ")}
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="w-full flex justify-between items-center">
-                    <span className="w-fit text-sm">
-                      {course.code}: {course.name}
-                    </span>
-                    <ChevronRight className="w-6 h-6" />
-                  </div>
-
-                  <div>
-                    <span className="pl-4 py-1 text-sm font-bold">Midsem</span>
-                    <span className="pl-4 py-1 text-sm">
-                      {`${
-                        course.midsemStartTime
-                          ? new Date(course.midsemStartTime).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                                hour: "numeric",
-                                minute: "numeric",
-                                hour12: true,
-                              },
-                            )
-                          : "N/A"
-                      } — ${
-                        course.midsemEndTime
-                          ? new Date(course.midsemEndTime).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                                hour: "numeric",
-                                minute: "numeric",
-                                hour12: true,
-                              },
-                            )
-                          : "N/A"
-                      }`}
-                      {course.midsemStartTime === null && (
-                        <Tooltip delayDuration={100}>
-                          <TooltipTrigger asChild>
-                            <div className="inline bg-transparent w-fit rounded-full hover:bg-slate-800/80 text-slate-100 p-1 transition duration-200 ease-in-out ml-2 text-sm font-bold">
-                              <HelpCircle className="inline h-4 w-4" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent className="w-96 bg-slate-700 text-slate-50 border-slate-600 text-md">
-                            Timetable Division hasn't published the midsem dates
-                            for this course. Either there is no midsem exam, or
-                            they haven't decided it yet. We recommend checking
-                            with your professor.
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
+          <div className="">
+            {courseSearchResults.map((course) => (
+              // TODO - deal with this biome rule
+              // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
+              <div
+                onClick={() => {
+                  if (!course.clashing) {
+                    setCurrentCourse(course.id);
+                  }
+                }}
+                key={course.id}
+                className={`relative px-4 transition flex-col pt-4 flex duration-200 ease-in-out border-t-2 border-slate-700/60 ${
+                  course.clashing
+                    ? "text-slate-400"
+                    : "cursor-pointer hover:bg-slate-700 text-slate-50"
+                }`}
+              >
+                {course.clashing && (
+                  <div className="absolute left-0 top-8 py-1 bg-slate-900/80 text-center w-full">
+                    <span className="text-slate-200 font-medium text-md">
+                      Clashing with{" "}
+                      {course.clashing
+                        .map((x) => {
+                          const [code, exam] = x.split("|");
+                          return `${code}'s ${exam.toLowerCase()}`;
+                        })
+                        .join(", ")}
                     </span>
                   </div>
-                  <div className="pb-4">
-                    <span className="pl-4 py-1 text-sm font-bold">Compre</span>
-                    <span className="pl-4 py-1 text-sm">
-                      {`${
-                        course.compreStartTime
-                          ? new Date(course.compreStartTime).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                                hour: "numeric",
-                                minute: "numeric",
-                                hour12: true,
-                              },
-                            )
-                          : "N/A"
-                      } — ${
-                        course.compreEndTime
-                          ? new Date(course.compreEndTime).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                                hour: "numeric",
-                                minute: "numeric",
-                                hour12: true,
-                              },
-                            )
-                          : "N/A"
-                      }`}
-                      {course.compreStartTime === null && (
-                        <Tooltip delayDuration={100}>
-                          <TooltipTrigger asChild>
-                            <div className="inline bg-transparent w-fit rounded-full hover:bg-slate-800/80 text-slate-100 p-1 transition duration-200 ease-in-out ml-2 text-sm font-bold">
-                              <HelpCircle className="inline h-4 w-4" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent className="w-96 bg-slate-700 text-slate-50 border-slate-600 text-md">
-                            Timetable Division hasn't published the compre dates
-                            for this course. Either there is no compre exam, or
-                            they haven't decided it yet. We recommend checking
-                            with your professor.
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
-                    </span>
-                  </div>
+                )}
+
+                <div className="w-full flex justify-between items-center">
+                  <span className="w-fit text-sm">
+                    {course.code}: {course.name}
+                  </span>
+                  <ChevronRight className="w-6 h-6" />
                 </div>
-              ))}
-              {courseSearchResults.length === 0 && (
-                <div className="flex flex-col justify-center items-center bg-slate-800/40 h-full rounded-xl">
-                  <Bird className="text-slate-300 w-36 h-36 mb-4" />
-                  <span className="text-slate-300 text-2xl">No results</span>
+
+                <div>
+                  <span className="pl-4 py-1 text-sm font-bold">Midsem</span>
+                  <span className="pl-4 py-1 text-sm">
+                    {`${
+                      course.midsemStartTime
+                        ? new Date(course.midsemStartTime).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                              hour: "numeric",
+                              minute: "numeric",
+                              hour12: true,
+                            },
+                          )
+                        : "N/A"
+                    } — ${
+                      course.midsemEndTime
+                        ? new Date(course.midsemEndTime).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                              hour: "numeric",
+                              minute: "numeric",
+                              hour12: true,
+                            },
+                          )
+                        : "N/A"
+                    }`}
+                    {course.midsemStartTime === null && (
+                      <Tooltip delayDuration={100}>
+                        <TooltipTrigger asChild>
+                          <div className="inline bg-transparent w-fit rounded-full hover:bg-slate-800/80 text-slate-100 p-1 transition duration-200 ease-in-out ml-2 text-sm font-bold">
+                            <HelpCircle className="inline h-4 w-4" />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent className="w-96 bg-slate-700 text-slate-50 border-slate-600 text-md">
+                          Timetable Division hasn't published the midsem dates
+                          for this course. Either there is no midsem exam, or
+                          they haven't decided it yet. We recommend checking
+                          with your professor.
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                  </span>
                 </div>
-              )}
-            </div>
+                <div className="pb-4">
+                  <span className="pl-4 py-1 text-sm font-bold">Compre</span>
+                  <span className="pl-4 py-1 text-sm">
+                    {`${
+                      course.compreStartTime
+                        ? new Date(course.compreStartTime).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                              hour: "numeric",
+                              minute: "numeric",
+                              hour12: true,
+                            },
+                          )
+                        : "N/A"
+                    } — ${
+                      course.compreEndTime
+                        ? new Date(course.compreEndTime).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                              hour: "numeric",
+                              minute: "numeric",
+                              hour12: true,
+                            },
+                          )
+                        : "N/A"
+                    }`}
+                    {course.compreStartTime === null && (
+                      <Tooltip delayDuration={100}>
+                        <TooltipTrigger asChild>
+                          <div className="inline bg-transparent w-fit rounded-full hover:bg-slate-800/80 text-slate-100 p-1 transition duration-200 ease-in-out ml-2 text-sm font-bold">
+                            <HelpCircle className="inline h-4 w-4" />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent className="w-96 bg-slate-700 text-slate-50 border-slate-600 text-md">
+                          Timetable Division hasn't published the compre dates
+                          for this course. Either there is no compre exam, or
+                          they haven't decided it yet. We recommend checking
+                          with your professor.
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                  </span>
+                </div>
+              </div>
+            ))}
+            {courseSearchResults.length === 0 && (
+              <div className="flex flex-col justify-center items-center bg-slate-800/40 h-full rounded-xl">
+                <Bird className="text-slate-300 w-36 h-36 mb-4" />
+                <span className="text-slate-300 text-2xl">No results</span>
+              </div>
+            )}
           </div>
         </TabsContent>
       </Tabs>
