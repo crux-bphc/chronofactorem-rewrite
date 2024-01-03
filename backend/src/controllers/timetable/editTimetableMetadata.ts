@@ -9,6 +9,7 @@ import { Timetable, User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { userRepository } from "../../repositories/userRepository.js";
+import sqids, { validSqid } from "../../utils/sqids.js";
 
 const dataSchema = z.object({
   body: z.object({
@@ -51,7 +52,10 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
       .json({ message: "draft timetable can not be public" });
   }
 
-  const id: number = parseInt(req.params.id);
+  const dbID = sqids.decode(req.params.id);
+  if (!validSqid(dbID)) {
+    return res.status(404).json({ message: "Timetable does not exist" });
+  }
 
   let timetable: Timetable | null = null;
 
@@ -59,7 +63,7 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
     timetable = await timetableRepository
       .createQueryBuilder("timetable")
       .leftJoinAndSelect("timetable.sections", "section")
-      .where("timetable.id = :id", { id })
+      .where("timetable.id = :id", { id: dbID[0] })
       .getOne();
   } catch (err: any) {
     // will replace the console.log with a logger when we have one
