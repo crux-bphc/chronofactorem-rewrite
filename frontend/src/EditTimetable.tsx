@@ -11,8 +11,10 @@ import { GripHorizontal, GripVertical } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import { courseType, timetableWithSectionsType } from "../../lib/src";
+import { userWithTimetablesType } from "../../lib/src/index";
 import authenticatedRoute from "./AuthenticatedRoute";
 import { TimetableGrid } from "./components/TimetableGrid";
+import { Badge } from "./components/ui/badge";
 import { Button } from "./components/ui/button";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { toast, useToast } from "./components/ui/use-toast";
@@ -35,6 +37,17 @@ const timetableQueryOptions = (timetableId: string) =>
     queryKey: ["timetable", timetableId],
     queryFn: () => fetchTimetable(timetableId),
   });
+
+const fetchUserDetails = async () => {
+  const response =
+    await axios.get<z.infer<typeof userWithTimetablesType>>("/api/user");
+  return response.data;
+};
+
+const userQueryOptions = queryOptions({
+  queryKey: ["user"],
+  queryFn: () => fetchUserDetails(),
+});
 
 const fetchCourses = async () => {
   const response = await axios.get<z.infer<typeof courseType>[]>(
@@ -155,10 +168,11 @@ const editTimetableRoute = new Route({
 });
 
 function EditTimetable() {
+  const [isVertical, setIsVertical] = useState(false);
   const { timetableId } = editTimetableRoute.useParams();
   const timetableQueryResult = useQuery(timetableQueryOptions(timetableId));
   const courseQueryResult = useQuery(courseQueryOptions());
-  const [isVertical, setIsVertical] = useState(false);
+  const userQueryResult = useQuery(userQueryOptions);
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
@@ -396,6 +410,18 @@ function EditTimetable() {
     );
   }
 
+  if (userQueryResult.data === undefined) {
+    return (
+      <span>
+        Unexpected error: timetableQueryResult.data is undefined. Please report
+        this{" "}
+        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+          here
+        </a>
+      </span>
+    );
+  }
+
   const timetableDetailsSections: {
     id: string;
     name: string;
@@ -406,9 +432,10 @@ function EditTimetable() {
     instructors: string[];
   }[] = [];
   const courses = courseQueryResult.data;
-  const sections = timetableQueryResult.data.sections;
+  const timetable = timetableQueryResult.data;
 
-  for (let i = 0; i < sections.length; i++) {
+  for (let i = 0; i < timetable.sections.length; i++) {
+    const sections = timetable.sections;
     const course = courses.find((course) => course.id === sections[i].courseId);
     if (course) {
       timetableDetailsSections.push({
@@ -427,17 +454,45 @@ function EditTimetable() {
     <>
       <div className="grow">
         <TooltipProvider>
-          <div>
-            <Button variant="ghost" onClick={() => setIsVertical(!isVertical)}>
-              {isVertical ? <GripVertical /> : <GripHorizontal />}
-            </Button>
-            <Button onClick={() => copyMutation.mutate()}>Copy</Button>
-            <Button
-              variant="destructive"
-              onClick={() => deleteMutation.mutate()}
-            >
-              Delete
-            </Button>
+          <div className="flex justify-between p-4">
+            <span>
+              <p className="font-bold text-3xl">{timetable.name}</p>
+              <span className="flex justify-between items-center gap-2">
+                <Badge variant="default" className="w-fit">
+                  <p className="flex items-center gap-1">
+                    <span>{timetable.acadYear}</span>
+                    <span>|</span>
+                    <span>{timetable.degrees.join("")}</span>
+                    <span>|</span>
+                    <span className="flex-none">{`${timetable.year}-${timetable.semester}`}</span>
+                  </p>
+                </Badge>
+                <span>
+                  <p className="text-sm font-bold inline">Last Updated: </p>
+                  <p className="inline">
+                    {new Date(timetable.lastUpdated).toLocaleString()}
+                  </p>
+                </span>
+              </span>
+            </span>
+            <span className="flex justify-center items-center gap-4">
+              <Button
+                variant="ghost"
+                onClick={() => setIsVertical(!isVertical)}
+              >
+                {isVertical ? <GripVertical /> : <GripHorizontal />}
+              </Button>
+              <Button onClick={() => copyMutation.mutate()}>Copy</Button>
+              {userQueryResult.data.id ===
+                timetableQueryResult.data.authorId && (
+                <Button
+                  variant="destructive"
+                  onClick={() => deleteMutation.mutate()}
+                >
+                  Delete
+                </Button>
+              )}
+            </span>
           </div>
           <TimetableGrid
             isVertical={isVertical}
