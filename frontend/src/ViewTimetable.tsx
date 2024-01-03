@@ -11,6 +11,7 @@ import { GripHorizontal, GripVertical } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import { courseType, timetableWithSectionsType } from "../../lib/src";
+import { userWithTimetablesType } from "../../lib/src/index";
 import authenticatedRoute from "./AuthenticatedRoute";
 import { TimetableGrid } from "./components/TimetableGrid";
 import { Button } from "./components/ui/button";
@@ -27,6 +28,12 @@ const fetchTimetable = async (timetableId: string) => {
       },
     },
   );
+  return response.data;
+};
+
+const fetchUserDetails = async () => {
+  const response =
+    await axios.get<z.infer<typeof userWithTimetablesType>>("/api/user");
   return response.data;
 };
 
@@ -53,6 +60,11 @@ const courseQueryOptions = () =>
     queryKey: ["courses"],
     queryFn: () => fetchCourses(),
   });
+
+const userQueryOptions = queryOptions({
+  queryKey: ["user"],
+  queryFn: () => fetchUserDetails(),
+});
 
 const viewTimetableRoute = new Route({
   getParentRoute: () => authenticatedRoute,
@@ -155,11 +167,14 @@ const viewTimetableRoute = new Route({
 });
 
 function ViewTimetable() {
+  const [isVertical, setIsVertical] = useState(false);
+
   const { timetableId } = viewTimetableRoute.useParams();
+
   const timetableQueryResult = useQuery(timetableQueryOptions(timetableId));
   const courseQueryResult = useQuery(courseQueryOptions());
-  const [isVertical, setIsVertical] = useState(false);
   const queryClient = useQueryClient();
+  const userQueryResult = useQuery(userQueryOptions);
 
   const deleteMutation = useMutation({
     mutationFn: () => {
@@ -481,6 +496,18 @@ function ViewTimetable() {
     );
   }
 
+  if (userQueryResult.data === undefined) {
+    return (
+      <span>
+        Unexpected error: timetableQueryResult.data is undefined. Please report
+        this{" "}
+        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+          here
+        </a>
+      </span>
+    );
+  }
+
   const timetableDetailsSections: {
     id: string;
     name: string;
@@ -516,24 +543,28 @@ function ViewTimetable() {
             <Button variant="ghost" onClick={() => setIsVertical(!isVertical)}>
               {isVertical ? <GripVertical /> : <GripHorizontal />}
             </Button>
-            <Button
-              onClick={() =>
-                editMutation.mutate({
-                  isDraft: true,
-                  isPrivate: true,
-                  name: timetableQueryResult.data.name,
-                })
-              }
-            >
-              Edit
-            </Button>
+            {userQueryResult.data.id === timetableQueryResult.data.authorId && (
+              <Button
+                onClick={() =>
+                  editMutation.mutate({
+                    isDraft: true,
+                    isPrivate: true,
+                    name: timetableQueryResult.data.name,
+                  })
+                }
+              >
+                Edit
+              </Button>
+            )}
             <Button onClick={() => copyMutation.mutate()}>Copy</Button>
-            <Button
-              variant="destructive"
-              onClick={() => deleteMutation.mutate()}
-            >
-              Delete
-            </Button>
+            {userQueryResult.data.id === timetableQueryResult.data.authorId && (
+              <Button
+                variant="destructive"
+                onClick={() => deleteMutation.mutate()}
+              >
+                Delete
+              </Button>
+            )}
           </div>
           <TimetableGrid
             isVertical={isVertical}
