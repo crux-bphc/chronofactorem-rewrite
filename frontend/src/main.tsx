@@ -8,6 +8,7 @@ import {
 import React from "react";
 import ReactDOM from "react-dom/client";
 import authenticatedRoute from "./AuthenticatedRoute";
+import editTimetableRoute from "./EditTimetable";
 import editUserProfileRoute from "./EditUserProfile";
 import getDegreesRoute from "./GetDegrees";
 import indexRoute from "./Home";
@@ -26,7 +27,11 @@ export const rootRoute = rootRouteWithContext<{
 const routeTree = rootRoute.addChildren([
   loginRoute,
   getDegreesRoute,
-  authenticatedRoute.addChildren([indexRoute, editUserProfileRoute]),
+  authenticatedRoute.addChildren([
+    indexRoute,
+    editUserProfileRoute,
+    editTimetableRoute,
+  ]),
 ]);
 
 export const router = new Router({
