@@ -9,7 +9,7 @@ import { Timetable, User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { userRepository } from "../../repositories/userRepository.js";
-import sqids, { validSqid } from "../../sqids.js";
+import sqids, { validSqid } from "../../utils/sqids.js";
 
 const dataSchema = z.object({
   body: z.object({

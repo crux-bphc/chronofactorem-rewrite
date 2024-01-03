@@ -3,7 +3,7 @@ import { z } from "zod";
 import { timetableIDType } from "../../../../lib/src/index.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
-import sqids, { validSqid } from "../../sqids.js";
+import sqids, { validSqid } from "../../utils/sqids.js";
 
 const dataSchema = z.object({
   params: z.object({

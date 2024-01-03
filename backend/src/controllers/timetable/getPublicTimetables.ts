@@ -11,7 +11,7 @@ import { Timetable, User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { userRepository } from "../../repositories/userRepository.js";
-import sqids from "../../sqids.js";
+import sqids from "../../utils/sqids.js";
 
 const dataSchema = z.object({
   query: z.object({

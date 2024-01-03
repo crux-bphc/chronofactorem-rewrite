@@ -1,5 +1,5 @@
 import Sqids from "sqids";
-import { env } from "./config/server.js";
+import { env } from "../config/server.js";
 
 const sqids = new Sqids({
   minLength: 4,

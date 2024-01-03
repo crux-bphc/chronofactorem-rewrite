@@ -11,7 +11,7 @@ import { courseRepository } from "../../repositories/courseRepository.js";
 import { sectionRepository } from "../../repositories/sectionRepository.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { userRepository } from "../../repositories/userRepository.js";
-import sqids, { validSqid } from "../../sqids.js";
+import sqids, { validSqid } from "../../utils/sqids.js";
 import { updateSectionWarnings } from "../../utils/updateWarnings.js";
 
 const dataSchema = z.object({

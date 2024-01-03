@@ -4,7 +4,7 @@ import { namedUUIDType } from "../../../../lib/src/index.js";
 import { User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { userRepository } from "../../repositories/userRepository.js";
-import sqids from "../../sqids.js";
+import sqids from "../../utils/sqids.js";
 
 const dataSchema = z.object({
   params: z.object({
