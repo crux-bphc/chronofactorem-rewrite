@@ -3,15 +3,15 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { z } from "zod";
-import { timetableType } from "../../lib/src";
+import { timetableWithSectionsType } from "../../lib/src";
 import authenticatedRoute from "./AuthenticatedRoute";
 import { useToast } from "./components/ui/use-toast";
 import { router } from "./main";
 
 const fetchTimetable = async (
   timetableId: string,
-): Promise<z.infer<typeof timetableType>> => {
-  const response = await axios.get<z.infer<typeof timetableType>>(
+): Promise<z.infer<typeof timetableWithSectionsType>> => {
+  const response = await axios.get<z.infer<typeof timetableWithSectionsType>>(
     `/api/timetable/${timetableId}`,
     {
       headers: {
