@@ -31,7 +31,7 @@ export const getTimetableById = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Timetable does not exist" });
     }
 
-    return res.json(timetable);
+    return res.json({ ...timetable, id: id });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Internal Server Error" });
