@@ -1,4 +1,5 @@
 import { ToastAction } from "@/components/ui/toast";
+import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import {
   queryOptions,
   useMutation,
@@ -7,13 +8,23 @@ import {
 } from "@tanstack/react-query";
 import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
-import { Copy, Edit2, GripHorizontal, GripVertical, Trash } from "lucide-react";
+import { Copy, GripHorizontal, GripVertical, Trash } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import { courseType, timetableWithSectionsType } from "../../lib/src";
 import { userWithTimetablesType } from "../../lib/src/index";
 import authenticatedRoute from "./AuthenticatedRoute";
 import { TimetableGrid } from "./components/TimetableGrid";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./components/ui/alert-dialog";
 import { Badge } from "./components/ui/badge";
 import { Button } from "./components/ui/button";
 import { TooltipProvider } from "./components/ui/tooltip";
@@ -492,13 +503,38 @@ function EditTimetable() {
               </Button>
               {userQueryResult.data.id ===
                 timetableQueryResult.data.authorId && (
-                <Button
-                  variant="ghost"
-                  className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
-                  onClick={() => deleteMutation.mutate()}
-                >
-                  <Trash />
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
+                    >
+                      <Trash />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="p-8">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="text-2xl">
+                        Are you sure?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription className="text-destructive text-lg font-bold">
+                        All your progress on this timetable will be lost, and
+                        unrecoverable.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogPrimitive.Action asChild>
+                        <Button
+                          variant="destructive"
+                          onClick={() => deleteMutation.mutate()}
+                        >
+                          Delete
+                        </Button>
+                      </AlertDialogPrimitive.Action>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               )}
             </span>
           </div>
