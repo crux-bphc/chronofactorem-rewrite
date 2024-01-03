@@ -1,4 +1,9 @@
 import { ToastAction } from "@/components/ui/toast";
+import {
+  Tooltip,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import {
   queryOptions,
@@ -8,7 +13,7 @@ import {
 } from "@tanstack/react-query";
 import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
-import { Copy, GripHorizontal, GripVertical, Trash } from "lucide-react";
+import { Copy, GripHorizontal, GripVertical, Send, Trash } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import { courseType, timetableWithSectionsType } from "../../lib/src";
@@ -27,7 +32,6 @@ import {
 } from "./components/ui/alert-dialog";
 import { Badge } from "./components/ui/badge";
 import { Button } from "./components/ui/button";
-import { TooltipProvider } from "./components/ui/tooltip";
 import { toast, useToast } from "./components/ui/use-toast";
 import { router } from "./main";
 
@@ -536,6 +540,26 @@ function EditTimetable() {
                   </AlertDialogContent>
                 </AlertDialog>
               )}
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Button
+                      className="text-green-200 w-fit text-xl p-4 ml-4 bg-green-900 hover:bg-green-800"
+                      onClick={() =>
+                        router.navigate({
+                          to: "/finalize/$timetableId",
+                          params: { timetableId: timetable.id },
+                        })
+                      }
+                    >
+                      <div className="hidden md:flex">Publish</div>
+                      <div className="flex md:hidden">
+                        <Send className="h-6 w-6" />
+                      </div>
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+              </Tooltip>
             </span>
           </div>
           <TimetableGrid
