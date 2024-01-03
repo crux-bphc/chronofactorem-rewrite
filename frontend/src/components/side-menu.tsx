@@ -3,8 +3,9 @@ import { rootRoute } from "@/main";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
-import { ArrowLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, Bird, ChevronRight, HelpCircle } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useDebounce } from "usehooks-ts";
 import { z } from "zod";
 import {
   courseType,
@@ -12,18 +13,27 @@ import {
   sectionTypeZodEnum,
   timetableWithSectionsType,
 } from "../../../lib/src";
+import { NavBar } from "./navbar";
 import { Button } from "./ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Input } from "./ui/input";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
+import Spinner from "./spinner";
 
 // TEMP, MAKE THIS THE EXPORT FOR THE FINAL VERSION
 function SideMenu({
   timetable,
   isOnEditPage,
-  courseDetails,
+  allCoursesDetails,
 }: {
   timetable: z.infer<typeof timetableWithSectionsType>;
   isOnEditPage: boolean;
-  courseDetails: z.infer<typeof courseType>[];
+  allCoursesDetails: z.infer<typeof courseType>[];
 }) {
   const queryClient = useQueryClient();
 
@@ -38,11 +48,11 @@ function SideMenu({
       Array.from(
         new Set(
           timetable.sections.map((section) =>
-            courseDetails.find((course) => course.id === section.courseId),
+            allCoursesDetails.find((course) => course.id === section.courseId),
           ),
         ),
       ).sort(),
-    [courseDetails, timetable.sections],
+    [allCoursesDetails, timetable.sections],
   );
 
   const [currentCourseID, setCurrentCourse] = useState<string | null>(null);
@@ -77,7 +87,7 @@ function SideMenu({
         for (let j = 0; j < depts.split("/").length; j++) {
           options.push(`${depts.split("/")[j]} ${codes.split("/")[j]}`);
         }
-        const matchedCourses = courseDetails.filter((e) =>
+        const matchedCourses = allCoursesDetails.filter((e) =>
           options.includes(e.code),
         );
         if (matchedCourses.length < options.length) {
@@ -94,7 +104,9 @@ function SideMenu({
           });
         }
       } else {
-        const matchedCourses = courseDetails.filter((e) => e.code === cdcs[i]);
+        const matchedCourses = allCoursesDetails.filter(
+          (e) => e.code === cdcs[i],
+        );
         if (matchedCourses.length === 1) {
           courses.push(matchedCourses[0]);
         } else {
@@ -108,7 +120,7 @@ function SideMenu({
     }
 
     return courses;
-  }, [timetable, courseDetails]);
+  }, [timetable, allCoursesDetails]);
 
   const currentCourseDetails = useQuery({
     queryKey: [currentCourseID],
@@ -283,6 +295,69 @@ function SideMenu({
     console.log(timetable.sections);
   };
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
+  const courseSearchResults = useMemo(
+    () =>
+      (debouncedSearchTerm === ""
+        ? allCoursesDetails
+        : allCoursesDetails.filter((e) =>
+            `${e.code}: ${e.name}`
+              .toLowerCase()
+              .includes(debouncedSearchTerm.toLowerCase()),
+          )
+      ).map((e) => {
+        const withClash = e as unknown as {
+          id: string;
+          code: string;
+          name: string;
+          midsemStartTime: string | null;
+          midsemEndTime: string | null;
+          compreStartTime: string | null;
+          compreEndTime: string | null;
+          clashing: null | string[];
+        };
+        if (e.midsemStartTime === null && e.compreStartTime === null) {
+          withClash.clashing = null;
+          return withClash;
+        }
+        if (e.midsemStartTime === null && e.compreStartTime !== null) {
+          const clashes = timetable.examTimes.filter((x) => {
+            if (x.split("|")[0] === e.code) return false;
+            return x.includes(
+              `${withClash.compreStartTime}|${withClash.compreEndTime}`,
+            );
+          });
+          withClash.clashing = clashes.length === 0 ? null : clashes;
+          return withClash;
+        }
+        if (e.midsemStartTime !== null && e.compreStartTime === null) {
+          const clashes = timetable.examTimes.filter((x) => {
+            if (x.split("|")[0] === e.code) return false;
+            return x.includes(
+              `${withClash.midsemStartTime}|${withClash.midsemStartTime}`,
+            );
+          });
+          withClash.clashing = clashes.length === 0 ? null : clashes;
+          return withClash;
+        }
+        const clashes = timetable.examTimes.filter((x) => {
+          if (x.split("|")[0] === e.code) return false;
+          return (
+            x.includes(
+              `${withClash.midsemStartTime}|${withClash.midsemEndTime}`,
+            ) ||
+            x.includes(
+              `${withClash.compreStartTime}|${withClash.compreEndTime}`,
+            )
+          );
+        });
+        withClash.clashing = clashes.length === 0 ? null : clashes;
+        return withClash;
+      }),
+    [allCoursesDetails, debouncedSearchTerm, timetable.examTimes],
+  );
+
   // JSX SECTION
   if (isOnCourseDetails) {
     return (
@@ -336,7 +411,7 @@ function SideMenu({
                   .map((section) => {
                     return (
                       <Button
-                        className={`flex flex-col h-fit hover:bg-primary ${
+                        className={`flex flex-col h-fit hover:brightness-150 ${
                           timetable.sections.find((e) => e.id === section.id)
                             ? "bg-primary"
                             : "bg-primary brightness-75"
@@ -578,6 +653,162 @@ function SideMenu({
               </div>
             ))}
         </TabsContent>
+
+        <TabsContent
+          value="search"
+          className="ring-slate-700 ring-offset-slate-700 bg-slate-800/40"
+        >
+          <div className="pt-1">
+            <Input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search Courses"
+              className="mx-4 my-2 w-[22rem] text-md p-2 bg-slate-900/80 ring-slate-700 ring-offset-slate-700 border-slate-700/60"
+            />
+
+            <div className="h-[calc(100vh-20rem)] overflow-y-auto">
+              {courseSearchResults.map((course) => (
+                // TODO - deal with this biome rule
+                // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
+                <div
+                  onClick={() => {
+                    if (!course.clashing) {
+                      setCurrentCourse(course.id);
+                    }
+                  }}
+                  key={course.id}
+                  className={`relative px-4 transition flex-col pt-4 flex duration-200 ease-in-out border-t-2 border-slate-700/60 ${
+                    course.clashing
+                      ? "text-slate-400"
+                      : "cursor-pointer hover:bg-slate-700 text-slate-50"
+                  }`}
+                >
+                  {course.clashing && (
+                    <div className="absolute left-0 top-8 py-1 bg-slate-900/80 text-center w-full">
+                      <span className="text-slate-200 font-medium text-md">
+                        Clashing with{" "}
+                        {course.clashing
+                          .map((x) => {
+                            const [code, exam] = x.split("|");
+                            return `${code}'s ${exam.toLowerCase()}`;
+                          })
+                          .join(", ")}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="w-full flex justify-between items-center">
+                    <span className="w-fit text-sm">
+                      {course.code}: {course.name}
+                    </span>
+                    <ChevronRight className="w-6 h-6" />
+                  </div>
+
+                  <div>
+                    <span className="pl-4 py-1 text-sm font-bold">Midsem</span>
+                    <span className="pl-4 py-1 text-sm">
+                      {`${
+                        course.midsemStartTime
+                          ? new Date(course.midsemStartTime).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                                hour: "numeric",
+                                minute: "numeric",
+                                hour12: true,
+                              },
+                            )
+                          : "N/A"
+                      } — ${
+                        course.midsemEndTime
+                          ? new Date(course.midsemEndTime).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                                hour: "numeric",
+                                minute: "numeric",
+                                hour12: true,
+                              },
+                            )
+                          : "N/A"
+                      }`}
+                      {course.midsemStartTime === null && (
+                        <Tooltip delayDuration={100}>
+                          <TooltipTrigger asChild>
+                            <div className="inline bg-transparent w-fit rounded-full hover:bg-slate-800/80 text-slate-100 p-1 transition duration-200 ease-in-out ml-2 text-sm font-bold">
+                              <HelpCircle className="inline h-4 w-4" />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent className="w-96 bg-slate-700 text-slate-50 border-slate-600 text-md">
+                            Timetable Division hasn't published the midsem dates
+                            for this course. Either there is no midsem exam, or
+                            they haven't decided it yet. We recommend checking
+                            with your professor.
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </span>
+                  </div>
+                  <div className="pb-4">
+                    <span className="pl-4 py-1 text-sm font-bold">Compre</span>
+                    <span className="pl-4 py-1 text-sm">
+                      {`${
+                        course.compreStartTime
+                          ? new Date(course.compreStartTime).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                                hour: "numeric",
+                                minute: "numeric",
+                                hour12: true,
+                              },
+                            )
+                          : "N/A"
+                      } — ${
+                        course.compreEndTime
+                          ? new Date(course.compreEndTime).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                                hour: "numeric",
+                                minute: "numeric",
+                                hour12: true,
+                              },
+                            )
+                          : "N/A"
+                      }`}
+                      {course.compreStartTime === null && (
+                        <Tooltip delayDuration={100}>
+                          <TooltipTrigger asChild>
+                            <div className="inline bg-transparent w-fit rounded-full hover:bg-slate-800/80 text-slate-100 p-1 transition duration-200 ease-in-out ml-2 text-sm font-bold">
+                              <HelpCircle className="inline h-4 w-4" />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent className="w-96 bg-slate-700 text-slate-50 border-slate-600 text-md">
+                            Timetable Division hasn't published the compre dates
+                            for this course. Either there is no compre exam, or
+                            they haven't decided it yet. We recommend checking
+                            with your professor.
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </span>
+                  </div>
+                </div>
+              ))}
+              {courseSearchResults.length === 0 && (
+                <div className="flex flex-col justify-center items-center bg-slate-800/40 h-full rounded-xl">
+                  <Bird className="text-slate-300 w-36 h-36 mb-4" />
+                  <span className="text-slate-300 text-2xl">No results</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </TabsContent>
       </Tabs>
     </div>
   );
@@ -593,7 +824,8 @@ export const sideMenuTestingRoute = new Route({
       queryFn: async () => {
         const result = await axios.get<
           z.infer<typeof timetableWithSectionsType>
-        >("/api/timetable/1", {
+          // Replace with your own tt id
+        >("/api/timetable/ecKL", {
           headers: {
             "Content-Type": "application/json",
           },
@@ -603,7 +835,7 @@ export const sideMenuTestingRoute = new Route({
       },
     });
 
-    const courseDetails = useQuery({
+    const allCoursesDetails = useQuery({
       queryKey: ["courses"],
       queryFn: async () => {
         const result = await axios.get<z.infer<typeof courseType>[]>(
@@ -619,19 +851,22 @@ export const sideMenuTestingRoute = new Route({
       },
     });
 
-    if (timetable.data === undefined || courseDetails.data === undefined) {
+    if (timetable.data === undefined || allCoursesDetails.data === undefined) {
       return <></>;
     }
 
     return (
-      <div className="flex w-full">
-        <SideMenu
-          timetable={timetable.data}
-          isOnEditPage={true}
-          courseDetails={courseDetails.data}
-        />
-        <div />
-      </div>
+      <TooltipProvider>
+        <NavBar />
+        <div className="flex w-full">
+          <SideMenu
+            timetable={timetable.data}
+            isOnEditPage={true}
+            allCoursesDetails={allCoursesDetails.data}
+          />
+          <div />
+        </div>
+      </TooltipProvider>
     );
   },
 });
