@@ -173,14 +173,16 @@ function Home() {
   const queryClient = useQueryClient();
   const createMutation = useMutation({
     mutationFn: () => {
-      return axios.post<{ message: string; id: number }>(
+      return axios.post<{ message: string; id: string }>(
         "/api/timetable/create",
       );
     },
-    onSuccess: (response) => {
+    onSuccess: (_response) => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
-      // TODO: Navigate to the newly created page
-      console.log(response.data.id);
+      router.navigate({
+        to: "/edit/$timetableId",
+        params: { timetableId: _response.data.id },
+      });
     },
     onError: (error) => {
       if (error instanceof AxiosError && error.response) {
