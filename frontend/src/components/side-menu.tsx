@@ -1,8 +1,8 @@
 import CDCList from "@/../CDCs.json";
 import { rootRoute } from "@/main";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Route } from "@tanstack/react-router";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
@@ -145,6 +145,131 @@ function SideMenu({
     );
   }, [uniqueSectionTypes]);
 
+  const timings = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const section of timetable.sections) {
+      for (const roomTime of section.roomTime) {
+        m.set(
+          roomTime.charAt(roomTime.lastIndexOf(":") - 1) +
+            roomTime.substring(roomTime.lastIndexOf(":") + 1),
+          `${section.roomTime[0].substring(
+            0,
+            section.roomTime[0].indexOf(":"),
+          )} ${section.type}${section.number}`,
+        );
+      }
+    }
+    return m;
+  }, [timetable]);
+
+  // might need to be extracted to parent
+  const addSectionMutation = useMutation({
+    mutationFn: async (body: { sectionId: string }) => {
+      const result = await axios.post(
+        `/api/timetable/${timetable.id}/add`,
+        body,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      return result.data;
+    },
+    onSuccess: () => {
+      // TODO - update grid
+      console.log("poggers");
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError && error.response) {
+        console.log(error.response.data.message);
+      }
+    },
+  });
+
+  const removeSectionMutation = useMutation({
+    mutationFn: async (body: { sectionId: string }) => {
+      const result = await axios.post(
+        `/api/timetable/${timetable.id}/remove`,
+        body,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      return result.data;
+    },
+    onSuccess: () => {
+      // TODO - update grid
+      console.log("poggers");
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError && error.response) {
+        console.log(error.response.data.message);
+      }
+    },
+  });
+
+  const swapCourseMutation = useMutation({
+    mutationFn: async ({
+      removeId,
+      addId,
+    }: { removeId: string; addId: string }) => {
+      await axios.post(
+        `/api/timetable/${timetable.id}/remove`,
+        { sectionId: removeId },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      const result2 = await axios.post(
+        `/api/timetable/${timetable.id}/add`,
+        { sectionId: addId },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      return result2.data;
+    },
+    onSuccess: () => {
+      // TODO - update grid
+      console.log("poggers");
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError && error.response) {
+        console.log(error.response.data.message);
+      }
+    },
+  });
+
+  const sectionClickHandler = (
+    section: (typeof timetable.sections)[number],
+  ) => {
+    if (timetable.sections.find((e) => e.id === section.id)) {
+      removeSectionMutation.mutate({ sectionId: section.id });
+    } else {
+      const other = timetable.sections.find(
+        (e) => e.type === section.type && e.courseId === section.courseId,
+      );
+      if (other !== undefined) {
+        swapCourseMutation.mutate({
+          removeId: other.id,
+          addId: section.id,
+        });
+      } else {
+        addSectionMutation.mutate({ sectionId: section.id });
+      }
+    }
+    console.log(timetable.sections);
+  };
+
   // JSX SECTION
   if (isOnCourseDetails) {
     return (
@@ -182,8 +307,26 @@ function SideMenu({
                 {currentCourseDetails.data?.sections
                   .filter((section) => section.type === sectionType)
                   .map((section) => {
+                    const tm = section.roomTime
+                      .map(
+                        (e) =>
+                          e.charAt(e.lastIndexOf(":") - 1) +
+                          e.substring(e.lastIndexOf(":") + 1),
+                      )
+                      .find((e) => timings.has(e));
+                    return {
+                      ...section,
+                      clashing: timings.get(tm ?? ""),
+                    };
+                  })
+                  .map((section) => {
                     return (
-                      <div className="flex flex-col" key={section.number}>
+                      // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
+                      <div
+                        className={"flex flex-col hover:bg-slate-900"}
+                        onClick={() => sectionClickHandler(section)}
+                        key={section.number}
+                      >
                         <span>
                           {currentCourseDetails.data?.code} {section.type}
                           {section.number}
@@ -196,6 +339,14 @@ function SideMenu({
                             ),
                           )}
                         </span>
+                        {section.clashing &&
+                          !timetable.sections.find(
+                            (e) => e.id === section.id,
+                          ) && (
+                            <span className="text-red-500">
+                              Clashing with {section.clashing}
+                            </span>
+                          )}
                       </div>
                     );
                   })}
