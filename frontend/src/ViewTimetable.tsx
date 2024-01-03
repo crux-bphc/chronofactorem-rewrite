@@ -14,6 +14,7 @@ import { courseType, timetableWithSectionsType } from "../../lib/src";
 import { userWithTimetablesType } from "../../lib/src/index";
 import authenticatedRoute from "./AuthenticatedRoute";
 import { TimetableGrid } from "./components/TimetableGrid";
+import { Badge } from "./components/ui/badge";
 import { Button } from "./components/ui/button";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { toast, useToast } from "./components/ui/use-toast";
@@ -540,32 +541,59 @@ function ViewTimetable() {
     <>
       <div className="grow">
         <TooltipProvider>
-          <div>
-            <Button variant="ghost" onClick={() => setIsVertical(!isVertical)}>
-              {isVertical ? <GripVertical /> : <GripHorizontal />}
-            </Button>
-            {userQueryResult.data.id === timetableQueryResult.data.authorId && (
+          <div className="flex justify-between p-4">
+            <span>
+              <p className="font-bold text-3xl">{timetable.name}</p>
+              <span className="flex justify-between items-center gap-2">
+                <Badge variant="default" className="w-fit">
+                  <p className="flex items-center gap-1">
+                    <span>{timetable.acadYear}</span>
+                    <span>|</span>
+                    <span>{timetable.degrees.join("")}</span>
+                    <span>|</span>
+                    <span className="flex-none">{`${timetable.year}-${timetable.semester}`}</span>
+                  </p>
+                </Badge>
+                <span>
+                  <p className="text-sm font-bold inline">Last Updated: </p>
+                  <p className="inline">
+                    {new Date(timetable.lastUpdated).toLocaleString()}
+                  </p>
+                </span>
+              </span>
+            </span>
+            <span className="flex justify-center items-center gap-4">
               <Button
-                onClick={() =>
-                  editMutation.mutate({
-                    isDraft: true,
-                    isPrivate: true,
-                    name: timetableQueryResult.data.name,
-                  })
-                }
+                variant="ghost"
+                onClick={() => setIsVertical(!isVertical)}
               >
-                Edit
+                {isVertical ? <GripVertical /> : <GripHorizontal />}
               </Button>
-            )}
-            <Button onClick={() => copyMutation.mutate()}>Copy</Button>
-            {userQueryResult.data.id === timetableQueryResult.data.authorId && (
-              <Button
-                variant="destructive"
-                onClick={() => deleteMutation.mutate()}
-              >
-                Delete
-              </Button>
-            )}
+              {userQueryResult.data.id ===
+                timetableQueryResult.data.authorId && (
+                <Button
+                  onClick={() =>
+                    editMutation.mutate({
+                      isDraft: true,
+                      isPrivate: true,
+                      name: timetableQueryResult.data.name,
+                    })
+                  }
+                >
+                  Edit
+                </Button>
+              )}
+              <Button onClick={() => copyMutation.mutate()}>Copy</Button>
+              {userQueryResult.data.id ===
+                timetableQueryResult.data.authorId && (
+                <Button
+                  variant="destructive"
+                  onClick={() => deleteMutation.mutate()}
+                >
+                  Delete
+                </Button>
+              )}
+            </span>
           </div>
           <TimetableGrid
             isVertical={isVertical}
