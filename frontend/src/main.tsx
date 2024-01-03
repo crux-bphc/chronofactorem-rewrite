@@ -12,6 +12,7 @@ import editUserProfileRoute from "./EditUserProfile";
 import getDegreesRoute from "./GetDegrees";
 import indexRoute from "./Home";
 import loginRoute from "./Login";
+import viewTimetableRoute from "./ViewTimetable";
 import RootComponent from "./RootComponent";
 import "./index.css";
 
@@ -26,7 +27,7 @@ export const rootRoute = rootRouteWithContext<{
 const routeTree = rootRoute.addChildren([
   loginRoute,
   getDegreesRoute,
-  authenticatedRoute.addChildren([indexRoute, editUserProfileRoute]),
+  authenticatedRoute.addChildren([indexRoute, editUserProfileRoute, viewTimetableRoute]),
 ]);
 
 export const router = new Router({
