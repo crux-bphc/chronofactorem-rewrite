@@ -10,6 +10,7 @@ import ReactDOM from "react-dom/client";
 import authenticatedRoute from "./AuthenticatedRoute";
 import editTimetableRoute from "./EditTimetable";
 import editUserProfileRoute from "./EditUserProfile";
+import finalizeTimetableRoute from "./Finalize";
 import getDegreesRoute from "./GetDegrees";
 import indexRoute from "./Home";
 import loginRoute from "./Login";
@@ -31,6 +32,7 @@ const routeTree = rootRoute.addChildren([
     indexRoute,
     editUserProfileRoute,
     editTimetableRoute,
+    finalizeTimetableRoute,
   ]),
 ]);
 
