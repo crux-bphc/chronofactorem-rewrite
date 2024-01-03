@@ -4,17 +4,15 @@ import {
   namedUUIDType,
   sectionTypeList,
   timetableIDType,
-} from "../../../../lib";
-import { Course } from "../../entity/Course";
-import { Section } from "../../entity/Section";
-import { Timetable } from "../../entity/Timetable";
-import { User } from "../../entity/User";
-import { validate } from "../../middleware/zodValidateRequest";
-import { courseRepository } from "../../repositories/courseRepository";
-import { sectionRepository } from "../../repositories/sectionRepository";
-import { timetableRepository } from "../../repositories/timetableRepository";
-import { userRepository } from "../../repositories/userRepository";
-import { updateSectionWarnings } from "../../utils/updateWarnings";
+} from "../../../../lib/src/index.js";
+import { Course, Section, Timetable, User } from "../../entity/entities.js";
+import { validate } from "../../middleware/zodValidateRequest.js";
+import { courseRepository } from "../../repositories/courseRepository.js";
+import { sectionRepository } from "../../repositories/sectionRepository.js";
+import { timetableRepository } from "../../repositories/timetableRepository.js";
+import { userRepository } from "../../repositories/userRepository.js";
+import sqids, { validSqid } from "../../utils/sqids.js";
+import { updateSectionWarnings } from "../../utils/updateWarnings.js";
 
 const dataSchema = z.object({
   body: z.object({
@@ -28,7 +26,10 @@ const dataSchema = z.object({
 export const removeSectionValidator = validate(dataSchema);
 
 export const removeSection = async (req: Request, res: Response) => {
-  const timetableId = parseInt(req.params.id);
+  const dbID = sqids.decode(req.params.id);
+  if (!validSqid(dbID)) {
+    return res.status(404).json({ message: "Timetable does not exist" });
+  }
   const sectionId = req.body.sectionId;
 
   let author: User | null = null;
@@ -55,7 +56,7 @@ export const removeSection = async (req: Request, res: Response) => {
     timetable = await timetableRepository
       .createQueryBuilder("timetable")
       .leftJoinAndSelect("timetable.sections", "section")
-      .where("timetable.id = :id", { id: timetableId })
+      .where("timetable.id = :id", { id: dbID[0] })
       .getOne();
   } catch (err: any) {
     // will replace the console.log with a logger when we have one

@@ -1,4 +1,4 @@
-import { AppDataSource } from "../db";
+import { AppDataSource } from "../db.js";
 
 module.exports = async () => {
   await AppDataSource.initialize();

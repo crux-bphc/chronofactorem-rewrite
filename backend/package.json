@@ -2,7 +2,7 @@
   "name": "chronofactorem-rewrite",
   "version": "0.0.1",
   "description": "A rewrite of our ChronoFactorem project",
-  "type": "commonjs",
+  "type": "module",
   "devDependencies": {
     "@biomejs/biome": "1.4.1",
     "@types/eslint": "^8.56.0",
@@ -35,12 +35,14 @@
     "openid-client": "^5.6.2",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.2.1",
+    "sqids": "^0.3.0",
+    "tsx": "^4.7.0",
     "typeorm": "0.3.17",
     "typescript": "5.3.3",
     "zod": "^3.22.4"
   },
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "typeorm": "typeorm-ts-node-commonjs"
+    "start": "tsx src/index.ts",
+    "typeorm": "typeorm-ts-node-esm"
   }
 }

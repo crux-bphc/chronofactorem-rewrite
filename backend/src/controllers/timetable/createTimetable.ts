@@ -1,11 +1,10 @@
 import { Request, Response } from "express";
-import { degreeEnum } from "../../../../lib";
-import { Section } from "../../entity/Section";
-import { Timetable } from "../../entity/Timetable";
-import { User } from "../../entity/User";
-import { timetableRepository } from "../../repositories/timetableRepository";
-import { userRepository } from "../../repositories/userRepository";
-import timetableJSON from "../../timetable.json";
+import { degreeEnum } from "../../../../lib/src/index.js";
+import { Section, Timetable, User } from "../../entity/entities.js";
+import { timetableRepository } from "../../repositories/timetableRepository.js";
+import { userRepository } from "../../repositories/userRepository.js";
+import timetableJSON from "../../timetable.json" with { type: "json" };
+import sqids from "../../utils/sqids.js";
 
 export const createTimetable = async (req: Request, res: Response) => {
   let author: User | null = null;
@@ -67,9 +66,10 @@ export const createTimetable = async (req: Request, res: Response) => {
       })
       .execute();
 
+    const timetableID = sqids.encode([createdTimetable.identifiers[0].id]);
     return res.status(201).json({
       message: "Timetable created successfully",
-      id: createdTimetable.identifiers[0].id,
+      id: timetableID,
     });
   } catch (err: any) {
     // will replace the console.log with a logger when we have one

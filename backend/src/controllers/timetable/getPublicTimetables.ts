@@ -6,12 +6,12 @@ import {
   namedCollegeYearType,
   namedDegreeZodList,
   namedSemesterType,
-} from "../../../../lib";
-import { Timetable } from "../../entity/Timetable";
-import { User } from "../../entity/User";
-import { validate } from "../../middleware/zodValidateRequest";
-import { timetableRepository } from "../../repositories/timetableRepository";
-import { userRepository } from "../../repositories/userRepository";
+} from "../../../../lib/src/index.js";
+import { Timetable, User } from "../../entity/entities.js";
+import { validate } from "../../middleware/zodValidateRequest.js";
+import { timetableRepository } from "../../repositories/timetableRepository.js";
+import { userRepository } from "../../repositories/userRepository.js";
+import sqids from "../../utils/sqids.js";
 
 const dataSchema = z.object({
   query: z.object({
@@ -109,7 +109,11 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
       let timetables: Timetable[] | null = null;
       timetables = await queryBuilder.getMany();
 
-      return res.json(timetables);
+      const timetablesWithEncodedIDs = timetables.map((t) => {
+        return { ...t, id: sqids.encode([t.id]) };
+      });
+
+      return res.json(timetablesWithEncodedIDs);
     } catch (err: any) {
       // will replace the console.log with a logger when we have one
       console.log("Error while querying timetable: ", err.message);

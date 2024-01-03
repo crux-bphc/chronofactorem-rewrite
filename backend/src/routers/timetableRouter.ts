@@ -1,32 +1,36 @@
 import * as express from "express";
-import { createTimetable } from "../controllers/timetable/createTimetable";
+import { createTimetable } from "../controllers/timetable/createTimetable.js";
 import {
   deleteTimeTableValidator,
   deleteTimetable,
-} from "../controllers/timetable/deleteTimetable";
+} from "../controllers/timetable/deleteTimetable.js";
 import {
   getTimetableById,
   getTimetableByIdValidator,
-} from "../controllers/timetable/getTimetableById";
+} from "../controllers/timetable/getTimetableById.js";
 
 import {
   addSection,
   addSectionValidator,
-} from "../controllers/timetable/addSection";
+} from "../controllers/timetable/addSection.js";
 import {
   editTimetableMetadata,
   editTimetableMetadataValidator,
-} from "../controllers/timetable/editTimetableMetadata";
+} from "../controllers/timetable/editTimetableMetadata.js";
 
+import {
+  copyTimetable,
+  copyTimetableValidator,
+} from "../controllers/timetable/copyTimetable.js";
 import {
   getPublicTimetables,
   getPublicTimetablesValidator,
-} from "../controllers/timetable/getPublicTimetables";
+} from "../controllers/timetable/getPublicTimetables.js";
 import {
   removeSection,
   removeSectionValidator,
-} from "../controllers/timetable/removeSection";
-import { authenticate } from "../middleware/auth";
+} from "../controllers/timetable/removeSection.js";
+import { authenticate } from "../middleware/auth.js";
 
 const timetableRouter = express.Router();
 
@@ -56,6 +60,12 @@ timetableRouter.post(
   authenticate,
   editTimetableMetadataValidator,
   editTimetableMetadata,
+);
+timetableRouter.post(
+  "/:id/copy",
+  authenticate,
+  copyTimetableValidator,
+  copyTimetable,
 );
 
 export default timetableRouter;

@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { timetableIDType } from "../../../../lib";
-import { Timetable } from "../../entity/Timetable";
-import { User } from "../../entity/User";
-import { validate } from "../../middleware/zodValidateRequest";
-import { timetableRepository } from "../../repositories/timetableRepository";
-import { userRepository } from "../../repositories/userRepository";
+import { timetableIDType } from "../../../../lib/src/index.js";
+import { Timetable, User } from "../../entity/entities.js";
+import { validate } from "../../middleware/zodValidateRequest.js";
+import { timetableRepository } from "../../repositories/timetableRepository.js";
+import { userRepository } from "../../repositories/userRepository.js";
+import sqids, { validSqid } from "../../utils/sqids.js";
 
 const dataSchema = z.object({
   params: z.object({
@@ -34,14 +34,17 @@ export const deleteTimetable = async (req: Request, res: Response) => {
     return res.status(401).json({ message: "unregistered user" });
   }
 
-  const id: number = parseInt(req.params.id);
+  const dbID = sqids.decode(req.params.id);
+  if (!validSqid(dbID)) {
+    return res.status(404).json({ message: "Timetable does not exist" });
+  }
 
   let timetable: Timetable | null = null;
 
   try {
     timetable = await timetableRepository
       .createQueryBuilder("timetable")
-      .where("timetable.id = :id", { id })
+      .where("timetable.id = :id", { id: dbID[0] })
       .getOne();
   } catch (err: any) {
     // will replace the console.log with a logger when we have one
