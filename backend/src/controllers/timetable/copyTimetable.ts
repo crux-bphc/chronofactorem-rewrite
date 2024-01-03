@@ -5,8 +5,8 @@ import { Section, Timetable, User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { userRepository } from "../../repositories/userRepository.js";
-import timetableJSON from "../../timetable.json" with { type: "json" };
 import sqids, { validSqid } from "../../sqids.js";
+import timetableJSON from "../../timetable.json" with { type: "json" };
 
 const dataSchema = z.object({
   params: z.object({

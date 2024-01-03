@@ -3,8 +3,8 @@ import { degreeEnum } from "../../../../lib/src/index.js";
 import { Section, Timetable, User } from "../../entity/entities.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { userRepository } from "../../repositories/userRepository.js";
-import timetableJSON from "../../timetable.json" with { type: "json" };
 import sqids from "../../sqids.js";
+import timetableJSON from "../../timetable.json" with { type: "json" };
 
 export const createTimetable = async (req: Request, res: Response) => {
   let author: User | null = null;
