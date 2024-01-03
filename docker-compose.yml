@@ -117,7 +117,7 @@ services:
         source: ./frontend/vite.config.ts
         target: /usr/local/app/frontend/vite.config.ts
     ports:
-      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+      - "${FRONTEND_DEV_PORT}:${FRONTEND_DEV_PORT}"
     profiles:
       - "dev"
 
