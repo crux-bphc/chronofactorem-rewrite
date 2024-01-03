@@ -1,6 +1,6 @@
 import CDCList from "@/../CDCs.json";
 import { rootRoute } from "@/main";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { ArrowLeft, ChevronRight } from "lucide-react";
@@ -25,6 +25,8 @@ function SideMenu({
   isOnEditPage: boolean;
   courseDetails: z.infer<typeof courseType>[];
 }) {
+  const queryClient = useQueryClient();
+
   // STATE MANAGEMENT SECTION
   // Some of these may have to be moved up to the parent later
   const [currentTab, setCurrentTab] = useState(() => {
@@ -180,6 +182,7 @@ function SideMenu({
     onSuccess: () => {
       // TODO - update grid
       console.log("poggers");
+      queryClient.invalidateQueries({ queryKey: ["timetable"] });
     },
     onError: (error) => {
       if (error instanceof AxiosError && error.response) {
@@ -205,6 +208,7 @@ function SideMenu({
     onSuccess: () => {
       // TODO - update grid
       console.log("poggers");
+      queryClient.invalidateQueries({ queryKey: ["timetable"] });
     },
     onError: (error) => {
       if (error instanceof AxiosError && error.response) {
@@ -241,6 +245,7 @@ function SideMenu({
     onSuccess: () => {
       // TODO - update grid
       console.log("poggers");
+      queryClient.invalidateQueries({ queryKey: ["timetable"] });
     },
     onError: (error) => {
       if (error instanceof AxiosError && error.response) {
@@ -301,7 +306,7 @@ function SideMenu({
             return (
               <TabsContent
                 value={sectionType}
-                className="flex flex-col"
+                className="flex flex-col gap-4"
                 key={sectionType}
               >
                 {currentCourseDetails.data?.sections
@@ -314,6 +319,7 @@ function SideMenu({
                           e.substring(e.lastIndexOf(":") + 1),
                       )
                       .find((e) => timings.has(e));
+
                     return {
                       ...section,
                       clashing: timings.get(tm ?? ""),
@@ -321,11 +327,21 @@ function SideMenu({
                   })
                   .map((section) => {
                     return (
-                      // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
-                      <div
-                        className={"flex flex-col hover:bg-slate-900"}
+                      <Button
+                        className={`flex flex-col h-fit hover:bg-primary ${
+                          timetable.sections.find((e) => e.id === section.id)
+                            ? "bg-primary"
+                            : "bg-primary brightness-75"
+                        }`}
                         onClick={() => sectionClickHandler(section)}
                         key={section.number}
+                        disabled={
+                          !isOnEditPage ||
+                          (section.clashing !== undefined &&
+                            !timetable.sections.find(
+                              (e) => e.id === section.id,
+                            ))
+                        }
                       >
                         <span>
                           {currentCourseDetails.data?.code} {section.type}
@@ -347,7 +363,7 @@ function SideMenu({
                               Clashing with {section.clashing}
                             </span>
                           )}
-                      </div>
+                      </Button>
                     );
                   })}
               </TabsContent>
@@ -358,7 +374,7 @@ function SideMenu({
     );
   }
 
-  // Default case: user is on view page, and not in course details
+  // user is not in course details
   return (
     <div className="bg-secondary w-96">
       <Tabs value={currentTab}>
@@ -385,7 +401,7 @@ function SideMenu({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="CDCs">
+        <TabsContent value="CDCs" className="gap-4 flex flex-col">
           {cdcs
             .filter((course) => course.id !== null)
             .map((nonOptionalCourses) => {
@@ -440,7 +456,7 @@ function SideMenu({
             })}
         </TabsContent>
 
-        <TabsContent value="currentCourses">
+        <TabsContent value="currentCourses" className="gap-4 flex flex-col">
           {coursesInTimetable.map((course) => {
             if (course === undefined) return <></>;
 
@@ -459,7 +475,8 @@ function SideMenu({
             );
           })}
         </TabsContent>
-        <TabsContent value="exams">
+
+        <TabsContent value="exams" className="flex flex-col">
           <span className="text-xl font-bold pl-4 flex mb-2 mt-2">Midsems</span>
           {timetable.examTimes
             .filter((e) => e.includes("|MIDSEM|"))
