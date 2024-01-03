@@ -690,7 +690,7 @@ function SideMenu({
         </TabsContent>
 
         <TabsContent value="search">
-          <div className="px-4">
+          <div className="px-4 pb-4 mt-[-1rem]">
             <Input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -710,15 +710,15 @@ function SideMenu({
                   }
                 }}
                 key={course.id}
-                className={`relative px-4 transition flex-col pt-4 flex duration-200 ease-in-out border-t-2 border-slate-700/60 ${
+                className={`relative px-4 transition flex-col pt-4 flex duration-200 ease-in-out border-t-2 border-muted-foreground/60 ${
                   course.clashing
-                    ? "text-slate-400"
-                    : "cursor-pointer hover:bg-slate-700 text-slate-50"
+                    ? "text-muted-foreground"
+                    : "cursor-pointer bg-secondary dark:hover:bg-slate-700 hover:bg-slate-200"
                 }`}
               >
                 {course.clashing && (
-                  <div className="absolute left-0 top-8 py-1 bg-slate-900/80 text-center w-full">
-                    <span className="text-slate-200 font-medium text-md">
+                  <div className="absolute left-0 top-8 py-1 dark:bg-slate-700/80 bg-slate-300/80 text-secondary-foreground text-center w-full">
+                    <span className="font-medium text-md">
                       Clashing with{" "}
                       {course.clashing
                         .map((x) => {
@@ -770,11 +770,11 @@ function SideMenu({
                     {course.midsemStartTime === null && (
                       <Tooltip delayDuration={100}>
                         <TooltipTrigger asChild>
-                          <div className="inline bg-transparent w-fit rounded-full hover:bg-slate-800/80 text-slate-100 p-1 transition duration-200 ease-in-out ml-2 text-sm font-bold">
+                          <div className="inline bg-transparent w-fit rounded-full dark:hover:bg-slate-800/80 text-secondary-foreground hover:bg-slate-300/80 p-1 transition duration-200 ease-in-out ml-2 text-sm font-bold">
                             <HelpCircle className="inline h-4 w-4" />
                           </div>
                         </TooltipTrigger>
-                        <TooltipContent className="w-96 bg-slate-700 text-slate-50 border-slate-600 text-md">
+                        <TooltipContent className="w-96 bg-secondary text-secondary-foreground border-slate-300 dark:border-slate-600 text-md">
                           Timetable Division hasn't published the midsem dates
                           for this course. Either there is no midsem exam, or
                           they haven't decided it yet. We recommend checking
@@ -817,11 +817,11 @@ function SideMenu({
                     {course.compreStartTime === null && (
                       <Tooltip delayDuration={100}>
                         <TooltipTrigger asChild>
-                          <div className="inline bg-transparent w-fit rounded-full hover:bg-slate-800/80 text-slate-100 p-1 transition duration-200 ease-in-out ml-2 text-sm font-bold">
+                          <div className="inline bg-transparent w-fit rounded-full dark:hover:bg-slate-800/80 text-secondary-foreground hover:bg-slate-300/80 p-1 transition duration-200 ease-in-out ml-2 text-sm font-bold">
                             <HelpCircle className="inline h-4 w-4" />
                           </div>
                         </TooltipTrigger>
-                        <TooltipContent className="w-96 bg-slate-700 text-slate-50 border-slate-600 text-md">
+                        <TooltipContent className="w-96 bg-secondary text-secondary-foreground border-slate-300 dark:border-slate-600 text-md">
                           Timetable Division hasn't published the compre dates
                           for this course. Either there is no compre exam, or
                           they haven't decided it yet. We recommend checking
@@ -834,9 +834,11 @@ function SideMenu({
               </div>
             ))}
             {courseSearchResults.length === 0 && (
-              <div className="flex flex-col justify-center items-center bg-slate-800/40 h-full rounded-xl">
-                <Bird className="text-slate-300 w-36 h-36 mb-4" />
-                <span className="text-slate-300 text-2xl">No results</span>
+              <div className="flex flex-col justify-center pt-4 items-center bg-secondary h-full rounded-xl">
+                <Bird className="text-muted-foreground w-36 h-36 mb-4" />
+                <span className="text-muted-foreground text-2xl">
+                  No results
+                </span>
               </div>
             )}
           </div>
