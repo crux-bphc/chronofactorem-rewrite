@@ -2,9 +2,12 @@ import { ToastAction } from "@/components/ui/toast";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
+import { useState } from "react";
 import { z } from "zod";
-import { timetableType } from "../../lib/src";
+import { courseType, timetableType } from "../../lib/src";
 import authenticatedRoute from "./AuthenticatedRoute";
+import { TimetableGrid } from "./components/TimetableGrid";
+import { TooltipProvider } from "./components/ui/tooltip";
 import { useToast } from "./components/ui/use-toast";
 import { router } from "./main";
 
@@ -28,13 +31,42 @@ const timetableQueryOptions = (timetableId: string) =>
     queryFn: () => fetchTimetable(timetableId),
   });
 
+const fetchCourses = async (): Promise<z.infer<typeof courseType>> => {
+  const response = await axios.get<z.infer<typeof courseType>>("/api/course", {
+    headers: {
+      "Content-Type": "application/json ",
+    },
+  });
+  return response.data;
+};
+
+const courseQueryOptions = () =>
+  queryOptions({
+    queryKey: ["courses"],
+    queryFn: () => fetchCourses(),
+  });
+
 const viewTimetableRoute = new Route({
   getParentRoute: () => authenticatedRoute,
   path: "view/$timetableId",
+  beforeLoad: ({ context: { queryClient } }) =>
+    queryClient.ensureQueryData(courseQueryOptions()).catch((error: Error) => {
+      if (
+        error instanceof AxiosError &&
+        error.response &&
+        error.response.status === 401
+      ) {
+        router.navigate({
+          to: "/login",
+        });
+      }
+
+      throw error;
+    }),
   loader: ({ context: { queryClient }, params: { timetableId } }) =>
     queryClient
       .ensureQueryData(timetableQueryOptions(timetableId))
-      .catch((error) => {
+      .catch((error: Error) => {
         if (
           error instanceof AxiosError &&
           error.response &&
@@ -117,6 +149,41 @@ const viewTimetableRoute = new Route({
 function ViewTimetable() {
   const { timetableId } = viewTimetableRoute.useParams();
   const timetableQueryResult = useQuery(timetableQueryOptions(timetableId));
+  const courseQueryResult = useQuery(courseQueryOptions());
+  const [isVertical, setIsVertical] = useState(false);
+
+  if (courseQueryResult.isFetching) {
+    return <span>Loading...</span>;
+  }
+
+  if (courseQueryResult.isError || courseQueryResult.data === undefined) {
+    return (
+      <span>
+        Unexpected error:{" "}
+        {JSON.stringify(
+          courseQueryResult.error
+            ? courseQueryResult.error.message
+            : "course query result is undefined",
+        )}{" "}
+        Please report this{" "}
+        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+          here
+        </a>
+      </span>
+    );
+  }
+
+  if (courseQueryResult.data === undefined) {
+    return (
+      <span>
+        Unexpected error: courseQueryResult.data is undefined. Please report
+        this{" "}
+        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+          here
+        </a>
+      </span>
+    );
+  }
 
   if (timetableQueryResult.isFetching) {
     return <span>Loading...</span>;
@@ -150,9 +217,46 @@ function ViewTimetable() {
       </span>
     );
   }
+  const timetableDetailsSections: {
+    id: string;
+    name: string;
+    roomTime: string[];
+    courseId: string;
+    type: string;
+    number: number;
+    instructors: string[];
+  }[] = [];
+  const courses = courseQueryResult.data;
+  const sections = timetableQueryResult.data.sections;
+
+  for (let i = 0; i < sections.length; i++) {
+    const course = courses.find(
+      (course: z.infer<typeof courseType>) =>
+        course.id === sections[i].courseId,
+    );
+    timetableDetailsSections.push({
+      id: sections[i].id,
+      name: course.name,
+      roomTime: sections[i].roomTime,
+      courseId: course.code,
+      type: sections[i].type,
+      number: sections[i].number,
+      instructors: sections[i].instructors,
+    });
+  }
+
   return (
     <>
-      <span>{JSON.stringify(timetableQueryResult.data)}</span>
+      <div className="grow">
+        <TooltipProvider>
+          <TimetableGrid
+            isVertical={isVertical}
+            timetableDetailsSections={timetableDetailsSections}
+            handleUnitClick={(e) => console.log(e)}
+            handleUnitDelete={(e) => console.log("DELETING", e)}
+          />
+        </TooltipProvider>
+      </div>
     </>
   );
 }
