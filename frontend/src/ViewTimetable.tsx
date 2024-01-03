@@ -518,9 +518,10 @@ function ViewTimetable() {
     instructors: string[];
   }[] = [];
   const courses = courseQueryResult.data;
-  const sections = timetableQueryResult.data.sections;
+  const timetable = timetableQueryResult.data;
 
-  for (let i = 0; i < sections.length; i++) {
+  for (let i = 0; i < timetable.sections.length; i++) {
+    const sections = timetable.sections;
     const course = courses.find((course) => course.id === sections[i].courseId);
     if (course) {
       timetableDetailsSections.push({
