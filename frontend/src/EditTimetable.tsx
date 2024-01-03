@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
+import { GripHorizontal, GripVertical } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import { courseType, timetableWithSectionsType } from "../../lib/src";
@@ -340,6 +341,9 @@ function EditTimetable() {
       <div className="grow">
         <TooltipProvider>
           <div>
+            <Button variant="ghost" onClick={() => setIsVertical(!isVertical)}>
+              {isVertical ? <GripVertical /> : <GripHorizontal />}
+            </Button>
             <Button
               variant="destructive"
               onClick={() => deleteMutation.mutate()}
