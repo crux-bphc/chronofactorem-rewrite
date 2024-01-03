@@ -4,6 +4,7 @@ import { Section, Timetable, User } from "../../entity/entities.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { userRepository } from "../../repositories/userRepository.js";
 import timetableJSON from "../../timetable.json" with { type: "json" };
+import sqids from "../../sqids.js";
 
 export const createTimetable = async (req: Request, res: Response) => {
   let author: User | null = null;
@@ -65,9 +66,10 @@ export const createTimetable = async (req: Request, res: Response) => {
       })
       .execute();
 
+    const timetableID = sqids.encode([createdTimetable.identifiers[0].id]);
     return res.status(201).json({
       message: "Timetable created successfully",
-      id: createdTimetable.identifiers[0].id,
+      id: timetableID,
     });
   } catch (err: any) {
     // will replace the console.log with a logger when we have one

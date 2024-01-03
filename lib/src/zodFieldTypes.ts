@@ -26,27 +26,19 @@ export const namedEmailType = (name?: string) =>
     .min(1, {
       message: addNameToString("email must be a non-empty string", name),
     })
-    .email(
-      {
-        message: addNameToString("email must be a valid email", name),
-      },
-    );
+    .email({
+      message: addNameToString("email must be a valid email", name),
+    });
 
 export const emailType = namedEmailType();
 
 export const namedTimetableIDType = (name?: string) =>
   z.coerce
-    .number({
-      invalid_type_error: addNameToString("timetable id not a number", name),
+    .string({
+      invalid_type_error: addNameToString("timetable id not a string", name),
       required_error: addNameToString("timetable id is required", name),
     })
-    .positive({
-      message: addNameToString("timetable id is an invalid id", name),
-    })
-    .int({
-      message: addNameToString("timetable id is an invalid id", name),
-    })
-    .max(2147483647, {
+    .min(4, {
       message: addNameToString("timetable id is an invalid id", name),
     });
 

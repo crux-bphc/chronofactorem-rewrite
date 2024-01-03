@@ -4,6 +4,7 @@ import { namedUUIDType } from "../../../../lib/src/index.js";
 import { User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { userRepository } from "../../repositories/userRepository.js";
+import sqids from "../../sqids.js";
 
 const dataSchema = z.object({
   params: z.object({
@@ -55,5 +56,11 @@ export const getUserDetails = async (req: Request, res: Response) => {
   if (!user) {
     return res.status(404).json({ message: "User not found" });
   }
-  return res.json(user);
+
+  return res.json({
+    ...user,
+    timetables: user.timetables.map((t) => {
+      return { ...t, id: sqids.encode([t.id]) };
+    }),
+  });
 };
