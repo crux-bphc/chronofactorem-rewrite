@@ -254,9 +254,7 @@ function SideMenu({
     },
   });
 
-  const sectionClickHandler = (
-    section: (typeof timetable.sections)[number],
-  ) => {
+  const handleSectionClick = (section: (typeof timetable.sections)[number]) => {
     if (timetable.sections.find((e) => e.id === section.id)) {
       removeSectionMutation.mutate({ sectionId: section.id });
     } else {
@@ -270,6 +268,16 @@ function SideMenu({
         });
       } else {
         addSectionMutation.mutate({ sectionId: section.id });
+        if (
+          uniqueSectionTypes.indexOf(currentSectionType) <
+          uniqueSectionTypes.length - 1
+        ) {
+          setCurrentSectionType(
+            uniqueSectionTypes[
+              uniqueSectionTypes.indexOf(currentSectionType) + 1
+            ],
+          );
+        }
       }
     }
     console.log(timetable.sections);
@@ -333,7 +341,7 @@ function SideMenu({
                             ? "bg-primary"
                             : "bg-primary brightness-75"
                         }`}
-                        onClick={() => sectionClickHandler(section)}
+                        onClick={() => handleSectionClick(section)}
                         key={section.number}
                         disabled={
                           !isOnEditPage ||
