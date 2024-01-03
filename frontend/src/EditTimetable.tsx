@@ -11,9 +11,7 @@ import { TooltipProvider } from "./components/ui/tooltip";
 import { useToast } from "./components/ui/use-toast";
 import { router } from "./main";
 
-const fetchTimetable = async (
-  timetableId: string,
-): Promise<z.infer<typeof timetableWithSectionsType>> => {
+const fetchTimetable = async (timetableId: string) => {
   const response = await axios.get<z.infer<typeof timetableWithSectionsType>>(
     `/api/timetable/${timetableId}`,
     {
@@ -31,12 +29,15 @@ const timetableQueryOptions = (timetableId: string) =>
     queryFn: () => fetchTimetable(timetableId),
   });
 
-const fetchCourses = async (): Promise<z.infer<typeof courseType>> => {
-  const response = await axios.get<z.infer<typeof courseType>>("/api/course", {
-    headers: {
-      "Content-Type": "application/json ",
+const fetchCourses = async () => {
+  const response = await axios.get<z.infer<typeof courseType>[]>(
+    "/api/course",
+    {
+      headers: {
+        "Content-Type": "application/json ",
+      },
     },
-  });
+  );
   return response.data;
 };
 
@@ -231,19 +232,18 @@ function EditTimetable() {
   const sections = timetableQueryResult.data.sections;
 
   for (let i = 0; i < sections.length; i++) {
-    const course = courses.find(
-      (course: z.infer<typeof courseType>) =>
-        course.id === sections[i].courseId,
-    );
-    timetableDetailsSections.push({
-      id: sections[i].id,
-      name: course.name,
-      roomTime: sections[i].roomTime,
-      courseId: course.code,
-      type: sections[i].type,
-      number: sections[i].number,
-      instructors: sections[i].instructors,
-    });
+    const course = courses.find((course) => course.id === sections[i].courseId);
+    if (course) {
+      timetableDetailsSections.push({
+        id: sections[i].id,
+        name: course.name,
+        roomTime: sections[i].roomTime,
+        courseId: course.code,
+        type: sections[i].type,
+        number: sections[i].number,
+        instructors: sections[i].instructors,
+      });
+    }
   }
 
   return (
