@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { ArrowLeft, Bird, ChevronRight, HelpCircle } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useDebounce } from "usehooks-ts";
 import { z } from "zod";
 import {
@@ -37,6 +37,7 @@ export function SideMenu({
   currentTab,
   setCurrentTab,
   isOnCourseDetails,
+  setSectionTypeChangeRequest,
 }: {
   timetable: z.infer<typeof timetableWithSectionsType>;
   isOnEditPage: boolean;
@@ -71,19 +72,14 @@ export function SideMenu({
   currentTab: string;
   setCurrentTab: React.Dispatch<React.SetStateAction<string>>;
   isOnCourseDetails: boolean;
+  setSectionTypeChangeRequest: React.Dispatch<
+    React.SetStateAction<"" | "L" | "P" | "T">
+  >;
 }) {
   const queryClient = useQueryClient();
 
   // STATE MANAGEMENT SECTION
   // Some of these may have to be moved up to the parent later
-
-  // To make sure currentSectionType's value matches with what section types exist on the current course
-  useEffect(() => {
-    setCurrentSectionType(
-      uniqueSectionTypes.length ? uniqueSectionTypes[0] : "L",
-    );
-  }, [uniqueSectionTypes, setCurrentSectionType]);
-
   const timings = useMemo(() => {
     const m = new Map<string, string>();
     for (const section of timetable.sections) {
@@ -245,7 +241,10 @@ export function SideMenu({
               return (
                 <TabsTrigger
                   value={sectionType}
-                  onClick={() => setCurrentSectionType(sectionType)}
+                  onClick={() => {
+                    setCurrentSectionType(sectionType);
+                    setSectionTypeChangeRequest("");
+                  }}
                   key={sectionType}
                 >
                   {sectionType}

@@ -17,6 +17,7 @@ import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import {
   AlertOctagon,
+  AlertTriangle,
   ArrowUpRightFromCircle,
   Copy,
   GripHorizontal,
@@ -24,7 +25,7 @@ import {
   Send,
   Trash,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import {
   courseType,
@@ -604,6 +605,31 @@ function EditTimetable() {
   const [currentSectionType, setCurrentSectionType] =
     useState<z.infer<typeof sectionTypeZodEnum>>("L");
 
+  const [sectionTypeChangeRequest, setSectionTypeChangeRequest] = useState<
+    z.infer<typeof sectionTypeZodEnum> | ""
+  >("");
+
+  // To make sure currentSectionType's value matches with what section types exist on the current course
+  // Also allows section type to be updated after current course is updated, if user wanted to go to a specific section type of a course
+  useEffect(() => {
+    let newSectionType: z.infer<typeof sectionTypeZodEnum> = "L";
+
+    if (
+      sectionTypeChangeRequest !== "" &&
+      uniqueSectionTypes.indexOf(sectionTypeChangeRequest) !== -1
+    ) {
+      newSectionType = sectionTypeChangeRequest;
+      setSectionTypeChangeRequest("");
+    } else if (uniqueSectionTypes.length > 0) {
+      newSectionType =
+        uniqueSectionTypes.indexOf(currentSectionType) !== -1
+          ? currentSectionType
+          : uniqueSectionTypes[0];
+    }
+
+    setCurrentSectionType(newSectionType);
+  }, [uniqueSectionTypes, sectionTypeChangeRequest, currentSectionType]);
+
   const [currentTab, setCurrentTab] = useState("CDCs");
 
   const isOnCourseDetails = useMemo(
@@ -862,6 +888,73 @@ function EditTimetable() {
                   </AlertDialogContent>
                 </AlertDialog>
               )}
+
+              {timetable.warnings.length !== 0 && (
+                <Tooltip delayDuration={100}>
+                  <TooltipTrigger
+                    asChild
+                    className="duration-200 mr-4 text-md p-2 h-fit hover:bg-orange-800/40 rounded-lg px-4"
+                  >
+                    <div className="flex items-center">
+                      <span className="text-orange-400 pr-4">
+                        {timetable.warnings
+                          .slice(0, 2)
+                          .map((x) => x.replace(":", " "))
+                          .map((x, i) => (
+                            <div key={x}>
+                              <span className="font-bold">{x}</span>
+                              {i >= 0 && i < timetable.warnings.length - 1 && (
+                                <span>, </span>
+                              )}
+                            </div>
+                          ))}
+                        {timetable.warnings.length > 2 &&
+                          ` and ${timetable.warnings.length - 2} other warning${
+                            timetable.warnings.length > 3 ? "s" : ""
+                          }`}
+                      </span>
+                      <AlertTriangle className="w-6 h-6 m-1 text-orange-400" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-muted text-foreground border-muted-foreground text-md">
+                    {timetable.warnings.map((warning) => (
+                      <div className="pb-2" key={warning}>
+                        <span className="font-bold">
+                          {warning.split(":")[0]} is
+                        </span>
+                        <div className="flex flex-col pl-4">
+                          {warning
+                            .split(":")[1]
+                            .split("")
+                            .map((x) => (
+                              <div className="flex items-center" key={x}>
+                                <span>missing a {x} section</span>
+                                <Button
+                                  onClick={() => {
+                                    setCurrentCourseID(
+                                      courses.filter(
+                                        (x) => x.code === warning.split(":")[0],
+                                      )[0].id,
+                                    );
+                                    setSectionTypeChangeRequest(
+                                      uniqueSectionTypes.filter(
+                                        (sectionType) => sectionType === x,
+                                      )[0],
+                                    );
+                                  }}
+                                  className="p-2 w-fit h-fit ml-2 mb-1 bg-transparent hover:bg-slate-700 rounded-full"
+                                >
+                                  <ArrowUpRightFromCircle className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    ))}
+                  </TooltipContent>
+                </Tooltip>
+              )}
+
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
                   <span>
@@ -901,6 +994,7 @@ function EditTimetable() {
               currentTab={currentTab}
               setCurrentTab={setCurrentTab}
               isOnCourseDetails={isOnCourseDetails}
+              setSectionTypeChangeRequest={setSectionTypeChangeRequest}
             />
             <TimetableGrid
               isVertical={isVertical}
