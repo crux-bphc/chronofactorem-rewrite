@@ -36,7 +36,12 @@ import {
 } from "./components/ui/alert-dialog";
 import { Badge } from "./components/ui/badge";
 import { Button } from "./components/ui/button";
-import { TooltipProvider } from "./components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./components/ui/tooltip";
 import { toast, useToast } from "./components/ui/use-toast";
 import { router } from "./main";
 
@@ -631,54 +636,89 @@ function ViewTimetable() {
               </span>
             </span>
             <span className="flex justify-center items-center gap-2">
-              <Button
-                onClick={generateScreenshot}
-                className="flex justify-between items-center gap-2"
-              >
-                <Download />
-                PNG
-              </Button>
-              <Button
-                variant="ghost"
-                className="rounded-full p-3"
-                onClick={() => setIsVertical(!isVertical)}
-              >
-                {isVertical ? <GripVertical /> : <GripHorizontal />}
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={generateScreenshot}
+                    className="flex justify-between items-center gap-2"
+                  >
+                    <Download />
+                    PNG
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Download timetable as image</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="rounded-full p-3"
+                    onClick={() => setIsVertical(!isVertical)}
+                  >
+                    {isVertical ? <GripVertical /> : <GripHorizontal />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Make timetable {isVertical ? "horizontal" : "vertical"}</p>
+                </TooltipContent>
+              </Tooltip>
               {userQueryResult.data.id ===
                 timetableQueryResult.data.authorId && (
-                <Button
-                  variant="ghost"
-                  className="rounded-full p-3"
-                  onClick={() =>
-                    editMutation.mutate({
-                      isDraft: true,
-                      isPrivate: true,
-                      name: timetableQueryResult.data.name,
-                    })
-                  }
-                >
-                  <Edit2 />
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="rounded-full p-3"
+                      onClick={() =>
+                        editMutation.mutate({
+                          isDraft: true,
+                          isPrivate: true,
+                          name: timetableQueryResult.data.name,
+                        })
+                      }
+                    >
+                      <Edit2 />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Edit Timetable</p>
+                  </TooltipContent>
+                </Tooltip>
               )}
-              <Button
-                variant="ghost"
-                className="rounded-full p-3"
-                onClick={() => copyMutation.mutate()}
-              >
-                <Copy />
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="rounded-full p-3"
+                    onClick={() => copyMutation.mutate()}
+                  >
+                    <Copy />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Copy Timetable</p>
+                </TooltipContent>
+              </Tooltip>
               {userQueryResult.data.id ===
                 timetableQueryResult.data.authorId && (
                 <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
-                    >
-                      <Trash />
-                    </Button>
-                  </AlertDialogTrigger>
+                  <Tooltip>
+                    <AlertDialogTrigger asChild>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
+                        >
+                          <Trash />
+                        </Button>
+                      </TooltipTrigger>
+                    </AlertDialogTrigger>
+                    <TooltipContent>
+                      <p>Delete Timetable</p>
+                    </TooltipContent>
+                  </Tooltip>
                   <AlertDialogContent className="p-8">
                     <AlertDialogHeader>
                       <AlertDialogTitle className="text-2xl">
