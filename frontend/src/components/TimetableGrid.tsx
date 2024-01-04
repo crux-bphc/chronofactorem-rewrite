@@ -11,6 +11,7 @@ export function TimetableGrid({
   timetableDetailsSections,
   handleUnitClick,
   handleUnitDelete,
+  isOnEditPage,
 }: {
   isVertical: boolean;
   timetableDetailsSections: {
@@ -47,6 +48,7 @@ export function TimetableGrid({
       instructors: string[];
     } | null,
   ) => void;
+  isOnEditPage: boolean;
 }) {
   const daysOfWeek = ["M", "T", "W", "Th", "F", "S"];
   const timings = [
@@ -193,7 +195,9 @@ export function TimetableGrid({
                       <div className="relative flex h-full text-xs sm:text-sm flex-col justify-end bg-muted-foreground/30 p-1.5 rounded gap-0.5">
                         <X
                           size={16}
-                          className="absolute top-1 right-1 sm:visible invisible hover:stroke-destructive dark:hover:stroke-red-400 transition duration-100 ease-in-out"
+                          className={`absolute top-1 right-1 sm:visible invisible hover:stroke-destructive dark:hover:stroke-red-400 transition duration-100 ease-in-out ${
+                            isOnEditPage ? "" : "hidden"
+                          }`}
                           onClick={() => handleUnitDelete(e)}
                         />
                         <span className="font-bold text-ellipsis overflow-hidden text-wrap tracking-tight">

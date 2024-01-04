@@ -736,7 +736,12 @@ function EditTimetable() {
               isVertical={isVertical}
               timetableDetailsSections={timetableDetailsSections}
               handleUnitClick={(e) => console.log(e)}
-              handleUnitDelete={(e) => console.log("DELETING", e)}
+              handleUnitDelete={(e) => {
+                e?.id
+                  ? removeSectionMutation.mutate({ sectionId: e?.id })
+                  : console.log("error:", e);
+              }}
+              isOnEditPage={true}
             />
           </div>
         </TooltipProvider>
