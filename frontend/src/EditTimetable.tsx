@@ -34,6 +34,7 @@ import { Badge } from "./components/ui/badge";
 import { Button } from "./components/ui/button";
 import { toast, useToast } from "./components/ui/use-toast";
 import { router } from "./main";
+import { SideMenu } from "./components/side-menu";
 
 const fetchTimetable = async (timetableId: string) => {
   const response = await axios.get<z.infer<typeof timetableWithSectionsType>>(
@@ -392,7 +393,7 @@ function EditTimetable() {
     );
   }
 
-  if (timetableQueryResult.isFetching) {
+  if (timetableQueryResult.isFetching && timetableQueryResult.isPending) {
     return <span>Loading...</span>;
   }
 
@@ -562,12 +563,19 @@ function EditTimetable() {
               </Tooltip>
             </span>
           </div>
-          <TimetableGrid
-            isVertical={isVertical}
-            timetableDetailsSections={timetableDetailsSections}
-            handleUnitClick={(e) => console.log(e)}
-            handleUnitDelete={(e) => console.log("DELETING", e)}
-          />
+          <div className="flex">
+            <SideMenu
+              timetable={timetable}
+              isOnEditPage={true}
+              allCoursesDetails={courses}
+            />
+            <TimetableGrid
+              isVertical={isVertical}
+              timetableDetailsSections={timetableDetailsSections}
+              handleUnitClick={(e) => console.log(e)}
+              handleUnitDelete={(e) => console.log("DELETING", e)}
+            />
+          </div>
         </TooltipProvider>
       </div>
     </>
