@@ -667,8 +667,8 @@ function Cms() {
                         </TooltipContent>
                       </Tooltip>
                     </div>
-                    {sectionNameList.data.sort().map((section) => (
-                      <span className="py-1">
+                    {sectionNameList.data.sort().map((section, i) => (
+                      <span className="py-1" key={2 * i}>
                         {section
                           ?.replace(/&lt;/g, "<")
                           .replace(/&gt;/g, ">")
