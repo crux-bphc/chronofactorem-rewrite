@@ -24,18 +24,14 @@ const authenticatedRoute = new Route({
     } catch (e) {
       if (e instanceof AxiosError && e.response) {
         if (
-          e.response.status === 400 &&
+          e.response.status === 200 &&
           e.response.data.message === "user needs to get degrees"
         ) {
           throw redirect({
             to: e.response.data.redirect,
           });
         }
-        if (
-          e.response.status === 200 ||
-          e.response.status === 401 ||
-          e.response.status === 500
-        ) {
+        if (e.response.status === 401 || e.response.status === 500) {
           throw redirect({
             to: "/login",
           });

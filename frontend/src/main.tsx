@@ -8,11 +8,16 @@ import {
 import React from "react";
 import ReactDOM from "react-dom/client";
 import authenticatedRoute from "./AuthenticatedRoute";
+import cmsOptionRoute from "./CMSOption";
+import cmsExportRoute from "./CmsExport";
+import editTimetableRoute from "./EditTimetable";
 import editUserProfileRoute from "./EditUserProfile";
+import finalizeTimetableRoute from "./Finalize";
 import getDegreesRoute from "./GetDegrees";
 import indexRoute from "./Home";
 import loginRoute from "./Login";
 import RootComponent from "./RootComponent";
+import viewTimetableRoute from "./ViewTimetable";
 import "./index.css";
 
 const queryClient = new QueryClient();
@@ -26,7 +31,15 @@ export const rootRoute = rootRouteWithContext<{
 const routeTree = rootRoute.addChildren([
   loginRoute,
   getDegreesRoute,
-  authenticatedRoute.addChildren([indexRoute, editUserProfileRoute]),
+  authenticatedRoute.addChildren([
+    indexRoute,
+    editUserProfileRoute,
+    editTimetableRoute,
+    finalizeTimetableRoute,
+    cmsOptionRoute,
+    viewTimetableRoute,
+    cmsExportRoute,
+  ]),
 ]);
 
 export const router = new Router({
