@@ -8,8 +8,16 @@ import {
 } from "@tanstack/react-query";
 import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
-import { Copy, Edit2, GripHorizontal, GripVertical, Trash } from "lucide-react";
-import { useState } from "react";
+import { toPng } from "html-to-image";
+import {
+  Copy,
+  Download,
+  Edit2,
+  GripHorizontal,
+  GripVertical,
+  Trash,
+} from "lucide-react";
+import { useCallback, useRef, useState } from "react";
 import { z } from "zod";
 import { courseType, timetableWithSectionsType } from "../../lib/src";
 import { userWithTimetablesType } from "../../lib/src/index";
@@ -188,6 +196,7 @@ function ViewTimetable() {
   const courseQueryResult = useQuery(courseQueryOptions());
   const queryClient = useQueryClient();
   const userQueryResult = useQuery(userQueryOptions);
+  const screenshotContentRef = useRef<HTMLDivElement>(null);
 
   const deleteMutation = useMutation({
     mutationFn: () => {
@@ -443,6 +452,47 @@ function ViewTimetable() {
     },
   });
 
+  const generateScreenshot = useCallback(() => {
+    const screenShotContent = screenshotContentRef.current;
+
+    if (screenShotContent === null) {
+      return;
+    }
+
+    // use some standard values where it is going to render properly
+    screenShotContent.style.height = isVertical ? "640px" : "512px";
+    screenShotContent.style.width = "1920px";
+
+    toPng(screenShotContent, {
+      cacheBust: true,
+    })
+      .then((dataUrl) => {
+        const link = document.createElement("a");
+        link.download = "timetable.png";
+        link.href = dataUrl;
+        link.click();
+
+        // later remove those values let the browser figure it out the proper values
+        screenShotContent.style.height = "";
+        screenShotContent.style.width = "";
+      })
+      .catch((err: Error) => {
+        console.error("something went wrong with image generation", err);
+        toast({
+          title: "Error",
+          description: err.message,
+          variant: "destructive",
+          action: (
+            <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+              <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                Report
+              </a>
+            </ToastAction>
+          ),
+        });
+      });
+  }, [isVertical]);
+
   if (courseQueryResult.isFetching) {
     return <span>Loading...</span>;
   }
@@ -576,6 +626,13 @@ function ViewTimetable() {
             </span>
             <span className="flex justify-center items-center gap-2">
               <Button
+                onClick={generateScreenshot}
+                className="flex justify-between items-center gap-2"
+              >
+                <Download />
+                PNG
+              </Button>
+              <Button
                 variant="ghost"
                 className="rounded-full p-3"
                 onClick={() => setIsVertical(!isVertical)}
@@ -642,7 +699,7 @@ function ViewTimetable() {
               )}
             </span>
           </div>
-          <div className="flex flex-row gap-4">
+          <div className="flex flex-row gap-4" ref={screenshotContentRef}>
             <SideMenu
               timetable={timetable}
               isOnEditPage={false}
