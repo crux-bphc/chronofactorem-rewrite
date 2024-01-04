@@ -272,11 +272,8 @@ function CmsExport() {
   }
 
   if (userQueryResult.isSuccess) {
-    const {
-      privateTimetables,
-      publicTimetables,
-      archivedTimetables,
-    } = userQueryResult.data;
+    const { privateTimetables, publicTimetables, archivedTimetables } =
+      userQueryResult.data;
 
     return (
       <>
