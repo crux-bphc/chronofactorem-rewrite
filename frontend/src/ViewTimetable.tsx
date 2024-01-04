@@ -1,3 +1,4 @@
+import CDCList from "@/../CDCs.json";
 import { ToastAction } from "@/components/ui/toast";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import {
@@ -17,9 +18,9 @@ import {
   GripVertical,
   Trash,
 } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
-import { courseType, timetableWithSectionsType } from "../../lib/src";
+import { courseType, courseWithSectionsType, sectionTypeZodEnum, timetableWithSectionsType } from "../../lib/src";
 import { userWithTimetablesType } from "../../lib/src/index";
 import authenticatedRoute from "./AuthenticatedRoute";
 import { TimetableGrid } from "./components/TimetableGrid";
@@ -199,8 +200,8 @@ function ViewTimetable() {
 
   const timetableQueryResult = useQuery(timetableQueryOptions(timetableId));
   const courseQueryResult = useQuery(courseQueryOptions());
-  const queryClient = useQueryClient();
   const userQueryResult = useQuery(userQueryOptions);
+  const queryClient = useQueryClient();
   const screenshotContentRef = useRef<HTMLDivElement>(null);
   const [isScreenshotMode, setIsScreenshotMode] = useState(false);
 
@@ -504,6 +505,202 @@ function ViewTimetable() {
       });
   }, [isVertical]);
 
+  const addSectionMutation = useMutation({
+    mutationFn: async (body: { sectionId: string }) => {
+      const result = await axios.post(
+        `/api/timetable/${timetable.id}/add`,
+        body,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      return result.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["timetable"] });
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError && error.response) {
+        console.log(error.response.data.message);
+      }
+    },
+  });
+
+  const removeSectionMutation = useMutation({
+    mutationFn: async (body: { sectionId: string }) => {
+      const result = await axios.post(
+        `/api/timetable/${timetable.id}/remove`,
+        body,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      return result.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["timetable"] });
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError && error.response) {
+        console.log(error.response.data.message);
+      }
+    },
+  });
+
+  const coursesInTimetable = useMemo(() => {
+    if (
+      courseQueryResult.data === undefined ||
+      timetableQueryResult.data === undefined
+    )
+      return [];
+
+    return courseQueryResult.data
+      .filter((e) =>
+        timetableQueryResult.data.sections
+          .map((x) => x.courseId)
+          .includes(e.id),
+      )
+      .sort();
+  }, [courseQueryResult.data, timetableQueryResult.data]);
+
+  const cdcs = useMemo(() => {
+    let cdcs: string[];
+    const coursesList = [];
+
+    if (
+      timetableQueryResult.data === undefined ||
+      courseQueryResult.data === undefined
+    )
+      return [];
+
+    const degree = (
+      timetableQueryResult.data.degrees.length === 1
+        ? timetableQueryResult.data.degrees[0]
+        : timetableQueryResult.data.degrees
+            .sort((a, b) => (b as any) - (a as any))
+            .join("")
+    ) as keyof typeof CDCList;
+    const cdcListKey =
+      `${timetableQueryResult.data.year}-${timetableQueryResult.data.semester}` as keyof (typeof CDCList)[typeof degree];
+
+    if (degree in CDCList && cdcListKey in CDCList[degree]) {
+      cdcs = CDCList[degree][cdcListKey];
+    } else {
+      return [];
+    }
+
+    // Code based on temp frontend
+    for (let i = 0; i < cdcs.length; i++) {
+      if (cdcs[i].includes("/")) {
+        const [depts, codes] = cdcs[i].split(" ");
+        const options: string[] = [];
+        for (let j = 0; j < depts.split("/").length; j++) {
+          options.push(`${depts.split("/")[j]} ${codes.split("/")[j]}`);
+        }
+        const matchedCourses = courseQueryResult.data.filter((e) =>
+          options.includes(e.code),
+        );
+        if (matchedCourses.length < options.length) {
+          coursesList.push({
+            id: null,
+            type: "warning" as "warning" | "optional",
+            warning: `One CDC of ${options.join(", ")} not found`,
+          });
+        } else {
+          coursesList.push({
+            id: null,
+            type: "optional" as "warning" | "optional",
+            options: matchedCourses,
+          });
+        }
+      } else {
+        const matchedCourses = courseQueryResult.data.filter(
+          (e) => e.code === cdcs[i],
+        );
+        if (matchedCourses.length === 1) {
+          coursesList.push(matchedCourses[0]);
+        } else {
+          coursesList.push({
+            id: null,
+            type: "warning" as "warning" | "optional",
+            warning: `CDC ${cdcs[i]} not found`,
+          });
+        }
+      }
+    }
+
+    return coursesList;
+  }, [timetableQueryResult, courseQueryResult]);
+
+  const [currentCourseID, setCurrentCourseID] = useState<string | null>(null);
+  const currentCourseQueryResult = useQuery({
+    queryKey: [currentCourseID],
+    queryFn: async () => {
+      if (currentCourseID === null) return null;
+
+      const result = await axios.get<z.infer<typeof courseWithSectionsType>>(
+        `/api/course/${currentCourseID}`,
+      );
+
+      return result.data;
+    },
+  });
+
+  const uniqueSectionTypes = useMemo(() => {
+    if (
+      currentCourseQueryResult.data === undefined ||
+      currentCourseQueryResult.data === null
+    )
+      return [];
+
+    return Array.from(
+      new Set(
+        currentCourseQueryResult.data.sections.map((section) => section.type),
+      ),
+    ).sort();
+  }, [currentCourseQueryResult.data]);
+
+  const [currentSectionType, setCurrentSectionType] =
+    useState<z.infer<typeof sectionTypeZodEnum>>("L");
+
+  const [sectionTypeChangeRequest, setSectionTypeChangeRequest] = useState<
+    z.infer<typeof sectionTypeZodEnum> | ""
+  >("");
+
+  // To make sure currentSectionType's value matches with what section types exist on the current course
+  // Also allows section type to be updated after current course is updated, if user wanted to go to a specific section type of a course
+  useEffect(() => {
+    let newSectionType: z.infer<typeof sectionTypeZodEnum> = "L";
+
+    if (
+      sectionTypeChangeRequest !== "" &&
+      uniqueSectionTypes.indexOf(sectionTypeChangeRequest) !== -1
+    ) {
+      newSectionType = sectionTypeChangeRequest;
+      setSectionTypeChangeRequest("");
+    } else if (uniqueSectionTypes.length > 0) {
+      newSectionType =
+        uniqueSectionTypes.indexOf(currentSectionType) !== -1
+          ? currentSectionType
+          : uniqueSectionTypes[0];
+    }
+
+    setCurrentSectionType(newSectionType);
+  }, [uniqueSectionTypes, sectionTypeChangeRequest, currentSectionType]);
+
+  const [currentTab, setCurrentTab] = useState("currentCourses");
+
+  const isOnCourseDetails = useMemo(
+    () => currentCourseID !== null,
+    [currentCourseID],
+  );
+
   if (courseQueryResult.isFetching) {
     return <span>Loading...</span>;
   }
@@ -754,6 +951,19 @@ function ViewTimetable() {
               timetable={timetable}
               isOnEditPage={false}
               allCoursesDetails={courses}
+              cdcs={cdcs}
+              setCurrentCourseID={setCurrentCourseID}
+              currentCourseDetails={currentCourseQueryResult}
+              uniqueSectionTypes={uniqueSectionTypes}
+              currentSectionType={currentSectionType}
+              setCurrentSectionType={setCurrentSectionType}
+              addSectionMutation={addSectionMutation}
+              removeSectionMutation={removeSectionMutation}
+              coursesInTimetable={coursesInTimetable}
+              currentTab={currentTab}
+              setCurrentTab={setCurrentTab}
+              isOnCourseDetails={isOnCourseDetails}
+              setSectionTypeChangeRequest={setSectionTypeChangeRequest}
               isScreenshotMode={isScreenshotMode}
             />
             <TimetableGrid
@@ -761,6 +971,7 @@ function ViewTimetable() {
               timetableDetailsSections={timetableDetailsSections}
               handleUnitClick={(e) => console.log(e)}
               handleUnitDelete={(e) => console.log("DELETING", e)}
+              isOnEditPage={false}
             />
           </div>
         </TooltipProvider>

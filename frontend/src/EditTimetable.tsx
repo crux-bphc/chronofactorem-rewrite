@@ -1016,6 +1016,7 @@ function EditTimetable() {
               setCurrentTab={setCurrentTab}
               isOnCourseDetails={isOnCourseDetails}
               setSectionTypeChangeRequest={setSectionTypeChangeRequest}
+              isScreenshotMode={false}
             />
             <TimetableGrid
               isVertical={isVertical}
