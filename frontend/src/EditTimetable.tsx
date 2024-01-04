@@ -17,7 +17,12 @@ import axios, { AxiosError } from "axios";
 import { Copy, GripHorizontal, GripVertical, Send, Trash } from "lucide-react";
 import { useMemo, useState } from "react";
 import { z } from "zod";
-import { courseType, timetableWithSectionsType } from "../../lib/src";
+import {
+  courseType,
+  courseWithSectionsType,
+  sectionTypeZodEnum,
+  timetableWithSectionsType,
+} from "../../lib/src";
 import { userWithTimetablesType } from "../../lib/src/index";
 import authenticatedRoute from "./AuthenticatedRoute";
 import { TimetableGrid } from "./components/TimetableGrid";
@@ -430,6 +435,37 @@ function EditTimetable() {
     return coursesList;
   }, [timetableQueryResult, courseQueryResult]);
 
+  const [currentCourseID, setCurrentCourseID] = useState<string | null>(null);
+  const currentCourseQueryResult = useQuery({
+    queryKey: [currentCourseID],
+    queryFn: async () => {
+      if (currentCourseID === null) return null;
+
+      const result = await axios.get<z.infer<typeof courseWithSectionsType>>(
+        `/api/course/${currentCourseID}`,
+      );
+
+      return result.data;
+    },
+  });
+
+  const uniqueSectionTypes = useMemo(() => {
+    if (
+      currentCourseQueryResult.data === undefined ||
+      currentCourseQueryResult.data === null
+    )
+      return [];
+
+    return Array.from(
+      new Set(
+        currentCourseQueryResult.data.sections.map((section) => section.type),
+      ),
+    ).sort();
+  }, [currentCourseQueryResult.data]);
+
+  const [currentSectionType, setCurrentSectionType] =
+    useState<z.infer<typeof sectionTypeZodEnum>>("L");
+
   if (courseQueryResult.isFetching) {
     return <span>Loading...</span>;
   }
@@ -639,6 +675,12 @@ function EditTimetable() {
               isOnEditPage={true}
               allCoursesDetails={courses}
               cdcs={cdcs}
+              currentCourseID={currentCourseID}
+              setCurrentCourseID={setCurrentCourseID}
+              currentCourseDetails={currentCourseQueryResult}
+              uniqueSectionTypes={uniqueSectionTypes}
+              currentSectionType={currentSectionType}
+              setCurrentSectionType={setCurrentSectionType}
             />
             <TimetableGrid
               isVertical={isVertical}
