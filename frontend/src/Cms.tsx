@@ -471,7 +471,7 @@ function Cms() {
     <>
       <TooltipProvider>
         {sectionsInTimetable.isSuccess && courseDetails.isSuccess ? (
-          <div className="flex pl-24 text-slate-50 pt-12 w-full">
+          <div className="flex pl-24 text-foreground pt-12 w-full">
             <div className="flex flex-col w-full">
               <div className="flex items-center">
                 <span className="text-5xl font-bold">
@@ -479,16 +479,16 @@ function Cms() {
                 </span>
                 <Tooltip delayDuration={100}>
                   <TooltipTrigger asChild>
-                    <div className="bg-transparent rounded-full hover:bg-slate-800 text-slate-100 px-4 py-3 ml-2 text-lg font-bold">
+                    <div className="bg-transparent rounded-full hover:bg-muted text-foreground px-4 py-3 ml-2 text-lg font-bold">
                       <HelpCircle />
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent className="w-96 flex space-y-2 flex-col bg-slate-800 text-slate-50 border-slate-700 text-md">
+                  <TooltipContent className="w-96 flex space-y-2 flex-col bg-muted text-foreground border-muted text-md">
                     <span>
                       To find these details, follow the instructions in{" "}
                       <a
                         href="https://youtu.be/ls1VsCPRH0I"
-                        className="text-blue-400 ml-1 inline items-center"
+                        className="text-blue-600 dark:text-blue-400 ml-1 inline items-center"
                       >
                         this quick, 1-minute-long video.
                         <ArrowUpRightFromCircle className="inline w-4 h-4 ml-1 mr-1" />
@@ -511,7 +511,7 @@ function Cms() {
                 <Tooltip delayDuration={100}>
                   <TooltipTrigger asChild>
                     <Button
-                      className="bg-transparent py-6 rounded-full hover:bg-slate-800 text-slate-100 mx-2 text-lg font-bold"
+                      className="bg-transparent py-6 rounded-full hover:bg-muted text-foreground mx-2 text-lg font-bold"
                       onClick={() => {
                         if (allowEdit) fetchEnrolledSections();
                         setAllowEdit(!allowEdit);
@@ -520,7 +520,7 @@ function Cms() {
                       {allowEdit ? <Save /> : <Pencil />}
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent className="bg-slate-800 text-slate-50 border-slate-700 text-md">
+                  <TooltipContent className="bg-muted text-foreground border-muted text-md">
                     {allowEdit ? "Save CMS Details" : "Edit CMS Details"}
                   </TooltipContent>
                 </Tooltip>
@@ -537,7 +537,7 @@ function Cms() {
                     ref={tokenRef}
                     id="webservicetoken"
                     placeholder="Web Service Token"
-                    className="text-xl bg-slate-800 ring-slate-700 ring-offset-slate-700 border-slate-700"
+                    className="text-xl bg-muted ring-muted ring-offset-muted border-muted"
                     disabled={!allowEdit}
                   />
                 </div>
@@ -549,7 +549,7 @@ function Cms() {
                     ref={cookieRef}
                     id="sessioncookie"
                     placeholder="Session Cookie"
-                    className="text-xl bg-slate-800 ring-slate-700 ring-offset-slate-700 border-slate-700"
+                    className="text-xl bg-muted ring-muted ring-offset-muted border-muted"
                     disabled={!allowEdit}
                   />
                 </div>
@@ -561,14 +561,14 @@ function Cms() {
                     ref={sesskeyRef}
                     id="sesskey"
                     placeholder="Session Key"
-                    className="text-xl bg-slate-800 ring-slate-700 ring-offset-slate-700 border-slate-700"
+                    className="text-xl bg-muted ring-muted ring-offset-muted border-muted"
                     disabled={!allowEdit}
                   />
                 </div>
               </div>
               <div className="flex relative h-fit">
                 {allowEdit && (
-                  <div className="flex justify-center items-center absolute bg-slate-950/60 w-3/4 h-full">
+                  <div className="flex justify-center items-center absolute bg-background/60 w-3/4 h-full">
                     <span className="text-3xl z-10 font-bold">
                       Enter your CMS details, and hit save to continue
                     </span>
@@ -588,26 +588,26 @@ function Cms() {
                         <Tooltip delayDuration={100}>
                           <TooltipTrigger asChild>
                             <Button
-                              className="ml-4 bg-transparent py-4 px-4 hover:bg-slate-800 rounded-full w-fit text-blue-50 text-md"
+                              className="ml-4 bg-transparent py-4 px-4 hover:bg-muted rounded-full w-fit text-blue-50 text-md"
                               onClick={() => fetchEnrolledSections()}
                             >
                               <RotateCw className="w-5 h-5" />
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent className="bg-slate-800 text-slate-50 border-slate-700 text-md">
+                          <TooltipContent className="bg-muted text-foreground border-muted text-md">
                             Refetch Enrolled Sections
                           </TooltipContent>
                         </Tooltip>
                         <Tooltip delayDuration={100}>
                           <TooltipTrigger asChild>
                             <Button
-                              className="ml-4 bg-transparent py-4 px-4 hover:bg-red-800 rounded-full w-fit text-slate-50 hover:text-red-50 text-md"
+                              className="ml-4 bg-transparent py-4 px-4 hover:bg-red-800 rounded-full w-fit text-foreground hover:text-red-50 text-md"
                               onClick={() => unenrollAllSections()}
                             >
                               <Trash className="w-5 h-5" />
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent className="bg-slate-800 text-slate-50 border-slate-700 text-md">
+                          <TooltipContent className="bg-muted text-foreground border-muted text-md">
                             Unenrol from these Sections
                           </TooltipContent>
                         </Tooltip>
@@ -631,8 +631,8 @@ function Cms() {
                       {enrolledCourses.length === 0 && (
                         <>
                           <div className="flex flex-col items-center">
-                            <Bird className="text-slate-300 w-36 h-36 mb-4" />
-                            <span className="text-xl text-slate-200">
+                            <Bird className="text-muted-foreground w-36 h-36 mb-4" />
+                            <span className="text-xl text-muted-foreground">
                               CMS is empty, or your CMS credentials are wrong,
                               or... CMS is being slow. Try again in a few
                               seconds, or check on CMS directly.
@@ -649,10 +649,10 @@ function Cms() {
                   {!sectionNameList.pending ? (
                     <div className="relative flex flex-col ml-8 text-md py-8 h-fit w-1/4">
                       {enrollingInProgress && (
-                        <div className="absolute bg-slate-950/80 flex items-center justify-center w-full h-full">
+                        <div className="absolute bg-background/80 flex items-center justify-center w-full h-full">
                           <div className="flex flex-col items-center justify-center">
                             <Spinner />
-                            <span className="text-slate-300 pt-4 text-xl">
+                            <span className="text-muted-foreground pt-4 text-xl">
                               Enrolling in sections...
                             </span>
                           </div>
@@ -671,7 +671,7 @@ function Cms() {
                               <Plus className="w-5 h-5" strokeWidth={2.5} />
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent className="bg-slate-800 text-slate-50 border-slate-700 text-md">
+                          <TooltipContent className="bg-muted text-foreground border-muted text-md">
                             Enroll in these sections
                           </TooltipContent>
                         </Tooltip>
@@ -689,8 +689,8 @@ function Cms() {
                       {sectionNameList.data.length === 0 && (
                         <>
                           <div className="flex flex-col items-center">
-                            <Bird className="text-slate-300 w-36 h-36 mb-4" />
-                            <span className="text-xl text-slate-200">
+                            <Bird className="text-muted-foreground w-36 h-36 mb-4" />
+                            <span className="text-xl text-muted-foreground">
                               No sections to enroll in
                             </span>
                           </div>
@@ -709,11 +709,11 @@ function Cms() {
                         <span className="text-3xl font-bold">Errors</span>
                         <Tooltip delayDuration={100}>
                           <TooltipTrigger asChild>
-                            <div className="bg-transparent rounded-full hover:bg-slate-800 text-slate-100 px-4 py-3 ml-2 text-lg font-bold">
+                            <div className="bg-transparent rounded-full hover:bg-muted text-foreground px-4 py-3 ml-2 text-lg font-bold">
                               <HelpCircle />
                             </div>
                           </TooltipTrigger>
-                          <TooltipContent className="w-96 bg-slate-800 text-slate-50 border-slate-700 text-md">
+                          <TooltipContent className="w-96 bg-muted text-foreground border-muted text-md">
                             ChronoFactorem wasn't able to enroll in these
                             sections. Either these sections don't exist, or
                             something else wen't wrong. You should try manually
