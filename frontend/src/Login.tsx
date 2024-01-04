@@ -35,17 +35,24 @@ const loginRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "login",
   loader: ({ context: { queryClient } }) =>
-    queryClient.ensureQueryData(authStatusQueryOptions).catch((error) => {
-      if (error instanceof AxiosError && error.response) {
-        if (error.response.status === 400) {
+    queryClient
+      .ensureQueryData(authStatusQueryOptions)
+      .then((data) => {
+        if (data) {
           router.navigate({
-            to: error.response.data.redirect,
+            to: data.redirect,
           });
         }
-      }
-
-      throw error;
-    }),
+      })
+      .catch((error) => {
+        if (error instanceof AxiosError && error.response) {
+          if (error.response.status === 401) {
+            // do nothing, as the user should be on the login page in this case
+            return;
+          }
+        }
+        throw error;
+      }),
   component: Login,
   errorComponent: ({ error }) => {
     const { toast } = useToast();

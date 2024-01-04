@@ -14,7 +14,7 @@ import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { useState } from "react";
 import { z } from "zod";
-import { userWithTimetablesType } from "../../lib/src/index";
+import { getBatchFromEmail, userWithTimetablesType } from "../../lib/src/index";
 import authenticatedRoute from "./AuthenticatedRoute";
 import { useToast } from "./components/ui/use-toast";
 import { router } from "./main";
@@ -246,16 +246,7 @@ function EditUserProfile() {
     );
   }
 
-  let batch;
-  if (userQueryResult.data.email !== undefined) {
-    batch = userQueryResult.data.email.match(
-      /^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/,
-    )
-      ? userQueryResult.data.email.slice(1, 5)
-      : "0000";
-  } else {
-    batch = "0000";
-  }
+  const batch = getBatchFromEmail(userQueryResult.data.email);
 
   const handleSubmit = async () => {
     if (firstDegree.includes("B") && secondDegree === null) {
