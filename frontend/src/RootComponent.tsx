@@ -8,8 +8,12 @@ export default function RootComponent() {
     <>
       <Toaster />
       <Outlet />
-      <ReactQueryDevtools buttonPosition="bottom-right" />
-      <TanStackRouterDevtools position="bottom-left" />
+      {import.meta.env.DEV && (
+        <>
+          <ReactQueryDevtools buttonPosition="bottom-right" />
+          <TanStackRouterDevtools position="bottom-left" />
+        </>
+      )}
     </>
   );
 }
