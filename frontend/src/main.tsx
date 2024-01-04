@@ -8,6 +8,7 @@ import {
 import React from "react";
 import ReactDOM from "react-dom/client";
 import authenticatedRoute from "./AuthenticatedRoute";
+import cmsExportRoute from "./CmsExport";
 import editUserProfileRoute from "./EditUserProfile";
 import getDegreesRoute from "./GetDegrees";
 import indexRoute from "./Home";
@@ -31,6 +32,7 @@ const routeTree = rootRoute.addChildren([
     indexRoute,
     editUserProfileRoute,
     viewTimetableRoute,
+    cmsExportRoute,
   ]),
 ]);
 
