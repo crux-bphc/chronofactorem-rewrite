@@ -16,7 +16,7 @@ import {
 } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
-import { Info, LogOut, Pencil, Plus } from "lucide-react";
+import { BookUp, Info, LogOut, Pencil, Plus } from "lucide-react";
 import { z } from "zod";
 import { userWithTimetablesType } from "../../../lib/src/index";
 import { router } from "../main";
@@ -174,7 +174,7 @@ export function NavBar() {
         >
           <div className="hidden md:flex">CMS Auto-Enroll</div>
           <div className="flex md:hidden">
-            <Info className="h-6 w-6" />
+            <BookUp className="h-6 w-6" />
           </div>
         </Link>
       </div>
