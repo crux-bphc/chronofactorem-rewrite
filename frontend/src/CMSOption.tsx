@@ -231,8 +231,8 @@ function CMSOption() {
             </div>
             <div className="flex space-x-4 pt-4">
               <Link
+                to="/"
                 className="bg-secondary text-secondary-foreground hover:bg-secondary/80 transition duration-200 w-4/12 px-4 h-fit py-4 rounded-lg xl:text-xl lg:text-lg md:text-md text-sm font-bold flex items-center"
-                href="/"
               >
                 No, Thanks
               </Link>
