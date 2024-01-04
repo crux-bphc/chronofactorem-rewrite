@@ -15,8 +15,7 @@ import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { useState } from "react";
 import { z } from "zod";
-// TODO: figure out why leaving out the `src` causes errors (mostly related to the whole CJS / ESM meme)
-import { collegeYearType, userWithTimetablesType } from "../../lib/src";
+import { collegeYearType, userWithTimetablesType } from "../../lib/src/index";
 import { rootRoute, router } from "./main";
 
 /*
