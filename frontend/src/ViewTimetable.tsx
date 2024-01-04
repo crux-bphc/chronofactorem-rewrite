@@ -15,6 +15,7 @@ import { courseType, timetableWithSectionsType } from "../../lib/src";
 import { userWithTimetablesType } from "../../lib/src/index";
 import authenticatedRoute from "./AuthenticatedRoute";
 import { TimetableGrid } from "./components/TimetableGrid";
+import { SideMenu } from "./components/side-menu";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -641,12 +642,19 @@ function ViewTimetable() {
               )}
             </span>
           </div>
-          <TimetableGrid
-            isVertical={isVertical}
-            timetableDetailsSections={timetableDetailsSections}
-            handleUnitClick={(e) => console.log(e)}
-            handleUnitDelete={(e) => console.log("DELETING", e)}
-          />
+          <div className="flex flex-row gap-4">
+            <SideMenu
+              timetable={timetable}
+              isOnEditPage={false}
+              allCoursesDetails={courses}
+            />
+            <TimetableGrid
+              isVertical={isVertical}
+              timetableDetailsSections={timetableDetailsSections}
+              handleUnitClick={(e) => console.log(e)}
+              handleUnitDelete={(e) => console.log("DELETING", e)}
+            />
+          </div>
         </TooltipProvider>
       </div>
     </>
