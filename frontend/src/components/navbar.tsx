@@ -168,6 +168,15 @@ export function NavBar() {
             <Info className="h-6 w-6" />
           </div>
         </Link>
+        <Link
+          to={userQueryResultData ? "/cmsExport" : undefined}
+          className="text-primary py-2 px-4 ml-4 text-lg rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out"
+        >
+          <div className="hidden md:flex">CMS Auto-Enroll</div>
+          <div className="flex md:hidden">
+            <Info className="h-6 w-6" />
+          </div>
+        </Link>
       </div>
       <div className="flex flex-row">
         <div className="pt-3">
