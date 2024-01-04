@@ -1,4 +1,3 @@
-import CDCList from "@/../CDCs.json";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { ArrowLeft, Bird, ChevronRight, HelpCircle } from "lucide-react";
