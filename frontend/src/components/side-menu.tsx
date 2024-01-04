@@ -1,7 +1,5 @@
 import CDCList from "@/../CDCs.json";
-import { rootRoute } from "@/main";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { ArrowLeft, Bird, ChevronRight, HelpCircle } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -13,19 +11,12 @@ import {
   sectionTypeZodEnum,
   timetableWithSectionsType,
 } from "../../../lib/src";
-import { NavBar } from "./navbar";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
-// TEMP, MAKE THIS THE EXPORT FOR THE FINAL VERSION
-function SideMenu({
+export function SideMenu({
   timetable,
   isOnEditPage,
   allCoursesDetails,
@@ -847,60 +838,3 @@ function SideMenu({
     </div>
   );
 }
-
-// TEMP FOR TESTING, REMOVE FOR FINAL VERSION
-export const sideMenuTestingRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: "/testSideMenu",
-  component: () => {
-    const timetable = useQuery({
-      queryKey: ["timetable"],
-      queryFn: async () => {
-        const result = await axios.get<
-          z.infer<typeof timetableWithSectionsType>
-          // Replace with your own tt id
-        >("/api/timetable/ecKL", {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        return result.data;
-      },
-    });
-
-    const allCoursesDetails = useQuery({
-      queryKey: ["courses"],
-      queryFn: async () => {
-        const result = await axios.get<z.infer<typeof courseType>[]>(
-          "/api/course",
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          },
-        );
-
-        return result.data;
-      },
-    });
-
-    if (timetable.data === undefined || allCoursesDetails.data === undefined) {
-      return <></>;
-    }
-
-    return (
-      <TooltipProvider>
-        <NavBar />
-        <div className="flex w-full">
-          <SideMenu
-            timetable={timetable.data}
-            isOnEditPage={true}
-            allCoursesDetails={allCoursesDetails.data}
-          />
-          <div />
-        </div>
-      </TooltipProvider>
-    );
-  },
-});
