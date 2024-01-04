@@ -1,3 +1,4 @@
+import CDCList from "@/../CDCs.json";
 import { ToastAction } from "@/components/ui/toast";
 import {
   Tooltip,
@@ -14,12 +15,13 @@ import {
 import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { Copy, GripHorizontal, GripVertical, Send, Trash } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { z } from "zod";
 import { courseType, timetableWithSectionsType } from "../../lib/src";
 import { userWithTimetablesType } from "../../lib/src/index";
 import authenticatedRoute from "./AuthenticatedRoute";
 import { TimetableGrid } from "./components/TimetableGrid";
+import { SideMenu } from "./components/side-menu";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -34,7 +36,6 @@ import { Badge } from "./components/ui/badge";
 import { Button } from "./components/ui/button";
 import { toast, useToast } from "./components/ui/use-toast";
 import { router } from "./main";
-import { SideMenu } from "./components/side-menu";
 
 const fetchTimetable = async (timetableId: string) => {
   const response = await axios.get<z.infer<typeof timetableWithSectionsType>>(
@@ -360,6 +361,75 @@ function EditTimetable() {
     },
   });
 
+  const cdcs = useMemo(() => {
+    let cdcs: string[];
+    const coursesList: any[] = [];
+
+    if (
+      timetableQueryResult.data === undefined ||
+      courseQueryResult.data === undefined
+    )
+      return [];
+
+    const degree = (
+      timetableQueryResult.data.degrees.length === 1
+        ? timetableQueryResult.data.degrees[0]
+        : timetableQueryResult.data.degrees
+            .sort((a, b) => (b as any) - (a as any))
+            .join("")
+    ) as keyof typeof CDCList;
+    const cdcListKey =
+      `${timetableQueryResult.data.year}-${timetableQueryResult.data.semester}` as keyof (typeof CDCList)[typeof degree];
+
+    if (degree in CDCList && cdcListKey in CDCList[degree]) {
+      cdcs = CDCList[degree][cdcListKey];
+    } else {
+      return [];
+    }
+
+    // Code based on temp frontend
+    for (let i = 0; i < cdcs.length; i++) {
+      if (cdcs[i].includes("/")) {
+        const [depts, codes] = cdcs[i].split(" ");
+        const options: string[] = [];
+        for (let j = 0; j < depts.split("/").length; j++) {
+          options.push(`${depts.split("/")[j]} ${codes.split("/")[j]}`);
+        }
+        const matchedCourses = courseQueryResult.data.filter((e) =>
+          options.includes(e.code),
+        );
+        if (matchedCourses.length < options.length) {
+          coursesList.push({
+            id: null,
+            type: "warning" as "warning" | "optional",
+            warning: `One CDC of ${options.join(", ")} not found`,
+          });
+        } else {
+          coursesList.push({
+            id: null,
+            type: "optional" as "warning" | "optional",
+            options: matchedCourses,
+          });
+        }
+      } else {
+        const matchedCourses = courseQueryResult.data.filter(
+          (e) => e.code === cdcs[i],
+        );
+        if (matchedCourses.length === 1) {
+          coursesList.push(matchedCourses[0]);
+        } else {
+          coursesList.push({
+            id: null,
+            type: "warning" as "warning" | "optional",
+            warning: `CDC ${cdcs[i]} not found`,
+          });
+        }
+      }
+    }
+
+    return coursesList;
+  }, [timetableQueryResult, courseQueryResult]);
+
   if (courseQueryResult.isFetching) {
     return <span>Loading...</span>;
   }
@@ -568,6 +638,7 @@ function EditTimetable() {
               timetable={timetable}
               isOnEditPage={true}
               allCoursesDetails={courses}
+              cdcs={cdcs}
             />
             <TimetableGrid
               isVertical={isVertical}

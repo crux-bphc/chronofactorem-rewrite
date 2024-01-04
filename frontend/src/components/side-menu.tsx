@@ -20,10 +20,12 @@ export function SideMenu({
   timetable,
   isOnEditPage,
   allCoursesDetails,
+  cdcs,
 }: {
   timetable: z.infer<typeof timetableWithSectionsType>;
   isOnEditPage: boolean;
   allCoursesDetails: z.infer<typeof courseType>[];
+  cdcs: any[];
 }) {
   const queryClient = useQueryClient();
 
@@ -50,67 +52,6 @@ export function SideMenu({
     () => currentCourseID !== null,
     [currentCourseID],
   );
-
-  const cdcs = useMemo(() => {
-    let cdcs: string[];
-    const courses: any[] = [];
-
-    const degree = (
-      timetable.degrees.length === 1
-        ? timetable.degrees[0]
-        : timetable.degrees.sort((a, b) => (b as any) - (a as any)).join("")
-    ) as keyof typeof CDCList;
-    const cdcListKey =
-      `${timetable.year}-${timetable.semester}` as keyof (typeof CDCList)[typeof degree];
-
-    if (degree in CDCList && cdcListKey in CDCList[degree]) {
-      cdcs = CDCList[degree][cdcListKey];
-    } else {
-      return [];
-    }
-
-    // Code based on temp frontend
-    for (let i = 0; i < cdcs.length; i++) {
-      if (cdcs[i].includes("/")) {
-        const [depts, codes] = cdcs[i].split(" ");
-        const options: string[] = [];
-        for (let j = 0; j < depts.split("/").length; j++) {
-          options.push(`${depts.split("/")[j]} ${codes.split("/")[j]}`);
-        }
-        const matchedCourses = allCoursesDetails.filter((e) =>
-          options.includes(e.code),
-        );
-        if (matchedCourses.length < options.length) {
-          courses.push({
-            id: null,
-            type: "warning" as "warning" | "optional",
-            warning: `One CDC of ${options.join(", ")} not found`,
-          });
-        } else {
-          courses.push({
-            id: null,
-            type: "optional" as "warning" | "optional",
-            options: matchedCourses,
-          });
-        }
-      } else {
-        const matchedCourses = allCoursesDetails.filter(
-          (e) => e.code === cdcs[i],
-        );
-        if (matchedCourses.length === 1) {
-          courses.push(matchedCourses[0]);
-        } else {
-          courses.push({
-            id: null,
-            type: "warning" as "warning" | "optional",
-            warning: `CDC ${cdcs[i]} not found`,
-          });
-        }
-      }
-    }
-
-    return courses;
-  }, [timetable, allCoursesDetails]);
 
   const currentCourseDetails = useQuery({
     queryKey: [currentCourseID],
