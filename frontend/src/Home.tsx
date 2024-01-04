@@ -68,7 +68,11 @@ const renderTimetableSection = (title: string, timetables: Timetable[]) => {
         <h2 className="text-2xl md:text-3xl font-bold">{title}</h2>
         <div className="flex flex-col items-center justify-center sm:flex-row sm:flex-wrap gap-8 pt-4 md:justify-normal">
           {timetables.map((timetable) => (
-            <TimetableCard key={timetable.id} timetable={timetable} />
+            <TimetableCard
+              key={timetable.id}
+              timetable={timetable}
+              showFooter={true}
+            />
           ))}
         </div>
       </section>
