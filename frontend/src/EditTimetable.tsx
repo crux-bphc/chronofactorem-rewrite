@@ -998,7 +998,7 @@ function EditTimetable() {
               </Tooltip>
             </span>
           </div>
-          <div className="flex">
+          <div className="flex flex-row gap-4">
             <SideMenu
               timetable={timetable}
               isOnEditPage={true}
