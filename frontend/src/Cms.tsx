@@ -1,7 +1,19 @@
 import axios, { AxiosError } from "axios";
 import { z } from "zod";
-import { userWithTimetablesType } from "../../lib/src";
-import { queryOptions } from "@tanstack/react-query";
+import {
+  courseType,
+  courseWithSectionsType,
+  sectionType,
+  timetableWithSectionsType,
+  userWithTimetablesType,
+} from "../../lib/src";
+import {
+  QueryCache,
+  QueryClient,
+  queryOptions,
+  useQueries,
+  useQuery,
+} from "@tanstack/react-query";
 import { ErrorComponent, Route } from "@tanstack/react-router";
 import { ToastAction } from "./components/ui/toast";
 import { router } from "./main";
@@ -26,8 +38,16 @@ import {
 import { Button } from "./components/ui/button";
 import { Label } from "./components/ui/label";
 import { Input } from "./components/ui/input";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Spinner from "./components/spinner";
+
+const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error) => {
+      console.log(`ERROR: ${error}`);
+    },
+  }),
+});
 
 const fetchUserDetails = async (): Promise<
   z.infer<typeof userWithTimetablesType>
@@ -48,23 +68,70 @@ const userQueryOptions = queryOptions({
   queryFn: () => fetchUserDetails(),
 });
 
+const fetchAllCoursesQueryOptions = () =>
+  queryOptions({
+    queryKey: ["course"],
+    queryFn: async () => {
+      const res = await axios.get<z.infer<typeof courseType>[]>(
+        "/api/course/",
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      return res.data;
+    },
+  });
+
+const fetchTimetableDetailsQueryOptions = (timetableId: string) =>
+  queryOptions({
+    queryKey: ["timetable", timetableId],
+    queryFn: async () => {
+      const res = await axios.get<z.infer<typeof timetableWithSectionsType>>(
+        `/api/timetable/${timetableId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      if (!res.data.draft && !res.data.archived) {
+        return res.data.sections;
+      }
+      alert(
+        "CMS Auto-Enroll cannot be used with draft or archived timetables.",
+      );
+      router.navigate({ to: "/" });
+    },
+  });
+
 const cmsRoute = new Route({
   getParentRoute: () => authenticatedRoute,
   path: "cms/$timetableId",
-  loader: ({ context: { queryClient } }) =>
-    queryClient.ensureQueryData(userQueryOptions).catch((error) => {
-      if (
-        error instanceof AxiosError &&
-        error.response &&
-        error.response.status === 401
-      ) {
-        router.navigate({
-          to: "/login",
-        });
-      }
+  loader: ({ params }) => {
+    queryClient
+      .ensureQueryData(userQueryOptions)
+      .then(() => {
+        queryClient.ensureQueryData(fetchAllCoursesQueryOptions());
+        queryClient.ensureQueryData(
+          fetchTimetableDetailsQueryOptions(params.timetableId),
+        );
+      })
+      .catch((error) => {
+        if (
+          error instanceof AxiosError &&
+          error.response &&
+          error.response.status === 401
+        ) {
+          router.navigate({
+            to: "/login",
+          });
+        }
 
-      throw error;
-    }),
+        throw error;
+      });
+  },
   component: Cms,
   errorComponent: ({ error }) => {
     const { toast } = useToast();
@@ -138,11 +205,7 @@ function Cms() {
   const cookieRef = useRef<HTMLInputElement>(null);
   const sesskeyRef = useRef<HTMLInputElement>(null);
   const [allowEdit, setAllowEdit] = useState(true);
-  const [coursesLoaded, setCoursesLoaded] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
-  const [sectionNameListLoaded, setSectionNameListLoaded] = useState(false);
-  const [sectionNameList, setSectionNameList] = useState<string[]>([]);
   const [enrollingInProgress, setEnrollingInProgress] = useState(false);
   const [enrolledLoaded, setEnrolledLoaded] = useState(true);
   const [enrolledCourses, setEnrolledCourses] = useState(
@@ -151,126 +214,59 @@ function Cms() {
       displayname: string;
     }[],
   );
-  const [sectionsInTimetable, setSectionsInTimetable] = useState<
-    {
-      courseId: string;
-      type: string;
-      roomTime: string[];
-      number: number;
-    }[]
-  >([]);
-  const [courseDetails, setCourseDetails] = useState<
-    {
-      id: string;
-      code: string;
-      name: string;
-      midsemStartTime: string | null;
-      midsemEndTime: string | null;
-      compreStartTime: string | null;
-      compreEndTime: string | null;
-    }[]
-  >([]);
 
-  useEffect(() => {
-    const computeFinalSectionNames = async () => {
-      const sectionNames = (
-        await Promise.all(
-          sectionsInTimetable.map(async (section) => {
-            const course = courseDetails.filter(
-              (course) => course.id === section.courseId,
-            )[0];
-            const { data, status } = await axios.get(
-              `/api/course/${course.id}`,
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              },
-            );
-            if (status === 200) {
-              const count = (data.sections as { type: string }[]).filter(
-                (e) => e.type === section.type,
-              ).length;
-              return count > 1
-                ? [
-                    `${section.roomTime[0].split(":")[0]} ${course.name} ${
-                      section.type
-                    }`,
-                    `${section.roomTime[0].split(":")[0]} ${course.name} ${
-                      section.type
-                    }${section.number}`,
-                  ]
-                : `${section.roomTime[0].split(":")[0]} ${course.name} ${
-                    section.type
-                  }${section.number}`;
-            }
-            if (status === 404) {
-              alert(`Error: ${data.message}`);
-              return [];
-            }
-            if (status === 500) {
-              alert(`Server error: ${data.message}`);
-              return [];
-            }
-            alert(`Server error: ${data}`);
-            return [];
-          }),
-        )
-      ).flat();
-      setSectionNameList(sectionNames);
-      setSectionNameListLoaded(true);
-    };
-    computeFinalSectionNames();
-  }, [courseDetails, sectionsInTimetable]);
-
-  useEffect(() => {
-    const fetchCourseDetails = async () => {
-      const { data, status } = await axios.get("/api/course", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (status === 200) {
-        setCoursesLoaded(true);
-        setCourseDetails(data);
-      } else if (status === 404) {
-        alert(`Error: ${data.message}`);
-      } else if (status === 500) {
-        alert(`Server error: ${data.message}`);
-      } else {
-        alert(`Server error: ${data}`);
-      }
-    };
-    const fetchTimetableDetails = async () => {
-      const { data, status } = await axios.get(
-        `/api/timetable/${timetableId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
+  const fetchCourseDetailsQueryOptions = (
+    section: z.infer<typeof sectionType>,
+    course: z.infer<typeof courseType>,
+  ) =>
+    queryOptions({
+      queryKey: ["course", course.id],
+      queryFn: async () => {
+        const res = await axios.get<z.infer<typeof courseWithSectionsType>>(
+          `/api/course/${course.id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
           },
-        },
-      );
-      if (status === 200) {
-        if (!data.draft && !data.archived) {
-          setIsLoaded(true);
-          setSectionsInTimetable(data.sections);
-        } else {
-          alert(
-            "CMS Auto-Enroll cannot be used with draft or archived timetables.",
-          );
-          router.navigate({ to: "/" });
-        }
-      } else if (status === 404) {
-        alert(`Error: ${data.message}`);
-      } else if (status === 500) {
-        alert(`Server error: ${data.message}`);
-      } else {
-        alert(`Server error: ${data}`);
-      }
-    };
-    fetchCourseDetails();
-    fetchTimetableDetails();
-  }, [timetableId]);
+        );
+        const count = (res.data.sections as { type: string }[]).filter(
+          (e) => e.type === section.type,
+        ).length;
+        return count > 1
+          ? [
+              `${section.roomTime[0].split(":")[0]} ${course.name} ${
+                section.type
+              }`,
+              `${section.roomTime[0].split(":")[0]} ${course.name} ${
+                section.type
+              }${section.number}`,
+            ]
+          : `${section.roomTime[0].split(":")[0]} ${course.name} ${
+              section.type
+            }${section.number}`;
+      },
+    });
+
+  const courseDetails = useQuery(fetchAllCoursesQueryOptions());
+  const sectionsInTimetable = useQuery(
+    fetchTimetableDetailsQueryOptions(timetableId),
+  );
+
+  const sectionNameList = useQueries({
+    queries: (sectionsInTimetable.data ?? []).map((section) => {
+      const course = (courseDetails.data ?? []).filter(
+        (course) => course.id === section.courseId,
+      )[0];
+      return fetchCourseDetailsQueryOptions(section, course);
+    }),
+    combine: (results) => {
+      return {
+        data: results.flatMap((result) => result.data),
+        pending: results.some((result) => result.isPending),
+      };
+    },
+  });
 
   const fetchEnrolledSections = async () => {
     setEnrolledLoaded(false);
@@ -320,13 +316,13 @@ function Cms() {
     setEnrolledLoaded(false);
     setEnrollingInProgress(true);
     const errors: string[] = [];
-    for (let i = 0; i < sectionNameList.length; i++) {
+    for (let i = 0; i < sectionNameList.data.length; i++) {
+      const ele = sectionNameList.data[i];
+      if (ele === undefined) continue;
       const { data: courseData } = await axios.get(
         `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_course_search_courses&moodlewsrestformat=json&wstoken=${
           tokenRef.current?.value
-        }&criterianame=search&criteriavalue=${encodeURIComponent(
-          sectionNameList[i],
-        )}`,
+        }&criterianame=search&criteriavalue=${encodeURIComponent(ele)}`,
       );
       if (
         "courses" in courseData &&
@@ -338,7 +334,7 @@ function Cms() {
         typeof courseData.courses[0].id === "number"
       ) {
         const split = courseData.courses[0].displayname.split(" ");
-        const sectionNameSplit = sectionNameList[i].split(" ");
+        const sectionNameSplit = ele.split(" ");
         if (
           split[split.length - 1] ===
           sectionNameSplit[sectionNameSplit.length - 1]
@@ -347,15 +343,15 @@ function Cms() {
             `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=enrol_self_enrol_user&moodlewsrestformat=json&wstoken=${tokenRef.current?.value}&courseid=${courseData.courses[0].id}`,
           );
           if (status !== 200 || !data.status) {
-            errors.push(sectionNameList[i]);
+            errors.push(ele);
             setErrors(errors);
           }
         } else {
-          errors.push(sectionNameList[i]);
+          errors.push(ele);
           setErrors(errors);
         }
       } else {
-        errors.push(sectionNameList[i]);
+        errors.push(ele);
         setErrors(errors);
       }
     }
@@ -393,7 +389,7 @@ function Cms() {
   return (
     <>
       <TooltipProvider>
-        {isLoaded && coursesLoaded ? (
+        {sectionsInTimetable.isSuccess && courseDetails.isSuccess ? (
           <div className="flex pl-24 text-slate-50 pt-12 w-full">
             <div className="flex flex-col w-full">
               <div className="flex items-center">
@@ -436,7 +432,7 @@ function Cms() {
                     <Button
                       className="bg-transparent py-6 rounded-full hover:bg-slate-800 text-slate-100 mx-2 text-lg font-bold"
                       onClick={() => {
-                        // if (allowEdit) fetchEnrolledSections();
+                        if (allowEdit) fetchEnrolledSections();
                         setAllowEdit(!allowEdit);
                       }}
                     >
@@ -569,7 +565,7 @@ function Cms() {
                       <Spinner />
                     </div>
                   )}
-                  {sectionNameListLoaded ? (
+                  {!sectionNameList.pending ? (
                     <div className="relative flex flex-col ml-8 text-md py-8 h-fit w-1/4">
                       {enrollingInProgress && (
                         <div className="absolute bg-slate-950/80 flex items-center justify-center w-full h-full">
@@ -599,17 +595,17 @@ function Cms() {
                           </TooltipContent>
                         </Tooltip>
                       </div>
-                      {sectionNameList.sort().map((section) => (
+                      {sectionNameList.data.sort().map((section) => (
                         <span className="py-1">
                           {section
-                            .replace(/&lt;/g, "<")
+                            ?.replace(/&lt;/g, "<")
                             .replace(/&gt;/g, ">")
                             .replace(/&quot;/g, '"')
                             .replace(/&#39;/g, "'")
                             .replace(/&amp;/g, "&")}
                         </span>
                       ))}
-                      {sectionNameList.length === 0 && (
+                      {sectionNameList.data.length === 0 && (
                         <>
                           <div className="flex flex-col items-center">
                             <Bird className="text-slate-300 w-36 h-36 mb-4" />
