@@ -323,7 +323,13 @@ function TimetableCard({ timetable, showFooter, isCMSPage }: Props) {
         <CardHeader className="pb-2">
           <CardTitle className="text-xl md:text-2xl flex justify-between items-center">
             <Link
-              to={isCMSPage ? ("/cms/$timetableId") : ("/view/$timetableId")}
+              to={
+                timetable.draft
+                  ? "/edit/$timetableId"
+                  : isCMSPage
+                    ? "/cms/$timetableId"
+                    : "/view/$timetableId"
+              }
               params={{
                 timetableId: timetable.id,
               }}
