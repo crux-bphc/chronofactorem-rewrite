@@ -142,7 +142,7 @@ export function NavBar() {
             </h1>
           </div>
           <div className="flex md:hidden">
-            <h1 className="scroll-m-20 cursor-pointer text-2xl font-extrabold tracking-tight lg:text-3xl m-4 text-foreground">
+            <h1 className="scroll-m-20 cursor-pointer text-2xl font-extrabold tracking-tight lg:text-3xl mx-2 my-4 text-foreground">
               Chrono
             </h1>
           </div>
@@ -161,7 +161,7 @@ export function NavBar() {
         <Link
           // Comment out for now because the route doesn't exist
           // to={userQueryResultData ? "/about" : undefined}
-          className="text-primary py-2 px-4 ml-4 text-lg rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out"
+          className="text-primary py-2 px-2 ml-2 text-lg rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out"
         >
           <div className="hidden md:flex">About</div>
           <div className="flex md:hidden">
@@ -170,7 +170,7 @@ export function NavBar() {
         </Link>
         <Link
           to={userQueryResultData ? "/cmsExport" : undefined}
-          className="text-primary py-2 px-4 ml-4 text-lg rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out"
+          className="text-primary py-2 px-2 ml-2 text-lg rounded-full hover:bg-muted transition h-fit whitespace-nowrap duration-200 ease-in-out"
         >
           <div className="hidden md:flex">CMS Auto-Enroll</div>
           <div className="flex md:hidden">

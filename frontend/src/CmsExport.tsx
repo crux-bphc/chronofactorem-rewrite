@@ -289,12 +289,12 @@ function CmsExport() {
       <>
         <TooltipProvider>
           <div className="flex items-center py-2 md:py-4 px-4 md:px-8">
-            <span className="text-5xl font-bold m-4 text-foreground">
+            <span className="lg:text-5xl text-4xl font-bold m-4 text-foreground">
               CMS Auto-Enroll
             </span>
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
-                <HelpCircle className="w-12 h-12 ml-2 text-muted-foreground hover:text-foreground transition duration-300 ease-in-out" />
+                <HelpCircle className="lg:w-12 w-8 lg:h-12 h-8 ml-2 text-muted-foreground hover:text-foreground transition duration-300 ease-in-out" />
               </TooltipTrigger>
               <TooltipContent className="w-[48rem] flex flex-col bg-muted text-foreground border-muted-foreground text-md">
                 <span>
