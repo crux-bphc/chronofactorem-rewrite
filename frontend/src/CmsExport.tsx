@@ -1,5 +1,11 @@
 import { ToastAction } from "@/components/ui/toast";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   queryOptions,
   useMutation,
   useQuery,
@@ -7,7 +13,7 @@ import {
 } from "@tanstack/react-query";
 import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
-import { CalendarX2 } from "lucide-react";
+import { ArrowUpRightFromCircle, CalendarX2, HelpCircle } from "lucide-react";
 import { z } from "zod";
 import { timetableType, userWithTimetablesType } from "../../lib/src/index";
 import authenticatedRoute from "./AuthenticatedRoute";
@@ -281,7 +287,59 @@ function CmsExport() {
 
     return (
       <>
-        <main className="text-foreground py-6 md:py-12 px-10 md:px-16">
+        <TooltipProvider>
+          <div className="flex items-center py-2 md:py-4 px-4 md:px-8">
+            <span className="text-5xl font-bold m-4 text-foreground">
+              CMS Auto-Enroll
+            </span>
+            <Tooltip delayDuration={100}>
+              <TooltipTrigger asChild>
+                <HelpCircle className="w-12 h-12 ml-2 text-slate-400 hover:text-slate-50 transition duration-300 ease-in-out" />
+              </TooltipTrigger>
+              <TooltipContent className="w-[48rem] flex flex-col bg-slate-800 text-slate-50 border-slate-700 text-md">
+                <span>
+                  ChronoFactorem now allows you to cut the hassle of enrolling
+                  into the CMS sections for your courses, and automates it all
+                  away.
+                </span>
+                <span className="pt-2">
+                  With just a few clicks, you can now sync everything in your
+                  academic life with ChronoFactorem.
+                </span>
+                <span className="pt-2">
+                  For those unaware, CMS is the single most important academic
+                  resource for your life at BITS Hyderabad. All your course
+                  slides, assignment details, and important announcements are
+                  posted on CMS. You can access CMS at
+                  <a
+                    href="https://cms.bits-hyderabad.ac.in/"
+                    className="text-blue-400 ml-1 inline items-center"
+                  >
+                    https://cms.bits-hyderabad.ac.in/
+                    <ArrowUpRightFromCircle className="inline w-4 h-4 ml-1 mr-1" />
+                  </a>
+                  , download the Android app
+                  <a
+                    href="https://play.google.com/store/apps/details?id=crux.bphc.cms"
+                    className="text-blue-400 ml-1 inline items-center"
+                  >
+                    here
+                    <ArrowUpRightFromCircle className="inline w-4 h-4 ml-1 mr-1" />
+                  </a>
+                  , and download the iOS app
+                  <a
+                    href="https://apps.apple.com/in/app/cms-bphc/id1489946522"
+                    className="text-blue-400 ml-1 inline items-center"
+                  >
+                    here
+                    <ArrowUpRightFromCircle className="inline w-4 h-4 ml-1 mr-1" />
+                  </a>
+                </span>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
+        <main className="text-foreground py-2 md:py-4 px-10 md:px-16">
           <h1 className="text-3xl font-bold text-center sm:text-left md:text-4xl">
             My Timetables
           </h1>
@@ -293,7 +351,11 @@ function CmsExport() {
                   <span>
                     <CalendarX2 className="h-24 w-24 md:h-32 md:w-32" />
                   </span>
-                  <h2 className="text-xl sm:text-2xl">It's empty in here.</h2>
+                  <h2 className="text-xl sm:text-2xl">
+                    Publish a timetable to enable CMS Auto-Enroll.
+                    <br />
+                    Draft timetables cannot be used with CMS Auto-Enroll.
+                  </h2>
                   <Button
                     className="text-lg sm:text-2xl py-6 px-10 font-bold"
                     onClick={() => createMutation.mutate()}
