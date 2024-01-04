@@ -157,13 +157,13 @@ const fetchTimetableDetailsQueryOptions = (timetableId: string) =>
           },
         },
       );
-      if (!res.data.draft && !res.data.archived) {
-        return res.data.sections;
-      }
-      alert(
-        "CMS Auto-Enroll cannot be used with draft or archived timetables.",
-      );
-      router.navigate({ to: "/" });
+      // if (!res.data.draft && !res.data.archived) {
+      return res.data.sections;
+      // }
+      // alert(
+      //   "CMS Auto-Enroll cannot be used with draft or archived timetables.",
+      // );
+      // router.navigate({ to: "/" });
     },
   });
 
@@ -471,259 +471,147 @@ function Cms() {
     <>
       <TooltipProvider>
         {sectionsInTimetable.isSuccess && courseDetails.isSuccess ? (
-          <div className="flex pl-24 text-foreground pt-12 w-full">
-            <div className="flex flex-col w-full">
-              <div className="flex items-center">
-                <span className="text-5xl font-bold">
-                  Enter your CMS Details
-                </span>
-                <Tooltip delayDuration={100}>
-                  <TooltipTrigger asChild>
-                    <div className="bg-transparent rounded-full hover:bg-muted text-foreground px-4 py-3 ml-2 text-lg font-bold">
-                      <HelpCircle />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent className="w-96 flex space-y-2 flex-col bg-muted text-foreground border-muted text-md">
-                    <span>
-                      To find these details, follow the instructions in{" "}
-                      <a
-                        href="https://youtu.be/ls1VsCPRH0I"
-                        className="text-blue-600 dark:text-blue-400 ml-1 inline items-center"
-                      >
-                        this quick, 1-minute-long video.
-                        <ArrowUpRightFromCircle className="inline w-4 h-4 ml-1 mr-1" />
-                      </a>
-                    </span>
-                    <span>
-                      To automate enrolling and unenrolling, ChronoFactorem
-                      needs these details to perform these actions on your
-                      behalf.
-                    </span>
-                    <span>
-                      ChronoFactorem does not collect, transmit, retain, or
-                      store any of these details. These details do not leave
-                      this webpage. All of ChronoFactorem's code is written, and
-                      deployed publicly, and can be viewed and verified by
-                      anyone that wishes to.
-                    </span>
-                  </TooltipContent>
-                </Tooltip>
-                <Tooltip delayDuration={100}>
-                  <TooltipTrigger asChild>
-                    <Button
-                      className="bg-transparent py-6 rounded-full hover:bg-muted text-foreground mx-2 text-lg font-bold"
-                      onClick={() => {
-                        if (allowEdit) fetchEnrolledSections();
-                        setAllowEdit(!allowEdit);
-                      }}
-                    >
-                      {allowEdit ? <Save /> : <Pencil />}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent className="bg-muted text-foreground border-muted text-md">
-                    {allowEdit ? "Save CMS Details" : "Edit CMS Details"}
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-              <div className="flex w-full space-x-4">
-                <div className="flex flex-col w-1/5">
-                  <Label
-                    htmlFor="webservicetoken"
-                    className="mt-4 mb-1 text-lg"
-                  >
-                    Web Service Token
-                  </Label>
-                  <Input
-                    ref={tokenRef}
-                    id="webservicetoken"
-                    placeholder="Web Service Token"
-                    className="text-xl bg-muted ring-muted ring-offset-muted border-muted"
-                    disabled={!allowEdit}
-                  />
-                </div>
-                <div className="flex flex-col w-1/5">
-                  <Label htmlFor="sessionkey" className="mt-4 mb-1 text-lg">
-                    Session Cookie
-                  </Label>
-                  <Input
-                    ref={cookieRef}
-                    id="sessioncookie"
-                    placeholder="Session Cookie"
-                    className="text-xl bg-muted ring-muted ring-offset-muted border-muted"
-                    disabled={!allowEdit}
-                  />
-                </div>
-                <div className="flex flex-col w-1/5">
-                  <Label htmlFor="sessionkey" className="mt-4 mb-1 text-lg">
-                    Session Key
-                  </Label>
-                  <Input
-                    ref={sesskeyRef}
-                    id="sesskey"
-                    placeholder="Session Key"
-                    className="text-xl bg-muted ring-muted ring-offset-muted border-muted"
-                    disabled={!allowEdit}
-                  />
-                </div>
-              </div>
-              <div className="flex relative h-fit">
-                {allowEdit && (
-                  <div className="flex justify-center items-center absolute bg-background/60 w-3/4 h-full">
-                    <span className="text-3xl z-10 font-bold">
-                      Enter your CMS details, and hit save to continue
-                    </span>
+          <div className="flex flex-col w-full text-foreground pl-24 pt-12 gap-2">
+            <div className="flex gap-2 items-center">
+              <span className="text-5xl font-bold">Enter your CMS Details</span>
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger asChild>
+                  <div className="bg-transparent rounded-full hover:bg-muted text-foreground px-4 py-3 text-lg font-bold">
+                    <HelpCircle />
                   </div>
-                )}
-                <div
-                  className={`w-full flex ${
-                    allowEdit ? "blur-sm pointer-events-none" : ""
-                  }`}
-                >
-                  {enrolledLoaded ? (
-                    <div className="flex flex-col pl-2 text-md py-8 w-1/4">
-                      <div className="flex pb-4">
-                        <span className="text-3xl font-bold">
-                          Enrolled Sections
-                        </span>
-                        <Tooltip delayDuration={100}>
-                          <TooltipTrigger asChild>
-                            <Button
-                              className="ml-4 bg-transparent py-4 px-4 hover:bg-muted rounded-full w-fit text-blue-50 text-md"
-                              onClick={() => fetchEnrolledSections()}
-                            >
-                              <RotateCw className="w-5 h-5" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent className="bg-muted text-foreground border-muted text-md">
-                            Refetch Enrolled Sections
-                          </TooltipContent>
-                        </Tooltip>
-                        <Tooltip delayDuration={100}>
-                          <TooltipTrigger asChild>
-                            <Button
-                              className="ml-4 bg-transparent py-4 px-4 hover:bg-red-800 rounded-full w-fit text-foreground hover:text-red-50 text-md"
-                              onClick={() => unenrollAllSections()}
-                            >
-                              <Trash className="w-5 h-5" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent className="bg-muted text-foreground border-muted text-md">
-                            Unenrol from these Sections
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                      {enrolledCourses
-                        .sort((a, b) =>
-                          a.displayname.localeCompare(b.displayname),
-                        )
-                        .map((section) => (
-                          <>
-                            <span className="py-1">
-                              {section.displayname
-                                .replace(/&lt;/g, "<")
-                                .replace(/&gt;/g, ">")
-                                .replace(/&quot;/g, '"')
-                                .replace(/&#39;/g, "'")
-                                .replace(/&amp;/g, "&")}
-                            </span>
-                          </>
-                        ))}
-                      {enrolledCourses.length === 0 && (
-                        <>
-                          <div className="flex flex-col items-center">
-                            <Bird className="text-muted-foreground w-36 h-36 mb-4" />
-                            <span className="text-xl text-muted-foreground">
-                              CMS is empty, or your CMS credentials are wrong,
-                              or... CMS is being slow. Try again in a few
-                              seconds, or check on CMS directly.
-                            </span>
-                          </div>
-                        </>
-                      )}
+                </TooltipTrigger>
+                <TooltipContent className="w-96 flex space-y-2 flex-col bg-muted text-foreground border-muted text-md">
+                  <span>
+                    To find these details, follow the instructions in{" "}
+                    <a
+                      href="https://youtu.be/ls1VsCPRH0I"
+                      className="text-blue-600 dark:text-blue-400 ml-1 inline items-center"
+                    >
+                      this quick, 1-minute-long video.
+                      <ArrowUpRightFromCircle className="inline w-4 h-4 ml-1 mr-1" />
+                    </a>
+                  </span>
+                  <span>
+                    To automate enrolling and unenrolling, ChronoFactorem needs
+                    these details to perform these actions on your behalf.
+                  </span>
+                  <span>
+                    ChronoFactorem does not collect, transmit, retain, or store
+                    any of these details. These details do not leave this
+                    webpage. All of ChronoFactorem's code is written, and
+                    deployed publicly, and can be viewed and verified by anyone
+                    that wishes to.
+                  </span>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger asChild>
+                  <Button
+                    className="bg-transparent py-3 rounded-full hover:bg-muted text-foreground text-lg font-bold"
+                    onClick={() => {
+                      if (allowEdit) fetchEnrolledSections();
+                      setAllowEdit(!allowEdit);
+                    }}
+                  >
+                    {allowEdit ? <Save /> : <Pencil />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="bg-muted text-foreground border-muted text-md">
+                  {allowEdit ? "Save CMS Details" : "Edit CMS Details"}
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <div className="flex w-full gap-6 mt-4">
+              <div className="flex flex-col w-fit">
+                <Label htmlFor="webservicetoken" className="mb-1 text-lg">
+                  Web Service Token
+                </Label>
+                <Input
+                  ref={tokenRef}
+                  id="webservicetoken"
+                  placeholder="Web Service Token"
+                  className="text-xl bg-muted ring-muted ring-offset-muted border-muted"
+                  disabled={!allowEdit}
+                />
+              </div>
+              <div className="flex flex-col w-fit">
+                <Label htmlFor="sessionkey" className="mb-1 text-lg">
+                  Session Cookie
+                </Label>
+                <Input
+                  ref={cookieRef}
+                  id="sessioncookie"
+                  placeholder="Session Cookie"
+                  className="text-xl bg-muted ring-muted ring-offset-muted border-muted"
+                  disabled={!allowEdit}
+                />
+              </div>
+              <div className="flex flex-col w-fit">
+                <Label htmlFor="sessionkey" className="mb-1 text-lg">
+                  Session Key
+                </Label>
+                <Input
+                  ref={sesskeyRef}
+                  id="sesskey"
+                  placeholder="Session Key"
+                  className="text-xl bg-muted ring-muted ring-offset-muted border-muted"
+                  disabled={!allowEdit}
+                />
+              </div>
+            </div>
+            <div className="flex relative h-fit">
+              {allowEdit && (
+                <div className="flex justify-center items-center absolute bg-background/60 w-3/4 h-full">
+                  <span className="text-3xl z-10 font-bold text-foreground/85">
+                    Enter your CMS details, and hit save to continue
+                  </span>
+                </div>
+              )}
+              <div
+                className={`w-full flex gap-24 ${
+                  allowEdit ? "blur-sm pointer-events-none" : ""
+                }`}
+              >
+                {enrolledLoaded ? (
+                  <div className="flex flex-col items-stretch pl-2 text-md py-8 w-1/4">
+                    <div className="flex pb-4">
+                      <span className="text-3xl font-bold">
+                        Enrolled Sections
+                      </span>
+                      <Tooltip delayDuration={100}>
+                        <TooltipTrigger asChild>
+                          <Button
+                            className="ml-4 bg-transparent py-4 px-4 hover:bg-muted rounded-full w-fit text-blue-50 text-md"
+                            onClick={() => fetchEnrolledSections()}
+                          >
+                            <RotateCw className="w-5 h-5" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-muted text-foreground border-muted text-md">
+                          Refetch enrolled sections
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip delayDuration={100}>
+                        <TooltipTrigger asChild>
+                          <Button
+                            className="ml-4 bg-transparent py-4 px-4 hover:bg-red-800 rounded-full w-fit text-foreground hover:text-red-50 text-md"
+                            onClick={() => unenrollAllSections()}
+                          >
+                            <Trash className="w-5 h-5" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-muted text-foreground border-muted text-md">
+                          Unenroll from these sections
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
-                  ) : (
-                    <div className="flex items-center justify-center w-1/4 pt-48">
-                      <Spinner />
-                    </div>
-                  )}
-                  {!sectionNameList.pending ? (
-                    <div className="relative flex flex-col ml-8 text-md py-8 h-fit w-1/4">
-                      {enrollingInProgress && (
-                        <div className="absolute bg-background/80 flex items-center justify-center w-full h-full">
-                          <div className="flex flex-col items-center justify-center">
-                            <Spinner />
-                            <span className="text-muted-foreground pt-4 text-xl">
-                              Enrolling in sections...
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                      <div className="flex pb-4">
-                        <span className="text-3xl font-bold">
-                          Sections to enroll in
-                        </span>
-                        <Tooltip delayDuration={100}>
-                          <TooltipTrigger asChild>
-                            <Button
-                              className="ml-4 bg-transparent py-4 px-4 hover:bg-green-800 rounded-full w-fit text-green-50 text-md"
-                              onClick={() => enrollAllSections()}
-                            >
-                              <Plus className="w-5 h-5" strokeWidth={2.5} />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent className="bg-muted text-foreground border-muted text-md">
-                            Enroll in these sections
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                      {sectionNameList.data.sort().map((section) => (
-                        <span className="py-1">
-                          {section
-                            ?.replace(/&lt;/g, "<")
-                            .replace(/&gt;/g, ">")
-                            .replace(/&quot;/g, '"')
-                            .replace(/&#39;/g, "'")
-                            .replace(/&amp;/g, "&")}
-                        </span>
-                      ))}
-                      {sectionNameList.data.length === 0 && (
-                        <>
-                          <div className="flex flex-col items-center">
-                            <Bird className="text-muted-foreground w-36 h-36 mb-4" />
-                            <span className="text-xl text-muted-foreground">
-                              No sections to enroll in
-                            </span>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center w-1/4 pt-48">
-                      <Spinner />
-                    </div>
-                  )}
-
-                  {errors.length > 0 && (
-                    <div className="flex flex-col ml-8 text-md py-8 w-1/4">
-                      <div className="flex pb-4 items-center">
-                        <span className="text-3xl font-bold">Errors</span>
-                        <Tooltip delayDuration={100}>
-                          <TooltipTrigger asChild>
-                            <div className="bg-transparent rounded-full hover:bg-muted text-foreground px-4 py-3 ml-2 text-lg font-bold">
-                              <HelpCircle />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent className="w-96 bg-muted text-foreground border-muted text-md">
-                            ChronoFactorem wasn't able to enroll in these
-                            sections. Either these sections don't exist, or
-                            something else wen't wrong. You should try manually
-                            enrolling in these sections.
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                      {errors.sort().map((section) => (
-                        <span className="py-1">
-                          {section
+                    {enrolledCourses
+                      .sort((a, b) =>
+                        a.displayname.localeCompare(b.displayname),
+                      )
+                      .map((section, i) => (
+                        <span key={2 * i} className="py-1">
+                          {section.displayname
                             .replace(/&lt;/g, "<")
                             .replace(/&gt;/g, ">")
                             .replace(/&quot;/g, '"')
@@ -731,9 +619,111 @@ function Cms() {
                             .replace(/&amp;/g, "&")}
                         </span>
                       ))}
+                    {enrolledCourses.length === 0 && (
+                      <>
+                        <div className="flex flex-col items-center">
+                          <Bird className="text-muted-foreground w-36 h-36 mb-4" />
+                          <span className="text-xl text-muted-foreground">
+                            Either CMS is empty, or your CMS credentials are
+                            wrong, or... CMS is being slow. Try again in a few
+                            seconds or check on CMS directly.
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center w-1/4 pt-48">
+                    <Spinner />
+                  </div>
+                )}
+                {!sectionNameList.pending ? (
+                  <div className="relative flex flex-col ml-8 text-md py-8 h-fit w-1/4">
+                    {enrollingInProgress && (
+                      <div className="absolute bg-background/80 flex items-center justify-center w-full h-full">
+                        <div className="flex flex-col items-center justify-center">
+                          <Spinner />
+                          <span className="text-muted-foreground pt-4 text-xl">
+                            Enrolling in sections...
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex pb-4">
+                      <span className="text-3xl font-bold">
+                        Sections to enroll in
+                      </span>
+                      <Tooltip delayDuration={100}>
+                        <TooltipTrigger asChild>
+                          <Button
+                            className="ml-4 bg-transparent py-4 px-4 hover:bg-green-800 rounded-full w-fit text-green-50 text-md"
+                            onClick={() => enrollAllSections()}
+                          >
+                            <Plus className="w-5 h-5" strokeWidth={2.5} />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-muted text-foreground border-muted text-md">
+                          Enroll in these sections
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
-                  )}
-                </div>
+                    {sectionNameList.data.sort().map((section) => (
+                      <span className="py-1">
+                        {section
+                          ?.replace(/&lt;/g, "<")
+                          .replace(/&gt;/g, ">")
+                          .replace(/&quot;/g, '"')
+                          .replace(/&#39;/g, "'")
+                          .replace(/&amp;/g, "&")}
+                      </span>
+                    ))}
+                    {sectionNameList.data.length === 0 && (
+                      <>
+                        <div className="flex flex-col items-center">
+                          <Bird className="text-muted-foreground w-36 h-36 mb-4" />
+                          <span className="text-xl text-muted-foreground">
+                            No sections to enroll in
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center w-1/4 pt-48">
+                    <Spinner />
+                  </div>
+                )}
+
+                {errors.length > 0 && (
+                  <div className="flex flex-col ml-8 text-md py-8 w-1/4">
+                    <div className="flex pb-4 items-center">
+                      <span className="text-3xl font-bold">Errors</span>
+                      <Tooltip delayDuration={100}>
+                        <TooltipTrigger asChild>
+                          <div className="bg-transparent rounded-full hover:bg-muted text-foreground px-4 py-3 ml-2 text-lg font-bold">
+                            <HelpCircle />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent className="w-96 bg-muted text-foreground border-muted text-md">
+                          ChronoFactorem wasn't able to enroll in these
+                          sections. Either these sections don't exist, or
+                          something else wen't wrong. You should try manually
+                          enrolling in these sections.
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    {errors.sort().map((section, i) => (
+                      <span key={2 * i} className="py-1">
+                        {section
+                          .replace(/&lt;/g, "<")
+                          .replace(/&gt;/g, ">")
+                          .replace(/&quot;/g, '"')
+                          .replace(/&#39;/g, "'")
+                          .replace(/&amp;/g, "&")}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
