@@ -197,6 +197,7 @@ function ViewTimetable() {
   const queryClient = useQueryClient();
   const userQueryResult = useQuery(userQueryOptions);
   const screenshotContentRef = useRef<HTMLDivElement>(null);
+  const [isScreenshotMode, setIsScreenshotMode] = useState(false);
 
   const deleteMutation = useMutation({
     mutationFn: () => {
@@ -454,6 +455,7 @@ function ViewTimetable() {
 
   const generateScreenshot = useCallback(() => {
     const screenShotContent = screenshotContentRef.current;
+    setIsScreenshotMode(true);
 
     if (screenShotContent === null) {
       return;
@@ -475,8 +477,12 @@ function ViewTimetable() {
         // later remove those values let the browser figure it out the proper values
         screenShotContent.style.height = "";
         screenShotContent.style.width = "";
+
+        setIsScreenshotMode(false);
       })
       .catch((err: Error) => {
+        setIsScreenshotMode(false);
+
         console.error("something went wrong with image generation", err);
         toast({
           title: "Error",
@@ -699,11 +705,16 @@ function ViewTimetable() {
               )}
             </span>
           </div>
-          <div className="flex flex-row gap-4" ref={screenshotContentRef}>
+          {/* the bg-background here is necessary so the generated image has the background in it */}
+          <div
+            className="flex flex-row gap-4 bg-background"
+            ref={screenshotContentRef}
+          >
             <SideMenu
               timetable={timetable}
               isOnEditPage={false}
               allCoursesDetails={courses}
+              isScreenshotMode={isScreenshotMode}
             />
             <TimetableGrid
               isVertical={isVertical}
