@@ -289,12 +289,14 @@ function CmsExport() {
       <>
         <TooltipProvider>
           <div className="flex items-center py-2 md:py-4 px-4 md:px-8">
-            <span className="lg:text-5xl text-4xl font-bold m-4 text-foreground">
+            <span className="xl:text-5xl lg:text-4xl md:text-3xl text-2xl font-bold m-4 text-foreground">
               CMS Auto-Enroll
             </span>
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
-                <HelpCircle className="lg:w-12 w-8 lg:h-12 h-8 ml-2 text-muted-foreground hover:text-foreground transition duration-300 ease-in-out" />
+                <div className="inline bg-transparent w-fit rounded-full dark:hover:bg-slate-800/80 text-muted-foreground hover:bg-slate-300/80 p-1 transition duration-200 ease-in-out ml-2 text-sm font-bold">
+                  <HelpCircle className="xl:w-12 lg:w-10 md:w-8 w-8 xl:h-12 lg:h-10 md:h-8 h-8" />
+                </div>
               </TooltipTrigger>
               <TooltipContent className="w-[48rem] flex flex-col bg-muted text-foreground border-muted-foreground text-md">
                 <span>
@@ -340,24 +342,24 @@ function CmsExport() {
           </div>
         </TooltipProvider>
         <main className="text-foreground py-2 md:py-4 px-10 md:px-16">
-          <h1 className="text-3xl font-bold text-center sm:text-left md:text-4xl">
+          <h1 className="xl:text-4xl lg:text-3xl md:text-2xl text-xl font-bold text-center sm:text-left md:text-4xl">
             My Timetables
           </h1>
           {privateTimetables.length === 0 &&
             publicTimetables.length === 0 &&
             archivedTimetables.length === 0 && (
               <>
-                <div className="bg-secondary mt-10 text-center flex flex-col items-center justify-center gap-8 py-16 rounded-lg">
+                <div className="bg-secondary mt-10 text-center flex flex-col items-center justify-center gap-8 py-16 px-4 rounded-lg">
                   <span>
                     <CalendarX2 className="h-24 w-24 md:h-32 md:w-32" />
                   </span>
-                  <h2 className="text-xl sm:text-2xl">
+                  <h2 className="lg:text-2xl text-lg">
                     Publish a timetable to enable CMS Auto-Enroll.
                     <br />
                     Draft timetables cannot be used with CMS Auto-Enroll.
                   </h2>
                   <Button
-                    className="text-lg sm:text-2xl py-6 px-10 font-bold"
+                    className="lg:text-2xl text-lg py-6 px-10 font-bold"
                     onClick={() => createMutation.mutate()}
                   >
                     Create Timetable
