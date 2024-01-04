@@ -45,6 +45,7 @@ import {
 } from "./ui/card";
 import { Switch } from "./ui/switch";
 import { useToast } from "./ui/use-toast";
+import { Link } from "@tanstack/react-router";
 
 type Props = {
   timetable: z.infer<typeof timetableType>;
@@ -320,7 +321,14 @@ function TimetableCard({ timetable, showFooter }: Props) {
       <Card className="min-h-60 flex flex-col min-w-80 shadow-lg">
         <CardHeader className="pb-2">
           <CardTitle className="text-xl md:text-2xl flex justify-between items-center">
-            {timetable.name}
+            <Link
+              to="/view/$timetableId"
+              params={{
+                timetableId: timetable.id,
+              }}
+            >
+              {timetable.name}
+            </Link>
             {timetable.archived && (timetable.private ? <EyeOff /> : <Eye />)}
           </CardTitle>
         </CardHeader>
