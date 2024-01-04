@@ -294,9 +294,9 @@ function CmsExport() {
             </span>
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
-                <HelpCircle className="w-12 h-12 ml-2 text-slate-400 hover:text-slate-50 transition duration-300 ease-in-out" />
+                <HelpCircle className="w-12 h-12 ml-2 text-muted-foreground hover:text-foreground transition duration-300 ease-in-out" />
               </TooltipTrigger>
-              <TooltipContent className="w-[48rem] flex flex-col bg-slate-800 text-slate-50 border-slate-700 text-md">
+              <TooltipContent className="w-[48rem] flex flex-col bg-muted text-foreground border-muted-foreground text-md">
                 <span>
                   ChronoFactorem now allows you to cut the hassle of enrolling
                   into the CMS sections for your courses, and automates it all
