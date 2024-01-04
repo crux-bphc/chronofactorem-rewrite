@@ -839,31 +839,52 @@ function EditTimetable() {
                   </TooltipContent>
                 </Tooltip>
               )}
-              <Button
-                variant="ghost"
-                className="rounded-full p-3"
-                onClick={() => setIsVertical(!isVertical)}
-              >
-                {isVertical ? <GripVertical /> : <GripHorizontal />}
-              </Button>
-              <Button
-                variant="ghost"
-                className="rounded-full p-3"
-                onClick={() => copyMutation.mutate()}
-              >
-                <Copy />
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="rounded-full p-3"
+                    onClick={() => setIsVertical(!isVertical)}
+                  >
+                    {isVertical ? <GripVertical /> : <GripHorizontal />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Make timetable {isVertical ? "horizontal" : "vertical"}</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="rounded-full p-3"
+                    onClick={() => copyMutation.mutate()}
+                  >
+                    <Copy />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Copy Timetable</p>
+                </TooltipContent>
+              </Tooltip>
               {userQueryResult.data.id ===
                 timetableQueryResult.data.authorId && (
                 <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
-                    >
-                      <Trash />
-                    </Button>
-                  </AlertDialogTrigger>
+                  <Tooltip>
+                    <AlertDialogTrigger asChild>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
+                        >
+                          <Trash />
+                        </Button>
+                      </TooltipTrigger>
+                    </AlertDialogTrigger>
+                    <TooltipContent>
+                      <p>Delete Timetable</p>
+                    </TooltipContent>
+                  </Tooltip>
                   <AlertDialogContent className="p-8">
                     <AlertDialogHeader>
                       <AlertDialogTitle className="text-2xl">
