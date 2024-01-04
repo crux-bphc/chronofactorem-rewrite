@@ -72,6 +72,7 @@ const renderTimetableSection = (title: string, timetables: Timetable[]) => {
               key={timetable.id}
               timetable={timetable}
               showFooter={true}
+              isCMSPage={false}
             />
           ))}
         </div>

@@ -50,9 +50,10 @@ import { useToast } from "./ui/use-toast";
 type Props = {
   timetable: z.infer<typeof timetableType>;
   showFooter: boolean;
+  isCMSPage: boolean;
 };
 
-function TimetableCard({ timetable, showFooter }: Props) {
+function TimetableCard({ timetable, showFooter, isCMSPage }: Props) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -322,7 +323,7 @@ function TimetableCard({ timetable, showFooter }: Props) {
         <CardHeader className="pb-2">
           <CardTitle className="text-xl md:text-2xl flex justify-between items-center">
             <Link
-              to="/view/$timetableId"
+              to={isCMSPage ? ("/cms/$timetableId") : ("/view/$timetableId")}
               params={{
                 timetableId: timetable.id,
               }}
