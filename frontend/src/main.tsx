@@ -8,8 +8,9 @@ import {
 import React from "react";
 import ReactDOM from "react-dom/client";
 import authenticatedRoute from "./AuthenticatedRoute";
-import editTimetableRoute from "./EditTimetable";
+import cmsOptionRoute from "./CMSOption";
 import cmsExportRoute from "./CmsExport";
+import editTimetableRoute from "./EditTimetable";
 import editUserProfileRoute from "./EditUserProfile";
 import finalizeTimetableRoute from "./Finalize";
 import getDegreesRoute from "./GetDegrees";
@@ -18,7 +19,6 @@ import loginRoute from "./Login";
 import RootComponent from "./RootComponent";
 import viewTimetableRoute from "./ViewTimetable";
 import "./index.css";
-import cmsOptionRoute from "./CMSOption";
 
 const queryClient = new QueryClient();
 

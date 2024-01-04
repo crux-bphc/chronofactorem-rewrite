@@ -7,13 +7,13 @@ import {
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { ErrorComponent, Link, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
+import { ArrowUpRightFromCircle, FlaskConical, HelpCircle } from "lucide-react";
 import { z } from "zod";
 import { timetableWithSectionsType } from "../../lib/src";
 import authenticatedRoute from "./AuthenticatedRoute";
 import { ToastAction } from "./components/ui/toast";
 import { useToast } from "./components/ui/use-toast";
 import { router } from "./main";
-import { ArrowUpRightFromCircle, HelpCircle, FlaskConical } from "lucide-react";
 
 const fetchTimetable = async (timetableId: string) => {
   const response = await axios.get<z.infer<typeof timetableWithSectionsType>>(

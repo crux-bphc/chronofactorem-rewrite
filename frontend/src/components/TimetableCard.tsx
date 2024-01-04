@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/tooltip";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { Edit2, Eye, EyeOff, Trash } from "lucide-react";
 import { useState } from "react";
@@ -45,7 +46,6 @@ import {
 } from "./ui/card";
 import { Switch } from "./ui/switch";
 import { useToast } from "./ui/use-toast";
-import { Link } from "@tanstack/react-router";
 
 type Props = {
   timetable: z.infer<typeof timetableType>;
