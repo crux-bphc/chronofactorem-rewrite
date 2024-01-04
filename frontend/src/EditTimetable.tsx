@@ -1,5 +1,11 @@
 import CDCList from "@/../CDCs.json";
 import { ToastAction } from "@/components/ui/toast";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import {
   queryOptions,
@@ -9,23 +15,24 @@ import {
 } from "@tanstack/react-query";
 import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
-import { toPng } from "html-to-image";
 import {
+  AlertOctagon,
+  AlertTriangle,
+  ArrowUpRightFromCircle,
   Copy,
-  Download,
-  Edit2,
   GripHorizontal,
   GripVertical,
+  Send,
   Trash,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import {
   courseType,
   courseWithSectionsType,
   sectionTypeZodEnum,
   timetableWithSectionsType,
-} from "../../lib/src/index";
+} from "../../lib/src";
 import { userWithTimetablesType } from "../../lib/src/index";
 import authenticatedRoute from "./AuthenticatedRoute";
 import { TimetableGrid } from "./components/TimetableGrid";
@@ -42,12 +49,6 @@ import {
 } from "./components/ui/alert-dialog";
 import { Badge } from "./components/ui/badge";
 import { Button } from "./components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./components/ui/tooltip";
 import { toast, useToast } from "./components/ui/use-toast";
 import { router } from "./main";
 
@@ -63,17 +64,22 @@ const fetchTimetable = async (timetableId: string) => {
   return response.data;
 };
 
+const timetableQueryOptions = (timetableId: string) =>
+  queryOptions({
+    queryKey: ["timetable", timetableId],
+    queryFn: () => fetchTimetable(timetableId),
+  });
+
 const fetchUserDetails = async () => {
   const response =
     await axios.get<z.infer<typeof userWithTimetablesType>>("/api/user");
   return response.data;
 };
 
-const timetableQueryOptions = (timetableId: string) =>
-  queryOptions({
-    queryKey: ["timetable", timetableId],
-    queryFn: () => fetchTimetable(timetableId),
-  });
+const userQueryOptions = queryOptions({
+  queryKey: ["user"],
+  queryFn: () => fetchUserDetails(),
+});
 
 const fetchCourses = async () => {
   const response = await axios.get<z.infer<typeof courseType>[]>(
@@ -93,14 +99,9 @@ const courseQueryOptions = () =>
     queryFn: () => fetchCourses(),
   });
 
-const userQueryOptions = queryOptions({
-  queryKey: ["user"],
-  queryFn: () => fetchUserDetails(),
-});
-
-const viewTimetableRoute = new Route({
+const editTimetableRoute = new Route({
   getParentRoute: () => authenticatedRoute,
-  path: "view/$timetableId",
+  path: "edit/$timetableId",
   beforeLoad: ({ context: { queryClient } }) =>
     queryClient.ensureQueryData(courseQueryOptions()).catch((error: Error) => {
       if (
@@ -131,7 +132,7 @@ const viewTimetableRoute = new Route({
 
         throw error;
       }),
-  component: ViewTimetable,
+  component: EditTimetable,
   errorComponent: ({ error }) => {
     const { toast } = useToast();
 
@@ -198,17 +199,13 @@ const viewTimetableRoute = new Route({
   },
 });
 
-function ViewTimetable() {
+function EditTimetable() {
   const [isVertical, setIsVertical] = useState(false);
-
-  const { timetableId } = viewTimetableRoute.useParams();
-
+  const { timetableId } = editTimetableRoute.useParams();
   const timetableQueryResult = useQuery(timetableQueryOptions(timetableId));
   const courseQueryResult = useQuery(courseQueryOptions());
   const userQueryResult = useQuery(userQueryOptions);
   const queryClient = useQueryClient();
-  const screenshotContentRef = useRef<HTMLDivElement>(null);
-  const [isScreenshotMode, setIsScreenshotMode] = useState(false);
 
   const deleteMutation = useMutation({
     mutationFn: () => {
@@ -298,11 +295,11 @@ function ViewTimetable() {
         `/api/timetable/${timetableId}/copy`,
       );
     },
-    onSuccess: (data) => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       router.navigate({
         to: "/edit/$timetableId",
-        params: { timetableId: data.data.id },
+        params: { timetableId: response.data.id },
       });
     },
     onError: (error) => {
@@ -378,138 +375,6 @@ function ViewTimetable() {
       }
     },
   });
-
-  const editMutation = useMutation({
-    mutationFn: (body: {
-      name: string;
-      isPrivate: boolean;
-      isDraft: boolean;
-    }) => {
-      return axios.post(`/api/timetable/${timetableId}/edit`, body);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-      router.navigate({ to: "/edit/$timetableId", params: { timetableId } });
-    },
-    onError: (error) => {
-      if (error instanceof AxiosError && error.response) {
-        if (error.response.status === 401) {
-          router.navigate({ to: "/login" });
-        }
-        if (error.response.status === 400) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 400",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 404) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 404",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 500) {
-          toast({
-            title: "Server Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 500",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else {
-          toast({
-            title: "Unknown Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : `API returned ${error.response.status}`,
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        }
-      }
-    },
-  });
-
-  const generateScreenshot = useCallback(() => {
-    const screenShotContent = screenshotContentRef.current;
-    setIsScreenshotMode(true);
-
-    if (screenShotContent === null) {
-      return;
-    }
-
-    // use some standard values where it is going to render properly
-    screenShotContent.style.height = isVertical ? "640px" : "512px";
-    screenShotContent.style.width = "1920px";
-
-    toPng(screenShotContent, {
-      cacheBust: true,
-    })
-      .then((dataUrl) => {
-        const link = document.createElement("a");
-        link.download = "timetable.png";
-        link.href = dataUrl;
-        link.click();
-
-        // later remove those values let the browser figure it out the proper values
-        screenShotContent.style.height = "";
-        screenShotContent.style.width = "";
-
-        setIsScreenshotMode(false);
-      })
-      .catch((err: Error) => {
-        setIsScreenshotMode(false);
-
-        console.error("something went wrong with image generation", err);
-        toast({
-          title: "Error",
-          description: err.message,
-          variant: "destructive",
-          action: (
-            <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-              <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                Report
-              </a>
-            </ToastAction>
-          ),
-        });
-      });
-  }, [isVertical]);
 
   const addSectionMutation = useMutation({
     mutationFn: async (body: { sectionId: string }) => {
@@ -644,6 +509,71 @@ function ViewTimetable() {
     return coursesList;
   }, [timetableQueryResult, courseQueryResult]);
 
+  const cdcNotFoundWarning = useMemo(
+    () =>
+      cdcs.filter((e) => e.id === null && e.type === "warning") as {
+        id: null;
+        type: "warning";
+        warning: string;
+      }[],
+    [cdcs],
+  );
+
+  const missingCDCs = useMemo(() => {
+    const missing: {
+      id: string;
+      code: string;
+      name: string;
+    }[] = [];
+    for (let i = 0; i < cdcs.length; i++) {
+      if (cdcs[i].id === null) {
+        const option = cdcs[i] as
+          | {
+              id: null;
+              type: "warning";
+              warning: string;
+            }
+          | {
+              id: null;
+              type: "optional";
+              options: {
+                id: string;
+                code: string;
+                name: string;
+              }[];
+            };
+        if (
+          option.type === "optional" &&
+          !option.options.some((e) =>
+            coursesInTimetable
+              .map((added) => added.id)
+              .includes(e.id as string),
+          )
+        ) {
+          const splitCodes = option.options.map((e) => e.code).join(" (or) ");
+          missing.push({
+            id: "",
+            code: splitCodes,
+            name: "",
+          });
+        }
+      } else {
+        if (
+          !coursesInTimetable.map((e) => e.id).includes(cdcs[i].id as string)
+        ) {
+          missing.push(
+            cdcs[i] as {
+              id: string;
+              code: string;
+              name: string;
+            },
+          );
+        }
+      }
+    }
+    return missing;
+  }, [coursesInTimetable, cdcs]);
+
   const [currentCourseID, setCurrentCourseID] = useState<string | null>(null);
   const currentCourseQueryResult = useQuery({
     queryKey: [currentCourseID],
@@ -700,12 +630,21 @@ function ViewTimetable() {
     setCurrentSectionType(newSectionType);
   }, [uniqueSectionTypes, sectionTypeChangeRequest, currentSectionType]);
 
-  const [currentTab, setCurrentTab] = useState("currentCourses");
+  const [currentTab, setCurrentTab] = useState("CDCs");
 
   const isOnCourseDetails = useMemo(
     () => currentCourseID !== null,
     [currentCourseID],
   );
+
+  const handleMissingCDCClick = (courseId: string) => {
+    setCurrentTab("CDCs");
+    if (courseId === "") {
+      setCurrentCourseID(null);
+    } else {
+      setCurrentCourseID(courseId);
+    }
+  };
 
   if (courseQueryResult.isFetching) {
     return <span>Loading...</span>;
@@ -740,7 +679,7 @@ function ViewTimetable() {
     );
   }
 
-  if (timetableQueryResult.isFetching) {
+  if (timetableQueryResult.isFetching && timetableQueryResult.isPending) {
     return <span>Loading...</span>;
   }
 
@@ -839,20 +778,67 @@ function ViewTimetable() {
               </span>
             </span>
             <span className="flex justify-center items-center gap-2">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={generateScreenshot}
-                    className="flex justify-between items-center gap-2"
+              {(missingCDCs.length > 0 || cdcNotFoundWarning.length > 0) && (
+                <Tooltip delayDuration={100}>
+                  <TooltipTrigger
+                    asChild
+                    className="hover:bg-slate-700 transition duration-200 ease-in-out"
                   >
-                    <Download />
-                    PNG
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Download timetable as image</p>
-                </TooltipContent>
-              </Tooltip>
+                    <div className="p-2 rounded-full">
+                      <AlertOctagon className="w-6 h-6 m-1" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-muted text-foreground border-muted-foreground text-md">
+                    {missingCDCs.length > 0 && (
+                      <div className="flex flex-col">
+                        <span>
+                          You haven't added all CDCs for this semester to your
+                          timetable.
+                        </span>
+                        <span className="font-bold pt-2">CDCs missing:</span>
+                        {missingCDCs.map((e) => (
+                          <div className="flex items-center" key={e.id}>
+                            <span className="ml-2">{e.code}</span>
+                            <Button
+                              onClick={() => {
+                                handleMissingCDCClick(e.id);
+                              }}
+                              className="p-2 w-fit h-fit ml-2 mb-1 bg-transparent hover:bg-slate-700 rounded-full"
+                            >
+                              <ArrowUpRightFromCircle className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {cdcNotFoundWarning.length > 0 && (
+                      <div className="flex flex-col">
+                        <span className="font-bold">
+                          Chrono could not find some of your CDCs in the list of
+                          courses.
+                        </span>
+                        <span className="flex">
+                          Please report this issue
+                          <a
+                            href="https://github.com/crux-bphc/chronofactorem-rewrite/issues"
+                            className="text-blue-300 flex pl-1"
+                          >
+                            here
+                            <ArrowUpRightFromCircle className="w-4 h-4 ml-1" />
+                          </a>
+                        </span>
+                        <span className="font-bold pt-2">Error List:</span>
+
+                        {cdcNotFoundWarning.map((e) => (
+                          <span className="ml-2" key={e.id}>
+                            {e.warning}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </TooltipContent>
+                </Tooltip>
+              )}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
@@ -867,29 +853,6 @@ function ViewTimetable() {
                   <p>Make timetable {isVertical ? "horizontal" : "vertical"}</p>
                 </TooltipContent>
               </Tooltip>
-              {userQueryResult.data.id ===
-                timetableQueryResult.data.authorId && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="rounded-full p-3"
-                      onClick={() =>
-                        editMutation.mutate({
-                          isDraft: true,
-                          isPrivate: true,
-                          name: timetableQueryResult.data.name,
-                        })
-                      }
-                    >
-                      <Edit2 />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Edit Timetable</p>
-                  </TooltipContent>
-                </Tooltip>
-              )}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
@@ -946,16 +909,99 @@ function ViewTimetable() {
                   </AlertDialogContent>
                 </AlertDialog>
               )}
+
+              {timetable.warnings.length !== 0 && (
+                <Tooltip delayDuration={100}>
+                  <TooltipTrigger
+                    asChild
+                    className="duration-200 mr-4 text-md p-2 h-fit hover:bg-orange-800/40 rounded-lg px-4"
+                  >
+                    <div className="flex items-center">
+                      <span className="text-orange-400 pr-4">
+                        {timetable.warnings
+                          .slice(0, 2)
+                          .map((x) => x.replace(":", " "))
+                          .map((x, i) => (
+                            <div key={x}>
+                              <span className="font-bold">{x}</span>
+                              {i >= 0 && i < timetable.warnings.length - 1 && (
+                                <span>, </span>
+                              )}
+                            </div>
+                          ))}
+                        {timetable.warnings.length > 2 &&
+                          ` and ${timetable.warnings.length - 2} other warning${
+                            timetable.warnings.length > 3 ? "s" : ""
+                          }`}
+                      </span>
+                      <AlertTriangle className="w-6 h-6 m-1 text-orange-400" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-muted text-foreground border-muted-foreground text-md">
+                    {timetable.warnings.map((warning) => (
+                      <div className="pb-2" key={warning}>
+                        <span className="font-bold">
+                          {warning.split(":")[0]} is
+                        </span>
+                        <div className="flex flex-col pl-4">
+                          {warning
+                            .split(":")[1]
+                            .split("")
+                            .map((x) => (
+                              <div className="flex items-center" key={x}>
+                                <span>missing a {x} section</span>
+                                <Button
+                                  onClick={() => {
+                                    setCurrentCourseID(
+                                      courses.filter(
+                                        (x) => x.code === warning.split(":")[0],
+                                      )[0].id,
+                                    );
+                                    setSectionTypeChangeRequest(
+                                      uniqueSectionTypes.filter(
+                                        (sectionType) => sectionType === x,
+                                      )[0],
+                                    );
+                                  }}
+                                  className="p-2 w-fit h-fit ml-2 mb-1 bg-transparent hover:bg-slate-700 rounded-full"
+                                >
+                                  <ArrowUpRightFromCircle className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    ))}
+                  </TooltipContent>
+                </Tooltip>
+              )}
+
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Button
+                      className="text-green-200 w-fit text-xl p-4 ml-4 bg-green-900 hover:bg-green-800"
+                      onClick={() =>
+                        router.navigate({
+                          to: "/finalize/$timetableId",
+                          params: { timetableId: timetable.id },
+                        })
+                      }
+                    >
+                      <div className="hidden md:flex">Publish</div>
+                      <div className="flex md:hidden">
+                        <Send className="h-6 w-6" />
+                      </div>
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+              </Tooltip>
             </span>
           </div>
-          {/* the bg-background here is necessary so the generated image has the background in it */}
-          <div
-            className="flex flex-row gap-4 bg-background"
-            ref={screenshotContentRef}
-          >
+          <div className="flex flex-row gap-4">
             <SideMenu
               timetable={timetable}
-              isOnEditPage={false}
+              isOnEditPage={true}
               allCoursesDetails={courses}
               cdcs={cdcs}
               setCurrentCourseID={setCurrentCourseID}
@@ -970,14 +1016,18 @@ function ViewTimetable() {
               setCurrentTab={setCurrentTab}
               isOnCourseDetails={isOnCourseDetails}
               setSectionTypeChangeRequest={setSectionTypeChangeRequest}
-              isScreenshotMode={isScreenshotMode}
+              isScreenshotMode={false}
             />
             <TimetableGrid
               isVertical={isVertical}
               timetableDetailsSections={timetableDetailsSections}
               handleUnitClick={(e) => console.log(e)}
-              handleUnitDelete={(e) => console.log("DELETING", e)}
-              isOnEditPage={false}
+              handleUnitDelete={(e) => {
+                e?.id
+                  ? removeSectionMutation.mutate({ sectionId: e?.id })
+                  : console.log("error:", e);
+              }}
+              isOnEditPage={true}
             />
           </div>
         </TooltipProvider>
@@ -986,4 +1036,4 @@ function ViewTimetable() {
   );
 }
 
-export default viewTimetableRoute;
+export default editTimetableRoute;

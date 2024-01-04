@@ -50,9 +50,10 @@ import { useToast } from "./ui/use-toast";
 type Props = {
   timetable: z.infer<typeof timetableType>;
   showFooter: boolean;
+  isCMSPage: boolean;
 };
 
-function TimetableCard({ timetable, showFooter }: Props) {
+function TimetableCard({ timetable, showFooter, isCMSPage }: Props) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -227,12 +228,114 @@ function TimetableCard({ timetable, showFooter }: Props) {
     },
   });
 
+  const editAndNavigateMutation = useMutation({
+    mutationFn: (body: {
+      name: string;
+      isPrivate: boolean;
+      isDraft: boolean;
+    }) => {
+      return axios.post(`/api/timetable/${timetable.id}/edit`, body);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      router.navigate({
+        to: "/edit/$timetableId",
+        params: { timetableId: timetable.id },
+      });
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError && error.response) {
+        if (error.response.status === 401) {
+          router.navigate({ to: "/login" });
+        }
+        if (error.response.status === 400) {
+          toast({
+            title: "Error",
+            description:
+              "message" in error.response.data
+                ? error.response.data.message
+                : "API returned 400",
+            variant: "destructive",
+            action: (
+              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                  Report
+                </a>
+              </ToastAction>
+            ),
+          });
+        } else if (error.response.status === 404) {
+          toast({
+            title: "Error",
+            description:
+              "message" in error.response.data
+                ? error.response.data.message
+                : "API returned 404",
+            variant: "destructive",
+            action: (
+              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                  Report
+                </a>
+              </ToastAction>
+            ),
+          });
+        } else if (error.response.status === 500) {
+          toast({
+            title: "Server Error",
+            description:
+              "message" in error.response.data
+                ? error.response.data.message
+                : "API returned 500",
+            variant: "destructive",
+            action: (
+              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                  Report
+                </a>
+              </ToastAction>
+            ),
+          });
+        } else {
+          toast({
+            title: "Unknown Error",
+            description:
+              "message" in error.response.data
+                ? error.response.data.message
+                : `API returned ${error.response.status}`,
+            variant: "destructive",
+            action: (
+              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                  Report
+                </a>
+              </ToastAction>
+            ),
+          });
+        }
+      }
+    },
+  });
+
   return (
     <TooltipProvider>
       <Card className="min-h-60 flex flex-col min-w-80 shadow-lg">
         <CardHeader className="pb-2">
           <CardTitle className="text-xl md:text-2xl flex justify-between items-center">
-            {timetable.name}
+            <Link
+              to={
+                timetable.draft
+                  ? "/edit/$timetableId"
+                  : isCMSPage
+                    ? "/cms/$timetableId"
+                    : "/view/$timetableId"
+              }
+              params={{
+                timetableId: timetable.id,
+              }}
+            >
+              {timetable.name}
+            </Link>
             {timetable.archived && (timetable.private ? <EyeOff /> : <Eye />)}
           </CardTitle>
         </CardHeader>
@@ -265,40 +368,26 @@ function TimetableCard({ timetable, showFooter }: Props) {
             )}
 
             {!timetable.archived ? (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="rounded-full p-3"
-                    onClick={() =>
-                      editMutation.mutate({
-                        name: timetable.name,
-                        isPrivate: true,
-                        isDraft: true,
-                      })
-                    }
-                  >
-                    <Edit2 />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Edit Timetable</p>
-                </TooltipContent>
-              </Tooltip>
+              <Button
+                variant="ghost"
+                className="rounded-full p-3"
+                onClick={() => {
+                  editAndNavigateMutation.mutate({
+                    name: timetable.name,
+                    isPrivate: true,
+                    isDraft: true,
+                  });
+                }}
+              >
+                <Edit2 />
+              </Button>
             ) : (
               <Dialog>
-                <Tooltip>
-                  <DialogTrigger asChild>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" className="rounded-full p-3">
-                        <Edit2 />
-                      </Button>
-                    </TooltipTrigger>
-                  </DialogTrigger>
-                  <TooltipContent>
-                    <p>Edit Timetable</p>
-                  </TooltipContent>
-                </Tooltip>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" className="rounded-full p-3">
+                    <Edit2 />
+                  </Button>
+                </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
                   <DialogHeader>
                     <DialogTitle>Edit Archived Timetable</DialogTitle>

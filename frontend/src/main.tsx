@@ -8,8 +8,11 @@ import {
 import React from "react";
 import ReactDOM from "react-dom/client";
 import authenticatedRoute from "./AuthenticatedRoute";
+import cmsOptionRoute from "./CMSOption";
 import cmsExportRoute from "./CmsExport";
+import editTimetableRoute from "./EditTimetable";
 import editUserProfileRoute from "./EditUserProfile";
+import finalizeTimetableRoute from "./Finalize";
 import getDegreesRoute from "./GetDegrees";
 import indexRoute from "./Home";
 import loginRoute from "./Login";
@@ -31,6 +34,9 @@ const routeTree = rootRoute.addChildren([
   authenticatedRoute.addChildren([
     indexRoute,
     editUserProfileRoute,
+    editTimetableRoute,
+    finalizeTimetableRoute,
+    cmsOptionRoute,
     viewTimetableRoute,
     cmsExportRoute,
   ]),
