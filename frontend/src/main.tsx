@@ -14,6 +14,7 @@ import getDegreesRoute from "./GetDegrees";
 import indexRoute from "./Home";
 import loginRoute from "./Login";
 import RootComponent from "./RootComponent";
+import viewTimetableRoute from "./ViewTimetable";
 import "./index.css";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const routeTree = rootRoute.addChildren([
   authenticatedRoute.addChildren([
     indexRoute,
     editUserProfileRoute,
+    viewTimetableRoute,
     cmsExportRoute,
   ]),
 ]);

@@ -20,10 +20,12 @@ export function SideMenu({
   timetable,
   isOnEditPage,
   allCoursesDetails,
+  isScreenshotMode,
 }: {
   timetable: z.infer<typeof timetableWithSectionsType>;
   isOnEditPage: boolean;
   allCoursesDetails: z.infer<typeof courseType>[];
+  isScreenshotMode: boolean;
 }) {
   const queryClient = useQueryClient();
 
@@ -450,7 +452,7 @@ export function SideMenu({
   // user is not in course details
   return (
     <div className="bg-secondary min-w-96">
-      <Tabs value={currentTab} className="py-2">
+      <Tabs value={isScreenshotMode ? "exams" : currentTab} className="py-2">
         <TabsList>
           {isOnEditPage && (
             <TabsTrigger
