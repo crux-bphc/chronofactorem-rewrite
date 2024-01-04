@@ -16,7 +16,7 @@ import {
 } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
-import { Info, LogOut, Pencil, Plus } from "lucide-react";
+import { BookUp, Info, LogOut, Pencil, Plus } from "lucide-react";
 import { z } from "zod";
 import { userWithTimetablesType } from "../../../lib/src/index";
 import { router } from "../main";
@@ -144,7 +144,7 @@ export function NavBar() {
             </h1>
           </div>
           <div className="flex md:hidden">
-            <h1 className="scroll-m-20 cursor-pointer text-2xl font-extrabold tracking-tight lg:text-3xl m-4 text-foreground">
+            <h1 className="scroll-m-20 cursor-pointer text-2xl font-extrabold tracking-tight lg:text-3xl mx-2 my-4 text-foreground">
               Chrono
             </h1>
           </div>
@@ -163,11 +163,20 @@ export function NavBar() {
         <Link
           // Comment out for now because the route doesn't exist
           // to={userQueryResultData ? "/about" : undefined}
-          className="text-primary py-2 px-4 ml-4 text-lg rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out"
+          className="text-primary py-2 px-2 ml-2 text-lg rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out"
         >
           <div className="hidden md:flex">About</div>
           <div className="flex md:hidden">
             <Info className="h-6 w-6" />
+          </div>
+        </Link>
+        <Link
+          to={userQueryResultData ? "/cmsExport" : undefined}
+          className="text-primary py-2 px-2 ml-2 text-lg rounded-full hover:bg-muted transition h-fit whitespace-nowrap duration-200 ease-in-out"
+        >
+          <div className="hidden md:flex">CMS Auto-Enroll</div>
+          <div className="flex md:hidden">
+            <BookUp className="h-6 w-6" />
           </div>
         </Link>
       </div>
