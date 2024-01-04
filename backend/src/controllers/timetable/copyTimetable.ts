@@ -6,6 +6,7 @@ import { validate } from "../../middleware/zodValidateRequest.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { userRepository } from "../../repositories/userRepository.js";
 import timetableJSON from "../../timetable.json" with { type: "json" };
+import sqids, { validSqid } from "../../utils/sqids.js";
 
 const dataSchema = z.object({
   params: z.object({
@@ -17,7 +18,11 @@ export const copyTimetableValidator = validate(dataSchema);
 
 export const copyTimetable = async (req: Request, res: Response) => {
   let author: User | null = null;
-  const timetableId = parseInt(req.params.id);
+  const dbID = sqids.decode(req.params.id);
+  if (!validSqid(dbID)) {
+    return res.status(404).json({ message: "Timetable does not exist" });
+  }
+
   try {
     author = await userRepository
       .createQueryBuilder("user")
@@ -56,7 +61,7 @@ export const copyTimetable = async (req: Request, res: Response) => {
     copiedTimetable = await timetableRepository
       .createQueryBuilder("timetable")
       .leftJoinAndSelect("timetable.sections", "section")
-      .where("timetable.id = :id", { id: timetableId })
+      .where("timetable.id = :id", { id: dbID[0] })
       .getOne();
   } catch (err: any) {
     console.log("Error while querying for timetable: ", err.message);
@@ -122,9 +127,10 @@ export const copyTimetable = async (req: Request, res: Response) => {
       return res.status(500).json({ message: "Internal Server Error" });
     }
 
+    const timetableID = sqids.encode([timetable.identifiers[0].id]);
     return res.status(201).json({
       message: "Timetable copied successfully",
-      id: timetable.identifiers[0].id,
+      id: timetableID,
     });
   } catch (err: any) {
     // will replace the console.log with a logger when we have one

@@ -28,6 +28,7 @@ GOOGLE_CLIENT_ID="859305615575-i9o0mr1vfh728u1a0tj227qbosbrk4rk.apps.googleuserc
 GOOGLE_CLIENT_SECRET="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"
 FRONTEND_DEV_PORT=5173
 NGINX_PORT=5000
+SQIDS_ALPHABET="P1fF29hw8BARdJpoSUZIDnXVWNzcCeGrlgk0qbsMxjYKaE5uLTyOt376Hmv4Qi"
 ```
 
 Obviously, we'll use different creds in production.
