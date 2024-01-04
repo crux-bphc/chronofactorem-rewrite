@@ -20,7 +20,12 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
-import { courseType, courseWithSectionsType, sectionTypeZodEnum, timetableWithSectionsType } from "../../lib/src";
+import {
+  courseType,
+  courseWithSectionsType,
+  sectionTypeZodEnum,
+  timetableWithSectionsType,
+} from "../../lib/src/index";
 import { userWithTimetablesType } from "../../lib/src/index";
 import authenticatedRoute from "./AuthenticatedRoute";
 import { TimetableGrid } from "./components/TimetableGrid";
@@ -293,10 +298,12 @@ function ViewTimetable() {
         `/api/timetable/${timetableId}/copy`,
       );
     },
-    onSuccess: (_data) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
-      // TODO: Uncomment this when the edit route is ready
-      // router.navigate({ to: "/edit/$timetableId", params: { data.id } });
+      router.navigate({
+        to: "/edit/$timetableId",
+        params: { timetableId: data.data.id },
+      });
     },
     onError: (error) => {
       if (error instanceof AxiosError && error.response) {
@@ -382,8 +389,7 @@ function ViewTimetable() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
-      // TODO: Uncomment this when the edit route is ready
-      // router.navigate({ to: "/edit/$timetableId", params: { timetableId } });
+      router.navigate({ to: "/edit/$timetableId", params: { timetableId } });
     },
     onError: (error) => {
       if (error instanceof AxiosError && error.response) {
