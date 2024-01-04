@@ -2,6 +2,7 @@ import CDCList from "@/../CDCs.json";
 import { ToastAction } from "@/components/ui/toast";
 import {
   Tooltip,
+  TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
@@ -14,7 +15,15 @@ import {
 } from "@tanstack/react-query";
 import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
-import { Copy, GripHorizontal, GripVertical, Send, Trash } from "lucide-react";
+import {
+  AlertOctagon,
+  ArrowUpRightFromCircle,
+  Copy,
+  GripHorizontal,
+  GripVertical,
+  Send,
+  Trash,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import {
@@ -414,9 +423,25 @@ function EditTimetable() {
     },
   });
 
+  const coursesInTimetable = useMemo(() => {
+    if (
+      courseQueryResult.data === undefined ||
+      timetableQueryResult.data === undefined
+    )
+      return [];
+
+    return courseQueryResult.data
+      .filter((e) =>
+        timetableQueryResult.data.sections
+          .map((x) => x.courseId)
+          .includes(e.id),
+      )
+      .sort();
+  }, [courseQueryResult.data, timetableQueryResult.data]);
+
   const cdcs = useMemo(() => {
     let cdcs: string[];
-    const coursesList: any[] = [];
+    const coursesList = [];
 
     if (
       timetableQueryResult.data === undefined ||
@@ -483,6 +508,71 @@ function EditTimetable() {
     return coursesList;
   }, [timetableQueryResult, courseQueryResult]);
 
+  const cdcNotFoundWarning = useMemo(
+    () =>
+      cdcs.filter((e) => e.id === null && e.type === "warning") as {
+        id: null;
+        type: "warning";
+        warning: string;
+      }[],
+    [cdcs],
+  );
+
+  const missingCDCs = useMemo(() => {
+    const missing: {
+      id: string;
+      code: string;
+      name: string;
+    }[] = [];
+    for (let i = 0; i < cdcs.length; i++) {
+      if (cdcs[i].id === null) {
+        const option = cdcs[i] as
+          | {
+              id: null;
+              type: "warning";
+              warning: string;
+            }
+          | {
+              id: null;
+              type: "optional";
+              options: {
+                id: string;
+                code: string;
+                name: string;
+              }[];
+            };
+        if (
+          option.type === "optional" &&
+          !option.options.some((e) =>
+            coursesInTimetable
+              .map((added) => added.id)
+              .includes(e.id as string),
+          )
+        ) {
+          const splitCodes = option.options.map((e) => e.code).join(" (or) ");
+          missing.push({
+            id: "",
+            code: splitCodes,
+            name: "",
+          });
+        }
+      } else {
+        if (
+          !coursesInTimetable.map((e) => e.id).includes(cdcs[i].id as string)
+        ) {
+          missing.push(
+            cdcs[i] as {
+              id: string;
+              code: string;
+              name: string;
+            },
+          );
+        }
+      }
+    }
+    return missing;
+  }, [coursesInTimetable, cdcs]);
+
   const [currentCourseID, setCurrentCourseID] = useState<string | null>(null);
   const currentCourseQueryResult = useQuery({
     queryKey: [currentCourseID],
@@ -513,6 +603,22 @@ function EditTimetable() {
 
   const [currentSectionType, setCurrentSectionType] =
     useState<z.infer<typeof sectionTypeZodEnum>>("L");
+
+  const [currentTab, setCurrentTab] = useState("CDCs");
+
+  const isOnCourseDetails = useMemo(
+    () => currentCourseID !== null,
+    [currentCourseID],
+  );
+
+  const handleMissingCDCClick = (courseId: string) => {
+    setCurrentTab("CDCs");
+    if (courseId === "") {
+      setCurrentCourseID(null);
+    } else {
+      setCurrentCourseID(courseId);
+    }
+  };
 
   if (courseQueryResult.isFetching) {
     return <span>Loading...</span>;
@@ -646,6 +752,67 @@ function EditTimetable() {
               </span>
             </span>
             <span className="flex justify-center items-center gap-2">
+              {(missingCDCs.length > 0 || cdcNotFoundWarning.length > 0) && (
+                <Tooltip delayDuration={100}>
+                  <TooltipTrigger
+                    asChild
+                    className="hover:bg-slate-700 transition duration-200 ease-in-out"
+                  >
+                    <div className="p-2 rounded-full">
+                      <AlertOctagon className="w-6 h-6 m-1" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-muted text-foreground border-muted-foreground text-md">
+                    {missingCDCs.length > 0 && (
+                      <div className="flex flex-col">
+                        <span>
+                          You haven't added all CDCs for this semester to your
+                          timetable.
+                        </span>
+                        <span className="font-bold pt-2">CDCs missing:</span>
+                        {missingCDCs.map((e) => (
+                          <div className="flex items-center" key={e.id}>
+                            <span className="ml-2">{e.code}</span>
+                            <Button
+                              onClick={() => {
+                                handleMissingCDCClick(e.id);
+                              }}
+                              className="p-2 w-fit h-fit ml-2 mb-1 bg-transparent hover:bg-slate-700 rounded-full"
+                            >
+                              <ArrowUpRightFromCircle className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {cdcNotFoundWarning.length > 0 && (
+                      <div className="flex flex-col">
+                        <span className="font-bold">
+                          Chrono could not find some of your CDCs in the list of
+                          courses.
+                        </span>
+                        <span className="flex">
+                          Please report this issue
+                          <a
+                            href="https://github.com/crux-bphc/chronofactorem-rewrite/issues"
+                            className="text-blue-300 flex pl-1"
+                          >
+                            here
+                            <ArrowUpRightFromCircle className="w-4 h-4 ml-1" />
+                          </a>
+                        </span>
+                        <span className="font-bold pt-2">Error List:</span>
+
+                        {cdcNotFoundWarning.map((e) => (
+                          <span className="ml-2" key={e.id}>
+                            {e.warning}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </TooltipContent>
+                </Tooltip>
+              )}
               <Button
                 variant="ghost"
                 className="rounded-full p-3"
@@ -723,7 +890,6 @@ function EditTimetable() {
               isOnEditPage={true}
               allCoursesDetails={courses}
               cdcs={cdcs}
-              currentCourseID={currentCourseID}
               setCurrentCourseID={setCurrentCourseID}
               currentCourseDetails={currentCourseQueryResult}
               uniqueSectionTypes={uniqueSectionTypes}
@@ -731,6 +897,10 @@ function EditTimetable() {
               setCurrentSectionType={setCurrentSectionType}
               addSectionMutation={addSectionMutation}
               removeSectionMutation={removeSectionMutation}
+              coursesInTimetable={coursesInTimetable}
+              currentTab={currentTab}
+              setCurrentTab={setCurrentTab}
+              isOnCourseDetails={isOnCourseDetails}
             />
             <TimetableGrid
               isVertical={isVertical}

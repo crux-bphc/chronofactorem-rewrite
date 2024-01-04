@@ -26,7 +26,6 @@ export function SideMenu({
   isOnEditPage,
   allCoursesDetails,
   cdcs,
-  currentCourseID,
   setCurrentCourseID,
   currentCourseDetails,
   uniqueSectionTypes,
@@ -34,12 +33,15 @@ export function SideMenu({
   setCurrentSectionType,
   addSectionMutation,
   removeSectionMutation,
+  coursesInTimetable,
+  currentTab,
+  setCurrentTab,
+  isOnCourseDetails,
 }: {
   timetable: z.infer<typeof timetableWithSectionsType>;
   isOnEditPage: boolean;
   allCoursesDetails: z.infer<typeof courseType>[];
   cdcs: any[];
-  currentCourseID: string | null;
   setCurrentCourseID: React.Dispatch<React.SetStateAction<string | null>>;
   currentCourseDetails: UseQueryResult<
     z.infer<typeof courseWithSectionsType> | null | undefined
@@ -65,31 +67,15 @@ export function SideMenu({
     },
     unknown
   >;
+  coursesInTimetable: z.infer<typeof courseType>[];
+  currentTab: string;
+  setCurrentTab: React.Dispatch<React.SetStateAction<string>>;
+  isOnCourseDetails: boolean;
 }) {
   const queryClient = useQueryClient();
 
   // STATE MANAGEMENT SECTION
   // Some of these may have to be moved up to the parent later
-  const [currentTab, setCurrentTab] = useState(() => {
-    return isOnEditPage ? "CDCs" : "currentCourses";
-  });
-
-  const coursesInTimetable = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          timetable.sections.map((section) =>
-            allCoursesDetails.find((course) => course.id === section.courseId),
-          ),
-        ),
-      ).sort(),
-    [allCoursesDetails, timetable.sections],
-  );
-
-  const isOnCourseDetails = useMemo(
-    () => currentCourseID !== null,
-    [currentCourseID],
-  );
 
   // To make sure currentSectionType's value matches with what section types exist on the current course
   useEffect(() => {
@@ -141,8 +127,6 @@ export function SideMenu({
       return result2.data;
     },
     onSuccess: () => {
-      // TODO - update grid
-      console.log("poggers");
       queryClient.invalidateQueries({ queryKey: ["timetable"] });
     },
     onError: (error) => {
@@ -178,7 +162,6 @@ export function SideMenu({
         }
       }
     }
-    console.log(timetable.sections);
   };
 
   const [searchTerm, setSearchTerm] = useState("");
