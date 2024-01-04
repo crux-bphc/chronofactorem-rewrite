@@ -17,6 +17,7 @@ import {
 import { Link, useRouter } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { BookUp, Info, LogOut, Pencil, Plus } from "lucide-react";
+import { useCookies } from "react-cookie";
 import { z } from "zod";
 import { userWithTimetablesType } from "../../../lib/src/index";
 import { router } from "../main";
@@ -49,6 +50,7 @@ export function NavBar() {
     "/edit/" || "/finalize/",
   );
 
+  const [cookies, setCookie, removeCookie] = useCookies(["session"]);
   const userQueryResult = useQuery(userQueryOptions);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -215,11 +217,17 @@ export function NavBar() {
             <DropdownMenuItem
               asChild
               className="focus:bg-destructive/90 focus:text-destructive-foreground cursor-pointer"
+              onClick={() => {
+                removeCookie("session", { path: "/" });
+                router.navigate({
+                  to: "/login",
+                });
+              }}
             >
-              <Link to={userQueryResultData ? "/login" : undefined}>
+              <div>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
-              </Link>
+              </div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
