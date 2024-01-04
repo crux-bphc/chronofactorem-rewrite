@@ -181,11 +181,11 @@ function Home() {
         "/api/timetable/create",
       );
     },
-    onSuccess: (_response) => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       router.navigate({
         to: "/edit/$timetableId",
-        params: { timetableId: _response.data.id },
+        params: { timetableId: response.data.id },
       });
     },
     onError: (error) => {
