@@ -22,6 +22,7 @@ import { Label } from "@/components/ui/label";
 import { ToastAction } from "@/components/ui/toast";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { Edit2, Eye, EyeOff, Trash } from "lucide-react";
 import { useState } from "react";
@@ -224,7 +225,14 @@ function TimetableCard({ timetable, showFooter }: Props) {
     <Card className="min-h-60 flex flex-col min-w-80 shadow-lg">
       <CardHeader className="pb-2">
         <CardTitle className="text-xl md:text-2xl flex justify-between items-center">
-          {timetable.name}
+          <Link
+            to="/view/$timetableId"
+            params={{
+              timetableId: timetable.id,
+            }}
+          >
+            {timetable.name}
+          </Link>
           {timetable.archived && (timetable.private ? <EyeOff /> : <Eye />)}
         </CardTitle>
       </CardHeader>
