@@ -1,4 +1,5 @@
 import {
+  UseMutationResult,
   UseQueryResult,
   useMutation,
   useQueryClient,
@@ -31,6 +32,8 @@ export function SideMenu({
   uniqueSectionTypes,
   currentSectionType,
   setCurrentSectionType,
+  addSectionMutation,
+  removeSectionMutation,
 }: {
   timetable: z.infer<typeof timetableWithSectionsType>;
   isOnEditPage: boolean;
@@ -45,6 +48,22 @@ export function SideMenu({
   currentSectionType: z.infer<typeof sectionTypeZodEnum>;
   setCurrentSectionType: React.Dispatch<
     React.SetStateAction<z.infer<typeof sectionTypeZodEnum>>
+  >;
+  addSectionMutation: UseMutationResult<
+    any,
+    Error,
+    {
+      sectionId: string;
+    },
+    unknown
+  >;
+  removeSectionMutation: UseMutationResult<
+    any,
+    Error,
+    {
+      sectionId: string;
+    },
+    unknown
   >;
 }) {
   const queryClient = useQueryClient();
@@ -95,59 +114,6 @@ export function SideMenu({
     }
     return m;
   }, [timetable]);
-
-  // might need to be extracted to parent
-  const addSectionMutation = useMutation({
-    mutationFn: async (body: { sectionId: string }) => {
-      const result = await axios.post(
-        `/api/timetable/${timetable.id}/add`,
-        body,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      return result.data;
-    },
-    onSuccess: () => {
-      // TODO - update grid
-      console.log("poggers");
-      queryClient.invalidateQueries({ queryKey: ["timetable"] });
-    },
-    onError: (error) => {
-      if (error instanceof AxiosError && error.response) {
-        console.log(error.response.data.message);
-      }
-    },
-  });
-
-  const removeSectionMutation = useMutation({
-    mutationFn: async (body: { sectionId: string }) => {
-      const result = await axios.post(
-        `/api/timetable/${timetable.id}/remove`,
-        body,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      return result.data;
-    },
-    onSuccess: () => {
-      // TODO - update grid
-      console.log("poggers");
-      queryClient.invalidateQueries({ queryKey: ["timetable"] });
-    },
-    onError: (error) => {
-      if (error instanceof AxiosError && error.response) {
-        console.log(error.response.data.message);
-      }
-    },
-  });
 
   const swapCourseMutation = useMutation({
     mutationFn: async ({

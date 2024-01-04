@@ -366,6 +366,54 @@ function EditTimetable() {
     },
   });
 
+  const addSectionMutation = useMutation({
+    mutationFn: async (body: { sectionId: string }) => {
+      const result = await axios.post(
+        `/api/timetable/${timetable.id}/add`,
+        body,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      return result.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["timetable"] });
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError && error.response) {
+        console.log(error.response.data.message);
+      }
+    },
+  });
+
+  const removeSectionMutation = useMutation({
+    mutationFn: async (body: { sectionId: string }) => {
+      const result = await axios.post(
+        `/api/timetable/${timetable.id}/remove`,
+        body,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      return result.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["timetable"] });
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError && error.response) {
+        console.log(error.response.data.message);
+      }
+    },
+  });
+
   const cdcs = useMemo(() => {
     let cdcs: string[];
     const coursesList: any[] = [];
@@ -681,6 +729,8 @@ function EditTimetable() {
               uniqueSectionTypes={uniqueSectionTypes}
               currentSectionType={currentSectionType}
               setCurrentSectionType={setCurrentSectionType}
+              addSectionMutation={addSectionMutation}
+              removeSectionMutation={removeSectionMutation}
             />
             <TimetableGrid
               isVertical={isVertical}
