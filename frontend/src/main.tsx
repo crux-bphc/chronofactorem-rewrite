@@ -13,8 +13,8 @@ import getDegreesRoute from "./GetDegrees";
 import indexRoute from "./Home";
 import loginRoute from "./Login";
 import RootComponent from "./RootComponent";
-import "./index.css";
 import { sideMenuTestingRoute } from "./components/side-menu";
+import "./index.css";
 
 const queryClient = new QueryClient();
 

@@ -15,8 +15,8 @@ import {
 } from "../../../lib/src";
 import { NavBar } from "./navbar";
 import { Button } from "./ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Input } from "./ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import {
   Tooltip,
   TooltipContent,
