@@ -16,6 +16,7 @@ import indexRoute from "./Home";
 import loginRoute from "./Login";
 import RootComponent from "./RootComponent";
 import "./index.css";
+import cmsOptionRoute from "./CMSOption";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const routeTree = rootRoute.addChildren([
     editUserProfileRoute,
     editTimetableRoute,
     finalizeTimetableRoute,
+    cmsOptionRoute,
   ]),
 ]);
 
