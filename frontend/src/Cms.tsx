@@ -43,8 +43,69 @@ import Spinner from "./components/spinner";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
+    // not sure if this is neeeded
     onError: (error) => {
-      console.log(`ERROR: ${error}`);
+      const { toast } = useToast();
+      if (error instanceof AxiosError) {
+        if (error.response) {
+          switch (error.response.status) {
+            case 404:
+              toast({
+                title: "Error",
+                description:
+                  "message" in error.response.data
+                    ? error.response.data.message
+                    : "API returned 404",
+                variant: "destructive",
+                action: (
+                  <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                    <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                      Report
+                    </a>
+                  </ToastAction>
+                ),
+              });
+              break;
+            case 500:
+              toast({
+                title: "Server Error",
+                description:
+                  "message" in error.response.data
+                    ? error.response.data.message
+                    : "API returned 500",
+                variant: "destructive",
+                action: (
+                  <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                    <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                      Report
+                    </a>
+                  </ToastAction>
+                ),
+              });
+              break;
+
+            default:
+              toast({
+                title: "Unknown Error",
+                description:
+                  "message" in error.response.data
+                    ? error.response.data.message
+                    : `API returned ${error.response.status}`,
+                variant: "destructive",
+                action: (
+                  <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                    <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                      Report
+                    </a>
+                  </ToastAction>
+                ),
+              });
+          }
+        } else {
+          // Fallback to the default ErrorComponent
+          return <ErrorComponent error={error} />;
+        }
+      }
     },
   }),
 });
@@ -201,6 +262,7 @@ const cmsRoute = new Route({
 
 function Cms() {
   const { timetableId } = cmsRoute.useParams();
+  const { toast } = useToast();
   const tokenRef = useRef<HTMLInputElement>(null);
   const cookieRef = useRef<HTMLInputElement>(null);
   const sesskeyRef = useRef<HTMLInputElement>(null);
@@ -279,7 +341,11 @@ function Cms() {
       typeof userData.userid !== "number"
     ) {
       console.log(userData);
-      alert("Web Service Token is likely incorrect");
+      toast({
+        title: "Warning!",
+        description: "Web Service Token is likely incorrect",
+        variant: "default",
+      });
       setEnrolledLoaded(true);
       return;
     }
@@ -301,13 +367,22 @@ function Cms() {
             }[],
           );
         } else {
-          alert("Error fetching courses from CMS! Check your credentials.");
+          toast({
+            title: "Error",
+            description:
+              "Error fetching courses from CMS! Check your credentials.",
+            variant: "destructive",
+          });
         }
       } else {
         setEnrolledCourses([]);
       }
     } else {
-      alert("Error fetching courses from CMS! Check your credentials.");
+      toast({
+        title: "Error",
+        description: "Error fetching courses from CMS! Check your credentials.",
+        variant: "destructive",
+      });
     }
     setEnrolledLoaded(true);
   };
@@ -380,7 +455,13 @@ function Cms() {
         },
       );
       if (status !== 200) {
-        alert(`Error when unenrolling from courses: ${JSON.stringify(data)}`);
+        toast({
+          title: "Error",
+          description: `Error when unenrolling from courses: ${JSON.stringify(
+            data,
+          )}`,
+          variant: "destructive",
+        });
       }
     }
     await fetchEnrolledSections();
