@@ -16,6 +16,7 @@ import getDegreesRoute from "./GetDegrees";
 import indexRoute from "./Home";
 import loginRoute from "./Login";
 import RootComponent from "./RootComponent";
+import viewTimetableRoute from "./ViewTimetable";
 import "./index.css";
 import cmsOptionRoute from "./CMSOption";
 
@@ -36,6 +37,7 @@ const routeTree = rootRoute.addChildren([
     editTimetableRoute,
     finalizeTimetableRoute,
     cmsOptionRoute,
+    viewTimetableRoute,
     cmsExportRoute,
   ]),
 ]);

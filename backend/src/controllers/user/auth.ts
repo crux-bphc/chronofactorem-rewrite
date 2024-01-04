@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { TokenSet, generators } from "openid-client";
 import {
   degreeList,
+  getBatchFromEmail,
   isAValidDegreeCombination,
   namedDegreeZodList,
 } from "../../../../lib/src/index.js";
@@ -17,6 +18,13 @@ import {
   ZodFinishedUserSession,
   ZodUnfinishedUserSession,
 } from "../../types/auth.js";
+import {
+  clearAuthCookies,
+  hashFingerprint,
+  setAuthCookies,
+  signJWT,
+  verifyJWT,
+} from "../../utils/authUtils.js";
 
 // On any route, when checking if a user is logged in, check for the cookie
 // in cookiestorage on the server, using -
@@ -31,9 +39,6 @@ const code_verifier = generators.codeVerifier();
 // redirects to the redirect URL for signing in
 export async function manageAuthRedirect(req: Request, res: Response) {
   try {
-    if (req.cookies.session) {
-      return res.redirect(`${env.BACKEND_URL}/auth/callback`);
-    }
     const client = await getClient();
     const code_challenge = generators.codeChallenge(code_verifier);
 
@@ -42,6 +47,23 @@ export async function manageAuthRedirect(req: Request, res: Response) {
       code_challenge,
       code_challenge_method: "S256",
     });
+
+    if (req.cookies.session && req.cookies.fingerprint) {
+      const sessionCookie = req.cookies.session;
+      const fingerprintCookie = req.cookies.fingerprint;
+
+      const sessionData = verifyJWT(sessionCookie);
+
+      if (
+        typeof sessionData === "string" ||
+        sessionData.fingerprintHash !== hashFingerprint(fingerprintCookie)
+      ) {
+        clearAuthCookies(res);
+        return res.redirect(authRedirect);
+      }
+
+      return res.redirect(`${env.BACKEND_URL}/auth/callback`);
+    }
 
     return res.redirect(authRedirect);
   } catch (err: any) {
@@ -54,7 +76,7 @@ export async function manageAuthRedirect(req: Request, res: Response) {
 // starts a session after validating access_token
 export async function authCallback(req: Request, res: Response) {
   try {
-    if (req.cookies.session) {
+    if (req.cookies.session && req.cookies.fingerprint) {
       res.redirect(env.FRONTEND_URL);
     } else {
       // sets session cookie
@@ -78,6 +100,8 @@ export async function authCallback(req: Request, res: Response) {
       // tokenSet.claims() returns validated information contained upon accessing the token
       const tokenExpiryTime = tokenSet.claims().exp;
 
+      // TODO: define maxAge independent from the google cookie
+
       // defines maxAge to be the time when the session cookie expires
       const maxAge = tokenExpiryTime * 1000 - Date.now(); // converts into milliseconds
 
@@ -87,10 +111,13 @@ export async function authCallback(req: Request, res: Response) {
           error: "incomplete information returned by OAuth provider",
         });
       }
+      const fingerprint = Math.random().toString(36).substring(2);
+
       const userData: UnfinishedUserSession = {
         name: userInfo.name,
         email: userInfo.email,
         maxAge: maxAge,
+        fingerprintHash: hashFingerprint(fingerprint),
       };
 
       const existingUser = await userRepository
@@ -106,48 +133,21 @@ export async function authCallback(req: Request, res: Response) {
           name: existingUser.name,
           email: existingUser.email,
           id: existingUser.id,
+          fingerprintHash: hashFingerprint(fingerprint),
         };
 
         // reset session and set ID as well
-        res.clearCookie("userInfo");
-        res.clearCookie("session");
-        res.cookie("session", finishedUserData, {
-          maxAge: maxAge,
-          httpOnly: true,
-          domain: env.FRONTEND_URL.replace("https://", "")
-            .replace("http://", "")
-            .split(":")[0],
-          secure: true,
-          sameSite: "none",
-        });
-        res.cookie("userInfo", finishedUserData, {
-          maxAge: maxAge,
-        });
-
+        const token = signJWT(finishedUserData, maxAge);
+        clearAuthCookies(res);
+        setAuthCookies(res, token, fingerprint, maxAge);
         res.redirect(env.FRONTEND_URL);
       } else {
-        // setting the cookie
-        res.cookie("session", userData, {
-          maxAge: maxAge,
-          httpOnly: true,
-          domain: env.FRONTEND_URL.replace("https://", "")
-            .replace("http://", "")
-            .split(":")[0],
-          secure: true,
-          sameSite: "none",
-        });
+        // reset session and set ID as well
+        const token = signJWT(userData, maxAge);
+        clearAuthCookies(res);
+        setAuthCookies(res, token, fingerprint, maxAge);
 
-        // slices mail to obtain batch
-        let batch;
-        if (userData.email !== undefined) {
-          batch = userData.email.match(
-            /^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/,
-          )
-            ? userData.email.slice(1, 5)
-            : "0000";
-        } else {
-          batch = "0000";
-        }
+        const batch = getBatchFromEmail(userData.email);
         // batch is set to 0000 if it's a non-student email, like hpc@hyderabad.bits-hyderabad.ac.in
         // or undefined
 
@@ -187,19 +187,40 @@ export async function getDegrees(req: Request, res: Response) {
     // the user: name, email and degrees is stored on the database
 
     // gets userInfo as part of session
-    if (req.cookies.session === undefined) {
+    if (
+      req.cookies.session === undefined ||
+      req.cookies.fingerprint === undefined
+    ) {
       return res.status(401).json({
         message: "cannot set degrees",
         error: "user session expired",
       });
     }
-    if (!ZodUnfinishedUserSession.safeParse(req.cookies.session).success) {
+
+    const sessionCookie = req.cookies.session;
+    const fingerprintCookie = req.cookies.fingerprint;
+
+    const sessionData = verifyJWT(sessionCookie);
+    if (typeof sessionData === "string") {
       return res.status(401).json({
         message: "cannot set degrees",
         error: "user session malformed",
       });
     }
-    const session: UnfinishedUserSession = req.cookies.session;
+
+    if (!ZodUnfinishedUserSession.safeParse(sessionData).success) {
+      return res.status(401).json({
+        message: "cannot set degrees",
+        error: "user session malformed",
+      });
+    }
+    const session = ZodUnfinishedUserSession.parse(sessionData);
+    if (session.fingerprintHash !== hashFingerprint(fingerprintCookie)) {
+      return res.status(401).json({
+        message: "cannot set degrees",
+        error: "user fingerprint malformed",
+      });
+    }
 
     if (
       !namedDegreeZodList("user").min(1).safeParse(req.body.degrees).success ||
@@ -221,16 +242,7 @@ export async function getDegrees(req: Request, res: Response) {
     };
 
     // slices mail to obtain batch
-    let batch;
-    if (userData.email !== undefined) {
-      batch = userData.email.match(/^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/)
-        ? userData.email.slice(1, 5)
-        : "0000";
-    } else {
-      batch = "0000";
-    }
-    // batch is set to 0000 if it's a non-student email, like hpc@hyderabad.bits-hyderabad.ac.in
-    // or undefined
+    const batch = getBatchFromEmail(userData.email);
 
     // converts name to title case
     const name = toTitleCase(userData.name);
@@ -260,27 +272,17 @@ export async function getDegrees(req: Request, res: Response) {
       })
       .execute();
 
-    res.clearCookie("userInfo");
-    res.clearCookie("session");
-
+    const fingerprint = Math.random().toString(36).substring(2);
     const finishedUserData: FinishedUserSession = {
       name: session.name,
       email: session.email,
       id: createdUser.identifiers[0].id,
+      fingerprintHash: hashFingerprint(fingerprint),
     };
 
-    res.cookie("session", finishedUserData, {
-      maxAge: session.maxAge,
-      httpOnly: true,
-      domain: env.FRONTEND_URL.replace("https://", "")
-        .replace("http://", "")
-        .split(":")[0],
-      secure: true,
-      sameSite: "none",
-    });
-    res.cookie("userInfo", finishedUserData, {
-      maxAge: session.maxAge,
-    });
+    const token = signJWT(finishedUserData, session.maxAge);
+    clearAuthCookies(res);
+    setAuthCookies(res, token, fingerprint, session.maxAge);
 
     // reset session and set ID as well
     res.json({
@@ -295,35 +297,35 @@ export async function getDegrees(req: Request, res: Response) {
   }
 }
 
-// this function deletes the session cookie to log out
-export async function logout(req: Request, res: Response) {
-  res.clearCookie("session", {
-    httpOnly: true,
-    domain: env.FRONTEND_URL.replace("https://", "")
-      .replace("http://", "")
-      .split(":")[0],
-    secure: true,
-    sameSite: "none",
-  });
-  res.clearCookie("userInfo");
-  return res.json({
-    authenticated: false,
-    message: "user logged out",
-  });
-}
-
 // checks whether user is not logged in, logged in but hasn't finished selecting degrees, or properly logged in
 export async function checkAuthStatus(req: Request, res: Response) {
   try {
-    if (req.cookies.session === undefined) {
-      return res.json({
+    if (
+      req.cookies.session === undefined ||
+      req.cookies.fingerprint === undefined
+    ) {
+      return res.status(401).json({
         message: "user not logged in",
       });
     }
 
-    if (ZodUnfinishedUserSession.safeParse(req.cookies.session).success) {
-      const session: UnfinishedUserSession = req.cookies.session;
+    const sessionCookie = req.cookies.session;
+    const fingerprintCookie = req.cookies.fingerprint;
 
+    const sessionData = verifyJWT(sessionCookie);
+
+    if (
+      typeof sessionData === "string" ||
+      sessionData.fingerprintHash !== hashFingerprint(fingerprintCookie)
+    ) {
+      return res.status(401).json({
+        message: "user session malformed",
+        error: "user session malformed",
+      });
+    }
+
+    if (ZodUnfinishedUserSession.safeParse(sessionData).success) {
+      const session = ZodUnfinishedUserSession.parse(sessionData);
       const user = await userRepository
         .createQueryBuilder()
         .select()
@@ -334,21 +336,15 @@ export async function checkAuthStatus(req: Request, res: Response) {
 
       if (user) {
         // reset session
-        res.clearCookie("userInfo");
-        res.clearCookie("session");
-
-        return res.json({
+        clearAuthCookies(res);
+        return res.status(401).json({
           message: "user not logged in",
         });
       }
 
-      const batch = session.email.match(
-        /^f\d{8}@hyderabad\.bits-pilani\.ac\.in$/,
-      )
-        ? session.email.slice(1, 5)
-        : "0000";
+      const batch = getBatchFromEmail(sessionData.email);
 
-      return res.status(400).json({
+      return res.json({
         message: "user needs to get degrees",
         redirect: `/getDegrees?year=${
           timetableJSON.metadata.acadYear - parseInt(batch) + 1
@@ -356,10 +352,8 @@ export async function checkAuthStatus(req: Request, res: Response) {
       });
     }
 
-    if (ZodFinishedUserSession.safeParse(req.cookies.session).success) {
-      return res
-        .status(400)
-        .json({ message: "user is logged in", redirect: "/" });
+    if (ZodFinishedUserSession.safeParse(sessionData).success) {
+      return res.json({ message: "user is logged in", redirect: "/" });
     }
 
     return res.status(401).json({
