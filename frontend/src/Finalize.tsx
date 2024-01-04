@@ -158,7 +158,10 @@ function FinalizeTimetable() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
-      router.navigate({ to: "/" });
+      router.navigate({
+        to: "/cmsOption/$timetableId",
+        params: { timetableId: timetableId },
+      });
     },
     onError: (error) => {
       if (error instanceof AxiosError && error.response) {
