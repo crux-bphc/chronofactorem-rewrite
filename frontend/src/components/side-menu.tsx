@@ -228,17 +228,26 @@ export function SideMenu({
   // JSX SECTION
   if (isOnCourseDetails) {
     return (
-      <div className="bg-secondary w-96">
-        <Button
-          className="rounded-full flex ml-2 px-2 mb-2 mr-2 items-center"
-          onClick={() => {
-            setCurrentCourseID(null);
-          }}
-        >
-          <ArrowLeft />
-        </Button>
-        <Tabs value={currentSectionType}>
-          <TabsList>
+      <div className="bg-secondary min-w-96 h-[calc(100vh-13rem)]">
+        <div className="flex items-center py-2 w-full">
+          <Button
+            variant={"ghost"}
+            className="rounded-full flex ml-2 px-2 mr-2 items-center hover:bg-secondary-foreground/10"
+            onClick={() => {
+              setCurrentCourseID(null);
+            }}
+          >
+            <ArrowLeft />
+          </Button>
+          <span className="font-semibold text-lg h-full">
+            {currentCourseDetails.data?.code}
+          </span>
+          <span className=" text-lg h-full">
+            : {` ${currentCourseDetails.data?.name}`}
+          </span>
+        </div>
+        <Tabs value={currentSectionType} className="h-[calc(100vh-20rem)]">
+          <TabsList className="w-full mb-2">
             {uniqueSectionTypes.map((sectionType) => {
               return (
                 <TabsTrigger
@@ -248,6 +257,7 @@ export function SideMenu({
                     setSectionTypeChangeRequest("");
                   }}
                   key={sectionType}
+                  className="text-xl font-bold w-full"
                 >
                   {sectionType}
                 </TabsTrigger>
@@ -259,66 +269,73 @@ export function SideMenu({
             return (
               <TabsContent
                 value={sectionType}
-                className="flex flex-col gap-4"
+                className="h-[calc(100vh-20rem)]"
                 key={sectionType}
               >
-                {currentCourseDetails.data?.sections
-                  .filter((section) => section.type === sectionType)
-                  .map((section) => {
-                    const tm = section.roomTime
-                      .map(
-                        (e) =>
-                          e.charAt(e.lastIndexOf(":") - 1) +
-                          e.substring(e.lastIndexOf(":") + 1),
-                      )
-                      .find((e) => timings.has(e));
+                <div className="flex flex-col gap-2 p-0 m-0 px-2 overflow-y-scroll h-[calc(100vh-20rem)]">
+                  {currentCourseDetails.data?.sections
+                    .filter((section) => section.type === sectionType)
+                    .map((section) => {
+                      const tm = section.roomTime
+                        .map(
+                          (e) =>
+                            e.charAt(e.lastIndexOf(":") - 1) +
+                            e.substring(e.lastIndexOf(":") + 1),
+                        )
+                        .find((e) => timings.has(e));
 
-                    return {
-                      ...section,
-                      clashing: timings.get(tm ?? ""),
-                    };
-                  })
-                  .map((section) => {
-                    return (
-                      <Button
-                        className={`flex flex-col h-fit hover:brightness-150 ${
-                          timetable.sections.find((e) => e.id === section.id)
-                            ? "bg-primary"
-                            : "bg-primary brightness-75"
-                        }`}
-                        onClick={() => handleSectionClick(section)}
-                        key={section.number}
-                        disabled={
-                          !isOnEditPage ||
-                          (section.clashing !== undefined &&
-                            !timetable.sections.find(
-                              (e) => e.id === section.id,
-                            ))
-                        }
-                      >
-                        <span>
-                          {currentCourseDetails.data?.code} {section.type}
-                          {section.number}
-                        </span>
-                        <span>{section.instructors}</span>
-                        <span>
-                          {Array.from(
-                            new Set(
-                              section.roomTime.map((e) => e.split(":")[1]),
-                            ),
-                          )}
-                        </span>
-                        {section.clashing &&
+                      return {
+                        ...section,
+                        clashing: timings.get(tm ?? ""),
+                      };
+                    })
+                    .map((section) => {
+                      return (
+                        <Button
+                          variant={"secondary"}
+                          className={`flex flex-col w-full h-fit border-slate-300 border-2 dark:border-slate-600/60 ${
+                            timetable.sections.find((e) => e.id === section.id)
+                              ? "dark:bg-slate-700 bg-slate-300"
+                              : "bg-transparent"
+                          }`}
+                          onClick={() => handleSectionClick(section)}
+                          key={section.number}
+                          disabled={
+                            !isOnEditPage ||
+                            (section.clashing !== undefined &&
+                              !timetable.sections.find(
+                                (e) => e.id === section.id,
+                              ))
+                          }
+                        >
+                          <div className="flex items-center h-full w-full gap-4">
+                            <span className="">
+                              {section.type}
+                              {section.number}
+                            </span>
+                            <div className="flex flex-col h-full min-h-16 justify-between text-left py-2">
+                              <span className="font-semibold text-wrap text-md">
+                                {section.instructors.join(", ")}
+                              </span>
+                              <span className="font-normal">
+                                {section.roomTime
+                                  .map((e) => e.split(":").splice(1).join(" "))
+                                  .join(", ")}
+                              </span>
+                            </div>
+                          </div>
+                          {/* {section.clashing &&
                           !timetable.sections.find(
                             (e) => e.id === section.id,
                           ) && (
                             <span className="text-red-500">
                               Clashing with {section.clashing}
                             </span>
-                          )}
-                      </Button>
-                    );
-                  })}
+                          )} */}
+                        </Button>
+                      );
+                    })}
+                </div>
               </TabsContent>
             );
           })}
@@ -330,7 +347,10 @@ export function SideMenu({
   // user is not in course details
   return (
     <div className="bg-secondary min-w-96">
-      <Tabs value={isScreenshotMode ? "exams" : currentTab} className="py-2">
+      <Tabs
+        value={isScreenshotMode ? "exams" : currentTab}
+        className="py-2 h-[calc(100vh-16rem)]"
+      >
         <TabsList>
           {isOnEditPage && (
             <TabsTrigger
@@ -560,8 +580,8 @@ export function SideMenu({
             ))}
         </TabsContent>
 
-        <TabsContent value="search">
-          <div className="px-4 pb-4 mt-[-1rem]">
+        <TabsContent value="search" className="h-full overflow-y-scroll">
+          <div className="px-4 pb-4 pt-1">
             <Input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -570,7 +590,7 @@ export function SideMenu({
             />
           </div>
 
-          <div className="">
+          <div className="overflow-scroll">
             {courseSearchResults.map((course) => (
               // TODO - deal with this biome rule
               // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
