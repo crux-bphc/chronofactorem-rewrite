@@ -50,7 +50,7 @@ export function NavBar() {
     "/edit/" || "/finalize/",
   );
 
-  const [cookies, setCookie, removeCookie] = useCookies(["session"]);
+  const [_cookies, _setCookie, removeCookie] = useCookies(["session"]);
   const userQueryResult = useQuery(userQueryOptions);
   const { toast } = useToast();
   const queryClient = useQueryClient();
