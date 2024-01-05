@@ -45,6 +45,11 @@ import {
 import { Badge } from "./components/ui/badge";
 import { Button } from "./components/ui/button";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "./components/ui/popover";
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -52,7 +57,6 @@ import {
 } from "./components/ui/tooltip";
 import { toast, useToast } from "./components/ui/use-toast";
 import { router } from "./main";
-import { Popover, PopoverContent, PopoverTrigger } from "./components/ui/popover";
 
 const fetchTimetable = async (timetableId: string) => {
   const response = await axios.get<z.infer<typeof timetableWithSectionsType>>(
@@ -862,7 +866,7 @@ function ViewTimetable() {
                       onClick={generateScreenshot}
                       className="flex justify-between items-center gap-2 md:text-md text-sm"
                     >
-                      <Download className="w-5 h-5 md:w-6 md:h-6"/>
+                      <Download className="w-5 h-5 md:w-6 md:h-6" />
                       PNG
                     </Button>
                   </TooltipTrigger>
@@ -870,22 +874,24 @@ function ViewTimetable() {
                     <p>Download timetable as image</p>
                   </TooltipContent>
                 </Tooltip>
-                {screenIsLarge && <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="rounded-full p-3"
-                      onClick={() => setIsVertical(!isVertical)}
-                    >
-                      {isVertical ? <GripVertical /> : <GripHorizontal />}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>
-                      Make timetable {isVertical ? "horizontal" : "vertical"}
-                    </p>
-                  </TooltipContent>
-                </Tooltip>}
+                {screenIsLarge && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="rounded-full p-3"
+                        onClick={() => setIsVertical(!isVertical)}
+                      >
+                        {isVertical ? <GripVertical /> : <GripHorizontal />}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>
+                        Make timetable {isVertical ? "horizontal" : "vertical"}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
                 {userQueryResult.data.id ===
                   timetableQueryResult.data.authorId && (
                   <Tooltip>
@@ -921,7 +927,7 @@ function ViewTimetable() {
                         }, 2000);
                       }}
                     >
-                      <Copy className="w-5 h-5 md:w-6 md:h-6"/>
+                      <Copy className="w-5 h-5 md:w-6 md:h-6" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -976,51 +982,54 @@ function ViewTimetable() {
             <div
               className="flex flex-row gap-4 bg-background h-full relative"
               ref={screenshotContentRef}
-            >{screenIsLarge ? (
-              <SideMenu
-                timetable={timetable}
-                isOnEditPage={false}
-                allCoursesDetails={courses}
-                cdcs={cdcs}
-                setCurrentCourseID={setCurrentCourseID}
-                currentCourseDetails={currentCourseQueryResult}
-                uniqueSectionTypes={uniqueSectionTypes}
-                currentSectionType={currentSectionType}
-                setCurrentSectionType={setCurrentSectionType}
-                addSectionMutation={addSectionMutation}
-                removeSectionMutation={removeSectionMutation}
-                coursesInTimetable={coursesInTimetable}
-                currentTab={currentTab}
-                setCurrentTab={setCurrentTab}
-                isOnCourseDetails={isOnCourseDetails}
-                setSectionTypeChangeRequest={setSectionTypeChangeRequest}
-                isScreenshotMode={isScreenshotMode}
-              /> ) : (
+            >
+              {screenIsLarge ? (
+                <SideMenu
+                  timetable={timetable}
+                  isOnEditPage={false}
+                  allCoursesDetails={courses}
+                  cdcs={cdcs}
+                  setCurrentCourseID={setCurrentCourseID}
+                  currentCourseDetails={currentCourseQueryResult}
+                  uniqueSectionTypes={uniqueSectionTypes}
+                  currentSectionType={currentSectionType}
+                  setCurrentSectionType={setCurrentSectionType}
+                  addSectionMutation={addSectionMutation}
+                  removeSectionMutation={removeSectionMutation}
+                  coursesInTimetable={coursesInTimetable}
+                  currentTab={currentTab}
+                  setCurrentTab={setCurrentTab}
+                  isOnCourseDetails={isOnCourseDetails}
+                  setSectionTypeChangeRequest={setSectionTypeChangeRequest}
+                  isScreenshotMode={isScreenshotMode}
+                />
+              ) : (
                 <Popover>
                   <PopoverTrigger className="absolute left-2 top-[-1rem]">
                     <Button variant={"default"} className="rounded-full">
                       <Menu />
                     </Button>
-                  </PopoverTrigger><PopoverContent>
-              <SideMenu
-                timetable={timetable}
-                isOnEditPage={false}
-                allCoursesDetails={courses}
-                cdcs={cdcs}
-                setCurrentCourseID={setCurrentCourseID}
-                currentCourseDetails={currentCourseQueryResult}
-                uniqueSectionTypes={uniqueSectionTypes}
-                currentSectionType={currentSectionType}
-                setCurrentSectionType={setCurrentSectionType}
-                addSectionMutation={addSectionMutation}
-                removeSectionMutation={removeSectionMutation}
-                coursesInTimetable={coursesInTimetable}
-                currentTab={currentTab}
-                setCurrentTab={setCurrentTab}
-                isOnCourseDetails={isOnCourseDetails}
-                setSectionTypeChangeRequest={setSectionTypeChangeRequest}
-                isScreenshotMode={isScreenshotMode}
-              />
+                  </PopoverTrigger>
+                  <PopoverContent>
+                    <SideMenu
+                      timetable={timetable}
+                      isOnEditPage={false}
+                      allCoursesDetails={courses}
+                      cdcs={cdcs}
+                      setCurrentCourseID={setCurrentCourseID}
+                      currentCourseDetails={currentCourseQueryResult}
+                      uniqueSectionTypes={uniqueSectionTypes}
+                      currentSectionType={currentSectionType}
+                      setCurrentSectionType={setCurrentSectionType}
+                      addSectionMutation={addSectionMutation}
+                      removeSectionMutation={removeSectionMutation}
+                      coursesInTimetable={coursesInTimetable}
+                      currentTab={currentTab}
+                      setCurrentTab={setCurrentTab}
+                      isOnCourseDetails={isOnCourseDetails}
+                      setSectionTypeChangeRequest={setSectionTypeChangeRequest}
+                      isScreenshotMode={isScreenshotMode}
+                    />
                   </PopoverContent>
                 </Popover>
               )}

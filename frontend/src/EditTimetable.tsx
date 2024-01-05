@@ -22,9 +22,9 @@ import {
   Copy,
   GripHorizontal,
   GripVertical,
+  Menu,
   Send,
   Trash,
-  Menu,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
@@ -51,13 +51,13 @@ import {
 } from "./components/ui/alert-dialog";
 import { Badge } from "./components/ui/badge";
 import { Button } from "./components/ui/button";
-import { toast, useToast } from "./components/ui/use-toast";
-import { router } from "./main";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "./components/ui/popover";
+import { toast, useToast } from "./components/ui/use-toast";
+import { router } from "./main";
 
 const fetchTimetable = async (timetableId: string) => {
   const response = await axios.get<z.infer<typeof timetableWithSectionsType>>(
