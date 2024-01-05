@@ -1046,6 +1046,7 @@ function ViewTimetable() {
       ) : (
         <div className="flex bg-background h-screen w-full justify-center items-center">
           <Spinner />
+          <span>Please wait while we copy over your timetable...</span>
         </div>
       )}
     </>
