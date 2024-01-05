@@ -951,10 +951,10 @@ function EditTimetable() {
                   <Tooltip delayDuration={100}>
                     <TooltipTrigger
                       asChild
-                      className="duration-200 mr-4 text-md p-2 h-fit hover:bg-orange-800/40 rounded-lg px-4"
+                      className="duration-200 mr-4 text-md p-2 h-fit hover:bg-orange-200/60 dark:hover:bg-orange-800/40 rounded-lg px-4"
                     >
                       <div className="flex items-center">
-                        <span className="text-orange-400 pr-4">
+                        <span className="text-orange-600 dark:text-orange-400 pr-4">
                           {timetable.warnings
                             .slice(0, 2)
                             .map((x) => x.replace(":", " "))
@@ -974,7 +974,7 @@ function EditTimetable() {
                               timetable.warnings.length > 3 ? "s" : ""
                             }`}
                         </span>
-                        <AlertTriangle className="w-6 h-6 m-1 text-orange-400" />
+                        <AlertTriangle className="w-6 h-6 m-1 text-orange-600 dark:text-orange-400" />
                       </div>
                     </TooltipTrigger>
                     <TooltipContent className="bg-muted text-foreground border-muted-foreground text-md">
@@ -1004,9 +1004,9 @@ function EditTimetable() {
                                         )[0],
                                       );
                                     }}
-                                    className="p-2 w-fit h-fit ml-2 mb-1 bg-transparent hover:bg-slate-700 rounded-full"
+                                    className="p-2 w-fit h-fit ml-2 mb-1 bg-transparent hover:bg-muted-foreground/30 rounded-full"
                                   >
-                                    <ArrowUpRightFromCircle className="w-4 h-4" />
+                                    <ArrowUpRightFromCircle className="w-4 h-4 text-foreground" />
                                   </Button>
                                 </div>
                               ))}

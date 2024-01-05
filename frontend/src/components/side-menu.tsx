@@ -289,9 +289,12 @@ export function SideMenu({
                         clashing: timings.get(tm ?? ""),
                       };
                     })
-                    .map((section) => {
+                    .map((section, i) => {
                       return (
-                        <span className="w-full relative flex flex-col">
+                        <span
+                          className="w-full relative flex flex-col"
+                          key={2 * i}
+                        >
                           <Button
                             variant={"secondary"}
                             className={`flex flex-col w-full h-fit border-slate-300 border-2 dark:border-slate-600/60 ${

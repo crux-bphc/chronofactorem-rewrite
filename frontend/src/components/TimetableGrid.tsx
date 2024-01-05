@@ -129,7 +129,7 @@ export function TimetableGrid({
     <div className="flex w-full">
       {isVertical ? (
         <div
-          className={`mt-16 sm:mt-12 gap-7 sm:gap-5 grid justify-between grid-rows-${displayCols} text-md text-center text-foreground/80 font-bold`}
+          className={`mt-16 sm:mt-14 gap-7 sm:gap-20 grid justify-start grid-rows-${displayCols} text-md text-center text-foreground/80 font-bold`}
         >
           {timings
             .filter((_, i) => i < displayCols)
@@ -226,7 +226,7 @@ export function TimetableGrid({
               ) : (
                 <div
                   className={`bg-background border border-muted dark:border-muted/70 ${
-                    isVertical ? "min-h-20 sm:min-h-16" : "min-h-20"
+                    isVertical ? "min-h-20 sm:min-h-20" : "min-h-20"
                   }`}
                   key={2 * i}
                 />
