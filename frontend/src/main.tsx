@@ -8,6 +8,7 @@ import {
 import React from "react";
 import { CookiesProvider } from "react-cookie";
 import ReactDOM from "react-dom/client";
+import aboutRoute from "./About";
 import authenticatedRoute from "./AuthenticatedRoute";
 import cmsOptionRoute from "./CMSOption";
 import cmsRoute from "./Cms";
@@ -33,6 +34,7 @@ export const rootRoute = rootRouteWithContext<{
 const routeTree = rootRoute.addChildren([
   loginRoute,
   getDegreesRoute,
+  aboutRoute,
   authenticatedRoute.addChildren([
     indexRoute,
     editUserProfileRoute,
