@@ -740,7 +740,7 @@ function ViewTimetable() {
         )}{" "}
         Please report this{" "}
         <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          here
+          <span className="text-blue-700 dark:text-blue-400">here</span>
         </a>
       </span>
     );
@@ -752,7 +752,7 @@ function ViewTimetable() {
         Unexpected error: courseQueryResult.data is undefined. Please report
         this{" "}
         <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          here
+          <span className="text-blue-700 dark:text-blue-400">here</span>
         </a>
       </span>
     );
@@ -773,7 +773,7 @@ function ViewTimetable() {
         )}{" "}
         Please report this{" "}
         <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          here
+          <span className="text-blue-700 dark:text-blue-400">here</span>
         </a>
       </span>
     );
@@ -785,7 +785,7 @@ function ViewTimetable() {
         Unexpected error: timetableQueryResult.data is undefined. Please report
         this{" "}
         <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          here
+          <span className="text-blue-700 dark:text-blue-400">here</span>
         </a>
       </span>
     );
@@ -797,7 +797,7 @@ function ViewTimetable() {
         Unexpected error: timetableQueryResult.data is undefined. Please report
         this{" "}
         <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          here
+          <span className="text-blue-700 dark:text-blue-400">here</span>
         </a>
       </span>
     );
