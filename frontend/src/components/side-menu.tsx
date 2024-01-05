@@ -239,10 +239,10 @@ export function SideMenu({
           >
             <ArrowLeft />
           </Button>
-          <span className="font-semibold text-lg h-full">
+          <span className="font-semibold text-md h-full">
             {currentCourseDetails.data?.code}
           </span>
-          <span className=" text-lg h-full">
+          <span className=" text-md h-full">
             : {` ${currentCourseDetails.data?.name}`}
           </span>
         </div>
@@ -291,48 +291,56 @@ export function SideMenu({
                     })
                     .map((section) => {
                       return (
-                        <Button
-                          variant={"secondary"}
-                          className={`flex flex-col w-full h-fit border-slate-300 border-2 dark:border-slate-600/60 ${
-                            timetable.sections.find((e) => e.id === section.id)
-                              ? "dark:bg-slate-700 bg-slate-300"
-                              : "bg-transparent"
-                          }`}
-                          onClick={() => handleSectionClick(section)}
-                          key={section.number}
-                          disabled={
-                            !isOnEditPage ||
-                            (section.clashing !== undefined &&
-                              !timetable.sections.find(
+                        <span className="w-full relative flex flex-col">
+                          <Button
+                            variant={"secondary"}
+                            className={`flex flex-col w-full h-fit border-slate-300 border-2 dark:border-slate-600/60 ${
+                              timetable.sections.find(
                                 (e) => e.id === section.id,
-                              ))
-                          }
-                        >
-                          <div className="flex items-center h-full w-full gap-4">
-                            <span className="">
-                              {section.type}
-                              {section.number}
-                            </span>
-                            <div className="flex flex-col h-full min-h-16 justify-between text-left py-2">
-                              <span className="font-semibold text-wrap text-md">
-                                {section.instructors.join(", ")}
+                              )
+                                ? "dark:bg-slate-700 bg-slate-300"
+                                : "bg-transparent"
+                            }`}
+                            onClick={() => handleSectionClick(section)}
+                            key={section.number}
+                            disabled={
+                              !isOnEditPage ||
+                              (section.clashing !== undefined &&
+                                !timetable.sections.find(
+                                  (e) => e.id === section.id,
+                                ))
+                            }
+                          >
+                            <div className="flex items-center h-full w-full gap-4">
+                              <span className="">
+                                {section.type}
+                                {section.number}
                               </span>
-                              <span className="font-normal">
-                                {section.roomTime
-                                  .map((e) => e.split(":").splice(1).join(" "))
-                                  .join(", ")}
-                              </span>
+                              <div className="flex flex-col h-full min-h-16 justify-between text-left py-2">
+                                <span className="font-semibold text-wrap text-md">
+                                  {section.instructors.join(", ")}
+                                </span>
+                                <span className="font-normal">
+                                  {section.roomTime
+                                    .map((e) =>
+                                      e.split(":").splice(1).join(" "),
+                                    )
+                                    .join(", ")}
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                          {/* {section.clashing &&
-                          !timetable.sections.find(
-                            (e) => e.id === section.id,
-                          ) && (
-                            <span className="text-red-500">
-                              Clashing with {section.clashing}
-                            </span>
-                          )} */}
-                        </Button>
+                          </Button>
+                          {section.clashing &&
+                            !timetable.sections.find(
+                              (e) => e.id === section.id,
+                            ) && (
+                              <div className="absolute left-0 top-8 bg-slate-700/80 text-center w-full">
+                                <span className="text-slate-100 font-bold text-md">
+                                  Clashing with {section.clashing}
+                                </span>
+                              </div>
+                            )}
+                        </span>
                       );
                     })}
                 </div>
