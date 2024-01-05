@@ -787,13 +787,13 @@ function EditTimetable() {
                   <Tooltip delayDuration={100}>
                     <TooltipTrigger
                       asChild
-                      className="hover:bg-slate-700 transition duration-200 ease-in-out"
+                      className="hover:bg-accent hover:text-accent-foreground transition duration-200 ease-in-out"
                     >
                       <div className="p-2 rounded-full">
                         <AlertOctagon className="w-6 h-6 m-1" />
                       </div>
                     </TooltipTrigger>
-                    <TooltipContent className="bg-muted text-foreground border-muted-foreground text-md">
+                    <TooltipContent className="bg-muted text-foreground border-muted-foreground/40 text-md">
                       {missingCDCs.length > 0 && (
                         <div className="flex flex-col">
                           <span>
@@ -808,7 +808,7 @@ function EditTimetable() {
                                 onClick={() => {
                                   handleMissingCDCClick(e.id);
                                 }}
-                                className="p-2 w-fit h-fit ml-2 mb-1 bg-transparent hover:bg-slate-700 rounded-full"
+                                className="p-2 w-fit h-fit ml-2 mb-1 bg-transparent hover:bg-slate-300 dark:hover:bg-slate-700 text-secondary-foreground rounded-full"
                               >
                                 <ArrowUpRightFromCircle className="w-4 h-4" />
                               </Button>
@@ -826,7 +826,7 @@ function EditTimetable() {
                             Please report this issue
                             <a
                               href="https://github.com/crux-bphc/chronofactorem-rewrite/issues"
-                              className="text-blue-300 flex pl-1"
+                              className="text-blue-700 dark:text-blue-400 flex pl-1"
                             >
                               here
                               <ArrowUpRightFromCircle className="w-4 h-4 ml-1" />

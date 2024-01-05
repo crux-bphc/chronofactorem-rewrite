@@ -297,11 +297,11 @@ function CmsExport() {
             </span>
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
-                <div className="inline bg-transparent w-fit rounded-full dark:hover:bg-slate-800/80 text-muted-foreground hover:bg-slate-300/80 p-1 transition duration-200 ease-in-out ml-2 text-sm font-bold">
+                <div className="inline bg-transparent w-fit rounded-full dark:hover:bg-slate-800/80 text-muted-foreground hover:bg-slate-300/40 p-1 transition duration-200 ease-in-out ml-2 text-sm font-bold">
                   <HelpCircle className="xl:w-12 lg:w-10 md:w-8 w-8 xl:h-12 lg:h-10 md:h-8 h-8" />
                 </div>
               </TooltipTrigger>
-              <TooltipContent className="w-[48rem] flex flex-col bg-muted text-foreground border-muted-foreground text-md">
+              <TooltipContent className="w-[48rem] flex flex-col bg-muted text-foreground border-slate-300 dark:border-slate-600 text-md">
                 <span>
                   ChronoFactorem now allows you to cut the hassle of enrolling
                   into the CMS sections for your courses, and automates it all
@@ -318,7 +318,7 @@ function CmsExport() {
                   posted on CMS. You can access CMS at
                   <a
                     href="https://cms.bits-hyderabad.ac.in/"
-                    className="text-blue-400 ml-1 inline items-center"
+                    className="text-blue-700 dark:text-blue-400 ml-1 inline items-center"
                   >
                     https://cms.bits-hyderabad.ac.in/
                     <ArrowUpRightFromCircle className="inline w-4 h-4 ml-1 mr-1" />
@@ -326,7 +326,7 @@ function CmsExport() {
                   , download the Android app
                   <a
                     href="https://play.google.com/store/apps/details?id=crux.bphc.cms"
-                    className="text-blue-400 ml-1 inline items-center"
+                    className="text-blue-700 dark:text-blue-400 ml-1 inline items-center"
                   >
                     here
                     <ArrowUpRightFromCircle className="inline w-4 h-4 ml-1 mr-1" />
@@ -334,7 +334,7 @@ function CmsExport() {
                   , and download the iOS app
                   <a
                     href="https://apps.apple.com/in/app/cms-bphc/id1489946522"
-                    className="text-blue-400 ml-1 inline items-center"
+                    className="text-blue-700 dark:text-blue-400 ml-1 inline items-center"
                   >
                     here
                     <ArrowUpRightFromCircle className="inline w-4 h-4 ml-1 mr-1" />
