@@ -67,7 +67,15 @@ const fetchTimetable = async (timetableId: string) => {
       },
     },
   );
-  return response.data;
+  if (!response.data.draft) {
+    return response.data;
+  }
+  toast({
+    title: "Error",
+    description: "Draft tables can only be edited",
+    variant: "destructive",
+  });
+  router.navigate({ to: "/" });
 };
 
 const fetchUserDetails = async () => {
@@ -84,7 +92,7 @@ const timetableQueryOptions = (timetableId: string) =>
 
 const fetchCourses = async () => {
   const response = await axios.get<z.infer<typeof courseType>[]>(
-    "/api/course",
+    "/api/course?archived=true",
     {
       headers: {
         "Content-Type": "application/json ",
@@ -1046,6 +1054,7 @@ function ViewTimetable() {
       ) : (
         <div className="flex bg-background h-screen w-full justify-center items-center">
           <Spinner />
+          <span>Please wait while we copy over your timetable...</span>
         </div>
       )}
     </>
