@@ -1020,7 +1020,7 @@ function EditTimetable() {
                 <Tooltip delayDuration={100}>
                   <TooltipTrigger asChild>
                     <span>
-                      <Button disabled={timetable.warnings.length !== 0 || missingCDCs.length !== 0}
+                      <Button disabled={timetable.warnings.length !== 0}
                         className="text-green-200 w-fit text-xl p-4 ml-4 bg-green-900 hover:bg-green-800"
                         onClick={() =>
                           router.navigate({
