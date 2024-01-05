@@ -37,6 +37,7 @@ import { userWithTimetablesType } from "../../lib/src/index";
 import authenticatedRoute from "./AuthenticatedRoute";
 import { TimetableGrid } from "./components/TimetableGrid";
 import { SideMenu } from "./components/side-menu";
+import Spinner from "./components/spinner";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -51,7 +52,6 @@ import { Badge } from "./components/ui/badge";
 import { Button } from "./components/ui/button";
 import { toast, useToast } from "./components/ui/use-toast";
 import { router } from "./main";
-import Spinner from "./components/spinner";
 
 const fetchTimetable = async (timetableId: string) => {
   const response = await axios.get<z.infer<typeof timetableWithSectionsType>>(
@@ -205,7 +205,7 @@ function EditTimetable() {
   const [isSpinner, setIsSpinner] = useState(false);
 
   const { timetableId } = editTimetableRoute.useParams();
-  
+
   const timetableQueryResult = useQuery(timetableQueryOptions(timetableId));
   const courseQueryResult = useQuery(courseQueryOptions());
   const userQueryResult = useQuery(userQueryOptions);
