@@ -319,9 +319,9 @@ function TimetableCard({ timetable, showFooter, isCMSPage }: Props) {
 
   return (
     <TooltipProvider>
-      <Card className="min-h-60 flex flex-col min-w-80 shadow-lg">
+      <Card className="min-h-60 flex flex-col min-w-80 max-w-80 max-h-96 shadow-lg">
         <CardHeader className="pb-2">
-          <CardTitle className="text-xl md:text-2xl flex justify-between items-center">
+          <CardTitle className="relative text-xl md:text-2xl text-wrap justify-between items-center">
             <Link
               to={
                 timetable.draft
@@ -336,13 +336,18 @@ function TimetableCard({ timetable, showFooter, isCMSPage }: Props) {
             >
               {timetable.name}
             </Link>
-            {timetable.archived && (timetable.private ? <EyeOff /> : <Eye />)}
+            <span className="absolute right-2 top-2">
+              {timetable.archived && (timetable.private ? <EyeOff /> : <Eye />)}
+            </span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Badge variant="default" className="w-fit">
             <p className="flex items-center gap-1">
-              <span>{timetable.acadYear}</span>
+              <span>
+                {timetable.acadYear}-
+                {(timetable.acadYear + 1).toString().slice(2)}
+              </span>
               <span>|</span>
               <span>{timetable.degrees.join("")}</span>
               <span>|</span>

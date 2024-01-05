@@ -228,7 +228,7 @@ export function SideMenu({
   // JSX SECTION
   if (isOnCourseDetails) {
     return (
-      <div className="bg-secondary min-w-96 h-[calc(100vh-13rem)]">
+      <div className="bg-secondary h-[calc(100vh-13rem)]">
         <div className="flex items-center py-2 w-full">
           <Button
             variant={"ghost"}
@@ -240,13 +240,11 @@ export function SideMenu({
             <ArrowLeft />
           </Button>
           <span className="font-semibold text-md h-full">
-            {currentCourseDetails.data?.code}
-          </span>
-          <span className=" text-md h-full">
-            : {` ${currentCourseDetails.data?.name}`}
+            {currentCourseDetails.data?.code}:{" "}
+            {` ${currentCourseDetails.data?.name}`}
           </span>
         </div>
-        <Tabs value={currentSectionType} className="h-[calc(100vh-20rem)]">
+        <Tabs value={currentSectionType} className=" h-[calc(100vh-20rem)]">
           <TabsList className="w-full mb-2">
             {uniqueSectionTypes.map((sectionType) => {
               return (
@@ -272,7 +270,7 @@ export function SideMenu({
                 className="h-[calc(100vh-20rem)]"
                 key={sectionType}
               >
-                <div className="flex flex-col gap-2 p-0 m-0 px-2 overflow-y-scroll h-[calc(100vh-20rem)]">
+                <div className="flex flex-col gap-2 p-0 m-0 px-2 overflow-y-scroll w-[28rem] h-[calc(100vh-20rem)]">
                   {currentCourseDetails.data?.sections
                     .filter((section) => section.type === sectionType)
                     .map((section) => {
@@ -301,7 +299,7 @@ export function SideMenu({
                               timetable.sections.find(
                                 (e) => e.id === section.id,
                               )
-                                ? "dark:bg-slate-700 bg-slate-300"
+                                ? "dark:bg-slate-700 bg-slate-300 hover:dark:bg-slate-700 hover:bg-slate-300"
                                 : "bg-transparent"
                             }`}
                             onClick={() => handleSectionClick(section)}
@@ -320,7 +318,7 @@ export function SideMenu({
                                 {section.number}
                               </span>
                               <div className="flex flex-col h-full min-h-16 justify-between text-left py-2">
-                                <span className="font-semibold text-wrap text-md">
+                                <span className="font-semibold whitespace-pre-wrap text-md">
                                   {section.instructors.join(", ")}
                                 </span>
                                 <span className="font-normal">
@@ -357,7 +355,7 @@ export function SideMenu({
 
   // user is not in course details
   return (
-    <div className="bg-secondary min-w-96">
+    <div className="bg-secondary w-[28rem]">
       <Tabs
         value={isScreenshotMode ? "exams" : currentTab}
         className="py-2 h-[calc(100vh-16rem)]"
@@ -365,7 +363,7 @@ export function SideMenu({
         <TabsList>
           {isOnEditPage && (
             <TabsTrigger
-              className="text-xl font-bold"
+              className="text-lg font-bold"
               value="CDCs"
               onClick={() => setCurrentTab("CDCs")}
             >
@@ -374,7 +372,7 @@ export function SideMenu({
           )}
           {isOnEditPage && (
             <TabsTrigger
-              className="text-xl font-bold"
+              className="text-lg font-bold"
               value="search"
               onClick={() => setCurrentTab("search")}
             >
@@ -383,14 +381,14 @@ export function SideMenu({
           )}
 
           <TabsTrigger
-            className="text-xl font-bold"
+            className="text-lg font-bold"
             value="currentCourses"
             onClick={() => setCurrentTab("currentCourses")}
           >
             Courses
           </TabsTrigger>
           <TabsTrigger
-            className="text-xl font-bold"
+            className="text-lg font-bold"
             value="exams"
             onClick={() => setCurrentTab("exams")}
           >
@@ -458,7 +456,10 @@ export function SideMenu({
             })}
         </TabsContent>
 
-        <TabsContent value="currentCourses" className="flex flex-col">
+        <TabsContent
+          value="currentCourses"
+          className="flex flex-col px-2 gap-2"
+        >
           {coursesInTimetable.map((course) => {
             if (course === undefined) return <></>;
             if (!isOnEditPage) {
@@ -591,7 +592,10 @@ export function SideMenu({
             ))}
         </TabsContent>
 
-        <TabsContent value="search" className="h-full overflow-y-scroll">
+        <TabsContent
+          value="search"
+          className="h-full w-[26rem] overflow-y-scroll"
+        >
           <div className="px-4 pb-4 pt-1">
             <Input
               value={searchTerm}
@@ -601,7 +605,7 @@ export function SideMenu({
             />
           </div>
 
-          <div className="overflow-scroll">
+          <div>
             {courseSearchResults.map((course) => (
               // TODO - deal with this biome rule
               // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
@@ -612,7 +616,7 @@ export function SideMenu({
                   }
                 }}
                 key={course.id}
-                className={`relative px-4 transition flex-col pt-4 flex duration-200 ease-in-out border-t-2 border-muted-foreground/60 ${
+                className={`relative px-4 transition flex-col pt-4 flex duration-200 ease-in-out border-t-2 border-muted-foreground/20 ${
                   course.clashing
                     ? "text-muted-foreground"
                     : "cursor-pointer bg-secondary dark:hover:bg-slate-700 hover:bg-slate-200"

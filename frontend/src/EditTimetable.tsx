@@ -782,7 +782,7 @@ function EditTimetable() {
                 <p className="font-bold lg:text-3xl text-md sm:text-lg md:text-xl">
                   {timetable.name}
                 </p>
-                <span className="flex lg:flex-row flex-col justify-between lg:items-center gap-2">
+                <span className="flex lg:flex-row flex-col lg:items-center justify-normal gap-2">
                   <Badge variant="default" className="w-fit">
                     <p className="flex items-center gap-1">
                       <span>{timetable.acadYear}</span>
@@ -951,7 +951,7 @@ function EditTimetable() {
                   <Tooltip delayDuration={100}>
                     <TooltipTrigger
                       asChild
-                      className="duration-200 mr-4 text-md p-2 h-fit hover:bg-orange-200/60 dark:hover:bg-orange-800/40 rounded-lg px-4"
+                      className="duration-200 mr-4 text-md p-2 h-fit dark:dark:hover:bg-orange-800/40 hover:bg-orange-300/40 rounded-lg px-4"
                     >
                       <div className="flex items-center">
                         <span className="text-orange-600 dark:text-orange-400 pr-4">
@@ -977,7 +977,7 @@ function EditTimetable() {
                         <AlertTriangle className="w-6 h-6 m-1 text-orange-600 dark:text-orange-400" />
                       </div>
                     </TooltipTrigger>
-                    <TooltipContent className="bg-muted text-foreground border-muted-foreground text-md">
+                    <TooltipContent className="bg-muted text-foreground border-muted-foreground/40 text-md">
                       {timetable.warnings.map((warning) => (
                         <div className="pb-2" key={warning}>
                           <span className="font-bold">
@@ -999,12 +999,10 @@ function EditTimetable() {
                                         )[0].id,
                                       );
                                       setSectionTypeChangeRequest(
-                                        uniqueSectionTypes.filter(
-                                          (sectionType) => sectionType === x,
-                                        )[0],
+                                        x as "L" | "P" | "T",
                                       );
                                     }}
-                                    className="p-2 w-fit h-fit ml-2 mb-1 bg-transparent hover:bg-muted-foreground/30 rounded-full"
+                                    className="p-2 w-fit h-fit ml-2 mb-1 bg-transparent hover:bg-slate-300 dark:hover:bg-muted-foreground/30 text-secondary-foreground rounded-full"
                                   >
                                     <ArrowUpRightFromCircle className="w-4 h-4 text-foreground" />
                                   </Button>

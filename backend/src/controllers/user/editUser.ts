@@ -33,29 +33,16 @@ export const editUser = async (req: Request, res: Response) => {
   }
 
   try {
-    await userRepository.manager.transaction(
-      async (transactionalEntityManager) => {
-        // Update degrees for user
-        const authorId = await transactionalEntityManager
-          .createQueryBuilder()
-          .update("user")
-          .set({ degrees })
-          .where("id = :id", { id: req.session?.id })
-          .returning("*")
-          .execute()
-          .then((response) => {
-            return response.raw[0].id;
-          });
-
-        // Update degrees for user's timetables
-        await transactionalEntityManager
-          .createQueryBuilder()
-          .update("timetable")
-          .set({ degrees })
-          .where("authorId = :author", { author: authorId })
-          .execute();
-      },
-    );
+    await userRepository
+      .createQueryBuilder()
+      .update("user")
+      .set({ degrees })
+      .where("id = :id", { id: req.session?.id })
+      .returning("*")
+      .execute()
+      .then((response) => {
+        return response.raw[0].id;
+      });
   } catch (err: any) {
     // will replace the console.log with a logger when we have one
     console.log("Error editing degrees: ", err.message);

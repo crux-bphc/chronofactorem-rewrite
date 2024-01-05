@@ -100,10 +100,8 @@ export async function authCallback(req: Request, res: Response) {
       // tokenSet.claims() returns validated information contained upon accessing the token
       const tokenExpiryTime = tokenSet.claims().exp;
 
-      // TODO: define maxAge independent from the google cookie
-
-      // defines maxAge to be the time when the session cookie expires
-      const maxAge = tokenExpiryTime * 1000 - Date.now(); // converts into milliseconds
+      // defines maxAge according to env vars
+      const maxAge = env.SESSION_MAX_AGE_MS; // converts into milliseconds
 
       if (userInfo.name === undefined || userInfo.email === undefined) {
         return res.status(500).json({

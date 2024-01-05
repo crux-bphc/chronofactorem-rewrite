@@ -484,6 +484,8 @@ function ViewTimetable() {
   const generateScreenshot = useCallback(() => {
     const screenShotContent = screenshotContentRef.current;
     setIsScreenshotMode(true);
+    const isLarge = screenIsLarge;
+    setScreenIsLarge(true);
 
     if (screenShotContent === null) {
       return;
@@ -507,9 +509,11 @@ function ViewTimetable() {
         screenShotContent.style.width = "";
 
         setIsScreenshotMode(false);
+        setScreenIsLarge(isLarge);
       })
       .catch((err: Error) => {
         setIsScreenshotMode(false);
+        setScreenIsLarge(isLarge);
 
         console.error("something went wrong with image generation", err);
         toast({
@@ -584,7 +588,7 @@ function ViewTimetable() {
 
     return courseQueryResult.data
       .filter((e) =>
-        timetableQueryResult.data.sections
+        timetableQueryResult.data?.sections
           .map((x) => x.courseId)
           .includes(e.id),
       )
@@ -849,7 +853,7 @@ function ViewTimetable() {
                 <p className="font-bold lg:text-3xl text-md sm:text-lg md:text-xl">
                   {timetable.name}
                 </p>
-                <span className="flex lg:flex-row flex-col justify-between lg:items-center gap-2">
+                <span className="flex lg:flex-row flex-col lg:items-center justify-normal gap-2">
                   <Badge variant="default" className="w-fit">
                     <p className="flex items-center gap-1">
                       <span>{timetable.acadYear}</span>
@@ -911,7 +915,7 @@ function ViewTimetable() {
                           editMutation.mutate({
                             isDraft: true,
                             isPrivate: true,
-                            name: timetableQueryResult.data.name,
+                            name: timetableQueryResult.data?.name ?? "",
                           })
                         }
                       >
