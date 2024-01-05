@@ -6,6 +6,7 @@ import {
   rootRouteWithContext,
 } from "@tanstack/react-router";
 import React from "react";
+import { CookiesProvider } from "react-cookie";
 import ReactDOM from "react-dom/client";
 import authenticatedRoute from "./AuthenticatedRoute";
 import cmsOptionRoute from "./CMSOption";
@@ -66,9 +67,11 @@ if (rootElement) {
   ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
       <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-        <QueryClientProvider client={queryClient}>
-          <RouterProvider router={router} />
-        </QueryClientProvider>
+        <CookiesProvider>
+          <QueryClientProvider client={queryClient}>
+            <RouterProvider router={router} />
+          </QueryClientProvider>
+        </CookiesProvider>
       </ThemeProvider>
     </React.StrictMode>,
   );

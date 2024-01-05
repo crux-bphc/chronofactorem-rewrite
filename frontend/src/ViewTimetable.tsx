@@ -30,6 +30,7 @@ import { userWithTimetablesType } from "../../lib/src/index";
 import authenticatedRoute from "./AuthenticatedRoute";
 import { TimetableGrid } from "./components/TimetableGrid";
 import { SideMenu } from "./components/side-menu";
+import Spinner from "./components/spinner";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -200,6 +201,7 @@ const viewTimetableRoute = new Route({
 
 function ViewTimetable() {
   const [isVertical, setIsVertical] = useState(false);
+  const [isSpinner, setIsSpinner] = useState(false);
 
   const { timetableId } = viewTimetableRoute.useParams();
 
@@ -815,173 +817,186 @@ function ViewTimetable() {
 
   return (
     <>
-      <div className="grow">
-        <TooltipProvider>
-          <div className="flex justify-between p-4">
-            <span>
-              <p className="font-bold text-3xl">{timetable.name}</p>
-              <span className="flex justify-between items-center gap-2">
-                <Badge variant="default" className="w-fit">
-                  <p className="flex items-center gap-1">
-                    <span>{timetable.acadYear}</span>
-                    <span>|</span>
-                    <span>{timetable.degrees.join("")}</span>
-                    <span>|</span>
-                    <span className="flex-none">{`${timetable.year}-${timetable.semester}`}</span>
-                  </p>
-                </Badge>
-                <span className="text-muted-foreground">
-                  <p className="text-sm font-bold inline">Last Updated: </p>
-                  <p className="inline">
-                    {new Date(timetable.lastUpdated).toLocaleString()}
-                  </p>
+      {!isSpinner ? (
+        <div className="grow">
+          <TooltipProvider>
+            <div className="flex justify-between p-4">
+              <span>
+                <p className="font-bold text-3xl">{timetable.name}</p>
+                <span className="flex justify-between items-center gap-2">
+                  <Badge variant="default" className="w-fit">
+                    <p className="flex items-center gap-1">
+                      <span>{timetable.acadYear}</span>
+                      <span>|</span>
+                      <span>{timetable.degrees.join("")}</span>
+                      <span>|</span>
+                      <span className="flex-none">{`${timetable.year}-${timetable.semester}`}</span>
+                    </p>
+                  </Badge>
+                  <span className="text-muted-foreground">
+                    <p className="text-sm font-bold inline">Last Updated: </p>
+                    <p className="inline">
+                      {new Date(timetable.lastUpdated).toLocaleString()}
+                    </p>
+                  </span>
                 </span>
               </span>
-            </span>
-            <span className="flex justify-center items-center gap-2">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={generateScreenshot}
-                    className="flex justify-between items-center gap-2"
-                  >
-                    <Download />
-                    PNG
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Download timetable as image</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="rounded-full p-3"
-                    onClick={() => setIsVertical(!isVertical)}
-                  >
-                    {isVertical ? <GripVertical /> : <GripHorizontal />}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Make timetable {isVertical ? "horizontal" : "vertical"}</p>
-                </TooltipContent>
-              </Tooltip>
-              {userQueryResult.data.id ===
-                timetableQueryResult.data.authorId && (
+              <span className="flex justify-center items-center gap-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={generateScreenshot}
+                      className="flex justify-between items-center gap-2"
+                    >
+                      <Download />
+                      PNG
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Download timetable as image</p>
+                  </TooltipContent>
+                </Tooltip>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       variant="ghost"
                       className="rounded-full p-3"
-                      onClick={() =>
-                        editMutation.mutate({
-                          isDraft: true,
-                          isPrivate: true,
-                          name: timetableQueryResult.data.name,
-                        })
-                      }
+                      onClick={() => setIsVertical(!isVertical)}
                     >
-                      <Edit2 />
+                      {isVertical ? <GripVertical /> : <GripHorizontal />}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Edit Timetable</p>
+                    <p>
+                      Make timetable {isVertical ? "horizontal" : "vertical"}
+                    </p>
                   </TooltipContent>
                 </Tooltip>
-              )}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="rounded-full p-3"
-                    onClick={() => copyMutation.mutate()}
-                  >
-                    <Copy />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Copy Timetable</p>
-                </TooltipContent>
-              </Tooltip>
-              {userQueryResult.data.id ===
-                timetableQueryResult.data.authorId && (
-                <AlertDialog>
+                {userQueryResult.data.id ===
+                  timetableQueryResult.data.authorId && (
                   <Tooltip>
-                    <AlertDialogTrigger asChild>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
-                        >
-                          <Trash />
-                        </Button>
-                      </TooltipTrigger>
-                    </AlertDialogTrigger>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="rounded-full p-3"
+                        onClick={() =>
+                          editMutation.mutate({
+                            isDraft: true,
+                            isPrivate: true,
+                            name: timetableQueryResult.data.name,
+                          })
+                        }
+                      >
+                        <Edit2 />
+                      </Button>
+                    </TooltipTrigger>
                     <TooltipContent>
-                      <p>Delete Timetable</p>
+                      <p>Edit Timetable</p>
                     </TooltipContent>
                   </Tooltip>
-                  <AlertDialogContent className="p-8">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle className="text-2xl">
-                        Are you sure?
-                      </AlertDialogTitle>
-                      <AlertDialogDescription className="text-destructive text-lg font-bold">
-                        All your progress on this timetable will be lost, and
-                        unrecoverable.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogPrimitive.Action asChild>
-                        <Button
-                          variant="destructive"
-                          onClick={() => deleteMutation.mutate()}
-                        >
-                          Delete
-                        </Button>
-                      </AlertDialogPrimitive.Action>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              )}
-            </span>
-          </div>
-          {/* the bg-background here is necessary so the generated image has the background in it */}
-          <div
-            className="flex flex-row gap-4 bg-background"
-            ref={screenshotContentRef}
-          >
-            <SideMenu
-              timetable={timetable}
-              isOnEditPage={false}
-              allCoursesDetails={courses}
-              cdcs={cdcs}
-              setCurrentCourseID={setCurrentCourseID}
-              currentCourseDetails={currentCourseQueryResult}
-              uniqueSectionTypes={uniqueSectionTypes}
-              currentSectionType={currentSectionType}
-              setCurrentSectionType={setCurrentSectionType}
-              addSectionMutation={addSectionMutation}
-              removeSectionMutation={removeSectionMutation}
-              coursesInTimetable={coursesInTimetable}
-              currentTab={currentTab}
-              setCurrentTab={setCurrentTab}
-              isOnCourseDetails={isOnCourseDetails}
-              setSectionTypeChangeRequest={setSectionTypeChangeRequest}
-              isScreenshotMode={isScreenshotMode}
-            />
-            <TimetableGrid
-              isVertical={isVertical}
-              timetableDetailsSections={timetableDetailsSections}
-              handleUnitClick={(e) => console.log(e)}
-              handleUnitDelete={(e) => console.log("DELETING", e)}
-              isOnEditPage={false}
-            />
-          </div>
-        </TooltipProvider>
-      </div>
+                )}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="rounded-full p-3"
+                      onClick={() => {
+                        setIsSpinner(true);
+                        setTimeout(() => {
+                          copyMutation.mutate();
+                        }, 2000);
+                      }}
+                    >
+                      <Copy />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Copy Timetable</p>
+                  </TooltipContent>
+                </Tooltip>
+                {userQueryResult.data.id ===
+                  timetableQueryResult.data.authorId && (
+                  <AlertDialog>
+                    <Tooltip>
+                      <AlertDialogTrigger asChild>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
+                          >
+                            <Trash />
+                          </Button>
+                        </TooltipTrigger>
+                      </AlertDialogTrigger>
+                      <TooltipContent>
+                        <p>Delete Timetable</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <AlertDialogContent className="p-8">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle className="text-2xl">
+                          Are you sure?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-destructive text-lg font-bold">
+                          All your progress on this timetable will be lost, and
+                          unrecoverable.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogPrimitive.Action asChild>
+                          <Button
+                            variant="destructive"
+                            onClick={() => deleteMutation.mutate()}
+                          >
+                            Delete
+                          </Button>
+                        </AlertDialogPrimitive.Action>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+              </span>
+            </div>
+            {/* the bg-background here is necessary so the generated image has the background in it */}
+            <div
+              className="flex flex-row gap-4 bg-background"
+              ref={screenshotContentRef}
+            >
+              <SideMenu
+                timetable={timetable}
+                isOnEditPage={false}
+                allCoursesDetails={courses}
+                cdcs={cdcs}
+                setCurrentCourseID={setCurrentCourseID}
+                currentCourseDetails={currentCourseQueryResult}
+                uniqueSectionTypes={uniqueSectionTypes}
+                currentSectionType={currentSectionType}
+                setCurrentSectionType={setCurrentSectionType}
+                addSectionMutation={addSectionMutation}
+                removeSectionMutation={removeSectionMutation}
+                coursesInTimetable={coursesInTimetable}
+                currentTab={currentTab}
+                setCurrentTab={setCurrentTab}
+                isOnCourseDetails={isOnCourseDetails}
+                setSectionTypeChangeRequest={setSectionTypeChangeRequest}
+                isScreenshotMode={isScreenshotMode}
+              />
+              <TimetableGrid
+                isVertical={isVertical}
+                timetableDetailsSections={timetableDetailsSections}
+                handleUnitClick={(e) => console.log(e)}
+                handleUnitDelete={(e) => console.log("DELETING", e)}
+                isOnEditPage={false}
+              />
+            </div>
+          </TooltipProvider>
+        </div>
+      ) : (
+        <div className="flex bg-background h-screen w-full justify-center items-center">
+          <Spinner />
+        </div>
+      )}
     </>
   );
 }
