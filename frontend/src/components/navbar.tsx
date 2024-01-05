@@ -14,9 +14,10 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { BookUp, Info, LogOut, Pencil, Plus } from "lucide-react";
+import { useCookies } from "react-cookie";
 import { z } from "zod";
 import { userWithTimetablesType } from "../../../lib/src/index";
 import { router } from "../main";
@@ -42,9 +43,18 @@ const userQueryOptions = queryOptions({
 });
 
 export function NavBar() {
+  const stateRouter = useRouter();
+  const isCMSPage =
+    stateRouter.state.resolvedLocation.pathname.includes("/cms");
+  const isEditPage = stateRouter.state.resolvedLocation.pathname.includes(
+    "/edit/" || "/finalize/",
+  );
+
+  const [cookies, setCookie, removeCookie] = useCookies(["session"]);
   const userQueryResult = useQuery(userQueryOptions);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
   const createMutation = useMutation({
     mutationFn: () => {
       return axios.post<{ message: string; id: string }>(
@@ -149,17 +159,19 @@ export function NavBar() {
             </h1>
           </div>
         </Link>
-        <Button
-          className="text-green-200 w-fit text-xl p-4 ml-4 bg-green-900 hover:bg-green-800"
-          onClick={
-            userQueryResultData ? () => createMutation.mutate() : undefined
-          }
-        >
-          <div className="hidden md:flex">Create a timetable</div>
-          <div className="flex md:hidden">
-            <Plus className="h-6 w-6" />
-          </div>
-        </Button>
+        {!isEditPage && (
+          <Button
+            className="text-green-200 w-fit text-xl p-4 ml-4 bg-green-900 hover:bg-green-800"
+            onClick={
+              userQueryResultData ? () => createMutation.mutate() : undefined
+            }
+          >
+            <div className="hidden md:flex">Create a timetable</div>
+            <div className="flex md:hidden">
+              <Plus className="h-6 w-6" />
+            </div>
+          </Button>
+        )}
         <Link
           // Comment out for now because the route doesn't exist
           // to={userQueryResultData ? "/about" : undefined}
@@ -170,15 +182,17 @@ export function NavBar() {
             <Info className="h-6 w-6" />
           </div>
         </Link>
-        <Link
-          to={userQueryResultData ? "/cmsExport" : undefined}
-          className="text-primary py-2 px-2 ml-2 text-lg rounded-full hover:bg-muted transition h-fit whitespace-nowrap duration-200 ease-in-out"
-        >
-          <div className="hidden md:flex">CMS Auto-Enroll</div>
-          <div className="flex md:hidden">
-            <BookUp className="h-6 w-6" />
-          </div>
-        </Link>
+        {!isCMSPage && (
+          <Link
+            to={userQueryResultData ? "/cmsExport" : undefined}
+            className="text-primary py-2 px-2 ml-2 text-lg rounded-full hover:bg-muted transition h-fit whitespace-nowrap duration-200 ease-in-out"
+          >
+            <div className="hidden md:flex">CMS Auto-Enroll</div>
+            <div className="flex md:hidden">
+              <BookUp className="h-6 w-6" />
+            </div>
+          </Link>
+        )}
       </div>
       <div className="flex flex-row">
         <div className="pt-3">
@@ -203,11 +217,17 @@ export function NavBar() {
             <DropdownMenuItem
               asChild
               className="focus:bg-destructive/90 focus:text-destructive-foreground cursor-pointer"
+              onClick={() => {
+                removeCookie("session", { path: "/" });
+                router.navigate({
+                  to: "/login",
+                });
+              }}
             >
-              <Link to={userQueryResultData ? "/login" : undefined}>
+              <div>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
-              </Link>
+              </div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
