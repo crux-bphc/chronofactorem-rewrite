@@ -131,7 +131,7 @@ const userQueryOptions = queryOptions({
 
 const fetchAllCoursesQueryOptions = () =>
   queryOptions({
-    queryKey: ["course"],
+    queryKey: ["courses"],
     queryFn: async () => {
       const res = await axios.get<z.infer<typeof courseType>[]>(
         "/api/course/",
@@ -282,7 +282,7 @@ function Cms() {
     course: z.infer<typeof courseType>,
   ) =>
     queryOptions({
-      queryKey: ["course", course.id],
+      queryKey: ["course", course.id, "section", section.id],
       queryFn: async () => {
         const res = await axios.get<z.infer<typeof courseWithSectionsType>>(
           `/api/course/${course.id}`,
@@ -324,7 +324,7 @@ function Cms() {
     }),
     combine: (results) => {
       return {
-        data: results.flatMap((result) => result.data),
+        data: results.map((result) => result.data),
         pending: results.some((result) => result.isPending),
       };
     },
@@ -340,7 +340,7 @@ function Cms() {
       !("userid" in userData) ||
       typeof userData.userid !== "number"
     ) {
-      console.log(userData);
+      // console.log(userData);
       toast({
         title: "Warning!",
         description: "Web Service Token is likely incorrect",
@@ -391,8 +391,8 @@ function Cms() {
     setEnrolledLoaded(false);
     setEnrollingInProgress(true);
     const errors: string[] = [];
-    for (let i = 0; i < sectionNameList.data.length; i++) {
-      const ele = sectionNameList.data[i];
+    for (let i = 0; i < sectionNameList.data.flat().length; i++) {
+      const ele = sectionNameList.data.flat()[i];
       if (ele === undefined) continue;
       const { data: courseData } = await axios.get(
         `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_course_search_courses&moodlewsrestformat=json&wstoken=${
@@ -667,16 +667,19 @@ function Cms() {
                         </TooltipContent>
                       </Tooltip>
                     </div>
-                    {sectionNameList.data.sort().map((section, i) => (
-                      <span className="py-1" key={2 * i}>
-                        {section
-                          ?.replace(/&lt;/g, "<")
-                          .replace(/&gt;/g, ">")
-                          .replace(/&quot;/g, '"')
-                          .replace(/&#39;/g, "'")
-                          .replace(/&amp;/g, "&")}
-                      </span>
-                    ))}
+                    {sectionNameList.data
+                      .flat()
+                      .sort()
+                      .map((section, i) => (
+                        <span className="py-1" key={2 * i}>
+                          {section
+                            ?.replace(/&lt;/g, "<")
+                            .replace(/&gt;/g, ">")
+                            .replace(/&quot;/g, '"')
+                            .replace(/&#39;/g, "'")
+                            .replace(/&amp;/g, "&")}
+                        </span>
+                      ))}
                     {sectionNameList.data.length === 0 && (
                       <>
                         <div className="flex flex-col items-center">
