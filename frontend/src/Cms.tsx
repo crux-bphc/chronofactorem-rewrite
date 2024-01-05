@@ -471,16 +471,18 @@ function Cms() {
     <>
       <TooltipProvider>
         {sectionsInTimetable.isSuccess && courseDetails.isSuccess ? (
-          <div className="flex flex-col w-full text-foreground pl-24 pt-12 gap-2">
+          <div className="flex flex-col w-full text-foreground pl-12 sm:pl-24 pt-12 gap-2">
             <div className="flex gap-2 items-center">
-              <span className="text-5xl font-bold">Enter your CMS Details</span>
+              <span className="text-3xl sm:text-5xl font-bold">
+                Enter your CMS Details
+              </span>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
                   <div className="bg-transparent rounded-full hover:bg-muted text-foreground px-4 py-3 text-lg font-bold">
                     <HelpCircle />
                   </div>
                 </TooltipTrigger>
-                <TooltipContent className="w-96 flex space-y-2 flex-col bg-muted text-foreground border-muted text-md">
+                <TooltipContent className="flex space-y-2 flex-col bg-muted text-foreground border-muted text-md">
                   <span>
                     To find these details, follow the instructions in{" "}
                     <a
@@ -523,7 +525,7 @@ function Cms() {
                 </TooltipContent>
               </Tooltip>
             </div>
-            <div className="flex w-full gap-6 mt-4">
+            <div className="flex flex-col sm:flex-row w-full gap-6 mt-4">
               <div className="flex flex-col w-fit">
                 <Label htmlFor="webservicetoken" className="mb-1 text-lg">
                   Web Service Token
@@ -561,21 +563,21 @@ function Cms() {
                 />
               </div>
             </div>
-            <div className="flex relative h-fit">
+            <div className="flex flex-col sm:flex-row relative h-fit">
               {allowEdit && (
-                <div className="flex justify-center items-center absolute bg-background/60 w-3/4 h-full">
+                <div className="flex justify-center items-center absolute bg-background/60 w-full sm:w-3/4 h-full">
                   <span className="text-3xl z-10 font-bold text-foreground/85">
                     Enter your CMS details, and hit save to continue
                   </span>
                 </div>
               )}
               <div
-                className={`w-full flex gap-24 ${
+                className={`w-full flex sm:flex-row flex-col gap-0 sm:gap-24 ${
                   allowEdit ? "blur-sm pointer-events-none" : ""
                 }`}
               >
                 {enrolledLoaded ? (
-                  <div className="flex flex-col items-stretch pl-2 text-md py-8 w-1/4">
+                  <div className="flex flex-col items-stretch pl-2 text-md py-8 w-full sm:w-1/4">
                     <div className="flex pb-4">
                       <span className="text-3xl font-bold">
                         Enrolled Sections
@@ -640,7 +642,7 @@ function Cms() {
                   </div>
                 )}
                 {!sectionNameList.pending ? (
-                  <div className="relative flex flex-col ml-8 text-md py-8 h-fit w-1/4">
+                  <div className="relative flex flex-col ml-8 text-md py-8 h-fit w-full sm:w-1/4">
                     {enrollingInProgress && (
                       <div className="absolute bg-background/80 flex items-center justify-center w-full h-full">
                         <div className="flex flex-col items-center justify-center">
