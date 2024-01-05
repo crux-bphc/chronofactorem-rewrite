@@ -10,6 +10,7 @@ import { CookiesProvider } from "react-cookie";
 import ReactDOM from "react-dom/client";
 import authenticatedRoute from "./AuthenticatedRoute";
 import cmsOptionRoute from "./CMSOption";
+import cmsRoute from "./Cms";
 import cmsExportRoute from "./CmsExport";
 import editTimetableRoute from "./EditTimetable";
 import editUserProfileRoute from "./EditUserProfile";
@@ -18,7 +19,6 @@ import getDegreesRoute from "./GetDegrees";
 import indexRoute from "./Home";
 import loginRoute from "./Login";
 import RootComponent from "./RootComponent";
-import cmsRoute from "./Cms";
 import viewTimetableRoute from "./ViewTimetable";
 import "./index.css";
 

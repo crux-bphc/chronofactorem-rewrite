@@ -1,12 +1,3 @@
-import axios, { AxiosError } from "axios";
-import { z } from "zod";
-import {
-  courseType,
-  courseWithSectionsType,
-  sectionType,
-  timetableWithSectionsType,
-  userWithTimetablesType,
-} from "../../lib/src";
 import {
   QueryCache,
   QueryClient,
@@ -15,16 +6,7 @@ import {
   useQuery,
 } from "@tanstack/react-query";
 import { ErrorComponent, Route } from "@tanstack/react-router";
-import { ToastAction } from "./components/ui/toast";
-import { router } from "./main";
-import authenticatedRoute from "./AuthenticatedRoute";
-import { useToast } from "./components/ui/use-toast";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./components/ui/tooltip";
+import axios, { AxiosError } from "axios";
 import {
   ArrowUpRightFromCircle,
   Bird,
@@ -35,11 +17,29 @@ import {
   Save,
   Trash,
 } from "lucide-react";
-import { Button } from "./components/ui/button";
-import { Label } from "./components/ui/label";
-import { Input } from "./components/ui/input";
 import { useRef, useState } from "react";
+import { z } from "zod";
+import {
+  courseType,
+  courseWithSectionsType,
+  sectionType,
+  timetableWithSectionsType,
+  userWithTimetablesType,
+} from "../../lib/src";
+import authenticatedRoute from "./AuthenticatedRoute";
 import Spinner from "./components/spinner";
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
+import { Label } from "./components/ui/label";
+import { ToastAction } from "./components/ui/toast";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./components/ui/tooltip";
+import { useToast } from "./components/ui/use-toast";
+import { router } from "./main";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
