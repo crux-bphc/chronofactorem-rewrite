@@ -1,10 +1,4 @@
-import {
-  QueryCache,
-  QueryClient,
-  queryOptions,
-  useQueries,
-  useQuery,
-} from "@tanstack/react-query";
+import { queryOptions, useQueries, useQuery } from "@tanstack/react-query";
 import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import {
@@ -91,9 +85,7 @@ const fetchTimetableDetailsQueryOptions = (timetableId: string) =>
       if (!res.data.draft) {
         return res.data;
       }
-      alert(
-        "CMS Auto-Enroll cannot be used with draft timetables.",
-      );
+      alert("CMS Auto-Enroll cannot be used with draft timetables.");
       router.navigate({ to: "/" });
     },
   });
