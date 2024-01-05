@@ -34,6 +34,7 @@ export const rootRoute = rootRouteWithContext<{
 const routeTree = rootRoute.addChildren([
   loginRoute,
   getDegreesRoute,
+  aboutRoute,
   authenticatedRoute.addChildren([
     indexRoute,
     editUserProfileRoute,
@@ -43,7 +44,6 @@ const routeTree = rootRoute.addChildren([
     viewTimetableRoute,
     cmsExportRoute,
     cmsRoute,
-    aboutRoute,
   ]),
 ]);
 
