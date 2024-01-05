@@ -157,13 +157,13 @@ const fetchTimetableDetailsQueryOptions = (timetableId: string) =>
           },
         },
       );
-      // if (!res.data.draft && !res.data.archived) {
-      return res.data.sections;
-      // }
-      // alert(
-      //   "CMS Auto-Enroll cannot be used with draft or archived timetables.",
-      // );
-      // router.navigate({ to: "/" });
+      if (!res.data.draft && !res.data.archived) {
+        return res.data.sections;
+      }
+      alert(
+        "CMS Auto-Enroll cannot be used with draft or archived timetables.",
+      );
+      router.navigate({ to: "/" });
     },
   });
 
