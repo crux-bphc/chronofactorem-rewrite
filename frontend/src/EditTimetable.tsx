@@ -869,7 +869,10 @@ function EditTimetable() {
                         setIsSpinner(true);
                         setTimeout(() => {
                           copyMutation.mutate();
-                        }, 2000);
+                          setTimeout(() => {
+                            setIsSpinner(false);
+                          }, 1000);
+                        }, 1000);
                       }}
                     >
                       <Copy />
