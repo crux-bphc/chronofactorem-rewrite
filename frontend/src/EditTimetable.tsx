@@ -1052,8 +1052,9 @@ function EditTimetable() {
           </TooltipProvider>
         </div>
       ) : (
-        <div className="flex bg-background h-screen w-full justify-center items-center">
+        <div className="flex text-muted-foreground gap-8 xl:text-xl lg:text-lg md:text-md text-sm flex-col bg-background h-full pt-96 w-full items-center">
           <Spinner />
+          <span>Please wait while we copy over your timetable...</span>
         </div>
       )}
     </>
