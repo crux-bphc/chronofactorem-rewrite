@@ -32,7 +32,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./components/ui/tooltip";
-import { useToast } from "./components/ui/use-toast";
+import { toast, useToast } from "./components/ui/use-toast";
 import { router } from "./main";
 
 const fetchUserDetails = async (): Promise<
@@ -85,7 +85,11 @@ const fetchTimetableDetailsQueryOptions = (timetableId: string) =>
       if (!res.data.draft) {
         return res.data;
       }
-      alert("CMS Auto-Enroll cannot be used with draft timetables.");
+      toast({
+        title: "Error",
+        description: "CMS Auto-Enroll cannot be used with draft timetables.",
+        variant: "destructive",
+      });
       router.navigate({ to: "/" });
     },
   });
@@ -239,7 +243,7 @@ function Cms() {
   );
 
   const sectionNameList = useQueries({
-    queries: (sectionsInTimetable.data.sections ?? []).map((section) => {
+    queries: (sectionsInTimetable.data?.sections ?? []).map((section) => {
       const course = (courseDetails.data ?? []).filter(
         (course) => course.id === section.courseId,
       )[0];

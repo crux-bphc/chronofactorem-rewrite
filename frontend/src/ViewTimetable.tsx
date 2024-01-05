@@ -67,7 +67,15 @@ const fetchTimetable = async (timetableId: string) => {
       },
     },
   );
-  return response.data;
+  if (!response.data.draft) {
+    return response.data;
+  }
+  toast({
+    title: "Error",
+    description: "Draft tables can only be edited",
+    variant: "destructive",
+  });
+  router.navigate({ to: "/" });
 };
 
 const fetchUserDetails = async () => {
