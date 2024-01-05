@@ -188,7 +188,7 @@ export function TimetableGrid({
                     {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
                     <div
                       className={`bg-background border border-muted dark:border-muted/70 cursor-pointer transition duration-200 ease-in-out text-foreground/65 p-1.5 ${
-                        isVertical ? "min-h-20 sm:min-h-16" : "min-h-20"
+                        isVertical ? "min-h-28 sm:min-h-16" : "min-h-20"
                       }`}
                       onClick={(event) => handleUnitClick(e, event)}
                     >
