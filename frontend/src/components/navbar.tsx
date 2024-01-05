@@ -173,8 +173,7 @@ export function NavBar() {
           </Button>
         )}
         <Link
-          // Comment out for now because the route doesn't exist
-          // to={userQueryResultData ? "/about" : undefined}
+          to={userQueryResultData ? "/about" : undefined}
           className="text-primary py-2 px-2 ml-2 text-lg rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out"
         >
           <div className="hidden md:flex">About</div>

@@ -8,6 +8,7 @@ import {
 import React from "react";
 import { CookiesProvider } from "react-cookie";
 import ReactDOM from "react-dom/client";
+import aboutRoute from "./About";
 import authenticatedRoute from "./AuthenticatedRoute";
 import cmsOptionRoute from "./CMSOption";
 import cmsRoute from "./Cms";
@@ -42,6 +43,7 @@ const routeTree = rootRoute.addChildren([
     viewTimetableRoute,
     cmsExportRoute,
     cmsRoute,
+    aboutRoute,
   ]),
 ]);
 
