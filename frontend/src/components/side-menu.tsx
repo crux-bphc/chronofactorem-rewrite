@@ -240,7 +240,8 @@ export function SideMenu({
             <ArrowLeft />
           </Button>
           <span className="font-semibold text-md h-full">
-            {currentCourseDetails.data?.code}: {` ${currentCourseDetails.data?.name}`}
+            {currentCourseDetails.data?.code}:{" "}
+            {` ${currentCourseDetails.data?.name}`}
           </span>
         </div>
         <Tabs value={currentSectionType} className=" h-[calc(100vh-20rem)]">
@@ -455,7 +456,10 @@ export function SideMenu({
             })}
         </TabsContent>
 
-        <TabsContent value="currentCourses" className="flex flex-col px-2 gap-2">
+        <TabsContent
+          value="currentCourses"
+          className="flex flex-col px-2 gap-2"
+        >
           {coursesInTimetable.map((course) => {
             if (course === undefined) return <></>;
             if (!isOnEditPage) {
@@ -588,7 +592,10 @@ export function SideMenu({
             ))}
         </TabsContent>
 
-        <TabsContent value="search" className="h-full w-[26rem] overflow-y-scroll">
+        <TabsContent
+          value="search"
+          className="h-full w-[26rem] overflow-y-scroll"
+        >
           <div className="px-4 pb-4 pt-1">
             <Input
               value={searchTerm}
