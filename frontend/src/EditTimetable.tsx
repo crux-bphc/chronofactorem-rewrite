@@ -1040,7 +1040,22 @@ function EditTimetable() {
               <TimetableGrid
                 isVertical={isVertical}
                 timetableDetailsSections={timetableDetailsSections}
-                handleUnitClick={(e) => console.log(e)}
+                handleUnitClick={(e, event) => {
+                  if (e?.courseId && e?.type) {
+                    if (event.detail === 1) {
+                      setCurrentCourseID(
+                        courses.filter((x) => x.code === e?.courseId)[0].id,
+                      );
+                      setSectionTypeChangeRequest(e?.type as "L" | "P" | "T");
+                    } else if (event.detail >= 2) {
+                      e?.id
+                        ? removeSectionMutation.mutate({ sectionId: e?.id })
+                        : console.log("error:", e);
+                    }
+                  } else {
+                    console.log("error:", e);
+                  }
+                }}
                 handleUnitDelete={(e) => {
                   e?.id
                     ? removeSectionMutation.mutate({ sectionId: e?.id })
