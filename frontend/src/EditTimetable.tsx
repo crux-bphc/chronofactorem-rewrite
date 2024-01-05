@@ -829,9 +829,9 @@ function EditTimetable() {
                               className="text-blue-300 flex pl-1"
                             >
                               <span className="text-blue-700 dark:text-blue-400">
-                              here
+                                here
                               </span>
-                            <ArrowUpRightFromCircle className="w-4 h-4 ml-1" />
+                              <ArrowUpRightFromCircle className="w-4 h-4 ml-1" />
                             </a>
                           </span>
                           <span className="font-bold pt-2">Error List:</span>
