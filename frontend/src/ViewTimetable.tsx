@@ -84,7 +84,7 @@ const timetableQueryOptions = (timetableId: string) =>
 
 const fetchCourses = async () => {
   const response = await axios.get<z.infer<typeof courseType>[]>(
-    "/api/course",
+    "/api/course?archived=true",
     {
       headers: {
         "Content-Type": "application/json ",

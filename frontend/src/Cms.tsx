@@ -59,7 +59,7 @@ const fetchAllCoursesQueryOptions = () =>
     queryKey: ["courses"],
     queryFn: async () => {
       const res = await axios.get<z.infer<typeof courseType>[]>(
-        "/api/course/",
+        "/api/course?archived=true",
         {
           headers: {
             "Content-Type": "application/json",
