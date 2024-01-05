@@ -236,7 +236,13 @@ function CMSOption() {
               >
                 No, Thanks
               </Link>
-              <Link className="text-green-200 bg-green-700 hover:bg-green-800 dark:bg-green-900 transition duration-200 ease-in-out w-4/12 px-4 h-fit py-4 rounded-lg xl:text-xl lg:text-lg md:text-md text-sm font-bold flex items-center">
+              <Link
+                to={"/cms/$timetableId"}
+                params={{
+                  timetableId: timetableId,
+                }}
+                className="text-green-200 bg-green-700 hover:bg-green-800 dark:bg-green-900 transition duration-200 ease-in-out w-4/12 px-4 h-fit py-4 rounded-lg xl:text-xl lg:text-lg md:text-md text-sm font-bold flex items-center"
+              >
                 Sure!
               </Link>
             </div>

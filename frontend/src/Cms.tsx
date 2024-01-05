@@ -41,75 +41,6 @@ import {
 import { useToast } from "./components/ui/use-toast";
 import { router } from "./main";
 
-const queryClient = new QueryClient({
-  queryCache: new QueryCache({
-    // not sure if this is neeeded
-    onError: (error) => {
-      const { toast } = useToast();
-      if (error instanceof AxiosError) {
-        if (error.response) {
-          switch (error.response.status) {
-            case 404:
-              toast({
-                title: "Error",
-                description:
-                  "message" in error.response.data
-                    ? error.response.data.message
-                    : "API returned 404",
-                variant: "destructive",
-                action: (
-                  <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                      Report
-                    </a>
-                  </ToastAction>
-                ),
-              });
-              break;
-            case 500:
-              toast({
-                title: "Server Error",
-                description:
-                  "message" in error.response.data
-                    ? error.response.data.message
-                    : "API returned 500",
-                variant: "destructive",
-                action: (
-                  <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                      Report
-                    </a>
-                  </ToastAction>
-                ),
-              });
-              break;
-
-            default:
-              toast({
-                title: "Unknown Error",
-                description:
-                  "message" in error.response.data
-                    ? error.response.data.message
-                    : `API returned ${error.response.status}`,
-                variant: "destructive",
-                action: (
-                  <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                      Report
-                    </a>
-                  </ToastAction>
-                ),
-              });
-          }
-        } else {
-          // Fallback to the default ErrorComponent
-          return <ErrorComponent error={error} />;
-        }
-      }
-    },
-  }),
-});
-
 const fetchUserDetails = async (): Promise<
   z.infer<typeof userWithTimetablesType>
 > => {
@@ -158,7 +89,7 @@ const fetchTimetableDetailsQueryOptions = (timetableId: string) =>
         },
       );
       if (!res.data.draft && !res.data.archived) {
-        return res.data.sections;
+        return res.data;
       }
       alert(
         "CMS Auto-Enroll cannot be used with draft or archived timetables.",
@@ -170,7 +101,7 @@ const fetchTimetableDetailsQueryOptions = (timetableId: string) =>
 const cmsRoute = new Route({
   getParentRoute: () => authenticatedRoute,
   path: "cms/$timetableId",
-  loader: ({ params }) => {
+  loader: ({ context: { queryClient }, params }) => {
     queryClient
       .ensureQueryData(userQueryOptions)
       .then(() => {
@@ -316,7 +247,7 @@ function Cms() {
   );
 
   const sectionNameList = useQueries({
-    queries: (sectionsInTimetable.data ?? []).map((section) => {
+    queries: (sectionsInTimetable.data.sections ?? []).map((section) => {
       const course = (courseDetails.data ?? []).filter(
         (course) => course.id === section.courseId,
       )[0];
