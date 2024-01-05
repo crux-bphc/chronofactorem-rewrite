@@ -14,6 +14,7 @@ COPY --chown=node:node frontend/vite.config.ts ./
 COPY --chown=node:node frontend/CDCs.json ./
 COPY --chown=node:node frontend/components.json ./
 COPY --chown=node:node frontend/index.html ./
+COPY --chown=node:node .env ./
 
 RUN npm install -g pnpm
 
@@ -52,5 +53,6 @@ RUN rm -rf ./*
 COPY nginx.prod.conf /etc/nginx/nginx.conf
 
 COPY --from=build-stage /usr/src/app/frontend/dist .
+COPY --from=build-stage /usr/src/app/frontend/.env .
 
 CMD ["nginx", "-g", "daemon off;"]
