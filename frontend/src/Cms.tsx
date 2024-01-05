@@ -485,6 +485,8 @@ function Cms() {
                     To find these details, follow the instructions in{" "}
                     <a
                       href="https://youtu.be/ls1VsCPRH0I"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="text-blue-600 dark:text-blue-400 ml-1 inline items-center"
                     >
                       this quick, 1-minute-long video.
