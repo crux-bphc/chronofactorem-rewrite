@@ -24,6 +24,7 @@ import {
   GripVertical,
   Send,
   Trash,
+  Menu,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
@@ -52,6 +53,11 @@ import { Badge } from "./components/ui/badge";
 import { Button } from "./components/ui/button";
 import { toast, useToast } from "./components/ui/use-toast";
 import { router } from "./main";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "./components/ui/popover";
 
 const fetchTimetable = async (timetableId: string) => {
   const response = await axios.get<z.infer<typeof timetableWithSectionsType>>(
@@ -641,6 +647,16 @@ function EditTimetable() {
     [currentCourseID],
   );
 
+  const [screenIsLarge, setScreenIsLarge] = useState(
+    window.matchMedia("(min-width: 1024px)").matches,
+  );
+
+  useEffect(() => {
+    window
+      .matchMedia("(min-width: 1024px)")
+      .addEventListener("change", (e) => setScreenIsLarge(e.matches));
+  }, []);
+
   const handleMissingCDCClick = (courseId: string) => {
     setCurrentTab("CDCs");
     if (courseId === "") {
@@ -759,12 +775,14 @@ function EditTimetable() {
   return (
     <>
       {!isSpinner ? (
-        <div className="grow">
+        <div className="grow h-[calc(100vh-12rem)]">
           <TooltipProvider>
             <div className="flex justify-between p-4">
               <span>
-                <p className="font-bold text-3xl">{timetable.name}</p>
-                <span className="flex justify-between items-center gap-2">
+                <p className="font-bold lg:text-3xl text-md sm:text-lg md:text-xl">
+                  {timetable.name}
+                </p>
+                <span className="flex lg:flex-row flex-col justify-between lg:items-center gap-2">
                   <Badge variant="default" className="w-fit">
                     <p className="flex items-center gap-1">
                       <span>{timetable.acadYear}</span>
@@ -774,8 +792,8 @@ function EditTimetable() {
                       <span className="flex-none">{`${timetable.year}-${timetable.semester}`}</span>
                     </p>
                   </Badge>
-                  <span className="text-muted-foreground">
-                    <p className="text-sm font-bold inline">Last Updated: </p>
+                  <span className="lg:text-md md:text-sm text-xs text-muted-foreground">
+                    <p className="font-bold inline">Last Updated: </p>
                     <p className="inline">
                       {new Date(timetable.lastUpdated).toLocaleString()}
                     </p>
@@ -790,7 +808,7 @@ function EditTimetable() {
                       className="hover:bg-slate-700 transition duration-200 ease-in-out"
                     >
                       <div className="p-2 rounded-full">
-                        <AlertOctagon className="w-6 h-6 m-1" />
+                        <AlertOctagon className="w-5 h-5 md:w-6 md:h-6 m-1" />
                       </div>
                     </TooltipTrigger>
                     <TooltipContent className="bg-muted text-foreground border-muted-foreground text-md">
@@ -844,22 +862,24 @@ function EditTimetable() {
                     </TooltipContent>
                   </Tooltip>
                 )}
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="rounded-full p-3"
-                      onClick={() => setIsVertical(!isVertical)}
-                    >
-                      {isVertical ? <GripVertical /> : <GripHorizontal />}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>
-                      Make timetable {isVertical ? "horizontal" : "vertical"}
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
+                {screenIsLarge && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="rounded-full p-3"
+                        onClick={() => setIsVertical(!isVertical)}
+                      >
+                        {isVertical ? <GripVertical /> : <GripHorizontal />}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>
+                        Make timetable {isVertical ? "horizontal" : "vertical"}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
@@ -875,7 +895,7 @@ function EditTimetable() {
                         }, 1000);
                       }}
                     >
-                      <Copy />
+                      <Copy className="w-5 h-5 md:w-6 md:h-6" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -892,7 +912,7 @@ function EditTimetable() {
                             variant="ghost"
                             className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
                           >
-                            <Trash />
+                            <Trash className="w-5 h-5 md:w-6 md:h-6" />
                           </Button>
                         </TooltipTrigger>
                       </AlertDialogTrigger>
@@ -1017,28 +1037,59 @@ function EditTimetable() {
                 </Tooltip>
               </span>
             </div>
-            <div className="flex flex-row gap-4">
-              <SideMenu
-                timetable={timetable}
-                isOnEditPage={true}
-                allCoursesDetails={courses}
-                cdcs={cdcs}
-                setCurrentCourseID={setCurrentCourseID}
-                currentCourseDetails={currentCourseQueryResult}
-                uniqueSectionTypes={uniqueSectionTypes}
-                currentSectionType={currentSectionType}
-                setCurrentSectionType={setCurrentSectionType}
-                addSectionMutation={addSectionMutation}
-                removeSectionMutation={removeSectionMutation}
-                coursesInTimetable={coursesInTimetable}
-                currentTab={currentTab}
-                setCurrentTab={setCurrentTab}
-                isOnCourseDetails={isOnCourseDetails}
-                setSectionTypeChangeRequest={setSectionTypeChangeRequest}
-                isScreenshotMode={false}
-              />
+            <div className="flex flex-row gap-4 h-full relative">
+              {screenIsLarge ? (
+                <SideMenu
+                  timetable={timetable}
+                  isOnEditPage={true}
+                  allCoursesDetails={courses}
+                  cdcs={cdcs}
+                  setCurrentCourseID={setCurrentCourseID}
+                  currentCourseDetails={currentCourseQueryResult}
+                  uniqueSectionTypes={uniqueSectionTypes}
+                  currentSectionType={currentSectionType}
+                  setCurrentSectionType={setCurrentSectionType}
+                  addSectionMutation={addSectionMutation}
+                  removeSectionMutation={removeSectionMutation}
+                  coursesInTimetable={coursesInTimetable}
+                  currentTab={currentTab}
+                  setCurrentTab={setCurrentTab}
+                  isOnCourseDetails={isOnCourseDetails}
+                  setSectionTypeChangeRequest={setSectionTypeChangeRequest}
+                  isScreenshotMode={false}
+                />
+              ) : (
+                <Popover>
+                  <PopoverTrigger className="absolute left-2 top-[-1rem]">
+                    <Button variant={"default"} className="rounded-full">
+                      <Menu />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent>
+                    <SideMenu
+                      timetable={timetable}
+                      isOnEditPage={true}
+                      allCoursesDetails={courses}
+                      cdcs={cdcs}
+                      setCurrentCourseID={setCurrentCourseID}
+                      currentCourseDetails={currentCourseQueryResult}
+                      uniqueSectionTypes={uniqueSectionTypes}
+                      currentSectionType={currentSectionType}
+                      setCurrentSectionType={setCurrentSectionType}
+                      addSectionMutation={addSectionMutation}
+                      removeSectionMutation={removeSectionMutation}
+                      coursesInTimetable={coursesInTimetable}
+                      currentTab={currentTab}
+                      setCurrentTab={setCurrentTab}
+                      isOnCourseDetails={isOnCourseDetails}
+                      setSectionTypeChangeRequest={setSectionTypeChangeRequest}
+                      isScreenshotMode={false}
+                    />
+                  </PopoverContent>
+                </Popover>
+              )}
               <TimetableGrid
-                isVertical={isVertical}
+                isVertical={screenIsLarge ? isVertical : true}
                 timetableDetailsSections={timetableDetailsSections}
                 handleUnitClick={(e) => console.log(e)}
                 handleUnitDelete={(e) => {
