@@ -409,7 +409,7 @@ function Cms() {
                     <HelpCircle />
                   </div>
                 </TooltipTrigger>
-                <TooltipContent className="flex space-y-2 flex-col bg-muted text-foreground border-muted text-md">
+                <TooltipContent className="lg:w-[48rem] md:w-[36rem] w-[24rem] flex space-y-2 flex-col bg-muted text-foreground border-muted text-md">
                   <span>
                     To find these details, follow the instructions in{" "}
                     <a
