@@ -77,6 +77,7 @@ const renderTimetableSection = (title: string, timetables: Timetable[]) => {
               key={timetable.id}
               timetable={timetable}
               showFooter={false}
+              isCMSPage={true}
             />
           ))}
         </div>
@@ -182,14 +183,16 @@ function CmsExport() {
   const queryClient = useQueryClient();
   const createMutation = useMutation({
     mutationFn: () => {
-      return axios.post<{ message: string; id: number }>(
+      return axios.post<{ message: string; id: string }>(
         "/api/timetable/create",
       );
     },
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
-      // TODO: Navigate to the newly created page
-      console.log(response.data.id);
+      router.navigate({
+        to: "/edit/$timetableId",
+        params: { timetableId: response.data.id },
+      });
     },
     onError: (error) => {
       if (error instanceof AxiosError && error.response) {
@@ -342,7 +345,7 @@ function CmsExport() {
           </div>
         </TooltipProvider>
         <main className="text-foreground py-2 md:py-4 px-10 md:px-16">
-          <h1 className="xl:text-4xl lg:text-3xl md:text-2xl text-xl font-bold text-center sm:text-left md:text-4xl">
+          <h1 className="xl:text-4xl lg:text-3xl md:text-2xl text-xl font-bold text-center sm:text-left">
             My Timetables
           </h1>
           {privateTimetables.length === 0 &&

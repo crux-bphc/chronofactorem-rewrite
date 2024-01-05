@@ -72,6 +72,7 @@ const renderTimetableSection = (title: string, timetables: Timetable[]) => {
               key={timetable.id}
               timetable={timetable}
               showFooter={true}
+              isCMSPage={false}
             />
           ))}
         </div>
@@ -177,14 +178,16 @@ function Home() {
   const queryClient = useQueryClient();
   const createMutation = useMutation({
     mutationFn: () => {
-      return axios.post<{ message: string; id: number }>(
+      return axios.post<{ message: string; id: string }>(
         "/api/timetable/create",
       );
     },
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
-      // TODO: Navigate to the newly created page
-      console.log(response.data.id);
+      router.navigate({
+        to: "/edit/$timetableId",
+        params: { timetableId: response.data.id },
+      });
     },
     onError: (error) => {
       if (error instanceof AxiosError && error.response) {

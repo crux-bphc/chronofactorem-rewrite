@@ -1,13 +1,18 @@
-import CDCList from "@/../CDCs.json";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  UseMutationResult,
+  UseQueryResult,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { ArrowLeft, Bird, ChevronRight, HelpCircle } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useDebounce } from "usehooks-ts";
 import { z } from "zod";
 import {
   courseType,
   courseWithSectionsType,
+  sectionTypeList,
   sectionTypeZodEnum,
   timetableWithSectionsType,
 } from "../../../lib/src";
@@ -20,135 +25,63 @@ export function SideMenu({
   timetable,
   isOnEditPage,
   allCoursesDetails,
+  cdcs,
+  setCurrentCourseID,
+  currentCourseDetails,
+  uniqueSectionTypes,
+  currentSectionType,
+  setCurrentSectionType,
+  addSectionMutation,
+  removeSectionMutation,
+  coursesInTimetable,
+  currentTab,
+  setCurrentTab,
+  isOnCourseDetails,
+  setSectionTypeChangeRequest,
+  isScreenshotMode,
 }: {
   timetable: z.infer<typeof timetableWithSectionsType>;
   isOnEditPage: boolean;
   allCoursesDetails: z.infer<typeof courseType>[];
+  cdcs: any[];
+  setCurrentCourseID: React.Dispatch<React.SetStateAction<string | null>>;
+  currentCourseDetails: UseQueryResult<
+    z.infer<typeof courseWithSectionsType> | null | undefined
+  >;
+  uniqueSectionTypes: sectionTypeList;
+  currentSectionType: z.infer<typeof sectionTypeZodEnum>;
+  setCurrentSectionType: React.Dispatch<
+    React.SetStateAction<z.infer<typeof sectionTypeZodEnum>>
+  >;
+  addSectionMutation: UseMutationResult<
+    any,
+    Error,
+    {
+      sectionId: string;
+    },
+    unknown
+  >;
+  removeSectionMutation: UseMutationResult<
+    any,
+    Error,
+    {
+      sectionId: string;
+    },
+    unknown
+  >;
+  coursesInTimetable: z.infer<typeof courseType>[];
+  currentTab: string;
+  setCurrentTab: React.Dispatch<React.SetStateAction<string>>;
+  isOnCourseDetails: boolean;
+  setSectionTypeChangeRequest: React.Dispatch<
+    React.SetStateAction<"" | "L" | "P" | "T">
+  >;
+  isScreenshotMode: boolean;
 }) {
   const queryClient = useQueryClient();
 
   // STATE MANAGEMENT SECTION
   // Some of these may have to be moved up to the parent later
-  const [currentTab, setCurrentTab] = useState(() => {
-    return isOnEditPage ? "CDCs" : "currentCourses";
-  });
-
-  const coursesInTimetable = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          timetable.sections.map((section) =>
-            allCoursesDetails.find((course) => course.id === section.courseId),
-          ),
-        ),
-      ).sort(),
-    [allCoursesDetails, timetable.sections],
-  );
-
-  const [currentCourseID, setCurrentCourse] = useState<string | null>(null);
-  const isOnCourseDetails = useMemo(
-    () => currentCourseID !== null,
-    [currentCourseID],
-  );
-
-  const cdcs = useMemo(() => {
-    let cdcs: string[];
-    const courses: any[] = [];
-
-    const degree = (
-      timetable.degrees.length === 1
-        ? timetable.degrees[0]
-        : timetable.degrees.sort((a, b) => (b as any) - (a as any)).join("")
-    ) as keyof typeof CDCList;
-    const cdcListKey =
-      `${timetable.year}-${timetable.semester}` as keyof (typeof CDCList)[typeof degree];
-
-    if (degree in CDCList && cdcListKey in CDCList[degree]) {
-      cdcs = CDCList[degree][cdcListKey];
-    } else {
-      return [];
-    }
-
-    // Code based on temp frontend
-    for (let i = 0; i < cdcs.length; i++) {
-      if (cdcs[i].includes("/")) {
-        const [depts, codes] = cdcs[i].split(" ");
-        const options: string[] = [];
-        for (let j = 0; j < depts.split("/").length; j++) {
-          options.push(`${depts.split("/")[j]} ${codes.split("/")[j]}`);
-        }
-        const matchedCourses = allCoursesDetails.filter((e) =>
-          options.includes(e.code),
-        );
-        if (matchedCourses.length < options.length) {
-          courses.push({
-            id: null,
-            type: "warning" as "warning" | "optional",
-            warning: `One CDC of ${options.join(", ")} not found`,
-          });
-        } else {
-          courses.push({
-            id: null,
-            type: "optional" as "warning" | "optional",
-            options: matchedCourses,
-          });
-        }
-      } else {
-        const matchedCourses = allCoursesDetails.filter(
-          (e) => e.code === cdcs[i],
-        );
-        if (matchedCourses.length === 1) {
-          courses.push(matchedCourses[0]);
-        } else {
-          courses.push({
-            id: null,
-            type: "warning" as "warning" | "optional",
-            warning: `CDC ${cdcs[i]} not found`,
-          });
-        }
-      }
-    }
-
-    return courses;
-  }, [timetable, allCoursesDetails]);
-
-  const currentCourseDetails = useQuery({
-    queryKey: [currentCourseID],
-    queryFn: async () => {
-      if (currentCourseID === null) return null;
-
-      const result = await axios.get<z.infer<typeof courseWithSectionsType>>(
-        `/api/course/${currentCourseID}`,
-      );
-
-      return result.data;
-    },
-  });
-
-  const uniqueSectionTypes = useMemo(() => {
-    if (
-      currentCourseDetails.data === undefined ||
-      currentCourseDetails.data === null
-    )
-      return [];
-
-    return Array.from(
-      new Set(
-        currentCourseDetails.data.sections.map((section) => section.type),
-      ),
-    ).sort();
-  }, [currentCourseDetails.data]);
-
-  const [currentSectionType, setCurrentSectionType] =
-    useState<z.infer<typeof sectionTypeZodEnum>>("L");
-
-  // To make sure currentSectionType's value matches with what section types exist on the current course
-  useEffect(() => {
-    setCurrentSectionType(
-      uniqueSectionTypes.length ? uniqueSectionTypes[0] : "L",
-    );
-  }, [uniqueSectionTypes]);
-
   const timings = useMemo(() => {
     const m = new Map<string, string>();
     for (const section of timetable.sections) {
@@ -165,59 +98,6 @@ export function SideMenu({
     }
     return m;
   }, [timetable]);
-
-  // might need to be extracted to parent
-  const addSectionMutation = useMutation({
-    mutationFn: async (body: { sectionId: string }) => {
-      const result = await axios.post(
-        `/api/timetable/${timetable.id}/add`,
-        body,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      return result.data;
-    },
-    onSuccess: () => {
-      // TODO - update grid
-      console.log("poggers");
-      queryClient.invalidateQueries({ queryKey: ["timetable"] });
-    },
-    onError: (error) => {
-      if (error instanceof AxiosError && error.response) {
-        console.log(error.response.data.message);
-      }
-    },
-  });
-
-  const removeSectionMutation = useMutation({
-    mutationFn: async (body: { sectionId: string }) => {
-      const result = await axios.post(
-        `/api/timetable/${timetable.id}/remove`,
-        body,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      return result.data;
-    },
-    onSuccess: () => {
-      // TODO - update grid
-      console.log("poggers");
-      queryClient.invalidateQueries({ queryKey: ["timetable"] });
-    },
-    onError: (error) => {
-      if (error instanceof AxiosError && error.response) {
-        console.log(error.response.data.message);
-      }
-    },
-  });
 
   const swapCourseMutation = useMutation({
     mutationFn: async ({
@@ -245,8 +125,6 @@ export function SideMenu({
       return result2.data;
     },
     onSuccess: () => {
-      // TODO - update grid
-      console.log("poggers");
       queryClient.invalidateQueries({ queryKey: ["timetable"] });
     },
     onError: (error) => {
@@ -282,7 +160,6 @@ export function SideMenu({
         }
       }
     }
-    console.log(timetable.sections);
   };
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -355,7 +232,7 @@ export function SideMenu({
         <Button
           className="rounded-full flex ml-2 px-2 mb-2 mr-2 items-center"
           onClick={() => {
-            setCurrentCourse(null);
+            setCurrentCourseID(null);
           }}
         >
           <ArrowLeft />
@@ -366,7 +243,10 @@ export function SideMenu({
               return (
                 <TabsTrigger
                   value={sectionType}
-                  onClick={() => setCurrentSectionType(sectionType)}
+                  onClick={() => {
+                    setCurrentSectionType(sectionType);
+                    setSectionTypeChangeRequest("");
+                  }}
                   key={sectionType}
                 >
                   {sectionType}
@@ -450,7 +330,7 @@ export function SideMenu({
   // user is not in course details
   return (
     <div className="bg-secondary min-w-96">
-      <Tabs value={currentTab} className="py-2">
+      <Tabs value={isScreenshotMode ? "exams" : currentTab} className="py-2">
         <TabsList>
           {isOnEditPage && (
             <TabsTrigger
@@ -503,7 +383,7 @@ export function SideMenu({
                 <Button
                   variant={"secondary"}
                   onClick={() => {
-                    setCurrentCourse(course.id);
+                    setCurrentCourseID(course.id);
                   }}
                   key={course.id}
                   className="rounded-none text-left py-8 bg-secondary dark:hover:bg-slate-700 hover:bg-slate-200"
@@ -533,7 +413,7 @@ export function SideMenu({
                 return (
                   <Button
                     onClick={() => {
-                      setCurrentCourse(course.id);
+                      setCurrentCourseID(course.id);
                     }}
                     key={course.id}
                   >
@@ -571,7 +451,7 @@ export function SideMenu({
               <Button
                 variant={"secondary"}
                 onClick={() => {
-                  setCurrentCourse(course.id);
+                  setCurrentCourseID(course.id);
                 }}
                 key={course.id}
                 className="rounded-none text-left py-8 bg-secondary dark:hover:bg-slate-700 hover:bg-slate-200"
@@ -697,7 +577,7 @@ export function SideMenu({
               <div
                 onClick={() => {
                   if (!course.clashing) {
-                    setCurrentCourse(course.id);
+                    setCurrentCourseID(course.id);
                   }
                 }}
                 key={course.id}
