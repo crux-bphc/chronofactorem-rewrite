@@ -465,7 +465,7 @@ export function SideMenu({
             if (!isOnEditPage) {
               return (
                 <>
-                  <div className="flex flex-col border-muted-foreground/70 rounded-md pl-3 py-2 border">
+                  <div className="flex flex-col border-muted-foreground/30 rounded-md pl-3 py-2 border">
                     <div className="flex">
                       <span className="font-bold">{`${course.code}`}</span>
                       <span>{`: ${course.name}`}</span>
