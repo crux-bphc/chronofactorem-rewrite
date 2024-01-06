@@ -217,7 +217,15 @@ export function NavBar() {
               asChild
               className="focus:bg-destructive/90 focus:text-destructive-foreground cursor-pointer"
               onClick={() => {
-                removeCookie("session", { path: "/" });
+                const frontendIsHTTPS =
+                  import.meta.env.VITE_FRONTEND_URL.includes("https://");
+                removeCookie("session", {
+                  path: "/",
+                  domain: import.meta.env.VITE_FRONTEND_URL.replace(
+                    frontendIsHTTPS ? "https://" : "http://",
+                    "",
+                  ),
+                });
                 router.navigate({
                   to: "/login",
                 });
