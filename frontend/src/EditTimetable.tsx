@@ -762,8 +762,7 @@ function EditTimetable() {
       variant: "destructive",
     });
     router.navigate({
-      to: "/view/$timetableId",
-      params: { timetableId: timetableId },
+      to: "/",
     });
   }
 
