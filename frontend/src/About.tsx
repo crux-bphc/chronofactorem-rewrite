@@ -22,10 +22,10 @@ function About() {
           Hyderabad.
         </p>
         <p className="pt-4">
-          This version of ChronoFactorem is a version we fastracked so that we
-          can get a full release of ChronoFactorem out for this registration
-          session. The frontend code is admittedly rushed, but we are somewhat
-          happy with it. If you do find them, please report them{" "}
+          This version of ChronoFactorem is the first real release of
+          ChronoFactorem. We really wanted to iron out as many bugs as we can
+          before we push it out to you to ensure a smooth experience, so it got
+          a little delayed. If you do still find bugs, please report them{" "}
           <a
             href="https://github.com/crux-bphc/chronofactorem-rewrite/issues"
             className="text-blue-400 inline pl-1 items-center"
