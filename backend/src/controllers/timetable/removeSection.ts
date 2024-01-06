@@ -182,13 +182,24 @@ export const removeSection = async (req: Request, res: Response) => {
     return currentSection.id !== section?.id;
   });
 
-  timetable.warnings = updateSectionWarnings(
-    course.code,
-    section,
-    sectionTypes,
-    false,
-    timetable.warnings,
-  );
+  try {
+    timetable.warnings = updateSectionWarnings(
+      course.code,
+      section,
+      sectionTypes,
+      false,
+      timetable.warnings,
+    );
+  } catch (err: any) {
+    console.log(
+      `user with id ${author.id} tried to remove section ${section.type}${section.number} of course ${course.code} but it isn't part of their timetable according to warnings`,
+    );
+
+    return res.status(500).json({
+      message:
+        "Timetable and warnings state inconsistent, please contact us if you see this",
+    });
+  }
 
   try {
     await timetableRepository.save(timetable);

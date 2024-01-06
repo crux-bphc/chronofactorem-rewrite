@@ -70,8 +70,8 @@ export const checkForExamHoursClash = (
       const { courseCode, end } = value;
       const start = key;
       if (
-        (newMidsemStartTime <= start && newMidsemEndTime >= start) ||
-        (newMidsemStartTime <= end && newMidsemEndTime >= end) ||
+        (newMidsemStartTime <= start && newMidsemEndTime > start) ||
+        (newMidsemStartTime < end && newMidsemEndTime >= end) ||
         (newMidsemStartTime >= start && newMidsemEndTime <= end)
       ) {
         return {
@@ -92,8 +92,8 @@ export const checkForExamHoursClash = (
       const { courseCode, end } = value;
       const start = key;
       if (
-        (newCompreStartTime <= start && newCompreEndTime >= start) ||
-        (newCompreStartTime <= end && newCompreEndTime >= end) ||
+        (newCompreStartTime <= start && newCompreEndTime > start) ||
+        (newCompreStartTime < end && newCompreEndTime >= end) ||
         (newCompreStartTime >= start && newCompreEndTime <= end)
       ) {
         return {
