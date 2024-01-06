@@ -129,7 +129,7 @@ export function TimetableGrid({
     <div className="flex w-full h-full">
       {isVertical ? (
         <div
-          className={`mt-16 sm:mt-12 h-full grid justify-between grid-rows-${displayCols} text-md text-center text-foreground/80 font-bold`}
+          className={`mt-16 gap-9 sm:gap-0 sm:mt-12 sm:h-full grid justify-between grid-rows-${displayCols} text-md text-center text-foreground/80 font-bold`}
         >
           {timings
             .filter((_, i) => i < displayCols)
@@ -219,8 +219,16 @@ export function TimetableGrid({
                       </div>
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent className="bg-primary-foreground text-foreground">
+                  <TooltipContent className="bg-primary-foreground text-center text-foreground">
                     {e.name}
+                    {isOnEditPage && (
+                      <>
+                        <br />
+                        <span className="text-muted-foreground">
+                          (Double tap to remove)
+                        </span>
+                      </>
+                    )}
                   </TooltipContent>
                 </Tooltip>
               ) : (
