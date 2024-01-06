@@ -90,7 +90,10 @@ const fetchTimetableDetailsQueryOptions = (timetableId: string) =>
         description: "CMS Auto-Enroll cannot be used with draft timetables.",
         variant: "destructive",
       });
-      router.navigate({ to: "/" });
+      router.navigate({
+        to: "/edit/$timetableId",
+        params: { timetableId: timetableId },
+      });
     },
   });
 
@@ -241,6 +244,7 @@ function Cms() {
   const sectionsInTimetable = useQuery(
     fetchTimetableDetailsQueryOptions(timetableId),
   );
+  const userQueryResult = useQuery(userQueryOptions);
 
   const sectionNameList = useQueries({
     queries: (sectionsInTimetable.data?.sections ?? []).map((section) => {
@@ -256,6 +260,19 @@ function Cms() {
       };
     },
   });
+
+  if (userQueryResult.data?.id !== sectionsInTimetable.data?.authorId) {
+    toast({
+      title: "Error",
+      description:
+        "CMS Auto-Enroll can only be used with your own timetables. Please make a copy of this timetable if you wish to do so.",
+      variant: "destructive",
+    });
+    router.navigate({
+      to: "/view/$timetableId",
+      params: { timetableId: timetableId },
+    });
+  }
 
   const fetchEnrolledSections = async () => {
     setEnrolledLoaded(false);
@@ -492,9 +509,21 @@ function Cms() {
             </div>
             <div className="flex flex-col sm:flex-row relative h-fit">
               {allowEdit && (
-                <div className="flex justify-center items-center absolute bg-background/60 w-full sm:w-3/4 h-full">
+                <div className="flex flex-col justify-center items-center absolute bg-background/60 w-full sm:w-3/4 h-full">
                   <span className="text-3xl z-10 font-bold text-foreground/85">
                     Enter your CMS details, and hit save to continue
+                  </span>{" "}
+                  <span>
+                    To find these details, follow the instructions in{" "}
+                    <a
+                      href="https://youtu.be/ls1VsCPRH0I"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 dark:text-blue-400 ml-1 inline items-center"
+                    >
+                      this quick, 1-minute-long video.
+                      <ArrowUpRightFromCircle className="inline w-4 h-4 ml-1 mr-1" />
+                    </a>
                   </span>
                 </div>
               )}
