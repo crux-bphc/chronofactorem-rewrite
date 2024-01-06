@@ -75,7 +75,10 @@ const fetchTimetable = async (timetableId: string) => {
     description: "Draft tables can only be edited",
     variant: "destructive",
   });
-  router.navigate({ to: "/" });
+  router.navigate({
+    to: "/edit/$timetableId",
+    params: { timetableId: timetableId },
+  });
 };
 
 const fetchUserDetails = async () => {
