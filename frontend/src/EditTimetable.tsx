@@ -68,7 +68,18 @@ const fetchTimetable = async (timetableId: string) => {
       },
     },
   );
-  return response.data;
+  if (response.data.draft) {
+    return response.data;
+  }
+  toast({
+    title: "Error",
+    description: "Non-draft timetables cannot be edited",
+    variant: "destructive",
+  });
+  router.navigate({
+    to: "/view/$timetableId",
+    params: { timetableId: timetableId },
+  });
 };
 
 const timetableQueryOptions = (timetableId: string) =>
@@ -443,7 +454,7 @@ function EditTimetable() {
 
     return courseQueryResult.data
       .filter((e) =>
-        timetableQueryResult.data.sections
+        timetableQueryResult.data?.sections
           .map((x) => x.courseId)
           .includes(e.id),
       )
@@ -744,6 +755,18 @@ function EditTimetable() {
     );
   }
 
+  if (userQueryResult.data.id !== timetableQueryResult.data.authorId) {
+    toast({
+      title: "Error",
+      description: "You are not authorized to edit this timetable",
+      variant: "destructive",
+    });
+    router.navigate({
+      to: "/view/$timetableId",
+      params: { timetableId: timetableId },
+    });
+  }
+
   const timetableDetailsSections: {
     id: string;
     name: string;
@@ -1038,7 +1061,7 @@ function EditTimetable() {
                 </Tooltip>
               </span>
             </div>
-            <div className="flex flex-row gap-4 h-full relative">
+            <div className="flex flex-row gap-4 sm:h-full relative">
               {screenIsLarge ? (
                 <SideMenu
                   timetable={timetable}
