@@ -228,7 +228,7 @@ export function SideMenu({
   // JSX SECTION
   if (isOnCourseDetails) {
     return (
-      <div className="bg-secondary h-[calc(100vh-13rem)]">
+      <div className="bg-secondary w-[26rem] h-[calc(100vh-13rem)]">
         <div className="flex items-center py-2 w-full">
           <Button
             variant={"ghost"}
@@ -270,7 +270,7 @@ export function SideMenu({
                 className="h-[calc(100vh-20rem)]"
                 key={sectionType}
               >
-                <div className="flex flex-col gap-2 p-0 m-0 px-2 overflow-y-scroll w-[28rem] h-[calc(100vh-20rem)]">
+                <div className="flex flex-col gap-2 p-0 m-0 px-2 overflow-y-scroll w-[26rem] h-[calc(100vh-20rem)]">
                   {currentCourseDetails.data?.sections
                     .filter((section) => section.type === sectionType)
                     .map((section) => {
@@ -321,7 +321,7 @@ export function SideMenu({
                                 <span className="font-semibold whitespace-pre-wrap text-md">
                                   {section.instructors.join(", ")}
                                 </span>
-                                <span className="font-normal">
+                                <span className="font-normal whitespace-pre-wrap">
                                   {section.roomTime
                                     .map((e) =>
                                       e.split(":").splice(1).join(" "),
@@ -355,7 +355,7 @@ export function SideMenu({
 
   // user is not in course details
   return (
-    <div className="bg-secondary w-[28rem]">
+    <div className="bg-secondary w-[26rem]">
       <Tabs
         value={isScreenshotMode ? "exams" : currentTab}
         className="py-2 h-[calc(100vh-16rem)]"
@@ -398,7 +398,7 @@ export function SideMenu({
 
         <TabsContent
           value="CDCs"
-          className="border-muted-foreground/80 flex flex-col"
+          className="border-muted-foreground/80 w-[26rem] data-[state=inactive]:h-0 flex flex-col h-full overflow-y-scroll"
         >
           {cdcs
             .filter((course) => course.id !== null)
@@ -458,7 +458,7 @@ export function SideMenu({
 
         <TabsContent
           value="currentCourses"
-          className="flex flex-col px-2 gap-2"
+          className="flex h-full data-[state=inactive]:h-0 w-[26rem] overflow-y-scroll flex-col px-2 gap-2"
         >
           {coursesInTimetable.map((course) => {
             if (course === undefined) return <></>;
@@ -497,7 +497,10 @@ export function SideMenu({
           })}
         </TabsContent>
 
-        <TabsContent value="exams" className="flex flex-col">
+        <TabsContent
+          value="exams"
+          className="flex data-[state=inactive]:h-0 w-[26rem] flex-col h-full overflow-y-scroll"
+        >
           <span className="text-xl font-bold pl-4 flex mb-2">Midsems</span>
           {timetable.examTimes
             .filter((e) => e.includes("|MIDSEM|"))
@@ -594,9 +597,9 @@ export function SideMenu({
 
         <TabsContent
           value="search"
-          className="h-full w-[26rem] overflow-y-scroll"
+          className="data-[state=inactive]:h-0 w-[26rem] h-full"
         >
-          <div className="px-4 pb-4 pt-1">
+          <div className="px-4 pb-4">
             <Input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -605,7 +608,7 @@ export function SideMenu({
             />
           </div>
 
-          <div>
+          <div className="h-[calc(100%-3rem)] overflow-y-scroll">
             {courseSearchResults.map((course) => (
               // TODO - deal with this biome rule
               // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
