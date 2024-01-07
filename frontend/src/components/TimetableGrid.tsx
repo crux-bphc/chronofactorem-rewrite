@@ -126,10 +126,10 @@ export function TimetableGrid({
   }, [timetableDetailsSections, isVertical]);
 
   return (
-    <div className="flex w-full h-full">
+    <div className="flex w-full lg:h-full h-[150%]">
       {isVertical ? (
         <div
-          className={`mt-16 gap-9 sm:gap-0 sm:mt-12 sm:h-full grid justify-between grid-rows-${displayCols} text-md text-center text-foreground/80 font-bold`}
+          className={`pt-16 gap-9 sm:gap-8 sm:mt-4 lg:pt-8 lg:gap-2 sm:h-full grid justify-between grid-rows-${displayCols} md:text-md text-sm text-center text-foreground/80 font-bold`}
         >
           {timings
             .filter((_, i) => i < displayCols)
@@ -141,7 +141,7 @@ export function TimetableGrid({
         </div>
       ) : (
         <div
-          className={`grid grid-rows-${displayRows} items-center mr-4 mt-12 text-lg text-center font-bold text-foreground/80`}
+          className={`grid grid-rows-${displayRows} items-center mr-4 mt-12 md:text-lg text-md text-center font-bold text-foreground/80`}
         >
           {daysOfWeek.map((e) => (
             <span key={e}>{e}</span>
@@ -151,7 +151,7 @@ export function TimetableGrid({
       <div className="flex flex-col w-full h-full">
         {isVertical ? (
           <div
-            className={`grid grid-cols-${displayRows} items-center pr-2 text-lg text-center font-bold text-foreground/80 `}
+            className={`grid grid-cols-${displayRows} items-center pr-2 md:text-lg text-md text-center font-bold text-foreground/80 `}
           >
             {daysOfWeek.map((e) => (
               <span key={e}>{e}</span>
@@ -159,7 +159,7 @@ export function TimetableGrid({
           </div>
         ) : (
           <div
-            className={`grid grid-cols-${displayCols} justify-between text-md text-center font-bold text-foreground/80`}
+            className={`grid grid-cols-${displayCols} justify-between md:text-md text-sm text-center font-bold text-foreground/80`}
           >
             {timings
               .filter((_, i) => i < displayCols)
