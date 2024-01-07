@@ -23,7 +23,13 @@ import RootComponent from "./RootComponent";
 import viewTimetableRoute from "./ViewTimetable";
 import "./index.css";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 export const rootRoute = rootRouteWithContext<{
   queryClient: QueryClient;
