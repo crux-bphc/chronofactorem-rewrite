@@ -261,7 +261,11 @@ function Cms() {
     },
   });
 
-  if (userQueryResult.data?.id !== sectionsInTimetable.data?.authorId) {
+  if (
+    userQueryResult.data?.id !== undefined &&
+    sectionsInTimetable.data?.authorId !== undefined &&
+    userQueryResult.data?.id !== sectionsInTimetable.data?.authorId
+  ) {
     toast({
       title: "Error",
       description:
