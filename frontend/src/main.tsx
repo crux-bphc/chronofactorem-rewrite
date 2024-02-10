@@ -19,9 +19,9 @@ import finalizeTimetableRoute from "./Finalize";
 import getDegreesRoute from "./GetDegrees";
 import indexRoute from "./Home";
 import loginRoute from "./Login";
+import notFoundRoute from "./NotFound";
 import RootComponent from "./RootComponent";
 import viewTimetableRoute from "./ViewTimetable";
-import notFoundRoute from "./NotFound";
 import "./index.css";
 
 const queryClient = new QueryClient({
