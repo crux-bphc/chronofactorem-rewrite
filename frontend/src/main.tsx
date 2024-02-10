@@ -21,6 +21,7 @@ import indexRoute from "./Home";
 import loginRoute from "./Login";
 import RootComponent from "./RootComponent";
 import viewTimetableRoute from "./ViewTimetable";
+import notFoundRoute from "./NotFound";
 import "./index.css";
 
 const queryClient = new QueryClient({
@@ -62,6 +63,7 @@ export const router = new Router({
   context: {
     queryClient,
   },
+  notFoundRoute: notFoundRoute,
 });
 
 // Register things for typesafety
