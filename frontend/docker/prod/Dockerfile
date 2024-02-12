@@ -53,6 +53,5 @@ RUN rm -rf ./*
 COPY nginx.prod.conf /etc/nginx/nginx.conf
 
 COPY --from=build-stage /usr/src/app/frontend/dist .
-COPY --from=build-stage /usr/src/app/frontend/.env .
 
 CMD ["nginx", "-g", "daemon off;"]
