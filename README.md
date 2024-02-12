@@ -4,7 +4,7 @@
 
 **NOTE:** ⚠️ If you have a development environment with latest commit at or before c288045, please read the [dev section](#dev) carefully. Old development environments are now broken.
 
-## Steps for setup:
+## Steps for setup
 
 1. Install [nvm](https://github.com/nvm-sh/nvm), and install Node v20.10.0 LTS using `nvm install v20.10.0`. If you're using a different node version manager, do the equivalent.
 2. Activate Node v20.10.0 using `nvm use v20.10.0`
@@ -33,6 +33,8 @@ NGINX_PORT=5000
 SQIDS_ALPHABET="P1fF29hw8BARdJpoSUZIDnXVWNzcCeGrlgk0qbsMxjYKaE5uLTyOt376Hmv4Qi"
 VITE_FRONTEND_URL="http://localhost:5000"
 SESSION_MAX_AGE_MS=86400000
+MS_PORT=7700
+MS_MASTER_KEY="aVerySecureKey"
 ```
 
 Obviously, we'll use different creds in production.
@@ -48,7 +50,7 @@ This project has 4 profiles as of now:
 - `testing`
 - `ingestion`
 
-## Steps to run any given profile:
+## Steps to run any given profile
 
 1. Run `docker compose --profile PROFILE down` to stop, and delete any containers in the profile named PROFILE.
 
@@ -62,7 +64,7 @@ This project has 4 profiles as of now:
 
 Running the project with the `dev` profile runs the backend with `nodemon`, and creates a bind mount with vite on the frontend, hot-reloading the running containers as soon as you save changes to your code. More importantly, this also creates an `nginx` container that makes the frontend and backend the same host to allow easy integration of the two. The `NGINX_PORT` defines which port it opens up for development. The frontend will be available at `http://localhost:NGINX_PORT/` and the backend will be at `http://localhost:NGINX_PORT/api`.
 
-**NOTE:** Changes to the `package.json`, `pnpm-lock.yaml` obviously, will require container rebuilds, and since the frontend container caches dependencies for the `dev` profile, we highly recommend rebuilding the containers entirely using `docker compose --profile dev down` and `docker compose --profile dev up --build`. Additionally, **any changes to code in the `lib` directory will also require a container rebuild**, due to the current state of `nodemon` not supporting external reference-based builds, see https://github.com/TypeStrong/ts-node/issues/897.
+**NOTE:** Changes to the `package.json`, `pnpm-lock.yaml` obviously, will require container rebuilds, and since the frontend container caches dependencies for the `dev` profile, we highly recommend rebuilding the containers entirely using `docker compose --profile dev down` and `docker compose --profile dev up --build`. Additionally, **any changes to code in the `lib` directory will also require a container rebuild**, due to the current state of `nodemon` not supporting external reference-based builds, see <https://github.com/TypeStrong/ts-node/issues/897>.
 
 #### Containers in the `dev` profile
 
