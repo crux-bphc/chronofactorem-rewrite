@@ -100,6 +100,19 @@ services:
     profiles:
       - "testing"
 
+  search-service:
+    image: getmeili/meilisearch:v1.6
+    env_file:
+      - .env
+    ports:
+      - "${MS_PORT}:${MS_PORT}"
+    volumes:
+      - ./data.ms:/data.ms
+    profiles:
+      - "dev"
+      - "prod"
+
+
   frontend-dev:
     init: true
     build:
