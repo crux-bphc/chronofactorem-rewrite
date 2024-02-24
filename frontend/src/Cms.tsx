@@ -44,7 +44,7 @@ const fetchUserDetails = async (): Promise<
       headers: {
         "Content-Type": "application/json",
       },
-    }
+    },
   );
   return response.data;
 };
@@ -64,7 +64,7 @@ const fetchAllCoursesQueryOptions = () =>
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
       return res.data;
     },
@@ -80,7 +80,7 @@ const fetchTimetableDetailsQueryOptions = (timetableId: string) =>
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
       if (!res.data.draft) {
         return res.data;
@@ -106,7 +106,7 @@ const cmsRoute = new Route({
       .then(() => {
         queryClient.ensureQueryData(fetchAllCoursesQueryOptions());
         queryClient.ensureQueryData(
-          fetchTimetableDetailsQueryOptions(params.timetableId)
+          fetchTimetableDetailsQueryOptions(params.timetableId),
         );
       })
       .catch((error) => {
@@ -204,7 +204,7 @@ function Cms() {
   const sesskeyFetchRef = useRef<string | null>(null);
   const [allowEdit, setAllowEdit] = useState(true);
   const [isExtensionInstalled, setIsExtensionInstalled] = useState(
-    chrome.runtime !== undefined && chrome.runtime !== null
+    chrome.runtime !== undefined && chrome.runtime !== null,
   );
   const extensionIdRef = useRef<HTMLInputElement | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
@@ -214,7 +214,7 @@ function Cms() {
     [] as {
       id: number;
       displayname: string;
-    }[]
+    }[],
   );
   const getCmsDetails = async (extensionID: string) => {
     try {
@@ -266,7 +266,7 @@ function Cms() {
   };
   const fetchCourseDetailsQueryOptions = (
     section: z.infer<typeof sectionType>,
-    course: z.infer<typeof courseType>
+    course: z.infer<typeof courseType>,
   ) =>
     queryOptions({
       queryKey: ["course", course.id, "section", section.id],
@@ -277,10 +277,10 @@ function Cms() {
             headers: {
               "Content-Type": "application/json",
             },
-          }
+          },
         );
         const count = (res.data.sections as { type: string }[]).filter(
-          (e) => e.type === section.type
+          (e) => e.type === section.type,
         ).length;
         return count > 1
           ? [
@@ -299,14 +299,14 @@ function Cms() {
 
   const courseDetails = useQuery(fetchAllCoursesQueryOptions());
   const sectionsInTimetable = useQuery(
-    fetchTimetableDetailsQueryOptions(timetableId)
+    fetchTimetableDetailsQueryOptions(timetableId),
   );
   const userQueryResult = useQuery(userQueryOptions);
 
   const sectionNameList = useQueries({
     queries: (sectionsInTimetable.data?.sections ?? []).map((section) => {
       const course = (courseDetails.data ?? []).filter(
-        (course) => course.id === section.courseId
+        (course) => course.id === section.courseId,
       )[0];
       return fetchCourseDetailsQueryOptions(section, course);
     }),
@@ -338,7 +338,7 @@ function Cms() {
   const fetchEnrolledSections = async () => {
     setEnrolledLoaded(false);
     const { data: userData, status: userStatus } = await axios.get(
-      `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_webservice_get_site_info&moodlewsrestformat=json&wstoken=${tokenFetchRef.current}`
+      `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_webservice_get_site_info&moodlewsrestformat=json&wstoken=${tokenFetchRef.current}`,
     );
     if (
       userStatus !== 200 ||
@@ -355,7 +355,7 @@ function Cms() {
       return;
     }
     const { data } = await axios.get(
-      `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_enrol_get_users_courses&moodlewsrestformat=json&wstoken=${tokenFetchRef.current}&userid=${userData.userid}`
+      `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_enrol_get_users_courses&moodlewsrestformat=json&wstoken=${tokenFetchRef.current}&userid=${userData.userid}`,
     );
     if (Array.isArray(data)) {
       if (data.length > 0) {
@@ -369,7 +369,7 @@ function Cms() {
             data as {
               id: number;
               displayname: string;
-            }[]
+            }[],
           );
         } else {
           toast({
@@ -402,7 +402,7 @@ function Cms() {
       const { data: courseData } = await axios.get(
         `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_course_search_courses&moodlewsrestformat=json&wstoken=${
           tokenRef.current?.value
-        }&criterianame=search&criteriavalue=${encodeURIComponent(ele)}`
+        }&criterianame=search&criteriavalue=${encodeURIComponent(ele)}`,
       );
       if (
         "courses" in courseData &&
@@ -420,7 +420,7 @@ function Cms() {
           sectionNameSplit[sectionNameSplit.length - 1]
         ) {
           const { status, data } = await axios.get(
-            `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=enrol_self_enrol_user&moodlewsrestformat=json&wstoken=${tokenRef.current?.value}&courseid=${courseData.courses[0].id}`
+            `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=enrol_self_enrol_user&moodlewsrestformat=json&wstoken=${tokenRef.current?.value}&courseid=${courseData.courses[0].id}`,
           );
           if (status !== 200 || !data.status) {
             errors.push(ele);
@@ -443,7 +443,7 @@ function Cms() {
     setEnrolledLoaded(false);
     for (let i = 0; i < enrolledCourses.length; i++) {
       const res = await axios.get(
-        `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_enrol_get_course_enrolment_methods&moodlewsrestformat=json&wstoken=${tokenRef.current?.value}&courseid=${enrolledCourses[i].id}`
+        `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_enrol_get_course_enrolment_methods&moodlewsrestformat=json&wstoken=${tokenRef.current?.value}&courseid=${enrolledCourses[i].id}`,
       );
       const enrollmentInstance = res.data;
       const { data, status } = await axios.post(
@@ -457,13 +457,13 @@ function Cms() {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
       if (status !== 200) {
         toast({
           title: "Error",
           description: `Error when unenrolling from courses: ${JSON.stringify(
-            data
+            data,
           )}`,
           variant: "destructive",
         });
@@ -516,9 +516,9 @@ function Cms() {
                     onClick={async () => {
                       await getCmsDetails(
                         extensionIdRef.current?.value !== undefined &&
-                          extensionIdRef.current?.value !== ""
+                        extensionIdRef.current?.value !== ""
                           ? extensionIdRef.current?.value
-                          : defaultExtensionId
+                          : defaultExtensionId,
                       );
                     }}
                   >
@@ -574,7 +574,7 @@ function Cms() {
                         </div>
                         {enrolledCourses
                           .sort((a, b) =>
-                            a.displayname.localeCompare(b.displayname)
+                            a.displayname.localeCompare(b.displayname),
                           )
                           .map((section, i) => (
                             <span key={2 * i} className="py-1">
@@ -853,7 +853,7 @@ function Cms() {
                       </div>
                       {enrolledCourses
                         .sort((a, b) =>
-                          a.displayname.localeCompare(b.displayname)
+                          a.displayname.localeCompare(b.displayname),
                         )
                         .map((section, i) => (
                           <span key={2 * i} className="py-1">
