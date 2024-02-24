@@ -221,7 +221,7 @@ function Cms() {
       if (typeof chrome !== "undefined" && chrome.runtime) {
         setIsExtensionInstalled(true);
 
-        let port = chrome.runtime.connect(extensionID, {
+        const port = chrome.runtime.connect(extensionID, {
           name: "chronofactorem",
         });
         port.onMessage.addListener((res) => {
