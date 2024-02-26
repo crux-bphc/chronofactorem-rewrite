@@ -204,7 +204,9 @@ function Cms() {
   const sesskeyFetchRef = useRef<string | null>(null);
   const [allowEdit, setAllowEdit] = useState(true);
   const [isExtensionInstalled, setIsExtensionInstalled] = useState(
-    chrome.runtime !== undefined && chrome.runtime !== null,
+    typeof chrome !== "undefined" &&
+      chrome.runtime !== undefined &&
+      chrome.runtime !== null,
   );
   const extensionIdRef = useRef<HTMLInputElement | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
@@ -752,6 +754,40 @@ function Cms() {
                   </TooltipTrigger>
                   <TooltipContent className="bg-muted text-foreground border-muted text-md">
                     {allowEdit ? "Save CMS Details" : "Edit CMS Details"}
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip delayDuration={100}>
+                  <TooltipTrigger asChild>
+                    <div className="bg-transparent rounded hover:bg-muted text-foreground px-2 py-2 text-lg font-bold">
+                      <Button>Auto Load CMS Details</Button>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="lg:w-[48rem] md:w-[36rem] w-[24rem] flex space-y-2 flex-col bg-muted text-foreground border-muted text-md">
+                    <span>
+                      Download the
+                      <a
+                        href="https://chromewebstore.google.com/detail/cms-enrollment-extension/ebjldebpahljhpakgngnandakdbajdnj?hl=en-GB"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600
+                          dark:text-blue-400 ml-1 inline items-center"
+                      >
+                        Chrome Extension
+                        <ArrowUpRightFromCircle className="inline w-4 h-4 ml-1 mr-1" />
+                      </a>
+                      to automatically load your CMS Details. The extension is
+                      open-source and can be found on
+                      <a
+                        href="https://github.com/Akshat-Oke/CMS-Extension"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600
+                          dark:text-blue-400 ml-1 inline items-center"
+                      >
+                        Github.
+                        <ArrowUpRightFromCircle className="inline w-4 h-4 ml-1 mr-1" />
+                      </a>
+                    </span>
                   </TooltipContent>
                 </Tooltip>
               </div>
