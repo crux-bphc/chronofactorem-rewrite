@@ -26,4 +26,6 @@ export const serverSchema = z.object({
   NGINX_PORT: z.coerce.number().default(80),
   SQIDS_ALPHABET: z.string().min(62),
   SESSION_MAX_AGE_MS: z.coerce.number().default(86400000),
+  VITE_FRONTEND_URL: z.string().url().min(1),
+  VITE_CMS_EXTENSION_ID: z.string().min(1),
 });
