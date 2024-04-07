@@ -1,20 +1,25 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
+import { Course, Timetable } from "../../entity/entities.js";
 import { z } from "zod";
-import {
-  namedSectionWithCourseType,
-  namedUUIDType,
-  sectionWithCourseType,
-} from "../../../../lib/src/index.js";
-
-import { Course, Section, Timetable, User } from "../../entity/entities.js";
+import { courseWithSectionsType } from "../../../../lib/src/index.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { courseRepository } from "../../repositories/courseRepository.js";
 import { sectionRepository } from "../../repositories/sectionRepository.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
+import { checkForExamTimingsChange } from "../../utils/checkForChange.js";
+import {
+  checkForClassHoursClash,
+  checkForExamHoursClash,
+} from "../../utils/checkForClashes.js";
+import {
+  addExamTimings,
+  removeCourseExams,
+  remSection,
+} from "../../utils/updateSection.js";
 
 const dataSchema = z.object({
   body: z.object({
-    course: sectionWithCourseType,
+    course: courseWithSectionsType,
   }),
 });
 
@@ -22,8 +27,7 @@ export const updateChangedTimetableValidator = validate(dataSchema);
 
 export const updateChangedTimetable = async (req: Request, res: Response) => {
   try {
-    const course: Course | null = req.body.course;
-    console.log(course?.midsemStartTime);
+    const course: Course = req.body.course;
     try {
       await courseRepository
         .createQueryBuilder()
@@ -34,26 +38,8 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
           compreStartTime: course?.compreStartTime,
           compreEndTime: course?.compreEndTime,
         })
-        .where("id=:id", { id: course?.id })
+        .where("id = :id", { id: course?.id })
         .execute();
-    } catch (err: any) {
-      console.log("Error while querying for course: ", err.message);
-      return res.status(500).json({ message: "Internal Server Error" });
-    }
-
-    const sections: Section[] = course?.sections || [];
-
-    try {
-      for (const section of sections) {
-        await sectionRepository
-          .createQueryBuilder()
-          .update({ roomTime: section.roomTime })
-          .where("section.id=:id", { id: section?.id })
-          .andWhere("array_to_string(section.room_time, ',') != :newRoomTime", {
-            newRoomTime: section.roomTime.join(","),
-          })
-          .execute();
-      }
     } catch (err: any) {
       console.log("Error while querying for course: ", err.message);
       return res.status(500).json({ message: "Internal Server Error" });
@@ -70,66 +56,87 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
       console.log("Error while querying for timetable: ", err.message);
       return res.status(500).json({ message: "Internal Server Error" });
     }
-    if (!timetables) {
-      return res.status(404).json({ message: "timetables not found" });
-    }
     for (const timetable of timetables) {
-      const currTimes = timetable.sections
-        .flatMap((el: Section) => {
-          return el.roomTime;
-        })
-        .map((el: string) => {
-          return `${el.split(":")[0]}:${el.split(":")[2]}${el.split(":")[3]}`;
+      if (checkForExamTimingsChange(timetable, course)) {
+        timetable.examTimes = timetable.examTimes.filter((examTime) => {
+          return examTime.split("|")[0] !== course?.code;
         });
 
-      const isEqual: boolean =
-        JSON.stringify(currTimes.sort()) ===
-        JSON.stringify(timetable.timings.sort());
-      if (!isEqual) {
-        const difference = currTimes.filter(
-          (el: string) => !timetable.timings.includes(el),
-        );
-
-        for (const sec of timetable.sections) {
-          const exists =
-            sec.roomTime
-              .map((el: string) => {
-                return `${el.split(":")[0]}:${el.split(":")[2]}${
-                  el.split(":")[3]
-                }`;
-              })
-              .filter((el) => {
-                return difference.includes(el);
-              }).length > 0;
-          if (exists) {
-            timetable.sections = timetable.sections.filter(
-              (el) => el.id !== sec.id,
-            );
+        if (checkForExamHoursClash(timetable, course).clash) {
+          for (const sec of timetable.sections) {
+            if (sec.courseId === course.id) {
+              remSection(timetable, sec);
+              timetable.draft = true;
+              removeCourseExams(timetable, course);
+              await timetableRepository.save(timetable);
+            }
           }
-          await timetableRepository.save(timetable);
-        }
-
-        timetable.timings = timetable.sections
-          .flatMap((el: Section) => {
-            return el.roomTime;
-          })
-          .map((el: string) => {
-            return `${el.split(":")[0]}:${el.split(":")[2]}${el.split(":")[3]}`;
-          })
-          .sort();
-
-        try {
-          await timetableRepository.save(timetable);
-        } catch (err: any) {
-          console.log(
-            "Error while removing section from timetable: ",
-            err.message,
-          );
-          return res.status(500).json({ message: "Internal Server Error" });
+        } else {
+          const newExamTimes = timetable.examTimes;
+          addExamTimings(newExamTimes, course);
+          timetable.examTimes = newExamTimes;
         }
       }
+      for (const section of timetable.sections) {
+        const newSection = course.sections.find((el) => el.id === section.id);
+
+        if (newSection !== undefined) {
+          remSection(timetable, section);
+
+          await timetableRepository
+            .createQueryBuilder()
+            .relation(Timetable, "sections")
+            .of(timetable)
+            .remove(section);
+
+          if (checkForClassHoursClash(timetable, newSection).clash) {
+            timetable.draft = true;
+          } else {
+            const newTimes: string[] = newSection.roomTime.map(
+              (time) =>
+                `${course?.code}:${time.split(":")[2]}${time.split(":")[3]}`,
+            );
+            await sectionRepository
+              .createQueryBuilder()
+              .update({ roomTime: newSection.roomTime })
+              .where("section.id = :id", { id: section?.id })
+              .execute();
+            await timetableRepository
+              .createQueryBuilder()
+              .relation(Timetable, "sections")
+              .of(timetable)
+              .add(newSection);
+            await timetableRepository
+              .createQueryBuilder()
+              .update(Timetable)
+              .set({
+                timings: [...timetable.timings, ...newTimes],
+                warnings: timetable.warnings,
+              })
+              .where("timetable.id = :id", { id: timetable.id })
+              .execute();
+
+            timetable.timings = [...timetable.timings, ...newTimes];
+            timetable.sections = [...timetable.sections, newSection];
+          }
+        }
+      }
+      removeCourseExams(timetable, course);
+      await timetableRepository.save(timetable);
     }
-    return res.json({ message: "Timetable successfully updated", timetables });
+    try {
+      for (const section of course.sections) {
+        await sectionRepository
+          .createQueryBuilder()
+          .update({ roomTime: section.roomTime })
+          .where("section.id=:id", { id: section?.id })
+          .execute();
+      }
+    } catch (err: any) {
+      console.log("Error while querying for course: ", err.message);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+    return res.json({ message: "Timetable successfully updated" });
   } catch (err: any) {
     console.log(err);
     return res.status(500).json({ message: "Internal Server Error" });

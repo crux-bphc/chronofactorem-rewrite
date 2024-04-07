@@ -63,9 +63,8 @@ export const checkForExamHoursClash = (
   }
 
   if (newCourse.midsemStartTime !== null && newCourse.midsemEndTime !== null) {
-    const newMidsemStartTime = newCourse.midsemStartTime;
-    const newMidsemEndTime = newCourse.midsemEndTime;
-
+    const newMidsemStartTime = new Date(newCourse.midsemStartTime);
+    const newMidsemEndTime = new Date(newCourse.midsemEndTime);
     for (const [key, value] of examTimesMap) {
       const { courseCode, end } = value;
       const start = key;
