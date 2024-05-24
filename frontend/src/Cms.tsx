@@ -192,6 +192,7 @@ const cmsRoute = new Route({
 
 function Cms() {
   const defaultExtensionId: string = import.meta.env.VITE_CMS_EXTENSION_ID;
+  const isnodeEnvironmentDev: boolean = import.meta.env.DEV;
   //you'll need to change the default extension id when you load the unpacked extension
   //loading unpacked extension is necessary to include localhost to externally_connectable matches
   const { timetableId } = cmsRoute.useParams();
@@ -242,7 +243,7 @@ function Cms() {
             toast({
               title: "Error",
               description:
-                "Error fetching CMS details. Check if the extension is installed and you are logged in.",
+                "Error fetching CMS details. Check if the extension is installed and you are logged into CMS.",
               variant: "destructive",
             });
           }
@@ -502,40 +503,52 @@ function Cms() {
                 </Tooltip>
               </div>
               <div className="flex flex-col sm:flex-row w-full gap-6 mt-4">
-                <div className="flex flex-col w-fit">
-                  <Label htmlFor="webservicetoken" className="mb-1 text-lg">
-                    Custom Extension ID
-                  </Label>
-                  <Input
-                    ref={extensionIdRef}
-                    id="extensionid"
-                    placeholder="leave blank for default"
-                    className="text-xl bg-muted ring-muted ring-offset-muted border-muted"
-                    disabled={!allowEdit}
-                  />
-                  <Button
-                    className="mt-4 py-4 px-4 hover:bg-muted text-md"
-                    onClick={async () => {
-                      await getCmsDetails(
-                        extensionIdRef.current?.value !== undefined &&
-                        extensionIdRef.current?.value !== ""
-                          ? extensionIdRef.current?.value
-                          : defaultExtensionId,
-                      );
-                    }}
-                  >
-                    Load
-                  </Button>
-                </div>
-
                 <div className="flex flex-col sm:flex-row relative h-fit">
                   {allowEdit && (
-                    <div className="flex flex-col justify-center items-center absolute bg-background/60 w-full sm:w-3/4 h-full">
-                      <span className="text-3xl z-10 font-bold text-foreground/85">
-                        Load your CMS details, and hit save to continue
-                      </span>{" "}
+                    <div className="flex flex-col justify-center items-center absolute left-40 bg-background/60 sm:w-1/4 h-full">
+                      <div className="absolute left-20 top-20 w-full">
+                        {isnodeEnvironmentDev ? (
+                          <div className="ml-10">
+                            <Label
+                              htmlFor="webservicetoken"
+                              className="mb-1 text-lg"
+                            >
+                              Custom Extension ID
+                            </Label>
+
+                            <Input
+                              ref={extensionIdRef}
+                              id="extensionid"
+                              placeholder="Leave blank for default"
+                              className="text-xl bg-muted ring-muted ring-offset-muted border-muted w-full"
+                              disabled={!allowEdit}
+                            />
+                          </div>
+                        ) : (
+                          ""
+                        )}
+                        <div className="flex flex-col items-center">
+                          <Button
+                            className="mt-4 py-4 px-4 hover:bg-gray-400 text-md"
+                            onClick={async () => {
+                              await getCmsDetails(
+                                extensionIdRef.current?.value !== undefined &&
+                                extensionIdRef.current?.value !== ""
+                                  ? extensionIdRef.current?.value
+                                  : defaultExtensionId,
+                              );
+                            }}
+                          >
+                            Load
+                          </Button>
+                        </div>
+                        <span className="text-3xl z-10 font-bold text-foreground/85 block w-full text-center mt-4 ml-2">
+                          Load your CMS details, and hit save to continue
+                        </span>{" "}
+                      </div>
                     </div>
                   )}
+
                   <div
                     className={`w-full flex sm:flex-row flex-col gap-0 sm:gap-24 ${
                       allowEdit ? "blur-sm pointer-events-none" : ""
