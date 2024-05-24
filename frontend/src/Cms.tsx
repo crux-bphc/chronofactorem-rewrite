@@ -232,7 +232,7 @@ function Cms() {
             tokenFetchRef.current = webServiceToken;
             cookieFetchRef.current = cookie;
             sesskeyFetchRef.current = sesskey;
-
+            setAllowEdit(false);
             toast({
               title: "Success",
               description: "Successfully loaded CMS details",
@@ -242,7 +242,7 @@ function Cms() {
             toast({
               title: "Error",
               description:
-                "Error fetching CMS details. Check if the extension is installed and running.",
+                "Error fetching CMS details. Check if the extension is installed and you are logged in.",
               variant: "destructive",
             });
           }
@@ -758,9 +758,9 @@ function Cms() {
                 </Tooltip>
                 <Tooltip delayDuration={100}>
                   <TooltipTrigger asChild>
-                    <div className="bg-transparent rounded hover:bg-muted text-foreground px-2 py-2 text-lg font-bold">
-                      <Button>Auto Load CMS Details</Button>
-                    </div>
+                   
+                      <Button className="hover:bg-gray-300">Auto Load CMS Details</Button>
+                    
                   </TooltipTrigger>
                   <TooltipContent className="lg:w-[48rem] md:w-[36rem] w-[24rem] flex space-y-2 flex-col bg-muted text-foreground border-muted text-md">
                     <span>
