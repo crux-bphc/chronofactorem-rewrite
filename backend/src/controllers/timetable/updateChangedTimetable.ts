@@ -14,7 +14,7 @@ import {
 import {
   addExamTimings,
   removeCourseExams,
-  remSection,
+  removeSection,
 } from "../../utils/updateSection.js";
 
 const dataSchema = z.object({
@@ -65,12 +65,11 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
         if (checkForExamHoursClash(timetable, course).clash) {
           for (const sec of timetable.sections) {
             if (sec.courseId === course.id) {
-              remSection(timetable, sec);
+              removeSection(timetable, sec);
               timetable.draft = true;
-              removeCourseExams(timetable, course);
-              await timetableRepository.save(timetable);
             }
           }
+          await timetableRepository.save(timetable);
         } else {
           const newExamTimes = timetable.examTimes;
           addExamTimings(newExamTimes, course);
@@ -81,7 +80,7 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
         const newSection = course.sections.find((el) => el.id === section.id);
 
         if (newSection !== undefined) {
-          remSection(timetable, section);
+          removeSection(timetable, section);
 
           await timetableRepository
             .createQueryBuilder()

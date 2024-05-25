@@ -1,6 +1,6 @@
 import { Course, Section, Timetable } from "../entity/entities.js";
 
-export const remSection = (timetable: Timetable, section: Section) => {
+export const removeSection = (timetable: Timetable, section: Section) => {
   const classTimings = section.roomTime.map((time) => {
     return time.split(":")[2] + time.split(":")[3];
   });
