@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { Course, Timetable } from "../../entity/entities.js";
+import { Course, Timetable, Section } from "../../entity/entities.js";
 import { z } from "zod";
 import { courseWithSectionsType } from "../../../../lib/src/index.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
@@ -11,11 +11,7 @@ import {
   checkForClassHoursClash,
   checkForExamHoursClash,
 } from "../../utils/checkForClashes.js";
-import {
-  addExamTimings,
-  removeCourseExams,
-  removeSection,
-} from "../../utils/updateSection.js";
+import { addExamTimings, removeSection } from "../../utils/updateSection.js";
 
 const dataSchema = z.object({
   body: z.object({
@@ -124,7 +120,16 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
           }
         }
       }
-      removeCourseExams(timetable, course);
+      const sameCourseSections: Section[] = timetable.sections.filter(
+        (currentSection) => {
+          return currentSection.courseId === course.id;
+        },
+      );
+      if (sameCourseSections.length === 0) {
+        timetable.examTimes = timetable.examTimes.filter((examTime) => {
+          return examTime.split("|")[0] !== course?.code;
+        });
+      }
       await timetableRepository.save(timetable);
     }
     try {

@@ -25,19 +25,3 @@ export const addExamTimings = (newExamTimes: Array<string>, course: Course) => {
     );
   }
 };
-
-export const removeCourseExams = async (
-  timetable: Timetable,
-  course: Course,
-) => {
-  const sameCourseSections: Section[] = timetable.sections.filter(
-    (currentSection) => {
-      return currentSection.courseId === course.id;
-    },
-  );
-  if (sameCourseSections.length === 0) {
-    timetable.examTimes = timetable.examTimes.filter((examTime) => {
-      return examTime.split("|")[0] !== course?.code;
-    });
-  }
-};
