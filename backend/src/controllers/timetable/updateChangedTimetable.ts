@@ -100,20 +100,24 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
               .update({ roomTime: newSection.roomTime })
               .where("section.id = :id", { id: section?.id })
               .execute();
-            await timetableRepository
-              .createQueryBuilder()
-              .relation(Timetable, "sections")
-              .of(timetable)
-              .add(newSection);
-            await timetableRepository
-              .createQueryBuilder()
-              .update(Timetable)
-              .set({
-                timings: [...timetable.timings, ...newTimes],
-                warnings: timetable.warnings,
-              })
-              .where("timetable.id = :id", { id: timetable.id })
-              .execute();
+            await timetableRepository.manager.transaction(
+              async (transactionEntityManager) => {
+                await transactionEntityManager
+                  .createQueryBuilder()
+                  .relation(Timetable, "sections")
+                  .of(timetable)
+                  .add(newSection);
+                await transactionEntityManager
+                  .createQueryBuilder()
+                  .update(Timetable)
+                  .set({
+                    timings: [...timetable.timings, ...newTimes],
+                    warnings: timetable.warnings,
+                  })
+                  .where("timetable.id = :id", { id: timetable.id })
+                  .execute();
+              },
+            );
 
             timetable.timings = [...timetable.timings, ...newTimes];
             timetable.sections = [...timetable.sections, newSection];
