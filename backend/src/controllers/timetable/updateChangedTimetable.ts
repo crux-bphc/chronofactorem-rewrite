@@ -84,6 +84,17 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
           return examTime.split("|")[0] !== course?.code;
         });
 
+        // Convert exam dates to actual dates from strings, since the
+        // checkForExamHoursClash() function compares them with dates
+
+        // This is needed because the course exam dates are not from DB,
+        // but are from the JSON body of the request.
+        // A similar procedure is used during ingestion as well.
+        course.compreStartTime = new Date(course.compreStartTime);
+        course.compreEndTime = new Date(course.compreEndTime);
+        course.midsemStartTime = new Date(course.midsemStartTime);
+        course.midsemEndTime = new Date(course.midsemEndTime);
+
         if (checkForExamHoursClash(timetable, course).clash) {
           for (const sec of timetable.sections) {
             await queryRunner.manager

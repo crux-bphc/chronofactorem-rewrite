@@ -16,12 +16,16 @@ export const removeSection = (timetable: Timetable, section: Section) => {
 export const addExamTimings = (newExamTimes: Array<string>, course: Course) => {
   if (course.midsemStartTime !== null && course.midsemEndTime !== null) {
     newExamTimes.push(
-      `${course.code}|MIDSEM|${course.midsemStartTime}|${course.midsemEndTime}`,
+      `${
+        course.code
+      }|MIDSEM|${course.midsemStartTime.toISOString()}|${course.midsemEndTime.toISOString()}`,
     );
   }
   if (course.compreStartTime !== null && course.compreEndTime !== null) {
     newExamTimes.push(
-      `${course.code}|COMPRE|${course.compreStartTime}|${course.compreEndTime}`,
+      `${
+        course.code
+      }|COMPRE|${course.compreStartTime.toISOString()}|${course.compreEndTime.toISOString()}`,
     );
   }
 };
