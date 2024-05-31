@@ -198,7 +198,8 @@ function Cms() {
   const { timetableId } = cmsRoute.useParams();
   const { toast } = useToast();
   const tokenRef = useRef<HTMLInputElement>(null);
-  const cookieRef = useRef<HTMLInputElement>(null);``
+  const cookieRef = useRef<HTMLInputElement>(null);
+  ``;
   const sesskeyRef = useRef<HTMLInputElement>(null);
   const tokenFetchRef = useRef<string | null>(null);
   const cookieFetchRef = useRef<string | null>(null);
@@ -341,7 +342,9 @@ function Cms() {
 
   const fetchEnrolledSections = async () => {
     setEnrolledLoaded(false);
-    const token = chooseManualMethod ? tokenRef.current?.value: tokenFetchRef.current;
+    const token = chooseManualMethod
+      ? tokenRef.current?.value
+      : tokenFetchRef.current;
     const { data: userData, status: userStatus } = await axios.get(
       `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_webservice_get_site_info&moodlewsrestformat=json&wstoken=${token}`,
     );
@@ -401,14 +404,16 @@ function Cms() {
     setEnrolledLoaded(false);
     setEnrollingInProgress(true);
     const errors: string[] = [];
-    const token = chooseManualMethod ? tokenRef.current?.value: tokenFetchRef.current;
+    const token = chooseManualMethod
+      ? tokenRef.current?.value
+      : tokenFetchRef.current;
     for (let i = 0; i < sectionNameList.data.flat().length; i++) {
       const ele = sectionNameList.data.flat()[i];
       if (ele === undefined) continue;
       const { data: courseData } = await axios.get(
-        `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_course_search_courses&moodlewsrestformat=json&wstoken=${
-          token
-        }&criterianame=search&criteriavalue=${encodeURIComponent(ele)}`,
+        `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_course_search_courses&moodlewsrestformat=json&wstoken=${token}&criterianame=search&criteriavalue=${encodeURIComponent(
+          ele,
+        )}`,
       );
       if (
         "courses" in courseData &&
@@ -421,7 +426,9 @@ function Cms() {
       ) {
         const split = courseData.courses[0].displayname.split(" ");
         const sectionNameSplit = ele.split(" ");
-        const token = chooseManualMethod ? tokenRef.current?.value: tokenFetchRef.current;
+        const token = chooseManualMethod
+          ? tokenRef.current?.value
+          : tokenFetchRef.current;
         if (
           split[split.length - 1] ===
           sectionNameSplit[sectionNameSplit.length - 1]
@@ -448,9 +455,15 @@ function Cms() {
 
   const unenrollAllSections = async () => {
     setEnrolledLoaded(false);
-    const token = chooseManualMethod ? tokenRef.current?.value: tokenFetchRef.current;
-    const cookie = chooseManualMethod ? cookieRef.current?.value: cookieFetchRef.current;
-    const sessKey = chooseManualMethod ? sesskeyRef.current?.value: sesskeyFetchRef.current;
+    const token = chooseManualMethod
+      ? tokenRef.current?.value
+      : tokenFetchRef.current;
+    const cookie = chooseManualMethod
+      ? cookieRef.current?.value
+      : cookieFetchRef.current;
+    const sessKey = chooseManualMethod
+      ? sesskeyRef.current?.value
+      : sesskeyFetchRef.current;
     for (let i = 0; i < enrolledCourses.length; i++) {
       const res = await axios.get(
         `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_enrol_get_course_enrolment_methods&moodlewsrestformat=json&wstoken=${token}&courseid=${enrolledCourses[i].id}`,
@@ -773,59 +786,73 @@ function Cms() {
                     </span>
                   </TooltipContent>
                 </Tooltip>
-               {chooseManualMethod? <Tooltip delayDuration={100}>
-                  <TooltipTrigger asChild>
-                    <Button
-                      className="bg-transparent py-3 rounded-full hover:bg-muted text-foreground text-lg font-bold"
-                      onClick={() => {
-                        if (allowEdit) fetchEnrolledSections();
-                        setAllowEdit(!allowEdit);
-                      }}
-                    >
-                      {allowEdit ? <Save /> : <Pencil />}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent className="bg-muted text-foreground border-muted text-md">
-                    {allowEdit ? "Save CMS Details" : "Edit CMS Details"}
-                  </TooltipContent>
-                </Tooltip>:""}
+                {chooseManualMethod ? (
+                  <Tooltip delayDuration={100}>
+                    <TooltipTrigger asChild>
+                      <Button
+                        className="bg-transparent py-3 rounded-full hover:bg-muted text-foreground text-lg font-bold"
+                        onClick={() => {
+                          if (allowEdit) fetchEnrolledSections();
+                          setAllowEdit(!allowEdit);
+                        }}
+                      >
+                        {allowEdit ? <Save /> : <Pencil />}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-muted text-foreground border-muted text-md">
+                      {allowEdit ? "Save CMS Details" : "Edit CMS Details"}
+                    </TooltipContent>
+                  </Tooltip>
+                ) : (
+                  ""
+                )}
                 <Tooltip delayDuration={100}>
                   <TooltipTrigger asChild>
-                    <Button className="hover:bg-gray-300" onClick={()=>{
-                      setChooseManualMethod(!chooseManualMethod);
-                    }}>
-                      {chooseManualMethod? "Auto Load CMS Details": "Manually Load CMS Details"}
+                    <Button
+                      className="hover:bg-gray-300"
+                      onClick={() => {
+                        setChooseManualMethod(!chooseManualMethod);
+                      }}
+                    >
+                      {chooseManualMethod
+                        ? "Auto Load CMS Details"
+                        : "Manually Load CMS Details"}
                     </Button>
                   </TooltipTrigger>
-                  {chooseManualMethod?  <TooltipContent className="lg:w-[48rem] md:w-[36rem] w-[24rem] flex space-y-2 flex-col bg-muted text-foreground border-muted text-md">
-                    <span>
-                      Download the
-                      <a
-                        href="https://chromewebstore.google.com/detail/cms-enrollment-extension/ebjldebpahljhpakgngnandakdbajdnj?hl=en-GB"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600
+                  {chooseManualMethod ? (
+                    <TooltipContent className="lg:w-[48rem] md:w-[36rem] w-[24rem] flex space-y-2 flex-col bg-muted text-foreground border-muted text-md">
+                      <span>
+                        Download the
+                        <a
+                          href="https://chromewebstore.google.com/detail/cms-enrollment-extension/ebjldebpahljhpakgngnandakdbajdnj?hl=en-GB"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600
                           dark:text-blue-400 ml-1 inline items-center"
-                      >
-                        Chrome Extension
-                        <ArrowUpRightFromCircle className="inline w-4 h-4 ml-1 mr-1" />
-                      </a>
-                      to automatically load your CMS Details. The extension is
-                      open-source and can be found on
-                      <a
-                        href="https://github.com/Akshat-Oke/CMS-Extension"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600
+                        >
+                          Chrome Extension
+                          <ArrowUpRightFromCircle className="inline w-4 h-4 ml-1 mr-1" />
+                        </a>
+                        to automatically load your CMS Details. The extension is
+                        open-source and can be found on
+                        <a
+                          href="https://github.com/Akshat-Oke/CMS-Extension"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600
                           dark:text-blue-400 ml-1 inline items-center"
-                      >
-                        Github.
-                        <ArrowUpRightFromCircle className="inline w-4 h-4 ml-1 mr-1" />
-                      </a>
-                    </span>
-                  </TooltipContent>: <TooltipContent className="lg:w-[23.5rem] md:w-[23.5rem] w-[23.5rem] flex space-y-2 flex-col bg-muted text-foreground border-muted text-md"><span>Extension not working? Use the manual method!</span></TooltipContent>}
+                        >
+                          Github.
+                          <ArrowUpRightFromCircle className="inline w-4 h-4 ml-1 mr-1" />
+                        </a>
+                      </span>
+                    </TooltipContent>
+                  ) : (
+                    <TooltipContent className="lg:w-[23.5rem] md:w-[23.5rem] w-[23.5rem] flex space-y-2 flex-col bg-muted text-foreground border-muted text-md">
+                      <span>Extension not working? Use the manual method!</span>
+                    </TooltipContent>
+                  )}
                 </Tooltip>
-                
               </div>
               <div className="flex flex-col sm:flex-row w-full gap-6 mt-4">
                 <div className="flex flex-col w-fit">
