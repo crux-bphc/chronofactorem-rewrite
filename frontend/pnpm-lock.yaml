@@ -53,6 +53,9 @@ importers:
       '@tanstack/router-devtools':
         specifier: ^1.0.0
         version: 1.0.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      '@types/chrome':
+        specifier: ^0.0.268
+        version: 0.0.268
       '@types/node':
         specifier: ^20.10.5
         version: 20.10.5
@@ -126,9 +129,6 @@ importers:
       '@biomejs/biome':
         specifier: 1.4.1
         version: 1.4.1
-      '@types/chrome':
-        specifier: ^0.0.268
-        version: 0.0.268
 
 packages:
 
