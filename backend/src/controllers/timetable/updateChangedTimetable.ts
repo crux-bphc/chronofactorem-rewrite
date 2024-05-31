@@ -25,10 +25,12 @@ export const updateChangedTimetableValidator = validate(dataSchema);
 
 export const updateChangedTimetable = async (req: Request, res: Response) => {
   try {
+    // Use a transaction because we will run many dependent mutations
     const queryRunner = AppDataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
+    // Update the course's exam timings, also make sure that the course is not archived
     const course: Course = req.body.course;
     try {
       await queryRunner.manager
@@ -47,6 +49,7 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
       return res.status(500).json({ message: "Internal Server Error" });
     }
 
+    // Fetch the total types of sections of that course (required later to update warnings)
     let requiredSectionTypes: sectionTypeList = [];
     try {
       const sectionTypeHolders = await queryRunner.manager
@@ -66,6 +69,7 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
 
     let timetables: Timetable[] | null = null;
 
+    // Fetch the timetables that are affected, archived timetables cannot be affected
     try {
       timetables = await queryRunner.manager
         .createQueryBuilder(Timetable, "timetable")
@@ -79,7 +83,9 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
     }
 
     for (const timetable of timetables) {
+      // For each timetable, check if the exam times have changed
       if (checkForExamTimingsChange(timetable, course)) {
+        // If they have, remove the course's exams from the timings
         timetable.examTimes = timetable.examTimes.filter((examTime) => {
           return examTime.split("|")[0] !== course?.code;
         });
@@ -95,7 +101,9 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
         course.midsemStartTime = new Date(course.midsemStartTime);
         course.midsemEndTime = new Date(course.midsemEndTime);
 
+        // Check if the new timings clash with any other timings of other courses
         if (checkForExamHoursClash(timetable, course).clash) {
+          // If they do, then remove all sections of the course with updated timings
           for (const sec of timetable.sections) {
             await queryRunner.manager
               .createQueryBuilder()
@@ -104,20 +112,23 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
               .remove(sec);
             removeSection(timetable, sec);
           }
+          // Since the timetable has been changed, make it a draft
           timetable.draft = true;
           timetable.private = true;
         } else {
+          // If there is no clash, simply add the new timings to the timetable
           const newExamTimes = timetable.examTimes;
           addExamTimings(newExamTimes, course);
           timetable.examTimes = newExamTimes;
         }
       }
       for (const section of timetable.sections) {
+        // For each section of the course previously in the timetable, find its corresponding replacement
         const newSection = course.sections.find((el) => el.id === section.id);
 
         if (newSection !== undefined) {
+          // Start off by removing the existing section, both in DB and the timings column of the timetable
           removeSection(timetable, section);
-
           await queryRunner.manager
             .createQueryBuilder()
             .relation(Timetable, "sections")
@@ -125,6 +136,9 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
             .remove(section);
 
           if (checkForClassHoursClash(timetable, newSection).clash) {
+            // If the updated section will cause a clash, then keep the section removed
+            // Also make the timetable a draft, and update its warnings since that
+            // section is now gone
             timetable.draft = true;
             timetable.private = true;
             timetable.warnings = updateSectionWarnings(
@@ -135,10 +149,12 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
               timetable.warnings,
             );
           } else {
+            // If there is no clash, add the new section timings to the timetable
             const newTimes: string[] = newSection.roomTime.map(
               (time) =>
                 `${course?.code}:${time.split(":")[2]}${time.split(":")[3]}`,
             );
+            // Add the section back to the timetable
             await queryRunner.manager
               .createQueryBuilder()
               .update(Section, { roomTime: newSection.roomTime })
@@ -150,11 +166,15 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
               .of(timetable)
               .add(section);
 
+            // Update the timings and the sections in the timetable object
             timetable.timings = [...timetable.timings, ...newTimes];
             timetable.sections = [...timetable.sections, newSection];
           }
         }
       }
+
+      // After all that, if the timetable now has 0 sections of that course,
+      // remove its exam timings as well, removing it fully from the timetable
       const sameCourseSections: Section[] = timetable.sections.filter(
         (currentSection) => {
           return currentSection.courseId === course.id;
@@ -190,6 +210,8 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
       }),
     );
 
+    // Regardless of whether or not a section was present in a timetable,
+    // update the section's timings
     try {
       for (const section of course.sections) {
         await queryRunner.manager
@@ -203,6 +225,7 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
       return res.status(500).json({ message: "Internal Server Error" });
     }
 
+    // After everything passes fine, commit the transaction
     await queryRunner.commitTransaction();
     queryRunner.release();
     return res.json({ message: "Timetable successfully updated" });
