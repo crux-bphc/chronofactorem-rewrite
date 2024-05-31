@@ -157,11 +157,6 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
             // Add the section back to the timetable
             await queryRunner.manager
               .createQueryBuilder()
-              .update(Section, { roomTime: newSection.roomTime })
-              .where("section.id = :id", { id: section?.id })
-              .execute();
-            await queryRunner.manager
-              .createQueryBuilder()
               .relation(Timetable, "sections")
               .of(timetable)
               .add(section);
