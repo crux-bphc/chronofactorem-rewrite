@@ -1,7 +1,10 @@
 import type { Request, Response } from "express";
 import { Course, Timetable, Section } from "../../entity/entities.js";
 import { z } from "zod";
-import { courseWithSectionsType } from "../../../../lib/src/index.js";
+import {
+  courseWithSectionsType,
+  sectionTypeList,
+} from "../../../../lib/src/index.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { checkForExamTimingsChange } from "../../utils/checkForChange.js";
 import {
@@ -10,6 +13,7 @@ import {
 } from "../../utils/checkForClashes.js";
 import { addExamTimings, removeSection } from "../../utils/updateSection.js";
 import { AppDataSource } from "../../db.js";
+import { updateSectionWarnings } from "../../utils/updateWarnings.js";
 
 const dataSchema = z.object({
   body: z.object({
@@ -41,6 +45,23 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
     } catch (err: any) {
       console.log("Error while querying for course: ", err.message);
       return res.status(500).json({ message: "Internal Server Error" });
+    }
+
+    let requiredSectionTypes: sectionTypeList = [];
+    try {
+      const sectionTypeHolders = await queryRunner.manager
+        .createQueryBuilder(Section, "section")
+        .select("section.type")
+        .where("section.courseId = :courseId", { courseId: course.id })
+        .distinctOn(["section.type"])
+        .getMany();
+      requiredSectionTypes = sectionTypeHolders.map((section) => section.type);
+    } catch (err: any) {
+      // will replace the console.log with a logger when we have one
+      console.log(
+        "Error while querying for course's section types: ",
+        err.message,
+      );
     }
 
     let timetables: Timetable[] | null = null;
@@ -95,6 +116,13 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
           if (checkForClassHoursClash(timetable, newSection).clash) {
             timetable.draft = true;
             timetable.private = true;
+            timetable.warnings = updateSectionWarnings(
+              course.code,
+              section,
+              requiredSectionTypes,
+              false,
+              timetable.warnings,
+            );
           } else {
             const newTimes: string[] = newSection.roomTime.map(
               (time) =>
