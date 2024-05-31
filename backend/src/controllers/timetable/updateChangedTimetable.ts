@@ -1,10 +1,11 @@
 import type { Request, Response } from "express";
-import { Course, Timetable, Section } from "../../entity/entities.js";
 import { z } from "zod";
 import {
   courseWithSectionsType,
   sectionTypeList,
 } from "../../../../lib/src/index.js";
+import { AppDataSource } from "../../db.js";
+import { Course, Section, Timetable } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { checkForExamTimingsChange } from "../../utils/checkForChange.js";
 import {
@@ -12,7 +13,6 @@ import {
   checkForExamHoursClash,
 } from "../../utils/checkForClashes.js";
 import { addExamTimings, removeSection } from "../../utils/updateSection.js";
-import { AppDataSource } from "../../db.js";
 import { updateSectionWarnings } from "../../utils/updateWarnings.js";
 
 const dataSchema = z.object({
