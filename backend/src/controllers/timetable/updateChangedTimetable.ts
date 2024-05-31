@@ -65,9 +65,10 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
           for (const sec of timetable.sections) {
             if (sec.courseId === course.id) {
               removeSection(timetable, sec);
-              timetable.draft = true;
             }
           }
+          timetable.draft = true;
+          timetable.private = true;
         } else {
           const newExamTimes = timetable.examTimes;
           addExamTimings(newExamTimes, course);
@@ -88,6 +89,7 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
 
           if (checkForClassHoursClash(timetable, newSection).clash) {
             timetable.draft = true;
+            timetable.private = true;
           } else {
             const newTimes: string[] = newSection.roomTime.map(
               (time) =>
