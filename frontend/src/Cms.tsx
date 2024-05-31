@@ -198,7 +198,7 @@ function Cms() {
   const { timetableId } = cmsRoute.useParams();
   const { toast } = useToast();
   const tokenRef = useRef<HTMLInputElement>(null);
-  const cookieRef = useRef<HTMLInputElement>(null);
+  const cookieRef = useRef<HTMLInputElement>(null);``
   const sesskeyRef = useRef<HTMLInputElement>(null);
   const tokenFetchRef = useRef<string | null>(null);
   const cookieFetchRef = useRef<string | null>(null);
@@ -210,6 +210,7 @@ function Cms() {
       chrome.runtime !== null,
   );
   const extensionIdRef = useRef<HTMLInputElement | null>(null);
+  const [chooseManualMethod, setChooseManualMethod] = useState<boolean>(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [enrollingInProgress, setEnrollingInProgress] = useState(false);
   const [enrolledLoaded, setEnrolledLoaded] = useState(true);
@@ -340,8 +341,9 @@ function Cms() {
 
   const fetchEnrolledSections = async () => {
     setEnrolledLoaded(false);
+    const token = chooseManualMethod ? tokenRef.current?.value: tokenFetchRef.current;
     const { data: userData, status: userStatus } = await axios.get(
-      `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_webservice_get_site_info&moodlewsrestformat=json&wstoken=${tokenFetchRef.current}`,
+      `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_webservice_get_site_info&moodlewsrestformat=json&wstoken=${token}`,
     );
     if (
       userStatus !== 200 ||
@@ -358,7 +360,7 @@ function Cms() {
       return;
     }
     const { data } = await axios.get(
-      `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_enrol_get_users_courses&moodlewsrestformat=json&wstoken=${tokenFetchRef.current}&userid=${userData.userid}`,
+      `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_enrol_get_users_courses&moodlewsrestformat=json&wstoken=${token}&userid=${userData.userid}`,
     );
     if (Array.isArray(data)) {
       if (data.length > 0) {
@@ -399,12 +401,13 @@ function Cms() {
     setEnrolledLoaded(false);
     setEnrollingInProgress(true);
     const errors: string[] = [];
+    const token = chooseManualMethod ? tokenRef.current?.value: tokenFetchRef.current;
     for (let i = 0; i < sectionNameList.data.flat().length; i++) {
       const ele = sectionNameList.data.flat()[i];
       if (ele === undefined) continue;
       const { data: courseData } = await axios.get(
         `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_course_search_courses&moodlewsrestformat=json&wstoken=${
-          tokenRef.current?.value
+          token
         }&criterianame=search&criteriavalue=${encodeURIComponent(ele)}`,
       );
       if (
@@ -418,12 +421,13 @@ function Cms() {
       ) {
         const split = courseData.courses[0].displayname.split(" ");
         const sectionNameSplit = ele.split(" ");
+        const token = chooseManualMethod ? tokenRef.current?.value: tokenFetchRef.current;
         if (
           split[split.length - 1] ===
           sectionNameSplit[sectionNameSplit.length - 1]
         ) {
           const { status, data } = await axios.get(
-            `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=enrol_self_enrol_user&moodlewsrestformat=json&wstoken=${tokenRef.current?.value}&courseid=${courseData.courses[0].id}`,
+            `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=enrol_self_enrol_user&moodlewsrestformat=json&wstoken=${token}&courseid=${courseData.courses[0].id}`,
           );
           if (status !== 200 || !data.status) {
             errors.push(ele);
@@ -444,17 +448,20 @@ function Cms() {
 
   const unenrollAllSections = async () => {
     setEnrolledLoaded(false);
+    const token = chooseManualMethod ? tokenRef.current?.value: tokenFetchRef.current;
+    const cookie = chooseManualMethod ? cookieRef.current?.value: cookieFetchRef.current;
+    const sessKey = chooseManualMethod ? sesskeyRef.current?.value: sesskeyFetchRef.current;
     for (let i = 0; i < enrolledCourses.length; i++) {
       const res = await axios.get(
-        `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_enrol_get_course_enrolment_methods&moodlewsrestformat=json&wstoken=${tokenRef.current?.value}&courseid=${enrolledCourses[i].id}`,
+        `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_enrol_get_course_enrolment_methods&moodlewsrestformat=json&wstoken=${token}&courseid=${enrolledCourses[i].id}`,
       );
       const enrollmentInstance = res.data;
       const { data, status } = await axios.post(
         "/api/user/unenroll",
         {
           enrollID: enrollmentInstance[0].id,
-          sesskey: sesskeyRef.current?.value,
-          cookie: cookieRef.current?.value,
+          sesskey: sessKey,
+          cookie: cookie,
         },
         {
           headers: {
@@ -551,7 +558,7 @@ function Cms() {
 
                   <div
                     className={`w-full flex sm:flex-row flex-col gap-0 sm:gap-24 ${
-                      allowEdit ? "blur-sm pointer-events-none" : ""
+                      allowEdit ? "blur-md pointer-events-none" : ""
                     }`}
                   >
                     {enrolledLoaded ? (
@@ -728,7 +735,20 @@ function Cms() {
                   </TooltipTrigger>
                   <TooltipContent className="lg:w-[48rem] md:w-[36rem] w-[24rem] flex space-y-2 flex-col bg-muted text-foreground border-muted text-md">
                     <span>
-                      To find these details, follow the instructions in{" "}
+                      To get these details, install the{" "}
+                      <a
+                        href="https://chromewebstore.google.com/detail/cms-enrollment-extension/ebjldebpahljhpakgngnandakdbajdnj"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 dark:text-blue-400 ml-1 inline items-center"
+                      >
+                        Chrome extension.
+                        <ArrowUpRightFromCircle className="inline w-4 h-4 ml-1 mr-1" />
+                      </a>
+                    </span>
+                    <span>
+                      If that doesn't work you can use the manual method as
+                      shown in{" "}
                       <a
                         href="https://youtu.be/ls1VsCPRH0I"
                         target="_blank"
@@ -753,7 +773,7 @@ function Cms() {
                     </span>
                   </TooltipContent>
                 </Tooltip>
-                <Tooltip delayDuration={100}>
+               {chooseManualMethod? <Tooltip delayDuration={100}>
                   <TooltipTrigger asChild>
                     <Button
                       className="bg-transparent py-3 rounded-full hover:bg-muted text-foreground text-lg font-bold"
@@ -768,14 +788,16 @@ function Cms() {
                   <TooltipContent className="bg-muted text-foreground border-muted text-md">
                     {allowEdit ? "Save CMS Details" : "Edit CMS Details"}
                   </TooltipContent>
-                </Tooltip>
+                </Tooltip>:""}
                 <Tooltip delayDuration={100}>
                   <TooltipTrigger asChild>
-                    <Button className="hover:bg-gray-300">
-                      Auto Load CMS Details
+                    <Button className="hover:bg-gray-300" onClick={()=>{
+                      setChooseManualMethod(!chooseManualMethod);
+                    }}>
+                      {chooseManualMethod? "Auto Load CMS Details": "Manually Load CMS Details"}
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent className="lg:w-[48rem] md:w-[36rem] w-[24rem] flex space-y-2 flex-col bg-muted text-foreground border-muted text-md">
+                  {chooseManualMethod?  <TooltipContent className="lg:w-[48rem] md:w-[36rem] w-[24rem] flex space-y-2 flex-col bg-muted text-foreground border-muted text-md">
                     <span>
                       Download the
                       <a
@@ -801,8 +823,9 @@ function Cms() {
                         <ArrowUpRightFromCircle className="inline w-4 h-4 ml-1 mr-1" />
                       </a>
                     </span>
-                  </TooltipContent>
+                  </TooltipContent>: <TooltipContent className="lg:w-[23.5rem] md:w-[23.5rem] w-[23.5rem] flex space-y-2 flex-col bg-muted text-foreground border-muted text-md"><span>Extension not working? Use the manual method!</span></TooltipContent>}
                 </Tooltip>
+                
               </div>
               <div className="flex flex-col sm:flex-row w-full gap-6 mt-4">
                 <div className="flex flex-col w-fit">
@@ -814,7 +837,7 @@ function Cms() {
                     id="webservicetoken"
                     placeholder="Web Service Token"
                     className="text-xl bg-muted ring-muted ring-offset-muted border-muted"
-                    disabled={!allowEdit}
+                    disabled={!allowEdit || !chooseManualMethod}
                   />
                 </div>
                 <div className="flex flex-col w-fit">
@@ -826,7 +849,7 @@ function Cms() {
                     id="sessioncookie"
                     placeholder="Session Cookie"
                     className="text-xl bg-muted ring-muted ring-offset-muted border-muted"
-                    disabled={!allowEdit}
+                    disabled={!allowEdit || !chooseManualMethod}
                   />
                 </div>
                 <div className="flex flex-col w-fit">
@@ -838,7 +861,7 @@ function Cms() {
                     id="sesskey"
                     placeholder="Session Key"
                     className="text-xl bg-muted ring-muted ring-offset-muted border-muted"
-                    disabled={!allowEdit}
+                    disabled={!allowEdit || !chooseManualMethod}
                   />
                 </div>
               </div>
@@ -849,7 +872,20 @@ function Cms() {
                       Enter your CMS details, and hit save to continue
                     </span>{" "}
                     <span>
-                      To find these details, follow the instructions in{" "}
+                      To get these details, install the{" "}
+                      <a
+                        href="https://chromewebstore.google.com/detail/cms-enrollment-extension/ebjldebpahljhpakgngnandakdbajdnj"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 dark:text-blue-400 ml-1 inline items-center"
+                      >
+                        Chrome extension.
+                        <ArrowUpRightFromCircle className="inline w-4 h-4 ml-1 mr-1" />
+                      </a>
+                    </span>
+                    <span>
+                      If that doesn't work you can use the manual method as
+                      shown in{" "}
                       <a
                         href="https://youtu.be/ls1VsCPRH0I"
                         target="_blank"
@@ -864,7 +900,7 @@ function Cms() {
                 )}
                 <div
                   className={`w-full flex sm:flex-row flex-col gap-0 sm:gap-24 ${
-                    allowEdit ? "blur-sm pointer-events-none" : ""
+                    allowEdit ? "blur-md pointer-events-none" : ""
                   }`}
                 >
                   {enrolledLoaded ? (
