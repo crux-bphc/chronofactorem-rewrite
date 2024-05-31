@@ -3,15 +3,13 @@ import { Course, Timetable, Section } from "../../entity/entities.js";
 import { z } from "zod";
 import { courseWithSectionsType } from "../../../../lib/src/index.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
-import { courseRepository } from "../../repositories/courseRepository.js";
-import { sectionRepository } from "../../repositories/sectionRepository.js";
-import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { checkForExamTimingsChange } from "../../utils/checkForChange.js";
 import {
   checkForClassHoursClash,
   checkForExamHoursClash,
 } from "../../utils/checkForClashes.js";
 import { addExamTimings, removeSection } from "../../utils/updateSection.js";
+import { AppDataSource } from "../../db.js";
 
 const dataSchema = z.object({
   body: z.object({
@@ -23,9 +21,13 @@ export const updateChangedTimetableValidator = validate(dataSchema);
 
 export const updateChangedTimetable = async (req: Request, res: Response) => {
   try {
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
     const course: Course = req.body.course;
     try {
-      await courseRepository
+      await queryRunner.manager
         .createQueryBuilder()
         .update(Course)
         .set({
@@ -44,14 +46,15 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
     let timetables: Timetable[] | null = null;
 
     try {
-      timetables = await timetableRepository
-        .createQueryBuilder("timetable")
+      timetables = await queryRunner.manager
+        .createQueryBuilder(Timetable, "timetable")
         .leftJoinAndSelect("timetable.sections", "section")
         .getMany();
     } catch (err: any) {
       console.log("Error while querying for timetable: ", err.message);
       return res.status(500).json({ message: "Internal Server Error" });
     }
+
     for (const timetable of timetables) {
       if (checkForExamTimingsChange(timetable, course)) {
         timetable.examTimes = timetable.examTimes.filter((examTime) => {
@@ -65,7 +68,6 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
               timetable.draft = true;
             }
           }
-          await timetableRepository.save(timetable);
         } else {
           const newExamTimes = timetable.examTimes;
           addExamTimings(newExamTimes, course);
@@ -78,7 +80,7 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
         if (newSection !== undefined) {
           removeSection(timetable, section);
 
-          await timetableRepository
+          await queryRunner.manager
             .createQueryBuilder()
             .relation(Timetable, "sections")
             .of(timetable)
@@ -91,29 +93,25 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
               (time) =>
                 `${course?.code}:${time.split(":")[2]}${time.split(":")[3]}`,
             );
-            await sectionRepository
+            await queryRunner.manager
               .createQueryBuilder()
-              .update({ roomTime: newSection.roomTime })
+              .update(Section, { roomTime: newSection.roomTime })
               .where("section.id = :id", { id: section?.id })
               .execute();
-            await timetableRepository.manager.transaction(
-              async (transactionEntityManager) => {
-                await transactionEntityManager
-                  .createQueryBuilder()
-                  .relation(Timetable, "sections")
-                  .of(timetable)
-                  .add(newSection);
-                await transactionEntityManager
-                  .createQueryBuilder()
-                  .update(Timetable)
-                  .set({
-                    timings: [...timetable.timings, ...newTimes],
-                    warnings: timetable.warnings,
-                  })
-                  .where("timetable.id = :id", { id: timetable.id })
-                  .execute();
-              },
-            );
+            await queryRunner.manager
+              .createQueryBuilder()
+              .relation(Timetable, "sections")
+              .of(timetable)
+              .add(newSection);
+            await queryRunner.manager
+              .createQueryBuilder()
+              .update(Timetable)
+              .set({
+                timings: [...timetable.timings, ...newTimes],
+                warnings: timetable.warnings,
+              })
+              .where("timetable.id = :id", { id: timetable.id })
+              .execute();
 
             timetable.timings = [...timetable.timings, ...newTimes];
             timetable.sections = [...timetable.sections, newSection];
@@ -130,20 +128,23 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
           return examTime.split("|")[0] !== course?.code;
         });
       }
-      await timetableRepository.save(timetable);
     }
+    await queryRunner.manager.save(timetables);
     try {
       for (const section of course.sections) {
-        await sectionRepository
+        await queryRunner.manager
           .createQueryBuilder()
-          .update({ roomTime: section.roomTime })
-          .where("section.id=:id", { id: section?.id })
+          .update(Section, { roomTime: section.roomTime })
+          .where("section.id = :id", { id: section?.id })
           .execute();
       }
     } catch (err: any) {
       console.log("Error while querying for course: ", err.message);
       return res.status(500).json({ message: "Internal Server Error" });
     }
+
+    await queryRunner.commitTransaction();
+    queryRunner.release();
     return res.json({ message: "Timetable successfully updated" });
   } catch (err: any) {
     console.log(err);
