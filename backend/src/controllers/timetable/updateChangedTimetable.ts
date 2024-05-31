@@ -65,6 +65,11 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
 
         if (checkForExamHoursClash(timetable, course).clash) {
           for (const sec of timetable.sections) {
+            await queryRunner.manager
+              .createQueryBuilder()
+              .relation(Timetable, "sections")
+              .of(timetable)
+              .remove(sec);
             removeSection(timetable, sec);
           }
           timetable.draft = true;
