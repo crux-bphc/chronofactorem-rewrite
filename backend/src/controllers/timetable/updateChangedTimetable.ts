@@ -49,6 +49,8 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
       timetables = await queryRunner.manager
         .createQueryBuilder(Timetable, "timetable")
         .leftJoinAndSelect("timetable.sections", "section")
+        .where("section.courseId = :id", { id: course?.id })
+        .andWhere("timetable.archived = :archived", { archived: false })
         .getMany();
     } catch (err: any) {
       console.log("Error while querying for timetable: ", err.message);
@@ -63,9 +65,7 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
 
         if (checkForExamHoursClash(timetable, course).clash) {
           for (const sec of timetable.sections) {
-            if (sec.courseId === course.id) {
-              removeSection(timetable, sec);
-            }
+            removeSection(timetable, sec);
           }
           timetable.draft = true;
           timetable.private = true;
@@ -104,16 +104,7 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
               .createQueryBuilder()
               .relation(Timetable, "sections")
               .of(timetable)
-              .add(newSection);
-            await queryRunner.manager
-              .createQueryBuilder()
-              .update(Timetable)
-              .set({
-                timings: [...timetable.timings, ...newTimes],
-                warnings: timetable.warnings,
-              })
-              .where("timetable.id = :id", { id: timetable.id })
-              .execute();
+              .add(section);
 
             timetable.timings = [...timetable.timings, ...newTimes];
             timetable.sections = [...timetable.sections, newSection];
@@ -131,7 +122,30 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
         });
       }
     }
-    await queryRunner.manager.save(timetables);
+
+    // Remove sections from the timetable before saving in db
+
+    // Since we are fetching only this course's sections in the
+    // timetable query (due to the left join), none of the other sections
+    // end up in timetable.sections. Saving this to db causes all the other
+    // sections of other courses to be wiped. This is why, using some typescript
+    // magic, we redefine the timetable type, and then set sections = undefined.
+    // Since sections = undefined, TypeORM sees that the field isn't present,
+    // and doesn't make any additional changes to timetable sections.
+
+    // If we do want to remove the sections, those db calls have already been
+    // made above. This db call is only here to update timetable timings and examTimes
+    type timetableWithoutSections = Omit<Timetable, "sections"> & {
+      sections: Section[] | undefined;
+    };
+    const timetablesWithoutSections: timetableWithoutSections[] = timetables;
+    await queryRunner.manager.save(
+      timetablesWithoutSections.map((x) => {
+        x.sections = undefined;
+        return x;
+      }),
+    );
+
     try {
       for (const section of course.sections) {
         await queryRunner.manager
