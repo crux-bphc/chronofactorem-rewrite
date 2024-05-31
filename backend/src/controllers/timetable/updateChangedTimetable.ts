@@ -43,6 +43,7 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
           compreEndTime: course?.compreEndTime,
         })
         .where("id = :id", { id: course?.id })
+        .andWhere("archived = :archived", { archived: false })
         .execute();
     } catch (err: any) {
       console.log("Error while querying for course: ", err.message);
