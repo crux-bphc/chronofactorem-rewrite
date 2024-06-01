@@ -199,7 +199,6 @@ function Cms() {
   const { toast } = useToast();
   const tokenRef = useRef<HTMLInputElement>(null);
   const cookieRef = useRef<HTMLInputElement>(null);
-  ``;
   const sesskeyRef = useRef<HTMLInputElement>(null);
   const tokenFetchRef = useRef<string | null>(null);
   const cookieFetchRef = useRef<string | null>(null);
