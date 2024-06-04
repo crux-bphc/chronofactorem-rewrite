@@ -245,3 +245,19 @@ export class Section {
   })
   createdAt!: Date;
 }
+
+@Entity()
+export class Announcement {
+  @PrimaryGeneratedColumn("uuid")
+  id!: string;
+
+  @Column({ type: "varchar", length: 800 })
+  message!: string;
+
+  @CreateDateColumn({
+    name: "created_at",
+    type: "timestamptz",
+    default: () => "CURRENT_TIMESTAMP",
+  })
+  createdAt!: Date;
+}
