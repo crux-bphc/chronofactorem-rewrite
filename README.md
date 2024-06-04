@@ -6,8 +6,8 @@
 
 ## Steps for setup:
 
-1. Install [nvm](https://github.com/nvm-sh/nvm), and install Node v20.10.0 LTS using `nvm install v20.10.0`. If you're using a different node version manager, do the equivalent.
-2. Activate Node v20.10.0 using `nvm use v20.10.0`
+1. Install [nvm](https://github.com/nvm-sh/nvm), and install Node v20.14.0 LTS using `nvm install v20.14.0`. If you're using a different node version manager, do the equivalent.
+2. Activate Node v20.14.0 using `nvm use v20.14.0`
 3. Install pnpm, using `npm i -g pnpm`
 4. Install the packages in this repo by running `pnpm i` in the the `backend`, `lib` and `frontend` folders of this repository.
 

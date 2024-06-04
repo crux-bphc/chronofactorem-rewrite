@@ -1,4 +1,4 @@
-FROM node:20.10.0-slim AS build-stage
+FROM node:20.14.0-slim AS build-stage
 ENV NODE_ENV production
 WORKDIR /usr/src/app/frontend
 
