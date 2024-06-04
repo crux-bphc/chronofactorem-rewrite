@@ -1,4 +1,4 @@
-FROM node:20.10.0-slim
+FROM node:20.14.0-slim
 ENV NODE_ENV development
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
