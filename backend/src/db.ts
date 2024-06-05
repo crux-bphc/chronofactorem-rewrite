@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { env } from "./config/server.js";
 import {
+  Announcement,
   Course,
   SearchHistory,
   Section,
@@ -14,7 +15,7 @@ export const AppDataSource = new DataSource({
   url: `postgres://${env.POSTGRES_USER}:${env.POSTGRES_PASSWORD}@${env.DB_HOST}:${env.PGPORT}?db=${env.POSTGRES_DB}`,
   synchronize: true,
   logging: false,
-  entities: [User, Timetable, Course, Section, SearchHistory],
+  entities: [User, Timetable, Course, Section, SearchHistory, Announcement],
   migrations: [],
   subscribers: [],
 });
