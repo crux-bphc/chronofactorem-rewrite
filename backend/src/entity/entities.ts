@@ -251,6 +251,9 @@ export class Announcement {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
+  @Column({ type: "varchar", length: 200 })
+  title!: string;
+
   @Column({ type: "varchar", length: 800 })
   message!: string;
 

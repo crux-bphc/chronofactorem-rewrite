@@ -9,6 +9,7 @@ import { announcementRepository } from "../../repositories/anouncementRepository
 const announcementSchema = z.object({
   body: z.object({
     chronoSecret: namedNonEmptyStringType("chrono secret"),
+    title: namedNonEmptyStringType("title"),
     message: namedNonEmptyStringType("message"),
   }),
 });
@@ -17,9 +18,9 @@ export const announcementValidator = validate(announcementSchema);
 
 export const createAnnoucement = async (req: Request, res: Response) => {
   try {
-    const { chronoSecret, message } = req.body;
+    const { title, message } = req.body;
 
-    if (env.CHRONO_SECRET !== chronoSecret) {
+    if (env.CHRONO_SECRET !== req.body.chronoSecret) {
       return res.status(401).json({ message: "Chrono Secret is incorrect" });
     }
 
@@ -28,6 +29,7 @@ export const createAnnoucement = async (req: Request, res: Response) => {
       .insert()
       .into(Announcement)
       .values({
+        title,
         message,
       })
       .execute();
