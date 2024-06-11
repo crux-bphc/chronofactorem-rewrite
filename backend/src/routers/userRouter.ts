@@ -21,11 +21,11 @@ userRouter.get("/:id?", authenticate, getUserDetailsValidator, getUserDetails);
 userRouter.post("/edit", authenticate, editUserValidator, editUser);
 userRouter.post("/unenroll", authenticate, unenrollValidator, unenroll);
 userRouter.post(
-  "/announcement",
+  "/announcements/get",
   authenticate,
   announcementValidator,
   createAnnoucement,
 );
-userRouter.get("/getannouncements", authenticate, getAllAnnouncements);
+userRouter.get("/announcements", authenticate, getAllAnnouncements);
 
 export default userRouter;
