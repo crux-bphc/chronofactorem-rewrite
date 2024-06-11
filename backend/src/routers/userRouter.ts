@@ -12,11 +12,11 @@ import {
   getUserDetails,
   getUserDetailsValidator,
 } from "../controllers/user/getUserDetails.js";
-import { authenticate } from "../middleware/auth.js";
 import {
   getAllAnnouncements,
   getAnnouncementValidator,
 } from "../controllers/user/retrieveAnnouncements.js";
+import { authenticate } from "../middleware/auth.js";
 
 const userRouter = express.Router();
 
