@@ -34,6 +34,7 @@ SQIDS_ALPHABET="P1fF29hw8BARdJpoSUZIDnXVWNzcCeGrlgk0qbsMxjYKaE5uLTyOt376Hmv4Qi"
 VITE_FRONTEND_URL="http://localhost:5000"
 SESSION_MAX_AGE_MS=86400000
 VITE_CMS_EXTENSION_ID="ebjldebpahljhpakgngnandakdbajdnj"
+CHRONO_SECRET="99fcf0561404319f865d52ec3d3d6239ccc1fbcd5f1f6e5c72cbfd3f5b6feff119ba5dc9a027f06e1ab5fcc39de6c71da6fc46c46b0206c06097394491f26b15"
 ```
 
 Obviously, we'll use different creds in production.
