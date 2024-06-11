@@ -21,7 +21,7 @@ userRouter.get("/:id?", authenticate, getUserDetailsValidator, getUserDetails);
 userRouter.post("/edit", authenticate, editUserValidator, editUser);
 userRouter.post("/unenroll", authenticate, unenrollValidator, unenroll);
 userRouter.post(
-  "/announcements/get",
+  "/announcements/create",
   authenticate,
   announcementValidator,
   createAnnoucement,
