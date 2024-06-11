@@ -12,10 +12,7 @@ import {
   getUserDetails,
   getUserDetailsValidator,
 } from "../controllers/user/getUserDetails.js";
-import {
-  getAllAnnouncements,
-  getAnnouncementValidator,
-} from "../controllers/user/retrieveAnnouncements.js";
+import { getAllAnnouncements } from "../controllers/user/retrieveAnnouncements.js";
 import { authenticate } from "../middleware/auth.js";
 
 const userRouter = express.Router();
@@ -29,11 +26,6 @@ userRouter.post(
   announcementValidator,
   createAnnoucement,
 );
-userRouter.get(
-  "/getannouncements",
-  authenticate,
-  getAnnouncementValidator,
-  getAllAnnouncements,
-);
+userRouter.get("/getannouncements", authenticate, getAllAnnouncements);
 
 export default userRouter;
