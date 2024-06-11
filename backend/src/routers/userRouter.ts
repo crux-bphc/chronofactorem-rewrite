@@ -13,6 +13,10 @@ import {
   getUserDetailsValidator,
 } from "../controllers/user/getUserDetails.js";
 import { authenticate } from "../middleware/auth.js";
+import {
+  getAllAnnouncements,
+  getAnnouncementValidator,
+} from "../controllers/user/retrieveAnnouncements.js";
 
 const userRouter = express.Router();
 
@@ -24,6 +28,12 @@ userRouter.post(
   authenticate,
   announcementValidator,
   createAnnoucement,
+);
+userRouter.get(
+  "/getannouncements",
+  authenticate,
+  getAnnouncementValidator,
+  getAllAnnouncements,
 );
 
 export default userRouter;
