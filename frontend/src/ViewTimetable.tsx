@@ -1059,7 +1059,7 @@ function ViewTimetable() {
           </TooltipProvider>
         </div>
       ) : (
-        <div className="flex flex-col text-muted-foreground gap-8 xl:text-xl lg:text-lg md:text-md text-sm bg-background h-full py-88 w-full items-center">
+        <div className="flex flex-col text-muted-foreground gap-8 xl:text-xl lg:text-lg md:text-md text-sm bg-background h-full py-80 w-full items-center">
           <Spinner />
           <span>Please wait while we copy over your timetable...</span>
         </div>
