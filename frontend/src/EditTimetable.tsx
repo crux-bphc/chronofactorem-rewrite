@@ -66,7 +66,7 @@ const fetchTimetable = async (timetableId: string) => {
       headers: {
         "Content-Type": "application/json ",
       },
-    }
+    },
   );
   if (response.data.draft) {
     return response.data;
@@ -89,9 +89,8 @@ const timetableQueryOptions = (timetableId: string) =>
   });
 
 const fetchUserDetails = async () => {
-  const response = await axios.get<z.infer<typeof userWithTimetablesType>>(
-    "/api/user"
-  );
+  const response =
+    await axios.get<z.infer<typeof userWithTimetablesType>>("/api/user");
   return response.data;
 };
 
@@ -107,7 +106,7 @@ const fetchCourses = async () => {
       headers: {
         "Content-Type": "application/json ",
       },
-    }
+    },
   );
   return response.data;
 };
@@ -314,7 +313,7 @@ function EditTimetable() {
   const copyMutation = useMutation({
     mutationFn: () => {
       return axios.post<{ message: string; id: string }>(
-        `/api/timetable/${timetableId}/copy`
+        `/api/timetable/${timetableId}/copy`,
       );
     },
     onSuccess: (response) => {
@@ -407,7 +406,7 @@ function EditTimetable() {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       return result.data;
@@ -431,7 +430,7 @@ function EditTimetable() {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       return result.data;
@@ -457,7 +456,7 @@ function EditTimetable() {
       .filter((e) =>
         timetableQueryResult.data?.sections
           .map((x) => x.courseId)
-          .includes(e.id)
+          .includes(e.id),
       )
       .sort();
   }, [courseQueryResult.data, timetableQueryResult.data]);
@@ -497,7 +496,7 @@ function EditTimetable() {
           options.push(`${depts.split("/")[j]} ${codes.split("/")[j]}`);
         }
         const matchedCourses = courseQueryResult.data.filter((e) =>
-          options.includes(e.code)
+          options.includes(e.code),
         );
         if (matchedCourses.length < options.length) {
           coursesList.push({
@@ -514,7 +513,7 @@ function EditTimetable() {
         }
       } else {
         const matchedCourses = courseQueryResult.data.filter(
-          (e) => e.code === cdcs[i]
+          (e) => e.code === cdcs[i],
         );
         if (matchedCourses.length === 1) {
           coursesList.push(matchedCourses[0]);
@@ -538,7 +537,7 @@ function EditTimetable() {
         type: "warning";
         warning: string;
       }[],
-    [cdcs]
+    [cdcs],
   );
 
   const missingCDCs = useMemo(() => {
@@ -567,7 +566,9 @@ function EditTimetable() {
         if (
           option.type === "optional" &&
           !option.options.some((e) =>
-            coursesInTimetable.map((added) => added.id).includes(e.id as string)
+            coursesInTimetable
+              .map((added) => added.id)
+              .includes(e.id as string),
           )
         ) {
           const splitCodes = option.options.map((e) => e.code).join(" (or) ");
@@ -586,7 +587,7 @@ function EditTimetable() {
               id: string;
               code: string;
               name: string;
-            }
+            },
           );
         }
       }
@@ -601,7 +602,7 @@ function EditTimetable() {
       if (currentCourseID === null) return null;
 
       const result = await axios.get<z.infer<typeof courseWithSectionsType>>(
-        `/api/course/${currentCourseID}`
+        `/api/course/${currentCourseID}`,
       );
 
       return result.data;
@@ -617,8 +618,8 @@ function EditTimetable() {
 
     return Array.from(
       new Set(
-        currentCourseQueryResult.data.sections.map((section) => section.type)
-      )
+        currentCourseQueryResult.data.sections.map((section) => section.type),
+      ),
     ).sort();
   }, [currentCourseQueryResult.data]);
 
@@ -654,11 +655,11 @@ function EditTimetable() {
 
   const isOnCourseDetails = useMemo(
     () => currentCourseID !== null,
-    [currentCourseID]
+    [currentCourseID],
   );
 
   const [screenIsLarge, setScreenIsLarge] = useState(
-    window.matchMedia("(min-width: 1024px)").matches
+    window.matchMedia("(min-width: 1024px)").matches,
   );
 
   useEffect(() => {
@@ -687,7 +688,7 @@ function EditTimetable() {
         {JSON.stringify(
           courseQueryResult.error
             ? courseQueryResult.error.message
-            : "course query result is undefined"
+            : "course query result is undefined",
         )}{" "}
         Please report this{" "}
         <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
@@ -720,7 +721,7 @@ function EditTimetable() {
         {JSON.stringify(
           timetableQueryResult.error
             ? timetableQueryResult.error.message
-            : "timetable query result is undefined"
+            : "timetable query result is undefined",
         )}{" "}
         Please report this{" "}
         <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
@@ -1016,11 +1017,11 @@ function EditTimetable() {
                                       setCurrentCourseID(
                                         courses.filter(
                                           (x) =>
-                                            x.code === warning.split(":")[0]
-                                        )[0].id
+                                            x.code === warning.split(":")[0],
+                                        )[0].id,
                                       );
                                       setSectionTypeChangeRequest(
-                                        x as "L" | "P" | "T"
+                                        x as "L" | "P" | "T",
                                       );
                                     }}
                                     className="p-2 w-fit h-fit ml-2 mb-1 bg-transparent hover:bg-slate-300 dark:hover:bg-muted-foreground/30 text-secondary-foreground rounded-full"
@@ -1117,7 +1118,7 @@ function EditTimetable() {
                   if (e?.courseId && e?.type) {
                     if (event.detail === 1) {
                       setCurrentCourseID(
-                        courses.filter((x) => x.code === e?.courseId)[0].id
+                        courses.filter((x) => x.code === e?.courseId)[0].id,
                       );
                       setSectionTypeChangeRequest(e?.type as "L" | "P" | "T");
                     } else if (event.detail >= 2) {
