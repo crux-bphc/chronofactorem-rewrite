@@ -65,7 +65,7 @@ const fetchTimetable = async (timetableId: string) => {
       headers: {
         "Content-Type": "application/json ",
       },
-    },
+    }
   );
   if (!response.data.draft) {
     return response.data;
@@ -82,8 +82,9 @@ const fetchTimetable = async (timetableId: string) => {
 };
 
 const fetchUserDetails = async () => {
-  const response =
-    await axios.get<z.infer<typeof userWithTimetablesType>>("/api/user");
+  const response = await axios.get<z.infer<typeof userWithTimetablesType>>(
+    "/api/user"
+  );
   return response.data;
 };
 
@@ -100,7 +101,7 @@ const fetchCourses = async () => {
       headers: {
         "Content-Type": "application/json ",
       },
-    },
+    }
   );
   return response.data;
 };
@@ -314,7 +315,7 @@ function ViewTimetable() {
   const copyMutation = useMutation({
     mutationFn: () => {
       return axios.post<{ message: string; id: string }>(
-        `/api/timetable/${timetableId}/copy`,
+        `/api/timetable/${timetableId}/copy`
       );
     },
     onSuccess: (data) => {
@@ -543,7 +544,7 @@ function ViewTimetable() {
           headers: {
             "Content-Type": "application/json",
           },
-        },
+        }
       );
 
       return result.data;
@@ -567,7 +568,7 @@ function ViewTimetable() {
           headers: {
             "Content-Type": "application/json",
           },
-        },
+        }
       );
 
       return result.data;
@@ -593,7 +594,7 @@ function ViewTimetable() {
       .filter((e) =>
         timetableQueryResult.data?.sections
           .map((x) => x.courseId)
-          .includes(e.id),
+          .includes(e.id)
       )
       .sort();
   }, [courseQueryResult.data, timetableQueryResult.data]);
@@ -633,7 +634,7 @@ function ViewTimetable() {
           options.push(`${depts.split("/")[j]} ${codes.split("/")[j]}`);
         }
         const matchedCourses = courseQueryResult.data.filter((e) =>
-          options.includes(e.code),
+          options.includes(e.code)
         );
         if (matchedCourses.length < options.length) {
           coursesList.push({
@@ -650,7 +651,7 @@ function ViewTimetable() {
         }
       } else {
         const matchedCourses = courseQueryResult.data.filter(
-          (e) => e.code === cdcs[i],
+          (e) => e.code === cdcs[i]
         );
         if (matchedCourses.length === 1) {
           coursesList.push(matchedCourses[0]);
@@ -674,7 +675,7 @@ function ViewTimetable() {
       if (currentCourseID === null) return null;
 
       const result = await axios.get<z.infer<typeof courseWithSectionsType>>(
-        `/api/course/${currentCourseID}`,
+        `/api/course/${currentCourseID}`
       );
 
       return result.data;
@@ -690,8 +691,8 @@ function ViewTimetable() {
 
     return Array.from(
       new Set(
-        currentCourseQueryResult.data.sections.map((section) => section.type),
-      ),
+        currentCourseQueryResult.data.sections.map((section) => section.type)
+      )
     ).sort();
   }, [currentCourseQueryResult.data]);
 
@@ -727,11 +728,11 @@ function ViewTimetable() {
 
   const isOnCourseDetails = useMemo(
     () => currentCourseID !== null,
-    [currentCourseID],
+    [currentCourseID]
   );
 
   const [screenIsLarge, setScreenIsLarge] = useState(
-    window.matchMedia("(min-width: 1024px)").matches,
+    window.matchMedia("(min-width: 1024px)").matches
   );
 
   useEffect(() => {
@@ -751,7 +752,7 @@ function ViewTimetable() {
         {JSON.stringify(
           courseQueryResult.error
             ? courseQueryResult.error.message
-            : "course query result is undefined",
+            : "course query result is undefined"
         )}{" "}
         Please report this{" "}
         <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
@@ -784,7 +785,7 @@ function ViewTimetable() {
         {JSON.stringify(
           timetableQueryResult.error
             ? timetableQueryResult.error.message
-            : "timetable query result is undefined",
+            : "timetable query result is undefined"
         )}{" "}
         Please report this{" "}
         <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
@@ -1059,7 +1060,7 @@ function ViewTimetable() {
           </TooltipProvider>
         </div>
       ) : (
-        <div className="flex flex-col text-muted-foreground gap-8 xl:text-xl lg:text-lg md:text-md text-sm bg-background h-full py-80 w-full items-center">
+        <div className="flex flex-col text-muted-foreground gap-8 xl:text-xl lg:text-lg md:text-md text-sm bg-background h-[calc(100dvh-5rem)] justify-center w-full items-center">
           <Spinner />
           <span>Please wait while we copy over your timetable...</span>
         </div>
