@@ -15,9 +15,9 @@ import cmsRoute from "./Cms";
 import cmsExportRoute from "./CmsExport";
 import editTimetableRoute from "./EditTimetable";
 import editUserProfileRoute from "./EditUserProfile";
-import finalizeTimetableRoute from "./Finalize";
+import finalizeTimetableRoute from "./FinalizeTimetable";
 import getDegreesRoute from "./GetDegrees";
-import indexRoute from "./Home";
+import homeRoute from "./Home";
 import loginRoute from "./Login";
 import notFoundRoute from "./NotFound";
 import RootComponent from "./RootComponent";
@@ -43,7 +43,7 @@ const routeTree = rootRoute.addChildren([
   getDegreesRoute,
   aboutRoute,
   authenticatedRoute.addChildren([
-    indexRoute,
+    homeRoute,
     editUserProfileRoute,
     editTimetableRoute,
     finalizeTimetableRoute,
