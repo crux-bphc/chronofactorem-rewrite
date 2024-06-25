@@ -6,6 +6,7 @@ const devOptions = {
   transport: {
     target: "pino-pretty",
     options: {
+      ignore: "pid,hostname",
       translateTime: "SYS:standard",
       destination: "logs/app.log",
       // append: false,
@@ -20,6 +21,7 @@ const prodOptions = {
       colorize: false,
       colorizeObjects: false,
       singleLine: true,
+      ignore: "pid,hostname",
       translateTime: "SYS:standard",
       destination: "logs/app.log",
     },

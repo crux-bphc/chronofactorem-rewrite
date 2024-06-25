@@ -7,5 +7,6 @@ export const logRequest = async (
 ) => {
   const { log, ...rest } = req;
   log.debug(rest);
+  log.info(`${rest.method} ${req.url}`);
   next();
 };
