@@ -33,9 +33,9 @@ const timetableQueryOptions = (timetableId: string) =>
     queryFn: () => fetchTimetable(timetableId),
   });
 
-const cmsOptionRoute = new Route({
+const CMSOptionRoute = new Route({
   getParentRoute: () => authenticatedRoute,
-  path: "cmsOption/$timetableId",
+  path: "CMSOption/$timetableId",
   loader: ({ context: { queryClient }, params: { timetableId } }) =>
     queryClient
       .ensureQueryData(timetableQueryOptions(timetableId))
@@ -120,7 +120,7 @@ const cmsOptionRoute = new Route({
 });
 
 function CMSOption() {
-  const { timetableId } = cmsOptionRoute.useParams();
+  const { timetableId } = CMSOptionRoute.useParams();
   const timetableQueryResult = useQuery(timetableQueryOptions(timetableId));
 
   if (timetableQueryResult.isFetching) {
@@ -237,7 +237,7 @@ function CMSOption() {
                 No, Thanks
               </Link>
               <Link
-                to={"/cms/$timetableId"}
+                to={"/CMS/$timetableId"}
                 params={{
                   timetableId: timetableId,
                 }}
@@ -253,4 +253,4 @@ function CMSOption() {
   );
 }
 
-export default cmsOptionRoute;
+export default CMSOptionRoute;

@@ -159,7 +159,7 @@ function FinalizeTimetable() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       router.navigate({
-        to: "/cmsOption/$timetableId",
+        to: "/CMSOption/$timetableId",
         params: { timetableId: timetableId },
       });
     },

@@ -94,9 +94,9 @@ const userQueryOptions = queryOptions({
   },
 });
 
-const cmsExportRoute = new Route({
+const CMSExportRoute = new Route({
   getParentRoute: () => authenticatedRoute,
-  path: "/cmsExport",
+  path: "/CMSExport",
   loader: ({ context: { queryClient } }) =>
     queryClient.ensureQueryData(userQueryOptions).catch((error) => {
       if (
@@ -111,7 +111,7 @@ const cmsExportRoute = new Route({
 
       throw error;
     }),
-  component: CmsExport,
+  component: CMSExport,
   errorComponent: ({ error }) => {
     const { toast } = useToast();
 
@@ -178,7 +178,7 @@ const cmsExportRoute = new Route({
   },
 });
 
-function CmsExport() {
+function CMSExport() {
   const userQueryResult = useQuery(userQueryOptions);
   const queryClient = useQueryClient();
   const createMutation = useMutation({
@@ -384,4 +384,4 @@ function CmsExport() {
   }
 }
 
-export default cmsExportRoute;
+export default CMSExportRoute;

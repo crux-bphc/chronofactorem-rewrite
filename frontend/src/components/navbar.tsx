@@ -45,7 +45,7 @@ const userQueryOptions = queryOptions({
 export function NavBar() {
   const stateRouter = useRouter();
   const isCMSPage =
-    stateRouter.state.resolvedLocation.pathname.includes("/cms");
+    stateRouter.state.resolvedLocation.pathname.includes("/CMS");
   const isEditPage = stateRouter.state.resolvedLocation.pathname.includes(
     "/edit/" || "/finalize/",
   );
@@ -183,7 +183,7 @@ export function NavBar() {
         </Link>
         {!isCMSPage && (
           <Link
-            to={userQueryResultData ? "/cmsExport" : undefined}
+            to={userQueryResultData ? "/CMSExport" : undefined}
             className="text-primary py-2 px-2 ml-2 text-lg rounded-full hover:bg-muted transition h-fit whitespace-nowrap duration-200 ease-in-out"
           >
             <div className="hidden md:flex">CMS Auto-Enroll</div>

@@ -10,9 +10,9 @@ import { CookiesProvider } from "react-cookie";
 import ReactDOM from "react-dom/client";
 import aboutRoute from "./About";
 import authenticatedRoute from "./AuthenticatedRoute";
-import cmsOptionRoute from "./CMSOption";
-import cmsRoute from "./Cms";
-import cmsExportRoute from "./CmsExport";
+import CMSRoute from "./CMS";
+import CMSExportRoute from "./CMSExport";
+import CMSOptionRoute from "./CMSOption";
 import editTimetableRoute from "./EditTimetable";
 import editUserProfileRoute from "./EditUserProfile";
 import finalizeTimetableRoute from "./FinalizeTimetable";
@@ -47,10 +47,10 @@ const routeTree = rootRoute.addChildren([
     editUserProfileRoute,
     editTimetableRoute,
     finalizeTimetableRoute,
-    cmsOptionRoute,
+    CMSOptionRoute,
     viewTimetableRoute,
-    cmsExportRoute,
-    cmsRoute,
+    CMSExportRoute,
+    CMSRoute,
   ]),
 ]);
 
