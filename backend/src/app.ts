@@ -9,9 +9,11 @@ import authRouter from "./routers/authRouter.js";
 import courseRouter from "./routers/courseRouter.js";
 import timetableRouter from "./routers/timetableRouter.js";
 import userRouter from "./routers/userRouter.js";
+import { logger } from "./utils/logger.js";
 
 // create express app
 const app = express();
+app.use(logger);
 
 // to parse cookies
 app.use(cookieParser());
