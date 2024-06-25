@@ -39,6 +39,17 @@ CHRONO_SECRET="99fcf0561404319f865d52ec3d3d6239ccc1fbcd5f1f6e5c72cbfd3f5b6feff11
 
 Obviously, we'll use different creds in production.
 
+### Code Formatting
+
+We use [Biome](https://biomejs.dev/) as our code formatter. You can either install the editor integration (here's the [VSCode extension](https://marketplace.visualstudio.com/items?itemName=biomejs.biome)) or run it directly from the command line in the `frontend/` and `backend/` folders:
+
+```sh
+# Check for suggestions
+pnpm biome check .
+# Apply suggestions
+pnpm biome check --apply .
+```
+
 ## Information about this project's Docker system
 
 This project's docker build system relies on something Docker Compose calls "profiles"
