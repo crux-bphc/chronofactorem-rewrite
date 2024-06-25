@@ -89,7 +89,7 @@ const userQueryOptions = queryOptions({
   },
 });
 
-const indexRoute = new Route({
+const homeRoute = new Route({
   getParentRoute: () => authenticatedRoute,
   path: "/",
   loader: ({ context: { queryClient } }) =>
@@ -328,4 +328,4 @@ function Home() {
   }
 }
 
-export default indexRoute;
+export default homeRoute;

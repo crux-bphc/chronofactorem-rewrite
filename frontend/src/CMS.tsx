@@ -97,9 +97,9 @@ const fetchTimetableDetailsQueryOptions = (timetableId: string) =>
     },
   });
 
-const cmsRoute = new Route({
+const CMSRoute = new Route({
   getParentRoute: () => authenticatedRoute,
-  path: "cms/$timetableId",
+  path: "CMS/$timetableId",
   loader: ({ context: { queryClient }, params }) => {
     queryClient
       .ensureQueryData(userQueryOptions)
@@ -123,7 +123,7 @@ const cmsRoute = new Route({
         throw error;
       });
   },
-  component: Cms,
+  component: CMS,
   errorComponent: ({ error }) => {
     const { toast } = useToast();
 
@@ -190,12 +190,12 @@ const cmsRoute = new Route({
   },
 });
 
-function Cms() {
+function CMS() {
   const defaultExtensionId: string = import.meta.env.VITE_CMS_EXTENSION_ID;
   const isnodeEnvironmentDev: boolean = import.meta.env.DEV;
   //you'll need to change the default extension id when you load the unpacked extension
   //loading unpacked extension is necessary to include localhost to externally_connectable matches
-  const { timetableId } = cmsRoute.useParams();
+  const { timetableId } = CMSRoute.useParams();
   const { toast } = useToast();
   const tokenRef = useRef<HTMLInputElement>(null);
   const cookieRef = useRef<HTMLInputElement>(null);
@@ -220,7 +220,7 @@ function Cms() {
       displayname: string;
     }[],
   );
-  const getCmsDetails = async (extensionID: string) => {
+  const getCMSDetails = async (extensionID: string) => {
     try {
       if (typeof chrome !== "undefined" && chrome.runtime) {
         setIsExtensionInstalled(true);
@@ -550,7 +550,7 @@ function Cms() {
                           <Button
                             className="mt-4 py-4 px-4 hover:bg-gray-400 text-md"
                             onClick={async () => {
-                              await getCmsDetails(
+                              await getCMSDetails(
                                 extensionIdRef.current?.value !== undefined &&
                                 extensionIdRef.current?.value !== ""
                                   ? extensionIdRef.current?.value
@@ -1098,4 +1098,4 @@ function Cms() {
   );
 }
 
-export default cmsRoute;
+export default CMSRoute;

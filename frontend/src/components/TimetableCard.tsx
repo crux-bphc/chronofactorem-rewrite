@@ -327,7 +327,7 @@ function TimetableCard({ timetable, showFooter, isCMSPage }: Props) {
                 timetable.draft
                   ? "/edit/$timetableId"
                   : isCMSPage
-                    ? "/cms/$timetableId"
+                    ? "/CMS/$timetableId"
                     : "/view/$timetableId"
               }
               params={{
