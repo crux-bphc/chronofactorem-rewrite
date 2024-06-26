@@ -1,14 +1,23 @@
 import { NextFunction, Request, Response } from "express";
 import { default as onFinished } from "on-finished";
 import { Logger } from "pino";
+import { ZodError } from "zod";
 
 interface ExtendedResponse extends Response {
-  body?: any;
+  body?: {
+    message?: string;
+  };
 }
 
 // funny how request needs this but not response
 interface ExtendedRequest extends Request {
   log: Logger;
+}
+
+function isZodError(err: unknown): err is ZodError {
+  return Boolean(
+    err && (err instanceof ZodError || (err as ZodError).name === "ZodError"),
+  );
 }
 
 export const logger = async (
@@ -30,11 +39,15 @@ export const logger = async (
   onFinished(res, (err, res) => {
     const { log: resLogger, ...rest } = res;
     resLogger.debug(rest);
-    if (err) {
-      resLogger.error(`${rest.statusCode} ${err}`);
+    if (err || rest.statusCode >= 500) {
+      resLogger.error(`${rest.statusCode} ${JSON.stringify(err)}`);
     } else {
       resLogger.info(
-        `${rest.statusCode} ${rest.body?.message ?? res.statusMessage}`,
+        `${rest.statusCode} ${
+          isZodError(rest.body)
+              ? JSON.stringify(rest.body).replace(/\\n/g, " ")
+              : (rest.body?.message ?? rest.statusMessage)
+        }`,
       );
     }
   });
