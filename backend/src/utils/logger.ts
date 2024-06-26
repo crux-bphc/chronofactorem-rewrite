@@ -1,4 +1,4 @@
-import { LoggerOptions, Logger as PinoLogger, pino } from "pino";
+import { Logger as PinoLogger, LoggerOptions, pino } from "pino";
 import { pinoHttp } from "pino-http";
 import { Logger, QueryRunner } from "typeorm";
 import { env } from "../config/server.js";
