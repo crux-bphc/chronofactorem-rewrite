@@ -19,5 +19,6 @@ export const AppDataSource = new DataSource({
   entities: [User, Timetable, Course, Section, SearchHistory, Announcement],
   migrations: [],
   subscribers: [],
+  maxQueryExecutionTime: env.DB_LONG_RUNNING_QUERY_MS,
   logger: new DatabaseLogger(databaseLogger),
 });

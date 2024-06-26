@@ -5,7 +5,7 @@ import { env } from "../config/server.js";
 
 const devOptions: LoggerOptions = {
   // NOTE: this level setting is for database logging only and is independent of the HTTP logging level
-  level: "debug",
+  level: env.LOG_LEVEL,
   transport: {
     target: "pino-pretty",
     options: {
@@ -22,7 +22,7 @@ const devOptions: LoggerOptions = {
 };
 
 const prodOptions: LoggerOptions = {
-  level: "debug",
+  level: env.LOG_LEVEL,
   base: undefined,
   formatters: {
     level(label: string, number: number) {
@@ -39,7 +39,7 @@ const prodOptions: LoggerOptions = {
 };
 
 const baseLogger = pino(
-  env.NODE_ENV === "development" ? devOptions : prodOptions,
+  (env.LOG_MODE ?? env.NODE_ENV) === "development" ? devOptions : prodOptions,
 );
 
 export const httpLogger = pinoHttp({
