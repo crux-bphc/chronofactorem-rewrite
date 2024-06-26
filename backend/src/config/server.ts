@@ -15,7 +15,7 @@ export const formatErrors = (
     })
     .filter(Boolean);
 
-if ("error" in _serverEnv) {
+if (_serverEnv.error !== undefined) {
   console.error(
     "❌ Invalid environment variables:\n",
     ...formatErrors(_serverEnv.error.format()),
