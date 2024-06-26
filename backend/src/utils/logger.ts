@@ -1,20 +1,11 @@
-import { pino } from "pino";
+import { LoggerOptions, Logger as PinoLogger, pino } from "pino";
 import { pinoHttp } from "pino-http";
+import { Logger, QueryRunner } from "typeorm";
 import { env } from "../config/server.js";
 
-const devOptions = {
-  transport: {
-    target: "pino-pretty",
-    options: {
-      ignore: "pid,hostname",
-      translateTime: "SYS:standard",
-      destination: "logs/app.log",
-      // append: false,
-    },
-  },
-};
-
-const prodOptions = {
+const devOptions: LoggerOptions = {
+  // NOTE: this level setting is for database logging only and is independent of the HTTP logging level
+  level: "debug",
   transport: {
     target: "pino-pretty",
     options: {
@@ -24,6 +15,25 @@ const prodOptions = {
       ignore: "pid,hostname",
       translateTime: "SYS:standard",
       destination: "logs/app.log",
+      // NOTE: this will clear logs every time the server hot-reloads
+      append: false,
+    },
+  },
+};
+
+const prodOptions: LoggerOptions = {
+  level: "debug",
+  base: undefined,
+  formatters: {
+    level(label: string, number: number) {
+      return { level: label };
+    },
+  },
+  transport: {
+    target: "pino/file",
+    options: {
+      destination: "logs/app.log",
+      append: true,
     },
   },
 };
@@ -34,6 +44,7 @@ const baseLogger = pino(
 
 export const httpLogger = pinoHttp({
   logger: baseLogger,
+  // NOTE: this level setting is for HTTP logging only and is independent of the base logger's level
   level: "debug",
   autoLogging: false,
 });
