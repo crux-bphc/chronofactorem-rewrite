@@ -26,6 +26,9 @@ dependencies:
   '@types/node':
     specifier: ^20.14.1
     version: 20.14.1
+  '@types/on-finished':
+    specifier: ^2.3.4
+    version: 2.3.4
   '@types/supertest':
     specifier: ^2.0.16
     version: 2.0.16
@@ -94,9 +97,6 @@ devDependencies:
   '@types/eslint':
     specifier: ^8.56.10
     version: 8.56.10
-  '@types/on-finished':
-    specifier: ^2.3.4
-    version: 2.3.4
   '@typescript-eslint/eslint-plugin':
     specifier: ^6.21.0
     version: 6.21.0(@typescript-eslint/parser@6.21.0)(eslint@8.57.0)(typescript@5.3.3)
@@ -1272,7 +1272,7 @@ packages:
     resolution: {integrity: sha512-Ld4UQD3udYcKPaAWlI1EYXKhefkZcTlpqOLkQRmN3u5Ml/tUypMivUHbNH8LweP4H4FlhGGO+uBjJI1Y1dkE1g==}
     dependencies:
       '@types/node': 20.14.1
-    dev: true
+    dev: false
 
   /@types/qs@6.9.15:
     resolution: {integrity: sha512-uXHQKES6DQKKCLh441Xv/dwxOq1TVS3JPUMlEqoEglvlhR6Mxnlew/Xq/LRVHpLyk7iK3zODe1qYHIMltO7XGg==}
