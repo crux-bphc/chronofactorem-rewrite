@@ -29,4 +29,10 @@ export const serverSchema = z.object({
   VITE_FRONTEND_URL: z.string().url().min(1),
   VITE_CMS_EXTENSION_ID: z.string().min(1),
   CHRONO_SECRET: z.string().min(1),
+  DB_LONG_RUNNING_QUERY_MS: z.coerce.number().default(2000),
+  LOG_MODE: z.enum(["development", "production"]).optional(),
+  // from pino.Level
+  LOG_LEVEL: z
+    .enum(["silent", "fatal", "error", "warn", "info", "debug", "trace"])
+    .default("debug"),
 });
