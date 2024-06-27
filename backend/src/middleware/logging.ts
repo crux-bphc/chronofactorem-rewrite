@@ -14,9 +14,12 @@ export const logger = async (
   next: NextFunction,
 ) => {
   const { log: reqLogger, ...rest } = req;
-  reqLogger?.debug(rest);
-  reqLogger?.info(`${rest.method} ${req.url}`);
+  // debug entire request object
+  reqLogger.debug(rest);
+  // log request method and URL (along with the default pino-http `req` object)
+  reqLogger.info(`${rest.method} ${req.url}`);
 
+  // monkey-patch res.json to make response body available for logging
   const originalSend = res.json;
   res.json = (body) => {
     res.body = body;
@@ -26,14 +29,16 @@ export const logger = async (
 
   onFinished(res, (err, res) => {
     const { log: resLogger, ...rest } = res;
+    // debug entire response object
     resLogger.debug(rest);
     if (err || rest.statusCode >= 500) {
       resLogger.error(`${rest.statusCode} ${JSON.stringify(err)}`);
     } else {
+      // since ZodErrors have a different format from our errors, we handle them separately
       resLogger.info(
         `${rest.statusCode} ${
           isZodError(rest.body)
-            ? JSON.stringify(rest.body).replace(/\\n/g, " ")
+            ? JSON.stringify(rest.body)
             : rest.body?.message ?? rest.statusMessage
         }`,
       );

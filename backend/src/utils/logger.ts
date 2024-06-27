@@ -4,18 +4,23 @@ import { Logger, QueryRunner } from "typeorm";
 import { env } from "../config/server.js";
 
 const devOptions: LoggerOptions = {
-  // NOTE: this level setting is for database logging only and is independent of the HTTP logging level
+  // this sets the overall log level
   level: env.LOG_LEVEL,
   transport: {
     target: "pino-pretty",
     options: {
+      // disable terminal colour escape sequences in the logs
       colorize: false,
       colorizeObjects: false,
       singleLine: true,
+      // remove pid and hostname
       ignore: "pid,hostname",
+      // make timestamps human readable
       translateTime: "SYS:standard",
       destination: "logs/app.log",
-      // NOTE: this will clear logs every time the server hot-reloads
+      // create logs if it doesn't exist
+      mkdir: true,
+      // NOTE: this will clear logs every time the server hot-reloads, set this to true if you want logs to persist
       append: false,
     },
   },
@@ -23,7 +28,9 @@ const devOptions: LoggerOptions = {
 
 const prodOptions: LoggerOptions = {
   level: env.LOG_LEVEL,
+  // this removes the pid and hostname
   base: undefined,
+  // by default, `level` shows the level number instead of the label, which isn't very nice
   formatters: {
     level(label: string, number: number) {
       return { level: label };
@@ -33,6 +40,7 @@ const prodOptions: LoggerOptions = {
     target: "pino/file",
     options: {
       destination: "logs/app.log",
+      mkdir: true,
       append: true,
     },
   },
@@ -44,12 +52,18 @@ const baseLogger = pino(
 
 export const httpLogger = pinoHttp({
   logger: baseLogger,
-  // NOTE: this level setting is for HTTP logging only and is independent of the base logger's level
+  // change this to modify the HTTP request log level
   level: "debug",
+  // disables automatic request logging (our debug logs are more detailed)
   autoLogging: false,
 });
 
-export const databaseLogger = baseLogger.child({ module: "database" });
+export const databaseLogger = baseLogger.child(
+  // every database log will have `module` set to "database", which is useful for filtering
+  { module: "database" },
+  // change this to modify the database log level
+  { level: "debug" },
+);
 
 export class DatabaseLogger implements Logger {
   constructor(private readonly logger: PinoLogger) {}
