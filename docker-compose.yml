@@ -62,6 +62,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - ./backend/logs:/usr/src/app/backend/logs
     ports:
       - "${BACKEND_PORT}:${BACKEND_PORT}"
     profiles:

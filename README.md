@@ -91,6 +91,8 @@ Running the project with the `dev` profile runs the backend with `nodemon`, and 
 
 Running the project with the `prod` profile compiles the backend code and runs the container while replicating the exact process with which the project is hosted on our server. It is a good idea to test any PR with this profile before merging it. **In rare cases, what might work in `dev` might not work in `prod`.** Better safe than sorry!
 
+**NOTE:** You may find that the two bind mounts `backend/data` (which stores the database) and `backend/logs` (which stores the logs) are owned by the root user on your system. Since our backend container runs as a non-root user, this can cause some issues. To fix this, **make sure that these folders are owned by the current (non-root) user** before running.
+
 For the frontend, we build our project using Vite and serve the static files using `nginx`. **Note that you will need to create an `nginx.prod.conf` for this**. This was gitignored because it didn't really work with our CI/CD pipeline.
 
 For convenience, here's a sample `nginx.prod.conf`. It's quite similar to the `nginx.dev.conf` except that the frontend is served statically instead of reverse proxying.
