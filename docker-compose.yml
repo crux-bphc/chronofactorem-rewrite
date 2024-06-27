@@ -62,8 +62,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    volumes:
-      - ./backend/logs:/usr/local/app/backend/logs
     ports:
       - "${BACKEND_PORT}:${BACKEND_PORT}"
     profiles:
@@ -80,6 +78,7 @@ services:
       db:
         condition: service_healthy
     volumes:
+      - ./backend/logs:/usr/local/app/backend/logs
       - ./backend/src:/usr/local/app/backend/src
       - ./backend/tsconfig.json:/usr/local/app/backend/tsconfig.json
     profiles:
