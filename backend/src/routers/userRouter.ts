@@ -27,5 +27,9 @@ userRouter.post(
   createAnnoucement,
 );
 userRouter.get("/announcements", authenticate, getAllAnnouncements);
+<<<<<<< Updated upstream
+=======
+userRouter.get("/:id?", authenticate, getUserDetailsValidator, getUserDetails);
+>>>>>>> Stashed changes
 
 export default userRouter;
