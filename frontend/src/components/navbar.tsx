@@ -21,10 +21,6 @@ import { useCookies } from "react-cookie";
 import { z } from "zod";
 import { userWithTimetablesType } from "../../../lib/src/index";
 import { router } from "../main";
-<<<<<<< Updated upstream
-=======
-import Announcements from "./announcements";
->>>>>>> Stashed changes
 import { ModeToggle } from "./mode-toggle";
 
 const fetchUserDetails = async (): Promise<
