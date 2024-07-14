@@ -21,8 +21,8 @@ import { useCookies } from "react-cookie";
 import { z } from "zod";
 import { userWithTimetablesType } from "../../../lib/src/index";
 import { router } from "../main";
-import { ModeToggle } from "./mode-toggle";
 import Announcements from "./announcements";
+import { ModeToggle } from "./mode-toggle";
 
 const fetchUserDetails = async (): Promise<
   z.infer<typeof userWithTimetablesType>
@@ -244,7 +244,6 @@ export function NavBar() {
         </div>
       </div>
     </>
-
   );
   if (userQueryResult.isFetching) {
     return renderNavbarBasedOnQueryFetch(undefined);
