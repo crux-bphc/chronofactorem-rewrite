@@ -267,3 +267,4 @@ export function NavBar() {
   }
   return renderNavbarBasedOnQueryFetch(userQueryResult.data);
 }
+   
