@@ -9,14 +9,15 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 import { useState } from "react";
-import type { announcementType } from "../../../lib/src";
 import type { z } from "zod";
-
+import type { announcementType } from "../../../lib/src";
 
 const fetchAnnouncements = async (): Promise<
   z.infer<typeof announcementType>[]
 > => {
-  const response = await axios.get<z.infer<typeof announcementType>[]>("api/user/announcements");
+  const response = await axios.get<z.infer<typeof announcementType>[]>(
+    "api/user/announcements",
+  );
   console.log(response.data);
   return response.data;
 };
