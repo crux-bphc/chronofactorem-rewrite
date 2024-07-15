@@ -38,10 +38,10 @@ function Announcements() {
       </DialogTrigger>
       <DialogContent className="max-h-[400px] overflow-y-scroll">
         <DialogHeader>
-          <DialogTitle className="text-xl">Announcements</DialogTitle>
+          <DialogTitle className="text-xl -mt-1">Announcements</DialogTitle>
         </DialogHeader>
         <DialogDescription>
-          <div className=" flex flex-col-reverse mx-3 mt-2 gap-3 divide-y divide-y-reverse">
+          <div className="flex flex-col-reverse mx-3 mt-1 gap-3 divide-y divide-y-reverse">
             {announcements?.length ? (
               announcements
                 .sort(
