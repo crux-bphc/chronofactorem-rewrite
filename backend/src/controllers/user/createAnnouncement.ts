@@ -5,12 +5,11 @@ import { env } from "../../config/server.js";
 import { Announcement } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { announcementRepository } from "../../repositories/anouncementRepository.js";
+import { announcementType } from "../../../../lib/src/zodEntityTypes.js";
 
 const announcementSchema = z.object({
-  body: z.object({
-    chronoSecret: namedNonEmptyStringType("chrono secret"),
-    title: namedNonEmptyStringType("title"),
-    message: namedNonEmptyStringType("message"),
+  body: announcementType.extend({
+    chronoSecret: namedNonEmptyStringType("chronoSecret"),
   }),
 });
 
