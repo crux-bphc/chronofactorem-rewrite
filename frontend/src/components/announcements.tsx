@@ -57,9 +57,9 @@ function Announcements() {
                       {announcement.title}
                     </h1>
                     <p className="opacity-70 text-xs">
-                      {new Date(announcement.createdAt as string)
-                        .toLocaleString()
-                        .slice(0, -3)}
+                      {new Date(
+                        announcement.createdAt as string,
+                      ).toLocaleString()}
                     </p>
                     <p className="opacity-90 mb-3">{announcement.message}</p>
                   </div>
