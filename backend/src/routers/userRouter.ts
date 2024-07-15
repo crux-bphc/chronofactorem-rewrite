@@ -17,7 +17,6 @@ import { authenticate } from "../middleware/auth.js";
 
 const userRouter = express.Router();
 
-userRouter.get("/:id?", authenticate, getUserDetailsValidator, getUserDetails);
 userRouter.post("/edit", authenticate, editUserValidator, editUser);
 userRouter.post("/unenroll", authenticate, unenrollValidator, unenroll);
 userRouter.post(
@@ -27,5 +26,6 @@ userRouter.post(
   createAnnoucement,
 );
 userRouter.get("/announcements", authenticate, getAllAnnouncements);
+userRouter.get("/:id?", authenticate, getUserDetailsValidator, getUserDetails);
 
 export default userRouter;
