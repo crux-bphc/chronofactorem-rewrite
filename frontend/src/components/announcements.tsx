@@ -14,7 +14,7 @@ const fetchAnnouncements = async () => {
   const response = await axios.get("api/user/announcements");
   console.log(response.data);
   return response.data;
-}
+};
 
 function Announcements() {
   const { data: announcements } = useQuery({
@@ -32,30 +32,27 @@ function Announcements() {
         </DialogHeader>
         <DialogDescription>
           <div className=" flex flex-col-reverse mx-3 mt-2 gap-3 divide-y divide-y-reverse">
-            {
-              announcements?.length ?
-                announcements.
-                  sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-                  .map(
-                    (announcement) => (
-                      <div className="flex gap-1 flex-col">
-                        <h1 className="font-bold text-base">
-                          {announcement.title}
-                        </h1>
-                        <p className="opacity-70 text-xs">
-                          {new Date(announcement.createdAt).toLocaleString().slice(0, -3)}
-                        </p>
-                        <p className="opacity-90 mb-3">
-                          {announcement.message}
-                        </p>
-                      </div>
-                    ),
-                  )
-                : <p>No announcements</p>
-            }
+            {announcements?.length ? (
+              announcements
+                .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+                .map((announcement) => (
+                  <div className="flex gap-1 flex-col">
+                    <h1 className="font-bold text-base">
+                      {announcement.title}
+                    </h1>
+                    <p className="opacity-70 text-xs">
+                      {new Date(announcement.createdAt)
+                        .toLocaleString()
+                        .slice(0, -3)}
+                    </p>
+                    <p className="opacity-90 mb-3">{announcement.message}</p>
+                  </div>
+                ))
+            ) : (
+              <p>No announcements</p>
+            )}
           </div>
         </DialogDescription>
-
       </DialogContent>
     </Dialog>
   );
