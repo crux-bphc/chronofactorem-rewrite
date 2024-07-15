@@ -10,7 +10,6 @@ import axios from "axios";
 
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Megaphone } from "lucide-react";
-import { useState } from "react";
 import type { z } from "zod";
 import type { announcementType } from "../../../lib/src";
 import { Button } from "./ui/button";
@@ -21,7 +20,6 @@ const fetchAnnouncements = async (): Promise<
   const response = await axios.get<z.infer<typeof announcementType>[]>(
     "api/user/announcements",
   );
-  console.log(response.data);
   return response.data;
 };
 
