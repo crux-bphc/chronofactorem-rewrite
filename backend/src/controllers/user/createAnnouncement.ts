@@ -5,7 +5,7 @@ import { namedNonEmptyStringType } from "../../../../lib/src/zodFieldTypes.js";
 import { env } from "../../config/server.js";
 import { Announcement } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
-import { announcementRepository } from "../../repositories/anouncementRepository.js";
+import { announcementRepository } from "../../repositories/announcementRepository.js";
 
 const announcementSchema = z.object({
   body: announcementType.extend({
@@ -15,7 +15,7 @@ const announcementSchema = z.object({
 
 export const announcementValidator = validate(announcementSchema);
 
-export const createAnnoucement = async (req: Request, res: Response) => {
+export const createAnnouncement = async (req: Request, res: Response) => {
   try {
     const { title, message } = req.body;
 

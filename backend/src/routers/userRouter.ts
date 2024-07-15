@@ -5,7 +5,7 @@ import {
 } from "../controllers/user/cmsFunctions.js";
 import {
   announcementValidator,
-  createAnnoucement,
+  createAnnouncement,
 } from "../controllers/user/createAnnouncement.js";
 import { editUser, editUserValidator } from "../controllers/user/editUser.js";
 import {
@@ -23,7 +23,7 @@ userRouter.post(
   "/announcements/create",
   authenticate,
   announcementValidator,
-  createAnnoucement,
+  createAnnouncement,
 );
 userRouter.get("/announcements", authenticate, getAllAnnouncements);
 userRouter.get("/:id?", authenticate, getUserDetailsValidator, getUserDetails);
