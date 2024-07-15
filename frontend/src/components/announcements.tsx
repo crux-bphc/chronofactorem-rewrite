@@ -31,7 +31,7 @@ function Announcements() {
 
   return (
     <Dialog>
-      <DialogTrigger>
+      <DialogTrigger asChild>
         <Button className="mr-9" variant="outline" size="icon">
           <Megaphone className="h-5 w-5" />
         </Button>
@@ -40,7 +40,7 @@ function Announcements() {
         <DialogHeader>
           <DialogTitle className="text-xl -mt-1">Announcements</DialogTitle>
         </DialogHeader>
-        <DialogDescription>
+        <DialogDescription asChild>
           <div className="flex flex-col-reverse mx-3 mt-1 gap-3 divide-y divide-y-reverse">
             {announcements?.length ? (
               announcements
