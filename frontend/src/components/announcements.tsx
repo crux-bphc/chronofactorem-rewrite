@@ -11,7 +11,7 @@ import axios from "axios";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Megaphone } from "lucide-react";
 import type { z } from "zod";
-import type { announcementType } from "../../../lib/src";
+import { announcementType } from "../../../lib/src";
 import { Button } from "./ui/button";
 
 const fetchAnnouncements = async (): Promise<
@@ -42,13 +42,12 @@ function Announcements() {
         </DialogHeader>
         <DialogDescription asChild>
           <div className="flex flex-col-reverse mx-3 mt-1 gap-3 divide-y divide-y-reverse">
-            {announcements?.length ? (
-              announcements
-                .sort(
-                  (a, b) =>
-                    new Date(a.createdAt as string).getTime() -
-                    new Date(b.createdAt as string).getTime(),
-                )
+            {Array.isArray(announcements) && announcements?.length ? (
+              announcements?.sort(
+                (a, b) =>
+                  new Date(a.createdAt as string).getTime() -
+                  new Date(b.createdAt as string).getTime(),
+              )
                 .map((announcement) => (
                   <div className="flex gap-1 flex-col">
                     <h1 className="font-bold text-base">
