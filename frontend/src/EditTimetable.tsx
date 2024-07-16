@@ -475,8 +475,8 @@ function EditTimetable() {
       timetableQueryResult.data.degrees.length === 1
         ? timetableQueryResult.data.degrees[0]
         : timetableQueryResult.data.degrees
-            .sort((a, b) => (b as any) - (a as any))
-            .join("")
+          .sort((a, b) => (b as any) - (a as any))
+          .join("")
     ) as keyof typeof CDCList;
     const cdcListKey =
       `${timetableQueryResult.data.year}-${timetableQueryResult.data.semester}` as keyof (typeof CDCList)[typeof degree];
@@ -550,19 +550,19 @@ function EditTimetable() {
       if (cdcs[i].id === null) {
         const option = cdcs[i] as
           | {
-              id: null;
-              type: "warning";
-              warning: string;
-            }
+            id: null;
+            type: "warning";
+            warning: string;
+          }
           | {
-              id: null;
-              type: "optional";
-              options: {
-                id: string;
-                code: string;
-                name: string;
-              }[];
-            };
+            id: null;
+            type: "optional";
+            options: {
+              id: string;
+              code: string;
+              name: string;
+            }[];
+          };
         if (
           option.type === "optional" &&
           !option.options.some((e) =>
@@ -907,6 +907,7 @@ function EditTimetable() {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
+                      disabled={timetableQueryResult.data.archived}
                       variant="ghost"
                       className="rounded-full p-3"
                       onClick={() => {
@@ -928,46 +929,46 @@ function EditTimetable() {
                 </Tooltip>
                 {userQueryResult.data.id ===
                   timetableQueryResult.data.authorId && (
-                  <AlertDialog>
-                    <Tooltip>
-                      <AlertDialogTrigger asChild>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
-                          >
-                            <Trash className="w-5 h-5 md:w-6 md:h-6" />
-                          </Button>
-                        </TooltipTrigger>
-                      </AlertDialogTrigger>
-                      <TooltipContent>
-                        <p>Delete Timetable</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    <AlertDialogContent className="p-8">
-                      <AlertDialogHeader>
-                        <AlertDialogTitle className="text-2xl">
-                          Are you sure?
-                        </AlertDialogTitle>
-                        <AlertDialogDescription className="text-destructive text-lg font-bold">
-                          All your progress on this timetable will be lost, and
-                          unrecoverable.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogPrimitive.Action asChild>
-                          <Button
-                            variant="destructive"
-                            onClick={() => deleteMutation.mutate()}
-                          >
-                            Delete
-                          </Button>
-                        </AlertDialogPrimitive.Action>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
+                    <AlertDialog>
+                      <Tooltip>
+                        <AlertDialogTrigger asChild>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
+                            >
+                              <Trash className="w-5 h-5 md:w-6 md:h-6" />
+                            </Button>
+                          </TooltipTrigger>
+                        </AlertDialogTrigger>
+                        <TooltipContent>
+                          <p>Delete Timetable</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <AlertDialogContent className="p-8">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="text-2xl">
+                            Are you sure?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription className="text-destructive text-lg font-bold">
+                            All your progress on this timetable will be lost, and
+                            unrecoverable.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogPrimitive.Action asChild>
+                            <Button
+                              variant="destructive"
+                              onClick={() => deleteMutation.mutate()}
+                            >
+                              Delete
+                            </Button>
+                          </AlertDialogPrimitive.Action>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
 
                 {timetable.warnings.length !== 0 && (
                   <Tooltip delayDuration={100}>
@@ -990,10 +991,8 @@ function EditTimetable() {
                               </div>
                             ))}
                           {timetable.warnings.length > 2 &&
-                            ` and ${
-                              timetable.warnings.length - 2
-                            } other warning${
-                              timetable.warnings.length > 3 ? "s" : ""
+                            ` and ${timetable.warnings.length - 2
+                            } other warning${timetable.warnings.length > 3 ? "s" : ""
                             }`}
                         </span>
                         <AlertTriangle className="w-6 h-6 m-1 text-orange-600 dark:text-orange-400" />
