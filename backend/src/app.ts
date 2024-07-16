@@ -5,13 +5,19 @@ import "dotenv/config";
 import express, { NextFunction } from "express";
 import { Request, Response } from "express";
 import { env } from "./config/server.js";
+import { logger } from "./middleware/logging.js";
 import authRouter from "./routers/authRouter.js";
 import courseRouter from "./routers/courseRouter.js";
 import timetableRouter from "./routers/timetableRouter.js";
 import userRouter from "./routers/userRouter.js";
+import { httpLogger } from "./utils/logger.js";
 
 // create express app
 const app = express();
+
+// logging
+app.use(httpLogger);
+app.use(logger);
 
 // to parse cookies
 app.use(cookieParser());

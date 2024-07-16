@@ -1,14 +1,12 @@
 # ChronoFactorem (rewrite)
 
-**NOTE:** Before contributing changes, we recommend you read the [Contributing Guide](./CONTRIBUTING.md)
-
-**NOTE:** ⚠️ If you have a development environment with latest commit at or before c288045, please read the [dev section](#dev) carefully. Old development environments are now broken.
+**NOTE:** Before contributing changes, we recommend you read the [Contributing Guide](./CONTRIBUTING.md).
 
 ## Steps for setup:
 
-1. Install [nvm](https://github.com/nvm-sh/nvm), and install Node v20.14.0 LTS using `nvm install v20.14.0`. If you're using a different node version manager, do the equivalent.
-2. Activate Node v20.14.0 using `nvm use v20.14.0`
-3. Install pnpm, using `npm i -g pnpm`
+1. Install [nvm](https://github.com/nvm-sh/nvm) and install Node v20.14.0 LTS using `nvm install v20.14.0`. If you're using a different Node version manager, do the equivalent.
+2. Activate Node v20.14.0 using `nvm use v20.14.0`.
+3. Install pnpm, using `npm i -g pnpm`.
 4. Install the packages in this repo by running `pnpm i` in the the `backend`, `lib` and `frontend` folders of this repository.
 
 Check [.env.example](./.env.example) for an example env file. It can be arbitrary, though we recommend using:
@@ -35,6 +33,9 @@ VITE_FRONTEND_URL="http://localhost:5000"
 SESSION_MAX_AGE_MS=86400000
 VITE_CMS_EXTENSION_ID="ebjldebpahljhpakgngnandakdbajdnj"
 CHRONO_SECRET="99fcf0561404319f865d52ec3d3d6239ccc1fbcd5f1f6e5c72cbfd3f5b6feff119ba5dc9a027f06e1ab5fcc39de6c71da6fc46c46b0206c06097394491f26b15"
+LOG_MODE="development"
+LOG_LEVEL="info"
+DB_LONG_RUNNING_QUERY_MS=2000
 ```
 
 Obviously, we'll use different creds in production.
@@ -52,7 +53,7 @@ pnpm biome check --apply .
 
 ## Information about this project's Docker system
 
-This project's docker build system relies on something Docker Compose calls "profiles"
+This project's docker build system relies on something Docker Compose calls "profiles".
 
 This project has 4 profiles as of now:
 
@@ -65,7 +66,7 @@ This project has 4 profiles as of now:
 
 1. Run `docker compose --profile PROFILE down` to stop, and delete any containers in the profile named PROFILE.
 
-   **NOTE:** Adding a `-v` flag at the end of this command deletes only the node_modules cache for the `frontend-dev` container. If you want to clear database data, you will have to delete the `backend/data` folder. Deleting this usually requires root permissions.
+   **NOTE:** Adding a `-v` flag at the end of this command deletes only the `node_modules` cache for the `frontend-dev` container. If you want to clear database data, you will have to delete the `backend/data` folder. Deleting this usually requires root permissions.
 
 2. Run `docker compose --profile PROFILE up --build` to build and run all containers in the profile named PROFILE.
 
@@ -75,7 +76,7 @@ This project has 4 profiles as of now:
 
 Running the project with the `dev` profile runs the backend with `nodemon`, and creates a bind mount with vite on the frontend, hot-reloading the running containers as soon as you save changes to your code. More importantly, this also creates an `nginx` container that makes the frontend and backend the same host to allow easy integration of the two. The `NGINX_PORT` defines which port it opens up for development. The frontend will be available at `http://localhost:NGINX_PORT/` and the backend will be at `http://localhost:NGINX_PORT/api`.
 
-**NOTE:** Changes to the `package.json`, `pnpm-lock.yaml` obviously, will require container rebuilds, and since the frontend container caches dependencies for the `dev` profile, we highly recommend rebuilding the containers entirely using `docker compose --profile dev down` and `docker compose --profile dev up --build`. Additionally, **any changes to code in the `lib` directory will also require a container rebuild**, due to the current state of `nodemon` not supporting external reference-based builds, see https://github.com/TypeStrong/ts-node/issues/897.
+**NOTE:** Changes to the `package.json` and `pnpm-lock.yaml` will obviously require container rebuilds, and since the frontend container caches dependencies for the `dev` profile, we highly recommend rebuilding the containers entirely using `docker compose --profile dev down` and `docker compose --profile dev up --build`. Additionally, **any changes to code in the `lib` directory will also require a container rebuild**, due to the current state of `nodemon` not supporting external reference-based builds, see https://github.com/TypeStrong/ts-node/issues/897.
 
 #### Containers in the `dev` profile
 
@@ -88,20 +89,87 @@ Running the project with the `dev` profile runs the backend with `nodemon`, and 
 
 ### Prod
 
-**NOTE:** As of this commit, prod containers for the frontend do not exist, and it is not verified whether or not the backend prod containers still work after the container reworking.
+Running the project with the `prod` profile compiles the backend code and runs the container while replicating the exact process with which the project is hosted on our server. It is a good idea to test any PR with this profile before merging it. **In rare cases, what might work in `dev` might not work in `prod`.** Better safe than sorry!
 
-Running the project with the `prod` profile compiles the backend code, and runs the container while replicating the exact process with which the project is hosted on our server. It is a good idea to test any PR with this profile before merging it. **In rare cases, what might work in `dev` might not work in `prod`.** Better safe than sorry!
+**NOTE:** You may find that the two bind mounts `backend/data` (which stores the database) and `backend/logs` (which stores the logs) are owned by the root user on your system. Since our backend container runs as a non-root user, this can cause some issues. To fix this, **make sure that these folders are owned by the current (non-root) user** before running.
+
+For the frontend, we build our project using Vite and serve the static files using `nginx`. **Note that you will need to create an `nginx.prod.conf` for this**. This was gitignored because it didn't really work with our CI/CD pipeline.
+
+For convenience, here's a sample `nginx.prod.conf`. It's quite similar to the `nginx.dev.conf` except that the frontend is served statically instead of reverse proxying.
+
+```nginx
+user  nginx;
+worker_processes  auto;
+
+error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
+
+events {
+	worker_connections  4096;  ## Default: 1024
+}
+
+http {
+	include /etc/nginx/mime.types;
+	default_type  application/octet-stream;
+
+	log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+										'$status $body_bytes_sent "$http_referer" '
+										'"$http_user_agent" "$http_x_forwarded_for"';
+
+	access_log  /var/log/nginx/access.log  main;
+
+	sendfile        on;
+	keepalive_timeout  65;
+	
+	gzip  on;
+
+	server {
+		listen 80;
+		client_max_body_size 11M;
+
+		gzip on;
+		gzip_proxied any;
+		gzip_comp_level 6;
+		gzip_buffers 16 8k;
+		gzip_http_version 1.1;
+		gzip_types text/css application/javascript application/json application/font-woff application/font-tff image/gif image/png image/svg+xml application/octet-stream;
+
+		access_log /usr/log/access.log;
+		error_log /usr/log/error.log;
+
+		location /api/ {
+			proxy_set_header X-Real-IP $remote_addr;
+			proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+			proxy_set_header Host $host;
+			proxy_set_header X-NginX-Proxy true;
+			proxy_pass http://backend-prod:3000/;
+		}
+
+		location / {
+			root /usr/share/nginx/html;
+ 			try_files $uri $uri/ /index.html;
+ 
+ 			location ~* \.(gif|jpe?g|png|webp|ico|svg|css|js|mp4)$ {
+ 				expires 1d;
+ 				add_header Pragma public;
+ 				add_header Cache-Control "public";
+ 			}
+		}
+	}
+}
+```
 
 #### Containers in the `prod` profile
 
 - db
 - backend-prod
+- frontend-prod
 
-**NOTE:** This same `db` container is used in `dev` and `ingestion`
+**NOTE:** This same `db` container is used in `dev` and `ingestion`.
 
 ### Testing
 
-**NOTE:** As of this commit, prod/testing containers for the frontend do not exist, and it is not verified whether or not the backend testing containers still work after the container reworking.
+**NOTE:** As of this commit, testing containers for the frontend do not exist, and it is not verified whether or not the backend testing containers still work after the container reworking.
 
 Running the project with the `testing` profile copies the project into the container like dev would, but runs tests instead of running the code with `nodemon`. Testing uses the environment variables from [.env.testing](./.env.testing).
 
@@ -130,4 +198,5 @@ If something goes wrong, and you need to overwrite the course data for a semeste
 - ingestion
 
 **NOTE:** This same `db` container is used in `dev` and `prod`
+
 **NOTE:** This same `ingestion` container is the container that runs the ingestion script.
