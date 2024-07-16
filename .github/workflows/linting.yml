@@ -1,9 +1,12 @@
 name: Lint code and check formatting with BiomeJS
 
-on: workflow_dispatch
+on:
+  pull_request:
+    types: [ labeled ]
 
 jobs:
   linting:
+    if: ${{ github.event.label.name == 'ready' }}
     runs-on: self-hosted
     steps:
       - name: Checkout
