@@ -157,6 +157,7 @@ const viewTimetableRoute = new Route({
       if (error.response) {
         switch (error.response.status) {
           case 404:
+            router.navigate({ to: "/404" });
             toast({
               title: "Error",
               description:

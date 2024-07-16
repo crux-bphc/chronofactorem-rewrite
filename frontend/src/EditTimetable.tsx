@@ -173,6 +173,7 @@ const editTimetableRoute = new Route({
                 </ToastAction>
               ),
             });
+            router.navigate({ to: "/404" });
             break;
           case 500:
             toast({
