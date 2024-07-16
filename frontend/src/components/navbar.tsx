@@ -21,6 +21,7 @@ import { useCookies } from "react-cookie";
 import { z } from "zod";
 import { userWithTimetablesType } from "../../../lib/src/index";
 import { router } from "../main";
+import Announcements from "./announcements";
 import { ModeToggle } from "./mode-toggle";
 
 const fetchUserDetails = async (): Promise<
@@ -195,6 +196,7 @@ export function NavBar() {
       </div>
       <div className="flex flex-row">
         <div className="pt-3">
+          <Announcements />
           <ModeToggle />
         </div>
         <DropdownMenu>

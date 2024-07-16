@@ -178,6 +178,17 @@ export const namedCourseWithSectionsType = (name?: string) =>
     })
     .merge(namedCourseType(name));
 
+export const namedAnnouncementType = (name?: string) =>
+  z
+    .object({
+      title: namedNonEmptyStringType(addNameToString("announcement title", name)),
+      message: namedNonEmptyStringType(addNameToString("announcement message", name)),
+      createdAt: namedISOTimestampType(addNameToString("announcement createdAt", name)).optional(),
+    })
+    .strict({ message: addNameToString("announcement has extra fields", name) });
+
+export const announcementType = namedAnnouncementType();
+
 export const userType = namedUserType();
 export const timetableType = namedTimetableType();
 export const sectionType = namedSectionType();

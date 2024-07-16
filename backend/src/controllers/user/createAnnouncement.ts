@@ -1,22 +1,21 @@
 import { Request, Response } from "express";
 import { z } from "zod";
+import { announcementType } from "../../../../lib/src/zodEntityTypes.js";
 import { namedNonEmptyStringType } from "../../../../lib/src/zodFieldTypes.js";
 import { env } from "../../config/server.js";
 import { Announcement } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
-import { announcementRepository } from "../../repositories/anouncementRepository.js";
+import { announcementRepository } from "../../repositories/announcementRepository.js";
 
 const announcementSchema = z.object({
-  body: z.object({
-    chronoSecret: namedNonEmptyStringType("chrono secret"),
-    title: namedNonEmptyStringType("title"),
-    message: namedNonEmptyStringType("message"),
+  body: announcementType.extend({
+    chronoSecret: namedNonEmptyStringType("chronoSecret"),
   }),
 });
 
 export const announcementValidator = validate(announcementSchema);
 
-export const createAnnoucement = async (req: Request, res: Response) => {
+export const createAnnouncement = async (req: Request, res: Response) => {
   try {
     const { title, message } = req.body;
 
