@@ -9,6 +9,7 @@ import {
   Timetable,
   User,
 } from "./entity/entities.js";
+import { DatabaseLogger, databaseLogger } from "./utils/logger.js";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -18,4 +19,6 @@ export const AppDataSource = new DataSource({
   entities: [User, Timetable, Course, Section, SearchHistory, Announcement],
   migrations: [],
   subscribers: [],
+  maxQueryExecutionTime: env.DB_LONG_RUNNING_QUERY_MS,
+  logger: new DatabaseLogger(databaseLogger),
 });
