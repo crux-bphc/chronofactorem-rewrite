@@ -5,16 +5,10 @@ on: workflow_dispatch
 jobs:
   staging:
     name: Build and deploy to staging
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: ssh into machine, and clone repo
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          port: ${{ secrets.PORT }}
-          script: |
+        run: |
             cd /home/ubuntu/clones
             cd chronofactorem-rewrite-staging
             git reset --hard HEAD
