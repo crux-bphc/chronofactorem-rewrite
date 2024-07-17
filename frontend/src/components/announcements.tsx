@@ -18,7 +18,7 @@ const fetchAnnouncements = async (): Promise<
   z.infer<typeof announcementType>[]
 > => {
   const response = await axios.get<z.infer<typeof announcementType>[]>(
-    "api/user/announcements",
+    "/api/user/announcements",
   );
   return response.data;
 };
