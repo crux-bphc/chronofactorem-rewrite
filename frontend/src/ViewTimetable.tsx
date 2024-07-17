@@ -595,8 +595,6 @@ function ViewTimetable() {
     let cdcs: string[];
     const coursesList = [];
 
-    console.log(timetableQueryResult.data);
-
     if (
       timetableQueryResult.data === undefined ||
       courseQueryResult.data === undefined
@@ -607,8 +605,8 @@ function ViewTimetable() {
       timetableQueryResult.data.degrees.length === 1
         ? timetableQueryResult.data.degrees[0]
         : timetableQueryResult.data.degrees
-            .sort((a, b) => (b as any) - (a as any))
-            .join("")
+          .sort((a, b) => (b as any) - (a as any))
+          .join("")
     ) as keyof typeof CDCList;
     const cdcListKey =
       `${timetableQueryResult.data.year}-${timetableQueryResult.data.semester}` as keyof (typeof CDCList)[typeof degree];
@@ -904,30 +902,36 @@ function ViewTimetable() {
                 )}
                 {userQueryResult.data.id ===
                   timetableQueryResult.data.authorId && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        disabled={timetableQueryResult.data.archived}
-                        variant="ghost"
-                        className="rounded-full p-3"
-                        onClick={() =>
-                          editMutation.mutate({
-                            isDraft: true,
-                            isPrivate: true,
-                            name: timetableQueryResult.data?.name ?? "",
-                          })
+                    <Tooltip>
+                      <TooltipTrigger className={`${timetableQueryResult.data.archived && 'cursor-not-allowed'}`}>
+                        <Button
+                          disabled={timetableQueryResult.data.archived}
+                          variant="ghost"
+                          className="rounded-full p-3"
+                          onClick={() =>
+                            editMutation.mutate({
+                              isDraft: true,
+                              isPrivate: true,
+                              name: timetableQueryResult.data?.name ?? "",
+                            })
+                          }
+                        >
+                          <Edit2 className="w-5 h-5 md:w-6 md:h-6" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {
+                          timetableQueryResult.data.archived ? (
+                            <p>Cannot edit archived timetable</p>
+                          ) : (
+                            <p>Edit Timetable</p>
+                          )
                         }
-                      >
-                        <Edit2 className="w-5 h-5 md:w-6 md:h-6" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Edit Timetable</p>
-                    </TooltipContent>
-                  </Tooltip>
-                )}
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
                 <Tooltip>
-                  <TooltipTrigger asChild>
+                  <TooltipTrigger className={`${timetableQueryResult.data.archived && 'cursor-not-allowed'}`}>
                     <Button
                       disabled={timetableQueryResult.data.archived}
                       variant="ghost"
@@ -943,51 +947,57 @@ function ViewTimetable() {
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Copy Timetable</p>
+                    {
+                      timetableQueryResult.data.archived ? (
+                        <p>Cannot copy archived timetable</p>
+                      ) : (
+                        <p>Copy Timetable</p>
+                      )
+                    }
                   </TooltipContent>
                 </Tooltip>
                 {userQueryResult.data.id ===
                   timetableQueryResult.data.authorId && (
-                  <AlertDialog>
-                    <Tooltip>
-                      <AlertDialogTrigger asChild>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
-                          >
-                            <Trash className="w-5 h-5 md:w-6 md:h-6" />
-                          </Button>
-                        </TooltipTrigger>
-                      </AlertDialogTrigger>
-                      <TooltipContent>
-                        <p>Delete Timetable</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    <AlertDialogContent className="p-8">
-                      <AlertDialogHeader>
-                        <AlertDialogTitle className="text-2xl">
-                          Are you sure?
-                        </AlertDialogTitle>
-                        <AlertDialogDescription className="text-destructive text-lg font-bold">
-                          All your progress on this timetable will be lost, and
-                          unrecoverable.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogPrimitive.Action asChild>
-                          <Button
-                            variant="destructive"
-                            onClick={() => deleteMutation.mutate()}
-                          >
-                            Delete
-                          </Button>
-                        </AlertDialogPrimitive.Action>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
+                    <AlertDialog>
+                      <Tooltip>
+                        <AlertDialogTrigger asChild>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
+                            >
+                              <Trash className="w-5 h-5 md:w-6 md:h-6" />
+                            </Button>
+                          </TooltipTrigger>
+                        </AlertDialogTrigger>
+                        <TooltipContent>
+                          <p>Delete Timetable</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <AlertDialogContent className="p-8">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="text-2xl">
+                            Are you sure?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription className="text-destructive text-lg font-bold">
+                            All your progress on this timetable will be lost, and
+                            unrecoverable.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogPrimitive.Action asChild>
+                            <Button
+                              variant="destructive"
+                              onClick={() => deleteMutation.mutate()}
+                            >
+                              Delete
+                            </Button>
+                          </AlertDialogPrimitive.Action>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
               </span>
             </div>
             {/* the bg-background here is necessary so the generated image has the background in it */}
