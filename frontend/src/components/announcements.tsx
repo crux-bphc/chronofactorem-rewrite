@@ -43,11 +43,12 @@ function Announcements() {
         <DialogDescription asChild>
           <div className="flex flex-col-reverse mx-3 mt-1 gap-3 divide-y divide-y-reverse">
             {Array.isArray(announcements) && announcements?.length ? (
-              announcements?.sort(
-                (a, b) =>
-                  new Date(a.createdAt as string).getTime() -
-                  new Date(b.createdAt as string).getTime(),
-              )
+              announcements
+                ?.sort(
+                  (a, b) =>
+                    new Date(a.createdAt as string).getTime() -
+                    new Date(b.createdAt as string).getTime(),
+                )
                 .map((announcement) => (
                   <div className="flex gap-1 flex-col">
                     <h1 className="font-bold text-base">
