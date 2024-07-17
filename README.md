@@ -36,6 +36,7 @@ CHRONO_SECRET="99fcf0561404319f865d52ec3d3d6239ccc1fbcd5f1f6e5c72cbfd3f5b6feff11
 LOG_MODE="development"
 LOG_LEVEL="info"
 DB_LONG_RUNNING_QUERY_MS=2000
+SEARCH_SERVICE_URL="http://chrono:4713"
 ```
 
 Obviously, we'll use different creds in production.
@@ -120,7 +121,7 @@ http {
 
 	sendfile        on;
 	keepalive_timeout  65;
-	
+
 	gzip  on;
 
 	server {
@@ -148,7 +149,7 @@ http {
 		location / {
 			root /usr/share/nginx/html;
  			try_files $uri $uri/ /index.html;
- 
+
  			location ~* \.(gif|jpe?g|png|webp|ico|svg|css|js|mp4)$ {
  				expires 1d;
  				add_header Pragma public;
