@@ -134,9 +134,36 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
         body: JSON.stringify(updatedTimetableStringID),
       });
       const resJson = await res.json();
-      console.log("ERROR:", resJson.error);
+      if (!res.ok) {
+        console.log(resJson.error);
+      }
     } catch (err: any) {
-      console.log("Error while adding timetable to search service: ", err);
+      console.log(
+        "Error while adding timetable to search service: ",
+        err.message,
+      );
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+  } else if (isDraft === true || isPrivate === true) {
+    try {
+      const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/remove`;
+
+      const res = await fetch(searchServiceURL, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: req.params.id }),
+      });
+      if (!res.ok) {
+        const resJson = await res.json();
+        console.log(resJson.error);
+      }
+    } catch (err: any) {
+      console.log(
+        "Error while removing timetable from search service: ",
+        err.message,
+      );
       return res.status(500).json({ message: "Internal Server Error" });
     }
   }

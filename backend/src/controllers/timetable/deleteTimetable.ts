@@ -78,13 +78,17 @@ export const deleteTimetable = async (req: Request, res: Response) => {
   try {
     const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/remove`;
 
-    await fetch(searchServiceURL, {
+    const res = await fetch(searchServiceURL, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ id: timetable.id }),
     });
+    if (!res.ok) {
+      const resJson = await res.json();
+      console.log(resJson.error);
+    }
   } catch (err: any) {
     console.log(
       "Error while removing timetable from search service: ",
