@@ -11,14 +11,14 @@ import axios from "axios";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Megaphone } from "lucide-react";
 import type { z } from "zod";
-import type { announcementType } from "../../../lib/src";
+import { announcementType } from "../../../lib/src";
 import { Button } from "./ui/button";
 
 const fetchAnnouncements = async (): Promise<
   z.infer<typeof announcementType>[]
 > => {
   const response = await axios.get<z.infer<typeof announcementType>[]>(
-    "api/user/announcements",
+    "/api/user/announcements",
   );
   return response.data;
 };
@@ -42,9 +42,9 @@ function Announcements() {
         </DialogHeader>
         <DialogDescription asChild>
           <div className="flex flex-col-reverse mx-3 mt-1 gap-3 divide-y divide-y-reverse">
-            {announcements?.length ? (
+            {Array.isArray(announcements) && announcements?.length ? (
               announcements
-                .sort(
+                ?.sort(
                   (a, b) =>
                     new Date(a.createdAt as string).getTime() -
                     new Date(b.createdAt as string).getTime(),

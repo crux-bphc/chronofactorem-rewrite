@@ -7,7 +7,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { ErrorComponent, Route } from "@tanstack/react-router";
+import { ErrorComponent, Route, notFound } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { toPng } from "html-to-image";
 import {
@@ -29,6 +29,7 @@ import {
 } from "../../lib/src/index";
 import { userWithTimetablesType } from "../../lib/src/index";
 import authenticatedRoute from "./AuthenticatedRoute";
+import NotFound from "./components/NotFound";
 import { TimetableGrid } from "./components/TimetableGrid";
 import { SideMenu } from "./components/side-menu";
 import Spinner from "./components/spinner";
@@ -147,32 +148,24 @@ const viewTimetableRoute = new Route({
           });
         }
 
+        if (
+          error instanceof AxiosError &&
+          error.response &&
+          error.response.status === 404
+        ) {
+          throw notFound();
+        }
+
         throw error;
       }),
   component: ViewTimetable,
+  notFoundComponent: NotFound,
   errorComponent: ({ error }) => {
     const { toast } = useToast();
 
     if (error instanceof AxiosError) {
       if (error.response) {
         switch (error.response.status) {
-          case 404:
-            toast({
-              title: "Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : "API returned 404",
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-            break;
           case 500:
             toast({
               title: "Server Error",
@@ -910,8 +903,15 @@ function ViewTimetable() {
                 {userQueryResult.data.id ===
                   timetableQueryResult.data.authorId && (
                   <Tooltip>
-                    <TooltipTrigger asChild>
+                    <TooltipTrigger
+                      className={
+                        timetableQueryResult.data.archived
+                          ? "cursor-not-allowed"
+                          : ""
+                      }
+                    >
                       <Button
+                        disabled={timetableQueryResult.data.archived}
                         variant="ghost"
                         className="rounded-full p-3"
                         onClick={() =>
@@ -926,13 +926,24 @@ function ViewTimetable() {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Edit Timetable</p>
+                      <p>
+                        {timetableQueryResult.data.archived
+                          ? "Cannot edit archived timetable"
+                          : "Edit Timetable"}
+                      </p>
                     </TooltipContent>
                   </Tooltip>
                 )}
                 <Tooltip>
-                  <TooltipTrigger asChild>
+                  <TooltipTrigger
+                    className={
+                      timetableQueryResult.data.archived
+                        ? "cursor-not-allowed"
+                        : ""
+                    }
+                  >
                     <Button
+                      disabled={timetableQueryResult.data.archived}
                       variant="ghost"
                       className="rounded-full p-3"
                       onClick={() => {
@@ -946,7 +957,11 @@ function ViewTimetable() {
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Copy Timetable</p>
+                    <p>
+                      {timetableQueryResult.data.archived
+                        ? "Cannot copy archived timetable"
+                        : "Copy Timetable"}
+                    </p>
                   </TooltipContent>
                 </Tooltip>
                 {userQueryResult.data.id ===
