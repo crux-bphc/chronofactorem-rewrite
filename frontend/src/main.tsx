@@ -19,7 +19,7 @@ import finalizeTimetableRoute from "./FinalizeTimetable";
 import getDegreesRoute from "./GetDegrees";
 import homeRoute from "./Home";
 import loginRoute from "./Login";
-import notFoundRoute from "./NotFound";
+import NotFound from "./components/NotFound";
 import RootComponent from "./RootComponent";
 import viewTimetableRoute from "./ViewTimetable";
 import "./index.css";
@@ -63,7 +63,7 @@ export const router = new Router({
   context: {
     queryClient,
   },
-  notFoundRoute: notFoundRoute,
+  defaultNotFoundComponent: NotFound
 });
 
 // Register things for typesafety
