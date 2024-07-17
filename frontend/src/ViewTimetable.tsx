@@ -7,7 +7,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { ErrorComponent, Route } from "@tanstack/react-router";
+import { ErrorComponent, Route, notFound } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { toPng } from "html-to-image";
 import {
@@ -29,6 +29,7 @@ import {
 } from "../../lib/src/index";
 import { userWithTimetablesType } from "../../lib/src/index";
 import authenticatedRoute from "./AuthenticatedRoute";
+import NotFound from "./components/NotFound";
 import { TimetableGrid } from "./components/TimetableGrid";
 import { SideMenu } from "./components/side-menu";
 import Spinner from "./components/spinner";
@@ -147,33 +148,24 @@ const viewTimetableRoute = new Route({
           });
         }
 
+        if (
+          error instanceof AxiosError &&
+          error.response &&
+          error.response.status === 404
+        ) {
+          throw notFound();
+        }
+
         throw error;
       }),
   component: ViewTimetable,
+  notFoundComponent: NotFound,
   errorComponent: ({ error }) => {
     const { toast } = useToast();
 
     if (error instanceof AxiosError) {
       if (error.response) {
         switch (error.response.status) {
-          case 404:
-            router.navigate({ to: "/404" });
-            toast({
-              title: "Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : "API returned 404",
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-            break;
           case 500:
             toast({
               title: "Server Error",
@@ -615,8 +607,8 @@ function ViewTimetable() {
       timetableQueryResult.data.degrees.length === 1
         ? timetableQueryResult.data.degrees[0]
         : timetableQueryResult.data.degrees
-          .sort((a, b) => (b as any) - (a as any))
-          .join("")
+            .sort((a, b) => (b as any) - (a as any))
+            .join("")
     ) as keyof typeof CDCList;
     const cdcListKey =
       `${timetableQueryResult.data.year}-${timetableQueryResult.data.semester}` as keyof (typeof CDCList)[typeof degree];
@@ -912,28 +904,28 @@ function ViewTimetable() {
                 )}
                 {userQueryResult.data.id ===
                   timetableQueryResult.data.authorId && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          disabled={timetableQueryResult.data.archived}
-                          variant="ghost"
-                          className="rounded-full p-3"
-                          onClick={() =>
-                            editMutation.mutate({
-                              isDraft: true,
-                              isPrivate: true,
-                              name: timetableQueryResult.data?.name ?? "",
-                            })
-                          }
-                        >
-                          <Edit2 className="w-5 h-5 md:w-6 md:h-6" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Edit Timetable</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  )}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        disabled={timetableQueryResult.data.archived}
+                        variant="ghost"
+                        className="rounded-full p-3"
+                        onClick={() =>
+                          editMutation.mutate({
+                            isDraft: true,
+                            isPrivate: true,
+                            name: timetableQueryResult.data?.name ?? "",
+                          })
+                        }
+                      >
+                        <Edit2 className="w-5 h-5 md:w-6 md:h-6" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Edit Timetable</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
@@ -956,46 +948,46 @@ function ViewTimetable() {
                 </Tooltip>
                 {userQueryResult.data.id ===
                   timetableQueryResult.data.authorId && (
-                    <AlertDialog>
-                      <Tooltip>
-                        <AlertDialogTrigger asChild>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
-                            >
-                              <Trash className="w-5 h-5 md:w-6 md:h-6" />
-                            </Button>
-                          </TooltipTrigger>
-                        </AlertDialogTrigger>
-                        <TooltipContent>
-                          <p>Delete Timetable</p>
-                        </TooltipContent>
-                      </Tooltip>
-                      <AlertDialogContent className="p-8">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle className="text-2xl">
-                            Are you sure?
-                          </AlertDialogTitle>
-                          <AlertDialogDescription className="text-destructive text-lg font-bold">
-                            All your progress on this timetable will be lost, and
-                            unrecoverable.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogPrimitive.Action asChild>
-                            <Button
-                              variant="destructive"
-                              onClick={() => deleteMutation.mutate()}
-                            >
-                              Delete
-                            </Button>
-                          </AlertDialogPrimitive.Action>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  )}
+                  <AlertDialog>
+                    <Tooltip>
+                      <AlertDialogTrigger asChild>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
+                          >
+                            <Trash className="w-5 h-5 md:w-6 md:h-6" />
+                          </Button>
+                        </TooltipTrigger>
+                      </AlertDialogTrigger>
+                      <TooltipContent>
+                        <p>Delete Timetable</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <AlertDialogContent className="p-8">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle className="text-2xl">
+                          Are you sure?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-destructive text-lg font-bold">
+                          All your progress on this timetable will be lost, and
+                          unrecoverable.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogPrimitive.Action asChild>
+                          <Button
+                            variant="destructive"
+                            onClick={() => deleteMutation.mutate()}
+                          >
+                            Delete
+                          </Button>
+                        </AlertDialogPrimitive.Action>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
               </span>
             </div>
             {/* the bg-background here is necessary so the generated image has the background in it */}
