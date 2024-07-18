@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { Request, Response } from "express";
 import { z } from "zod";
 import {
@@ -5,6 +6,7 @@ import {
   namedNonEmptyStringType,
   timetableIDType,
 } from "../../../../lib/src/index.js";
+import { env } from "../../config/server.js";
 import { Timetable, User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
@@ -68,7 +70,6 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
   } catch (err: any) {
     // will replace the console.log with a logger when we have one
     console.log("Error while querying timetable: ", err.message);
-
     return res.status(500).json({ message: "Internal Server Error" });
   }
 
@@ -104,19 +105,67 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
       message: "cannot publish timetable with warnings",
     });
   }
-
+  let updatedTimetable;
   try {
-    await timetableRepository
-      .createQueryBuilder("timetable")
-      .update()
-      .set({ name: name, private: isPrivate, draft: isDraft })
-      .where("timetable.id = :id", { id: timetable.id })
-      .execute();
+    updatedTimetable = await timetableRepository.save({
+      ...timetable,
+      name: name,
+      private: isPrivate,
+      draft: isDraft,
+    });
   } catch (err: any) {
     // will replace the console.log with a logger when we have one
     console.log("Error while editing timetable: ", err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
 
-    res.status(500).json({ message: "Internal Server Error" });
+  if (isDraft === false && isPrivate === false) {
+    try {
+      const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/add`;
+      const updatedTimetableStringID = {
+        ...updatedTimetable,
+        id: req.params.id,
+      };
+      const res = await fetch(searchServiceURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedTimetableStringID),
+      });
+      const resJson = await res.json();
+      if (!res.ok) {
+        console.log(resJson.error);
+      }
+    } catch (err: any) {
+      console.log(
+        "Error while adding timetable to search service: ",
+        err.message,
+      );
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+  } else {
+    try {
+      const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/remove`;
+
+      const res = await fetch(searchServiceURL, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: req.params.id }),
+      });
+      if (!res.ok) {
+        const resJson = await res.json();
+        console.log(resJson.error);
+      }
+    } catch (err: any) {
+      console.log(
+        "Error while removing timetable from search service: ",
+        err.message,
+      );
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 
   return res.json({ message: "timetable edited" });

@@ -152,3 +152,6 @@ services:
       - "${NGINX_PORT}:80"
     profiles:
       - "dev"
+networks:
+  default:
+    name: "chrono_net"
