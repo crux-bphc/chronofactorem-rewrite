@@ -144,7 +144,7 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
       );
       return res.status(500).json({ message: "Internal Server Error" });
     }
-  } else if (isDraft === true || isPrivate === true) {
+  } else {
     try {
       const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/remove`;
 
