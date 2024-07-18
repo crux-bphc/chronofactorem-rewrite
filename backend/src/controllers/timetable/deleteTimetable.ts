@@ -1,8 +1,8 @@
+import "dotenv/config";
 import { Request, Response } from "express";
 import { z } from "zod";
-import "dotenv/config";
-import { env } from "../../config/server.js";
 import { timetableIDType } from "../../../../lib/src/index.js";
+import { env } from "../../config/server.js";
 import { Timetable, User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
