@@ -2,11 +2,14 @@ import type { Request, Response } from "express";
 import { z } from "zod";
 import {
   courseWithSectionsType,
+  namedNonEmptyStringType,
   sectionTypeList,
 } from "../../../../lib/src/index.js";
+import { env } from "../../config/server.js";
 import { AppDataSource } from "../../db.js";
 import { Course, Section, Timetable } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
+import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { checkForExamTimingsChange } from "../../utils/checkForChange.js";
 import {
   checkForClassHoursClash,
@@ -17,6 +20,7 @@ import { updateSectionWarnings } from "../../utils/updateWarnings.js";
 
 const dataSchema = z.object({
   body: z.object({
+    chronoSecret: namedNonEmptyStringType("chronoSecret"),
     course: courseWithSectionsType,
   }),
 });
@@ -25,6 +29,9 @@ export const updateChangedTimetableValidator = validate(dataSchema);
 
 export const updateChangedTimetable = async (req: Request, res: Response) => {
   try {
+    if (env.CHRONO_SECRET !== req.body.chronoSecret) {
+      return res.status(401).json({ message: "Chrono Secret is incorrect" });
+    }
     // Use a transaction because we will run many dependent mutations
     const queryRunner = AppDataSource.createQueryRunner();
     await queryRunner.connect();
@@ -220,10 +227,50 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
       console.log("Error while querying for course: ", err.message);
       return res.status(500).json({ message: "Internal Server Error" });
     }
-
     // After everything passes fine, commit the transaction
     await queryRunner.commitTransaction();
     queryRunner.release();
+
+    // update course in search service
+    try {
+      const searchServiceURL = `${env.SEARCH_SERVICE_URL}/course/remove`;
+      const res = await fetch(searchServiceURL, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: course.id }),
+      });
+      if (!res.ok) {
+        const resJson = await res.json();
+        console.log(resJson.error);
+      }
+    } catch (err: any) {
+      console.log(
+        "Error while removing course from search service: ",
+        err.message,
+      );
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+
+    try {
+      const searchServiceURL = `${env.SEARCH_SERVICE_URL}/course/add`;
+      const res = await fetch(searchServiceURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(course),
+      });
+      if (!res.ok) {
+        const resJson = await res.json();
+        console.log(resJson.error);
+      }
+    } catch (err: any) {
+      console.log("Error while adding course to search service: ", err.message);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+
     return res.json({ message: "Timetable successfully updated" });
   } catch (err: any) {
     console.log(err);

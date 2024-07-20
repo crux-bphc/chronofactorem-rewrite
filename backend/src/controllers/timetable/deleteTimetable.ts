@@ -83,7 +83,7 @@ export const deleteTimetable = async (req: Request, res: Response) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ id: timetable.id }),
+      body: JSON.stringify({ id: req.params.id }),
     });
     if (!res.ok) {
       const resJson = await res.json();
