@@ -317,7 +317,6 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
             body: JSON.stringify(timetableWithSectionsString),
           });
           const resJson = await res.json();
-          console.log(resJson);
           if (!res.ok) {
             console.log(resJson.error);
           }
