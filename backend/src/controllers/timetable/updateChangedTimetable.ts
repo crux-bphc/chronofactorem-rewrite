@@ -15,6 +15,7 @@ import {
   checkForClassHoursClash,
   checkForExamHoursClash,
 } from "../../utils/checkForClashes.js";
+import sqids from "../../utils/sqids.js";
 import { addExamTimings, removeSection } from "../../utils/updateSection.js";
 import { updateSectionWarnings } from "../../utils/updateWarnings.js";
 
@@ -270,7 +271,65 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
       console.log("Error while adding course to search service: ", err.message);
       return res.status(500).json({ message: "Internal Server Error" });
     }
+    // update timetables in search service
 
+    for (const timetable of timetables) {
+      try {
+        const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/remove`;
+        const encodedId = sqids.encode([timetable.id]);
+        const res = await fetch(searchServiceURL, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: encodedId }),
+        });
+
+        if (!res.ok) {
+          const resJson = await res.json();
+          console.log(resJson.error);
+        }
+      } catch (err: any) {
+        console.log(
+          "Error while removing timetable from search service: ",
+          err.message,
+        );
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+      if (!timetable.draft && !timetable.private) {
+        const timetableWithSections = await timetableRepository
+          .createQueryBuilder("timetable")
+          .leftJoinAndSelect("timetable.sections", "section")
+          .where("timetable.id=:id", { id: timetable.id })
+          .getOne();
+        const encodedId = sqids.encode([timetable.id]);
+        const timetableWithSectionsString = {
+          ...timetableWithSections,
+          id: encodedId,
+        };
+        try {
+          const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/add`;
+          const res = await fetch(searchServiceURL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(timetableWithSectionsString),
+          });
+          const resJson = await res.json();
+          console.log(resJson);
+          if (!res.ok) {
+            console.log(resJson.error);
+          }
+        } catch (err: any) {
+          console.log(
+            "Error while adding timetable to search service: ",
+            err.message,
+          );
+          return res.status(500).json({ message: "Internal Server Error" });
+        }
+      }
+    }
     return res.json({ message: "Timetable successfully updated" });
   } catch (err: any) {
     console.log(err);
