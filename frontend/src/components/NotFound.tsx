@@ -1,5 +1,3 @@
-import { router } from "../main";
-
 const NotFound = () => (
   <div className="h-[calc(100vh-68px)] w-full flex flex-col justify-center items-center">
     <h1 className="text-9xl font-extrabold text-white tracking-widest">404</h1>
