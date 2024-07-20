@@ -58,8 +58,8 @@ function About() {
           </a>
           . We thank Arunachala AM, Jason Goveas, Anurav Garg, Dharanikanth
           Reddy, Karthik Prakash, Shreyash Dash, Kovid Lakhera, Palaniappan R,
-          Meghraj Goswami, and Soumitra Shewale for this rewrite of
-          ChronoFactorem.
+          Meghraj Goswami, Soumitra Shewale, Kishan Abijay, Namit Bhutani, 
+          Chaitanya Keyal and Samir Khairati for this rewrite of ChronoFactorem.
         </p>
       </div>
     </main>
