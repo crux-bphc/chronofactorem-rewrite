@@ -181,6 +181,7 @@ export const namedCourseWithSectionsType = (name?: string) =>
 export const namedAnnouncementType = (name?: string) =>
   z
     .object({
+      id: namedUUIDType(addNameToString("announcement id", name)),
       title: namedNonEmptyStringType(addNameToString("announcement title", name)),
       message: namedNonEmptyStringType(addNameToString("announcement message", name)),
       createdAt: namedISOTimestampType(addNameToString("announcement createdAt", name)).optional(),
