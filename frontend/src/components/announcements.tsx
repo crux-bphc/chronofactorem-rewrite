@@ -111,6 +111,7 @@ function Announcements() {
                     {!readAnnouncements.includes(announcement.id) && (
                       <Button
                         onClick={() => markAsRead(announcement.id)}
+                        className="mb-3"
                         size="sm"
                         variant="outline"
                       >
