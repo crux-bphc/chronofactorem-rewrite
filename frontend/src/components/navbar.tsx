@@ -16,13 +16,15 @@ import {
 } from "@tanstack/react-query";
 import { Link, useRouter } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
-import { BookUp, Info, LogOut, Pencil, Plus } from "lucide-react";
+import { BookUp, Info, LogOut, Pencil, Plus, Search } from "lucide-react";
 import { useCookies } from "react-cookie";
 import { z } from "zod";
 import { userWithTimetablesType } from "../../../lib/src/index";
 import { router } from "../main";
+import SearchBar from "./SearchBar";
 import Announcements from "./announcements";
 import { ModeToggle } from "./mode-toggle";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
 const fetchUserDetails = async (): Promise<
   z.infer<typeof userWithTimetablesType>
@@ -162,7 +164,7 @@ export function NavBar() {
         </Link>
         {!isEditPage && (
           <Button
-            className="text-green-200 w-fit text-xl p-4 ml-4 bg-green-900 hover:bg-green-800"
+            className="text-green-200 w-fit text-xl px-2 md:px-4 py-4 md:ml-4 bg-green-900 hover:bg-green-800"
             onClick={
               userQueryResultData ? () => createMutation.mutate() : undefined
             }
@@ -175,7 +177,7 @@ export function NavBar() {
         )}
         <Link
           to={userQueryResultData ? "/about" : undefined}
-          className="text-primary py-2 px-2 ml-2 text-lg rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out"
+          className="text-primary py-2 px-2 md:ml-2 text-lg rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out"
         >
           <div className="hidden md:flex">About</div>
           <div className="flex md:hidden">
@@ -185,7 +187,7 @@ export function NavBar() {
         {!isCMSPage && (
           <Link
             to={userQueryResultData ? "/CMSExport" : undefined}
-            className="text-primary py-2 px-2 ml-2 text-lg rounded-full hover:bg-muted transition h-fit whitespace-nowrap duration-200 ease-in-out"
+            className="text-primary py-2 px-2 md:ml-2 text-lg rounded-full hover:bg-muted transition h-fit whitespace-nowrap duration-200 ease-in-out"
           >
             <div className="hidden md:flex">CMS Auto-Enroll</div>
             <div className="flex md:hidden">
@@ -193,9 +195,34 @@ export function NavBar() {
             </div>
           </Link>
         )}
+        <div className="hidden md:flex md:ml-4">
+          <SearchBar />
+        </div>
+        <div className="text-primary py-2 px-2 md:ml-2 text-lg rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out">
+          <div className="flex md:hidden">
+            <Popover>
+              <PopoverTrigger asChild className="cursor-pointer">
+                <Search />
+              </PopoverTrigger>
+              <PopoverContent className="w-80 mt-4 mr-8">
+                <div className="grid gap-4">
+                  <div className="space-y-2">
+                    <h4 className="font-medium leading-none">
+                      Search Timetables
+                    </h4>
+                  </div>
+                  <div className="">
+                    <SearchBar />
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
       </div>
+
       <div className="flex flex-row">
-        <div className="pt-3">
+        <div className="flex pt-3">
           <Announcements />
           <ModeToggle />
         </div>
