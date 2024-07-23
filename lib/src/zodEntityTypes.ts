@@ -181,14 +181,40 @@ export const namedCourseWithSectionsType = (name?: string) =>
 export const namedAnnouncementType = (name?: string) =>
   z
     .object({
-      title: namedNonEmptyStringType(addNameToString("announcement title", name)),
-      message: namedNonEmptyStringType(addNameToString("announcement message", name)),
-      createdAt: namedISOTimestampType(addNameToString("announcement createdAt", name)).optional(),
+      title: namedNonEmptyStringType(
+        addNameToString("announcement title", name),
+      ),
+      message: namedNonEmptyStringType(
+        addNameToString("announcement message", name),
+      ),
+      createdAt: namedISOTimestampType(
+        addNameToString("announcement createdAt", name),
+      ).optional(),
     })
-    .strict({ message: addNameToString("announcement has extra fields", name) });
+    .strict({
+      message: addNameToString("announcement has extra fields", name),
+    });
 
+export const namedAnnouncementWithIDType = (name?: string) =>
+  z
+    .object({
+      id: namedUUIDType(addNameToString("announcement id", name)),
+      title: namedNonEmptyStringType(
+        addNameToString("announcement title", name),
+      ),
+      message: namedNonEmptyStringType(
+        addNameToString("announcement message", name),
+      ),
+      createdAt: namedISOTimestampType(
+        addNameToString("announcement createdAt", name),
+      ).optional(),
+    })
+    .strict({
+      message: addNameToString("announcement has extra fields", name),
+    });
+
+export const announcementWithIDType = namedAnnouncementWithIDType();
 export const announcementType = namedAnnouncementType();
-
 export const userType = namedUserType();
 export const timetableType = namedTimetableType();
 export const sectionType = namedSectionType();
