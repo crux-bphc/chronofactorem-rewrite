@@ -52,7 +52,9 @@ function Announcements() {
     if (unreadAnnouncements && unreadAnnouncements.length > 0) {
       toast({
         title: "New Announcements",
-        description: `You have ${unreadAnnouncements.length} unread announcement${unreadAnnouncements.length > 1 ? 's' : ''}.`,
+        description: `You have ${
+          unreadAnnouncements.length
+        } unread announcement${unreadAnnouncements.length > 1 ? "s" : ""}.`,
       });
     }
   }, [announcements, readAnnouncements, toast]);
