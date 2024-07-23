@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { z } from "zod";
 import { namedNonEmptyStringType } from "../../../../lib/src/zodFieldTypes.js";
 import { env } from "../../config/server.js";
+import { Timetable } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 
 const searchTimetableSchema = z.object({
@@ -23,12 +24,16 @@ export const searchTimetable = async (req: Request, res: Response) => {
       headers: { "Content-Type": "application/json" },
     });
 
-    const timetables = await response.json();
+    let timetables = await response.json();
 
-    if (!timetables.ok) {
+    if (!response.ok) {
       console.log("Error while searching timetable: ", timetables.error);
       return res.status(500).json({ message: "Internal Server Error" });
     }
+
+    timetables = timetables.map(
+      (el: { timetable: Timetable; score: string }) => el.timetable,
+    );
 
     return res.json(timetables);
   } catch (err) {
