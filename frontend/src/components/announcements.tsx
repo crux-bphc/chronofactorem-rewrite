@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -7,18 +6,19 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
+import { DialogTrigger } from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Megaphone } from "lucide-react";
+import { useEffect, useState } from "react";
 import type { z } from "zod";
-import { announcementType } from "../../../lib/src";
+import { announcementWithIDType } from "../../../lib/src";
 import { Button } from "./ui/button";
 
 const fetchAnnouncements = async (): Promise<
-  z.infer<typeof announcementType>[]
+  z.infer<typeof announcementWithIDType>[]
 > => {
-  const response = await axios.get<z.infer<typeof announcementType>[]>(
+  const response = await axios.get<z.infer<typeof announcementWithIDType>[]>(
     "/api/user/announcements",
   );
   return response.data;
