@@ -9,7 +9,9 @@ export const getAllAnnouncements = async (req: Request, res: Response) => {
       .getMany();
 
     return res.status(200).json(announcements);
-  } catch (err) {
+  } catch (err: any) {
+    logger.error("Error retrieving announcements: ", err.message);
+
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

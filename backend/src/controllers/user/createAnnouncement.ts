@@ -37,7 +37,9 @@ export const createAnnouncement = async (req: Request, res: Response) => {
     return res
       .status(201)
       .json({ message: "Announcement Created Successfully" });
-  } catch (err) {
+  } catch (err: any) {
+    logger.error("Error creating announcement: ", err.message);
+
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
