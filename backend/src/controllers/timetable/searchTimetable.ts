@@ -24,14 +24,14 @@ export const searchTimetable = async (req: Request, res: Response) => {
       headers: { "Content-Type": "application/json" },
     });
 
-    let timetables = await response.json();
+    const searchResults = await response.json();
 
     if (!response.ok) {
-      console.log("Error while searching timetable: ", timetables.error);
+      console.log("Error while searching timetable: ", searchResults.error);
       return res.status(500).json({ message: "Internal Server Error" });
     }
 
-    timetables = timetables.map(
+    const timetables = searchResults.map(
       (el: { timetable: Timetable; score: string }) => el.timetable,
     );
 
