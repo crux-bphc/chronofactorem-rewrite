@@ -69,16 +69,15 @@ const SearchBar = () => {
   return (
     <div className="flex items-center gap-2">
       <div className="relative ml-auto flex-1 md:grow-0">
-        <Search
-          className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground cursor-pointer"
-          onClick={() => handleSearch(searchRef.current?.value)}
-        />
-
         <Input
           type="search"
           placeholder="Search Timetables..."
           className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
           ref={searchRef}
+        />
+        <Search
+          className="absolute right-4 top-2.5 h-4 w-4 text-muted-foreground cursor-pointer"
+          onClick={() => handleSearch(searchRef.current?.value)}
         />
       </div>
       <DropdownMenu>
