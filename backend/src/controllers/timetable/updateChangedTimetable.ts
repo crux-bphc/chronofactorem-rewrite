@@ -271,8 +271,8 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
       console.log("Error while adding course to search service: ", err.message);
       return res.status(500).json({ message: "Internal Server Error" });
     }
-    // update timetables in search service
 
+    // update timetables in search service
     for (const timetable of timetables) {
       try {
         const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/remove`;
@@ -316,8 +316,8 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
             },
             body: JSON.stringify(timetableWithSectionsString),
           });
-          const resJson = await res.json();
           if (!res.ok) {
+            const resJson = await res.json();
             console.log(resJson.error);
           }
         } catch (err: any) {
