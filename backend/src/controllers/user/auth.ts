@@ -68,6 +68,7 @@ export async function manageAuthRedirect(req: Request, res: Response) {
 
     return res.redirect(authRedirect);
   } catch (err: any) {
+    logger.error("Authentication failure: ", err);
     return res.status(500).json({
       message: "authentication failure",
     });
@@ -167,6 +168,7 @@ export async function authCallback(req: Request, res: Response) {
 }
 
 export async function getDegrees(req: Request, res: Response) {
+  const logger = req.log;
   // this function is declared outside the try catch block
   // to make the capitalised name into title case
 
@@ -288,6 +290,7 @@ export async function getDegrees(req: Request, res: Response) {
       success: true,
     });
   } catch (error: any) {
+    logger.error("Failed to register: ", error);
     return res.status(500).json({
       success: false,
       message: "failed to register",
@@ -298,6 +301,7 @@ export async function getDegrees(req: Request, res: Response) {
 
 // checks whether user is not logged in, logged in but hasn't finished selecting degrees, or properly logged in
 export async function checkAuthStatus(req: Request, res: Response) {
+  const logger = req.log;
   try {
     if (
       req.cookies.session === undefined ||
@@ -360,6 +364,7 @@ export async function checkAuthStatus(req: Request, res: Response) {
       error: "user session malformed",
     });
   } catch (error: any) {
+    logger.error("Error while checking auth status: ", error);
     return res.status(500).json({
       message: "Internal Server Error",
       error: JSON.stringify(error),
