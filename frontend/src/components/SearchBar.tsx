@@ -1,9 +1,6 @@
-import { useQueryClient } from "@tanstack/react-query";
-import axios, { AxiosError } from "axios";
+import { router } from "@/main";
 import { ListFilter, Search } from "lucide-react";
 import { useRef } from "react";
-import { z } from "zod";
-import { timetableWithSectionsType } from "../../../lib/src";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -14,27 +11,11 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Input } from "./ui/input";
-import { ToastAction } from "./ui/toast";
 import { useToast } from "./ui/use-toast";
-
-const fetchSearchDetails = async (
-  query: string,
-): Promise<z.infer<typeof timetableWithSectionsType>[]> => {
-  const response = await axios.get<z.infer<typeof timetableWithSectionsType>[]>(
-    `/api/timetable/search?query=${query}`,
-    {
-      headers: {
-        "Content-Type": "application/json ",
-      },
-    },
-  );
-  return response.data;
-};
 
 const SearchBar = () => {
   const { toast } = useToast();
   const searchRef = useRef<HTMLInputElement>(null);
-  const queryClient = useQueryClient();
   const handleSearch = async (query: string | undefined) => {
     if (query === undefined || query.length < 2) {
       toast({
@@ -43,28 +24,10 @@ const SearchBar = () => {
       });
       return;
     }
-    try {
-      const timetables = await queryClient.fetchQuery({
-        queryKey: ["search_timetable"],
-        queryFn: () => fetchSearchDetails(query),
-      });
-      localStorage.setItem("timetable_search", JSON.stringify(timetables));
-    } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        toast({
-          title: "Server Error",
-          description: `${error.response.data.message}`,
-          variant: "destructive",
-          action: (
-            <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-              <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                Report
-              </a>
-            </ToastAction>
-          ),
-        });
-      }
-    }
+    router.navigate({
+      to: "/search/$query",
+      params: { query },
+    });
   };
   return (
     <div className="flex items-center gap-2">
