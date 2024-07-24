@@ -70,7 +70,6 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
         .getMany();
       requiredSectionTypes = sectionTypeHolders.map((section) => section.type);
     } catch (err: any) {
-      // will replace the logger.error with a logger when we have one
       logger.error(
         "Error while querying for course's section types: ",
         err.message,
@@ -245,7 +244,10 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
       });
       if (!res.ok) {
         const resJson = await res.json();
-        logger.error("Error while removing course from search service: ", resJson.error);
+        logger.error(
+          "Error while removing course from search service: ",
+          resJson.error,
+        );
       }
     } catch (err: any) {
       logger.error(
@@ -266,10 +268,16 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
       });
       if (!res.ok) {
         const resJson = await res.json();
-        logger.error("Error while adding course to search service: ", resJson.error);
+        logger.error(
+          "Error while adding course to search service: ",
+          resJson.error,
+        );
       }
     } catch (err: any) {
-      logger.error("Error while adding course to search service: ", err.message);
+      logger.error(
+        "Error while adding course to search service: ",
+        err.message,
+      );
       return res.status(500).json({ message: "Internal Server Error" });
     }
 
@@ -288,7 +296,10 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
 
         if (!res.ok) {
           const resJson = await res.json();
-          logger.error("Error while removing timetable from search service: ", resJson.error);
+          logger.error(
+            "Error while removing timetable from search service: ",
+            resJson.error,
+          );
         }
       } catch (err: any) {
         logger.error(
@@ -319,7 +330,10 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
           });
           if (!res.ok) {
             const resJson = await res.json();
-            logger.error("Error while adding timetable to search service: ", resJson.error);
+            logger.error(
+              "Error while adding timetable to search service: ",
+              resJson.error,
+            );
           }
         } catch (err: any) {
           logger.error(

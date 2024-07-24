@@ -30,7 +30,6 @@ export const copyTimetable = async (req: Request, res: Response) => {
       .where("user.id = :id", { id: req.session?.id })
       .getOne();
   } catch (err: any) {
-    // will replace the logger.error with a logger when we have one
     logger.error("Error while querying for user: ", err.message);
 
     return res.status(500).json({ message: "Internal Server Error" });
@@ -65,7 +64,6 @@ export const copyTimetable = async (req: Request, res: Response) => {
       .where("timetable.id = :id", { id: dbID[0] })
       .getOne();
   } catch (err: any) {
-    // will replace the logger.error with a logger when we have one
     logger.error("Error while querying for timetable: ", err.message);
 
     return res.status(500).json({ message: "Internal Server Error" });
@@ -121,7 +119,6 @@ export const copyTimetable = async (req: Request, res: Response) => {
           .add(section);
       }
     } catch (err: any) {
-      // will replace the logger.error with a logger when we have one
       logger.error(
         "Error while copying sections into new timetable: ",
         err.message,
@@ -136,7 +133,6 @@ export const copyTimetable = async (req: Request, res: Response) => {
       id: timetableID,
     });
   } catch (err: any) {
-    // will replace the logger.error with a logger when we have one
     logger.error("Error while copying timetable: ", err.message);
 
     return res.status(500).json({ message: "Internal Server Error" });

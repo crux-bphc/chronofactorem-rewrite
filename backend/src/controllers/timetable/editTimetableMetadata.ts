@@ -40,7 +40,6 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
       .where("user.id = :id", { id: req.session?.id })
       .getOne();
   } catch (err: any) {
-    // will replace the logger.error with a logger when we have one
     logger.error("Error while querying user: ", err.message);
     return res.status(500).json({ message: "Internal Server Error" });
   }
@@ -69,7 +68,6 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
       .where("timetable.id = :id", { id: dbID[0] })
       .getOne();
   } catch (err: any) {
-    // will replace the logger.error with a logger when we have one
     logger.error("Error while querying timetable: ", err.message);
     return res.status(500).json({ message: "Internal Server Error" });
   }
@@ -115,7 +113,6 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
       draft: isDraft,
     });
   } catch (err: any) {
-    // will replace the logger.error with a logger when we have one
     logger.error("Error while editing timetable: ", err.message);
     return res.status(500).json({ message: "Internal Server Error" });
   }
@@ -136,7 +133,10 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
       });
       const resJson = await res.json();
       if (!res.ok) {
-        logger.error("Error while adding timetable to search service: ", resJson.error);
+        logger.error(
+          "Error while adding timetable to search service: ",
+          resJson.error,
+        );
       }
     } catch (err: any) {
       logger.error(
@@ -158,7 +158,10 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
       });
       if (!res.ok) {
         const resJson = await res.json();
-        logger.error("Error while removing timetable from search service: ", resJson.error);
+        logger.error(
+          "Error while removing timetable from search service: ",
+          resJson.error,
+        );
       }
     } catch (err: any) {
       logger.error(

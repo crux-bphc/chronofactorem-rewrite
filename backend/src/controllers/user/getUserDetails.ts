@@ -49,7 +49,6 @@ export const getUserDetails = async (req: Request, res: Response) => {
       .where("user.id = :id", { id })
       .getOne();
   } catch (err: any) {
-    // will replace the logger.error with a logger when we have one
     logger.error("Error while querying for user: ", err.message);
     res.status(500).json({ message: "Internal Server Error" });
   }

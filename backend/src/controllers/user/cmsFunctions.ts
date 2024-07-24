@@ -35,7 +35,6 @@ export const unenroll = async (req: Request, res: Response) => {
     );
     return res.status(unenrolResponse.status).end();
   } catch (err: any) {
-    // will replace the logger.error with a logger when we have one
     logger.error("Error unenrolling from course: ", err.message);
     return res.status(500).json({ message: "Internal Server Error" });
   }
