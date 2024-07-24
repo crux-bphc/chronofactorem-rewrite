@@ -136,7 +136,7 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
       });
       const resJson = await res.json();
       if (!res.ok) {
-        console.log(resJson.error);
+        console.log("Error while adding timetable to search service: ", resJson.error);
       }
     } catch (err: any) {
       console.log(
@@ -158,7 +158,7 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
       });
       if (!res.ok) {
         const resJson = await res.json();
-        console.log(resJson.error);
+        console.log("Error while removing timetable from search service: ", resJson.error);
       }
     } catch (err: any) {
       console.log(

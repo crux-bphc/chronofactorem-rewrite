@@ -88,7 +88,7 @@ export const deleteTimetable = async (req: Request, res: Response) => {
     });
     if (!res.ok) {
       const resJson = await res.json();
-      console.log(resJson.error);
+      console.log("Error while removing timetable from search service: ", resJson.error);
     }
   } catch (err: any) {
     console.log(
