@@ -34,7 +34,7 @@ export const getTimetableById = async (req: Request, res: Response) => {
 
     return res.json({ ...timetable, id: id });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

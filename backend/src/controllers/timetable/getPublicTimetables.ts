@@ -44,8 +44,8 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
         .where("user.id = :id", { id: req.session?.id })
         .getOne();
     } catch (err: any) {
-      // will replace the console.log with a logger when we have one
-      console.log("Error while querying for user: ", err.message);
+      // will replace the logger.error with a logger when we have one
+      logger.error("Error while querying for user: ", err.message);
 
       return res.status(500).json({ message: "Internal Server Error" });
     }
@@ -116,8 +116,8 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
 
       return res.json(timetablesWithEncodedIDs);
     } catch (err: any) {
-      // will replace the console.log with a logger when we have one
-      console.log("Error while querying timetable: ", err.message);
+      // will replace the logger.error with a logger when we have one
+      logger.error("Error while querying timetable: ", err.message);
       return res.status(500).json({ message: "Internal Server Error" });
     }
   } catch (err: any) {

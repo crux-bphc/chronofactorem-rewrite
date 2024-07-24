@@ -36,7 +36,7 @@ export const getAllCourses = async (req: Request, res: Response) => {
 
     return res.header("Cache-Control", "max-age=3600").json(courses);
   } catch (error) {
-    console.error("An error occurred while fetching courses:", error);
+    logger.error("An error occurred while fetching courses:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

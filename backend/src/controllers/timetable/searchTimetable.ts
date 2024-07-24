@@ -28,7 +28,7 @@ export const searchTimetable = async (req: Request, res: Response) => {
     const searchResults = await response.json();
 
     if (!response.ok) {
-      console.log("Error while searching timetable: ", searchResults.error);
+      logger.error("Error while searching timetable: ", searchResults.error);
       return res.status(500).json({ message: "Internal Server Error" });
     }
 
@@ -38,7 +38,7 @@ export const searchTimetable = async (req: Request, res: Response) => {
 
     return res.json(timetables);
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

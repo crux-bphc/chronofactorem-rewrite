@@ -45,8 +45,8 @@ export const editUser = async (req: Request, res: Response) => {
         return response.raw[0].id;
       });
   } catch (err: any) {
-    // will replace the console.log with a logger when we have one
-    console.log("Error editing degrees: ", err.message);
+    // will replace the logger.error with a logger when we have one
+    logger.error("Error editing degrees: ", err.message);
 
     return res.status(500).json({ message: "Internal Server Error" });
   }
