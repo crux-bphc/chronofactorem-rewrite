@@ -38,6 +38,7 @@ const code_verifier = generators.codeVerifier();
 
 // redirects to the redirect URL for signing in
 export async function manageAuthRedirect(req: Request, res: Response) {
+  const logger = req.log;
   try {
     const client = await getClient();
     const code_challenge = generators.codeChallenge(code_verifier);

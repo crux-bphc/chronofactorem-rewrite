@@ -18,6 +18,7 @@ const unenrollDataSchema = z.object({
 export const unenrollValidator = validate(unenrollDataSchema);
 
 export const unenroll = async (req: Request, res: Response) => {
+  const logger = req.log;
   const enrollID: number = req.body.enrollID;
   const sesskey: string = req.body.sesskey;
   const cookie: string = req.body.cookie;

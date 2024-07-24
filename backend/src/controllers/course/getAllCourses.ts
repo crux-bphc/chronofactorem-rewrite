@@ -14,6 +14,7 @@ const dataSchema = z.object({
 export const getAllCoursesValidator = validate(dataSchema);
 
 export const getAllCourses = async (req: Request, res: Response) => {
+  const logger = req.log;
   // note that if archived is not passed as a param, (req.query.archived as string) evaluates to the string "undefined"
   const archived: boolean = (req.query.archived as string) === "true";
 

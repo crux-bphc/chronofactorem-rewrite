@@ -24,6 +24,7 @@ const dataSchema = z.object({
 export const editUserValidator = validate(dataSchema);
 
 export const editUser = async (req: Request, res: Response) => {
+  const logger = req.log;
   const degrees: degreeList = req.body.degrees;
 
   if (degrees.length === 2 && !isAValidDegreeCombination(degrees)) {

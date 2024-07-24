@@ -27,6 +27,7 @@ const dataSchema = z.object({
 export const editTimetableMetadataValidator = validate(dataSchema);
 
 export const editTimetableMetadata = async (req: Request, res: Response) => {
+  const logger = req.log;
   let author: User | null = null;
 
   const name: string = req.body.name;

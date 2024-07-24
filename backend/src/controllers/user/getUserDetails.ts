@@ -15,6 +15,7 @@ const dataSchema = z.object({
 export const getUserDetailsValidator = validate(dataSchema);
 
 export const getUserDetails = async (req: Request, res: Response) => {
+  const logger = req.log;
   const id = req.params.id ?? req.session?.id;
   let user: User | null = null;
 

@@ -14,6 +14,7 @@ const dataSchema = z.object({
 export const getTimetableByIdValidator = validate(dataSchema);
 
 export const getTimetableById = async (req: Request, res: Response) => {
+  const logger = req.log;
   try {
     const id = req.params.id as string;
     const dbID = sqids.decode(id);

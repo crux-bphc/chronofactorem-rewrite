@@ -18,6 +18,7 @@ const dataSchema = z.object({
 export const deleteTimeTableValidator = validate(dataSchema);
 
 export const deleteTimetable = async (req: Request, res: Response) => {
+  const logger = req.log;
   let author: User | null = null;
 
   try {

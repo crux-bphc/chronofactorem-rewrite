@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { announcementRepository } from "../../repositories/announcementRepository.js";
 
 export const getAllAnnouncements = async (req: Request, res: Response) => {
+  const logger = req.log;
   try {
     const announcements = await announcementRepository
       .createQueryBuilder("announcement")

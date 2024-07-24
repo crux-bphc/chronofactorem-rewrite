@@ -34,6 +34,7 @@ const dataSchema = z.object({
 export const getPublicTimetablesValidator = validate(dataSchema);
 
 export const getPublicTimetables = async (req: Request, res: Response) => {
+  const logger = req.log;
   try {
     let user: User | null = null;
     try {

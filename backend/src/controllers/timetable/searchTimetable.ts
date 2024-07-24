@@ -14,6 +14,7 @@ const searchTimetableSchema = z.object({
 export const searchTimetableValidator = validate(searchTimetableSchema);
 
 export const searchTimetable = async (req: Request, res: Response) => {
+  const logger = req.log;
   try {
     const { query } = req.query;
 

@@ -29,6 +29,7 @@ const dataSchema = z.object({
 export const updateChangedTimetableValidator = validate(dataSchema);
 
 export const updateChangedTimetable = async (req: Request, res: Response) => {
+  const logger = req.log;
   try {
     if (env.CHRONO_SECRET !== req.body.chronoSecret) {
       return res.status(401).json({ message: "Chrono Secret is incorrect" });

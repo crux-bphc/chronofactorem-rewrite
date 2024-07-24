@@ -7,6 +7,7 @@ import timetableJSON from "../../timetable.json" with { type: "json" };
 import sqids from "../../utils/sqids.js";
 
 export const createTimetable = async (req: Request, res: Response) => {
+  const logger = req.log;
   let author: User | null = null;
 
   try {

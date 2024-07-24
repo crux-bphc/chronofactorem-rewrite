@@ -30,6 +30,7 @@ const dataSchema = z.object({
 export const addSectionValidator = validate(dataSchema);
 
 export const addSection = async (req: Request, res: Response) => {
+  const logger = req.log;
   const dbID = sqids.decode(req.params.id);
   if (!validSqid(dbID)) {
     return res.status(404).json({ message: "Timetable does not exist" });

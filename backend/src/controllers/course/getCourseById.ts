@@ -13,6 +13,7 @@ const dataSchema = z.object({
 export const getCourseByIdValidator = validate(dataSchema);
 
 export const getCourseById = async (req: Request, res: Response) => {
+  const logger = req.log;
   try {
     const id = req.params.id as string;
     const course = await courseRepository

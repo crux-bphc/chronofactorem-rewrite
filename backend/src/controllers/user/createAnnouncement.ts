@@ -16,6 +16,7 @@ const announcementSchema = z.object({
 export const announcementValidator = validate(announcementSchema);
 
 export const createAnnouncement = async (req: Request, res: Response) => {
+  const logger = req.log;
   try {
     const { title, message } = req.body;
 
