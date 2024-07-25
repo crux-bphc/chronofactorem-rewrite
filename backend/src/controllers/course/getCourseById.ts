@@ -13,6 +13,7 @@ const dataSchema = z.object({
 export const getCourseByIdValidator = validate(dataSchema);
 
 export const getCourseById = async (req: Request, res: Response) => {
+  const logger = req.log;
   try {
     const id = req.params.id as string;
     const course = await courseRepository
@@ -32,7 +33,7 @@ export const getCourseById = async (req: Request, res: Response) => {
 
     return res.json(course);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

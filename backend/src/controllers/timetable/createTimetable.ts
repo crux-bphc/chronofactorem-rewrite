@@ -7,6 +7,7 @@ import timetableJSON from "../../timetable.json" with { type: "json" };
 import sqids from "../../utils/sqids.js";
 
 export const createTimetable = async (req: Request, res: Response) => {
+  const logger = req.log;
   let author: User | null = null;
 
   try {
@@ -15,8 +16,7 @@ export const createTimetable = async (req: Request, res: Response) => {
       .where("user.id = :id", { id: req.session?.id })
       .getOne();
   } catch (err: any) {
-    // will replace the console.log with a logger when we have one
-    console.log("Error while querying for user: ", err.message);
+    logger.error("Error while querying for user: ", err.message);
 
     return res.status(500).json({ message: "Internal Server Error" });
   }
@@ -72,8 +72,7 @@ export const createTimetable = async (req: Request, res: Response) => {
       id: timetableID,
     });
   } catch (err: any) {
-    // will replace the console.log with a logger when we have one
-    console.log("Error while creating timetable: ", err.message);
+    logger.error("Error while creating timetable: ", err.message);
 
     return res.status(500).json({ message: "Internal Server Error" });
   }

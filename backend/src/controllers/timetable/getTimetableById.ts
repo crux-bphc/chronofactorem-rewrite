@@ -14,6 +14,7 @@ const dataSchema = z.object({
 export const getTimetableByIdValidator = validate(dataSchema);
 
 export const getTimetableById = async (req: Request, res: Response) => {
+  const logger = req.log;
   try {
     const id = req.params.id as string;
     const dbID = sqids.decode(id);
@@ -33,7 +34,7 @@ export const getTimetableById = async (req: Request, res: Response) => {
 
     return res.json({ ...timetable, id: id });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

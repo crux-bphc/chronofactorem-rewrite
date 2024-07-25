@@ -30,6 +30,7 @@ const dataSchema = z.object({
 export const addSectionValidator = validate(dataSchema);
 
 export const addSection = async (req: Request, res: Response) => {
+  const logger = req.log;
   const dbID = sqids.decode(req.params.id);
   if (!validSqid(dbID)) {
     return res.status(404).json({ message: "Timetable does not exist" });
@@ -45,8 +46,7 @@ export const addSection = async (req: Request, res: Response) => {
       .where("user.id = :id", { id: req.session?.id })
       .getOne();
   } catch (err: any) {
-    // will replace the console.log with a logger when we have one
-    console.log("Error while querying user: ", err.message);
+    logger.error("Error while querying user: ", err.message);
 
     return res.status(500).json({ message: "Internal Server Error" });
   }
@@ -63,8 +63,7 @@ export const addSection = async (req: Request, res: Response) => {
       .where("timetable.id = :id", { id: dbID[0] })
       .getOne();
   } catch (err: any) {
-    // will replace the console.log with a logger when we have one
-    console.log("Error while querying timetable: ", err.message);
+    logger.error("Error while querying timetable: ", err.message);
 
     return res.status(500).json({ message: "Internal Server Error" });
   }
@@ -93,8 +92,7 @@ export const addSection = async (req: Request, res: Response) => {
       .where("section.id = :id", { id: sectionId })
       .getOne();
   } catch (err: any) {
-    // will replace the console.log with a logger when we have one
-    console.log("Error while querying for section: ", err.message);
+    logger.error("Error while querying for section: ", err.message);
 
     return res.status(500).json({ message: "Internal Server Error" });
   }
@@ -112,8 +110,7 @@ export const addSection = async (req: Request, res: Response) => {
       .where("course.id = :id", { id: courseId })
       .getOne();
   } catch (err: any) {
-    // will replace the console.log with a logger when we have one
-    console.log("Error while querying for course: ", err.message);
+    logger.error("Error while querying for course: ", err.message);
 
     return res.status(500).json({ message: "Internal Server Error" });
   }
@@ -151,8 +148,7 @@ export const addSection = async (req: Request, res: Response) => {
       .getMany();
     sectionTypes = sectionTypeHolders.map((section) => section.type);
   } catch (err: any) {
-    // will replace the console.log with a logger when we have one
-    console.log(
+    logger.error(
       "Error while querying for course's section types: ",
       err.message,
     );
@@ -171,8 +167,7 @@ export const addSection = async (req: Request, res: Response) => {
       .andWhere("section.type = :type", { type: section.type })
       .getCount();
   } catch (err: any) {
-    // will replace the console.log with a logger when we have one
-    console.log(
+    logger.error(
       "Error while querying for other sections of same course: ",
       err.message,
     );
@@ -254,8 +249,7 @@ export const addSection = async (req: Request, res: Response) => {
       },
     );
   } catch (err: any) {
-    // will replace the console.log with a logger when we have one
-    console.log("Error while updating timetable with section: ", err.message);
+    logger.error("Error while updating timetable with section: ", err.message);
 
     return res.status(500).json({ message: "Internal Server Error" });
   }

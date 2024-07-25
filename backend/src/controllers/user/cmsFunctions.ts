@@ -18,6 +18,7 @@ const unenrollDataSchema = z.object({
 export const unenrollValidator = validate(unenrollDataSchema);
 
 export const unenroll = async (req: Request, res: Response) => {
+  const logger = req.log;
   const enrollID: number = req.body.enrollID;
   const sesskey: string = req.body.sesskey;
   const cookie: string = req.body.cookie;
@@ -34,8 +35,7 @@ export const unenroll = async (req: Request, res: Response) => {
     );
     return res.status(unenrolResponse.status).end();
   } catch (err: any) {
-    // will replace the console.log with a logger when we have one
-    console.log("Error unenrolling from course: ", err.message);
+    logger.error("Error unenrolling from course: ", err.message);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

@@ -29,6 +29,7 @@ const dataSchema = z.object({
 export const updateChangedTimetableValidator = validate(dataSchema);
 
 export const updateChangedTimetable = async (req: Request, res: Response) => {
+  const logger = req.log;
   try {
     if (env.CHRONO_SECRET !== req.body.chronoSecret) {
       return res.status(401).json({ message: "Chrono Secret is incorrect" });
@@ -54,7 +55,7 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
         .andWhere("archived = :archived", { archived: false })
         .execute();
     } catch (err: any) {
-      console.log("Error while querying for course: ", err.message);
+      logger.error("Error while querying for course: ", err.message);
       return res.status(500).json({ message: "Internal Server Error" });
     }
 
@@ -69,8 +70,7 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
         .getMany();
       requiredSectionTypes = sectionTypeHolders.map((section) => section.type);
     } catch (err: any) {
-      // will replace the console.log with a logger when we have one
-      console.log(
+      logger.error(
         "Error while querying for course's section types: ",
         err.message,
       );
@@ -87,7 +87,7 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
         .andWhere("timetable.archived = :archived", { archived: false })
         .getMany();
     } catch (err: any) {
-      console.log("Error while querying for timetable: ", err.message);
+      logger.error("Error while querying for timetable: ", err.message);
       return res.status(500).json({ message: "Internal Server Error" });
     }
 
@@ -225,7 +225,7 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
           .execute();
       }
     } catch (err: any) {
-      console.log("Error while querying for course: ", err.message);
+      logger.error("Error while querying for course: ", err.message);
       return res.status(500).json({ message: "Internal Server Error" });
     }
     // After everything passes fine, commit the transaction
@@ -244,10 +244,13 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
       });
       if (!res.ok) {
         const resJson = await res.json();
-        console.log(resJson.error);
+        logger.error(
+          "Error while removing course from search service: ",
+          resJson.error,
+        );
       }
     } catch (err: any) {
-      console.log(
+      logger.error(
         "Error while removing course from search service: ",
         err.message,
       );
@@ -265,10 +268,16 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
       });
       if (!res.ok) {
         const resJson = await res.json();
-        console.log(resJson.error);
+        logger.error(
+          "Error while adding course to search service: ",
+          resJson.error,
+        );
       }
     } catch (err: any) {
-      console.log("Error while adding course to search service: ", err.message);
+      logger.error(
+        "Error while adding course to search service: ",
+        err.message,
+      );
       return res.status(500).json({ message: "Internal Server Error" });
     }
 
@@ -287,10 +296,13 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
 
         if (!res.ok) {
           const resJson = await res.json();
-          console.log(resJson.error);
+          logger.error(
+            "Error while removing timetable from search service: ",
+            resJson.error,
+          );
         }
       } catch (err: any) {
-        console.log(
+        logger.error(
           "Error while removing timetable from search service: ",
           err.message,
         );
@@ -318,10 +330,13 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
           });
           if (!res.ok) {
             const resJson = await res.json();
-            console.log(resJson.error);
+            logger.error(
+              "Error while adding timetable to search service: ",
+              resJson.error,
+            );
           }
         } catch (err: any) {
-          console.log(
+          logger.error(
             "Error while adding timetable to search service: ",
             err.message,
           );
@@ -331,7 +346,7 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
     }
     return res.json({ message: "Timetable successfully updated" });
   } catch (err: any) {
-    console.log(err);
+    logger.error(err);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

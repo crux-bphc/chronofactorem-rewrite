@@ -24,6 +24,7 @@ const dataSchema = z.object({
 export const editUserValidator = validate(dataSchema);
 
 export const editUser = async (req: Request, res: Response) => {
+  const logger = req.log;
   const degrees: degreeList = req.body.degrees;
 
   if (degrees.length === 2 && !isAValidDegreeCombination(degrees)) {
@@ -44,8 +45,7 @@ export const editUser = async (req: Request, res: Response) => {
         return response.raw[0].id;
       });
   } catch (err: any) {
-    // will replace the console.log with a logger when we have one
-    console.log("Error editing degrees: ", err.message);
+    logger.error("Error editing degrees: ", err.message);
 
     return res.status(500).json({ message: "Internal Server Error" });
   }
