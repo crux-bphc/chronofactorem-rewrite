@@ -115,6 +115,7 @@ const searchRoute = new Route({
 
 function SearchResults() {
   const { query } = searchRoute.useParams();
+  // @ts-ignore Suppress unused variable warning, needs to be removed when the page is finished
   const searchQueryResult = useQuery(searchQueryOptions(query));
   return (
     <main className="text-foreground py-6 md:py-12 px-10 md:px-16">
