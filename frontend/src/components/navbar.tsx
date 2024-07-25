@@ -205,16 +205,7 @@ export function NavBar() {
                 <Search />
               </PopoverTrigger>
               <PopoverContent className="w-80 mt-4 mr-8">
-                <div className="grid gap-4">
-                  <div className="space-y-2">
-                    <h4 className="font-medium leading-none">
-                      Search Timetables
-                    </h4>
-                  </div>
-                  <div className="">
-                    <SearchBar />
-                  </div>
-                </div>
+                <SearchBar />
               </PopoverContent>
             </Popover>
           </div>

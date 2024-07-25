@@ -31,7 +31,7 @@ const SearchBar = () => {
     });
   };
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 m-1">
       <div className="relative ml-auto flex-1 md:grow-0">
         <Input
           type="search"

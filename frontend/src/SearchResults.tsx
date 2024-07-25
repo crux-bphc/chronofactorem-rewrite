@@ -24,7 +24,7 @@ const fetchSearchDetails = async (
 
 const searchQueryOptions = (query: string) =>
   queryOptions({
-    queryKey: ["search_timetable"],
+    queryKey: ["search_timetables", query],
     queryFn: () => fetchSearchDetails(query),
   });
 
@@ -44,14 +44,6 @@ const searchRoute = new Route({
           router.navigate({
             to: "/login",
           });
-        }
-
-        if (
-          error instanceof AxiosError &&
-          error.response &&
-          error.response.status === 404
-        ) {
-          throw notFound();
         }
 
         throw error;
