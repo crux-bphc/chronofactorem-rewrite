@@ -20,6 +20,7 @@ const SearchBar = () => {
     if (query === undefined || query.length < 2) {
       toast({
         title: "Error",
+        variant: "destructive",
         description: "Search query has to be atleast 2 characters long",
       });
       return;
@@ -35,7 +36,7 @@ const SearchBar = () => {
         <Input
           type="search"
           placeholder="Search Timetables..."
-          className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
+          className="w-full rounded-lg bg-background pl-4 md:w-48 lg:w-80"
           ref={searchRef}
         />
         <Search

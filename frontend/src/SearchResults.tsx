@@ -15,7 +15,7 @@ const fetchSearchDetails = async (
     `/api/timetable/search?query=${query}`,
     {
       headers: {
-        "Content-Type": "application/json ",
+        "Content-Type": "application/json",
       },
     },
   );
