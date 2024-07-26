@@ -34,8 +34,8 @@ export const addTimetable = async (
       },
       body: JSON.stringify(modifiedTimetable),
     });
-    const resJson = await res.json();
     if (!res.ok) {
+      const resJson = await res.json();
       logger.error(
         "Error while adding timetable to search service: ",
         resJson.error,
@@ -44,6 +44,36 @@ export const addTimetable = async (
   } catch (err: any) {
     logger.error(
       "Error while adding timetable to search service: ",
+      err.message,
+    );
+    throw err;
+  }
+};
+
+export const removeTimetable = async (
+  timetableId: number,
+  logger: Logger | Console,
+) => {
+  try {
+    const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/remove`;
+    const encodedId = sqids.encode([timetableId]);
+    const res = await fetch(searchServiceURL, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id: encodedId }),
+    });
+    if (!res.ok) {
+      const resJson = await res.json();
+      logger.error(
+        "Error while removing timetable from search service: ",
+        resJson.error,
+      );
+    }
+  } catch (err: any) {
+    logger.error(
+      "Error while removing timetable from search service: ",
       err.message,
     );
     throw err;
