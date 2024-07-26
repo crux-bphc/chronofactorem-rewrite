@@ -15,7 +15,7 @@ import {
   checkForClassHoursClash,
   checkForExamHoursClash,
 } from "../../utils/checkForClashes.js";
-import { addTimetable } from "../../utils/search.js";
+import { addTimetable, removeTimetable } from "../../utils/search.js";
 import sqids from "../../utils/sqids.js";
 import { addExamTimings, removeSection } from "../../utils/updateSection.js";
 import { updateSectionWarnings } from "../../utils/updateWarnings.js";
@@ -285,28 +285,8 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
     // update timetables in search service
     for (const timetable of timetables) {
       try {
-        const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/remove`;
-        const encodedId = sqids.encode([timetable.id]);
-        const res = await fetch(searchServiceURL, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ id: encodedId }),
-        });
-
-        if (!res.ok) {
-          const resJson = await res.json();
-          logger.error(
-            "Error while removing timetable from search service: ",
-            resJson.error,
-          );
-        }
+        removeTimetable(timetable.id, logger);
       } catch (err: any) {
-        logger.error(
-          "Error while removing timetable from search service: ",
-          err.message,
-        );
         return res.status(500).json({ message: "Internal Server Error" });
       }
       if (!timetable.draft && !timetable.private) {
@@ -318,10 +298,6 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
         try {
           addTimetable(timetableWithSections, null, logger);
         } catch (err: any) {
-          logger.error(
-            "Error while adding timetable to search service: ",
-            err.message,
-          );
           return res.status(500).json({ message: "Internal Server Error" });
         }
       }

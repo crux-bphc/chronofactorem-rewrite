@@ -2,7 +2,7 @@ import { QueryRunner } from "typeorm";
 import { sectionTypeEnum } from "../../lib/src/index.js";
 import { env } from "./config/server.js";
 import { Course, Section, Timetable } from "./entity/entities.js";
-import { addTimetable } from "./utils/search.js";
+import { addTimetable, removeTimetable } from "./utils/search.js";
 import sqids from "./utils/sqids.js";
 
 interface ExamJSON {
@@ -407,28 +407,7 @@ export const ingestJSON = async (
       .getManyAndCount();
     console.log(`${timetableCount} timetables are to be updated`);
     for (const { id } of timetableIds) {
-      const encodedId = sqids.encode([id]);
-      try {
-        const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/remove`;
-        const res = await fetch(searchServiceURL, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ id: encodedId }),
-        });
-        if (!res.ok) {
-          const resJson = await res.json();
-          console.log(
-            `error while removing timetable ${id} from search service: ${resJson.error}`,
-          );
-        }
-      } catch (err: any) {
-        console.log(
-          `error while removing timetable ${id} from search service: ${err.message}`,
-        );
-      }
-      try {
+        removeTimetable(id, console);
         const timetable = await queryRunner.manager
           .createQueryBuilder()
           .select("timetable")
@@ -437,11 +416,6 @@ export const ingestJSON = async (
           .where("timetable.id = :id", { id })
           .getOneOrFail();
         addTimetable(timetable, null, console);
-      } catch (err: any) {
-        console.log(
-          `error while adding timetable ${id} to search service: ${err.message}`,
-        );
-      }
     }
     console.log("updated timetables in search service!");
 
