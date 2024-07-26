@@ -15,6 +15,7 @@ import {
   checkForClassHoursClash,
   checkForExamHoursClash,
 } from "../../utils/checkForClashes.js";
+import { addTimetable } from "../../utils/search.js";
 import sqids from "../../utils/sqids.js";
 import { addExamTimings, removeSection } from "../../utils/updateSection.js";
 import { updateSectionWarnings } from "../../utils/updateWarnings.js";
@@ -312,29 +313,10 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
         const timetableWithSections = await timetableRepository
           .createQueryBuilder("timetable")
           .leftJoinAndSelect("timetable.sections", "section")
-          .where("timetable.id=:id", { id: timetable.id })
-          .getOne();
-        const encodedId = sqids.encode([timetable.id]);
-        const timetableWithSectionsString = {
-          ...timetableWithSections,
-          id: encodedId,
-        };
+          .where("timetable.id = :id", { id: timetable.id })
+          .getOneOrFail();
         try {
-          const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/add`;
-          const res = await fetch(searchServiceURL, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(timetableWithSectionsString),
-          });
-          if (!res.ok) {
-            const resJson = await res.json();
-            logger.error(
-              "Error while adding timetable to search service: ",
-              resJson.error,
-            );
-          }
+          addTimetable(timetableWithSections, null, logger);
         } catch (err: any) {
           logger.error(
             "Error while adding timetable to search service: ",

@@ -2,6 +2,7 @@ import { QueryRunner } from "typeorm";
 import { sectionTypeEnum } from "../../lib/src/index.js";
 import { env } from "./config/server.js";
 import { Course, Section, Timetable } from "./entity/entities.js";
+import { addTimetable } from "./utils/search.js";
 import sqids from "./utils/sqids.js";
 
 interface ExamJSON {
@@ -427,32 +428,15 @@ export const ingestJSON = async (
           `error while removing timetable ${id} from search service: ${err.message}`,
         );
       }
-      const timetable = await queryRunner.manager
-        .createQueryBuilder()
-        .select("timetable")
-        .from(Timetable, "timetable")
-        .leftJoinAndSelect("timetable.sections", "section")
-        .where("timetable.id = :id", { id })
-        .getOne();
-      const timetableWithSqid = {
-        ...timetable,
-        id: encodedId,
-      };
       try {
-        const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/add`;
-        const res = await fetch(searchServiceURL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(timetableWithSqid),
-        });
-        if (!res.ok) {
-          const resJson = await res.json();
-          console.log(
-            `error while adding timetable ${id} to search service: ${resJson.error}`,
-          );
-        }
+        const timetable = await queryRunner.manager
+          .createQueryBuilder()
+          .select("timetable")
+          .from(Timetable, "timetable")
+          .leftJoinAndSelect("timetable.sections", "section")
+          .where("timetable.id = :id", { id })
+          .getOneOrFail();
+        addTimetable(timetable, null, console);
       } catch (err: any) {
         console.log(
           `error while adding timetable ${id} to search service: ${err.message}`,

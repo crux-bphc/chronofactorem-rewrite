@@ -11,6 +11,7 @@ import { Timetable, User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { userRepository } from "../../repositories/userRepository.js";
+import { addTimetable } from "../../utils/search.js";
 import sqids, { validSqid } from "../../utils/sqids.js";
 
 const dataSchema = z.object({
@@ -119,30 +120,8 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
 
   if (isDraft === false && isPrivate === false) {
     try {
-      const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/add`;
-      const updatedTimetableStringID = {
-        ...updatedTimetable,
-        id: req.params.id,
-      };
-      const res = await fetch(searchServiceURL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedTimetableStringID),
-      });
-      const resJson = await res.json();
-      if (!res.ok) {
-        logger.error(
-          "Error while adding timetable to search service: ",
-          resJson.error,
-        );
-      }
+      addTimetable(updatedTimetable, req.session?.email ?? "", logger);
     } catch (err: any) {
-      logger.error(
-        "Error while adding timetable to search service: ",
-        err.message,
-      );
       return res.status(500).json({ message: "Internal Server Error" });
     }
   } else {
