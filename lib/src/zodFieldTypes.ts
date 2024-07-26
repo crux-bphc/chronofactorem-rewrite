@@ -33,14 +33,10 @@ export const namedEmailType = (name?: string) =>
 export const emailType = namedEmailType();
 
 export const namedTimetableIDType = (name?: string) =>
-  z.coerce
-    .string({
-      invalid_type_error: addNameToString("timetable id not a string", name),
-      required_error: addNameToString("timetable id is required", name),
-    })
-// .min(4, {
-//   message: addNameToString("timetable id is an invalid id", name),
-// });
+  z.coerce.string({
+    invalid_type_error: addNameToString("timetable id not a string", name),
+    required_error: addNameToString("timetable id is required", name),
+  });
 
 export const timetableIDType = namedTimetableIDType();
 
