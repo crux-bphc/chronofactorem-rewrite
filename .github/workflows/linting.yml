@@ -39,6 +39,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Install lib dependencies
+        run: pnpm install
+        working-directory: "./lib"
+
+      - name: Run biomejs linter and formatter on lib
+        run: pnpm biome ci .
+        working-directory: "./lib"
+
       - name: Install backend dependencies
         run: pnpm install
         working-directory: "./backend"
