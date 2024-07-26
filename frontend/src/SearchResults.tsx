@@ -1,5 +1,5 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
-import { ErrorComponent, Route, notFound } from "@tanstack/react-router";
+import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { z } from "zod";
 import { timetableWithSectionsType } from "../../lib/src";
