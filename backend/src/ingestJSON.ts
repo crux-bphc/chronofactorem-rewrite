@@ -3,7 +3,6 @@ import { sectionTypeEnum } from "../../lib/src/index.js";
 import { env } from "./config/server.js";
 import { Course, Section, Timetable } from "./entity/entities.js";
 import { addTimetable, removeTimetable } from "./utils/search.js";
-import sqids from "./utils/sqids.js";
 
 interface ExamJSON {
   midsem: string | null;
@@ -407,15 +406,15 @@ export const ingestJSON = async (
       .getManyAndCount();
     console.log(`${timetableCount} timetables are to be updated`);
     for (const { id } of timetableIds) {
-        removeTimetable(id, console);
-        const timetable = await queryRunner.manager
-          .createQueryBuilder()
-          .select("timetable")
-          .from(Timetable, "timetable")
-          .leftJoinAndSelect("timetable.sections", "section")
-          .where("timetable.id = :id", { id })
-          .getOneOrFail();
-        addTimetable(timetable, null, console);
+      removeTimetable(id, console);
+      const timetable = await queryRunner.manager
+        .createQueryBuilder()
+        .select("timetable")
+        .from(Timetable, "timetable")
+        .leftJoinAndSelect("timetable.sections", "section")
+        .where("timetable.id = :id", { id })
+        .getOneOrFail();
+      addTimetable(timetable, null, console);
     }
     console.log("updated timetables in search service!");
 

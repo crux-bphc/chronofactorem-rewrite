@@ -16,7 +16,6 @@ import {
   checkForExamHoursClash,
 } from "../../utils/checkForClashes.js";
 import { addTimetable, removeTimetable } from "../../utils/search.js";
-import sqids from "../../utils/sqids.js";
 import { addExamTimings, removeSection } from "../../utils/updateSection.js";
 import { updateSectionWarnings } from "../../utils/updateWarnings.js";
 
