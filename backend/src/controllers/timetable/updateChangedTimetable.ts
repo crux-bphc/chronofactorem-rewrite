@@ -15,7 +15,12 @@ import {
   checkForClassHoursClash,
   checkForExamHoursClash,
 } from "../../utils/checkForClashes.js";
-import { addTimetable, removeTimetable } from "../../utils/search.js";
+import {
+  addCourse,
+  addTimetable,
+  removeCourse,
+  removeTimetable,
+} from "../../utils/search.js";
 import { addExamTimings, removeSection } from "../../utils/updateSection.js";
 import { updateSectionWarnings } from "../../utils/updateWarnings.js";
 
@@ -234,50 +239,14 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
 
     // update course in search service
     try {
-      const searchServiceURL = `${env.SEARCH_SERVICE_URL}/course/remove`;
-      const res = await fetch(searchServiceURL, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id: course.id }),
-      });
-      if (!res.ok) {
-        const resJson = await res.json();
-        logger.error(
-          "Error while removing course from search service: ",
-          resJson.error,
-        );
-      }
+      removeCourse(course.id, logger);
     } catch (err: any) {
-      logger.error(
-        "Error while removing course from search service: ",
-        err.message,
-      );
       return res.status(500).json({ message: "Internal Server Error" });
     }
 
     try {
-      const searchServiceURL = `${env.SEARCH_SERVICE_URL}/course/add`;
-      const res = await fetch(searchServiceURL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(course),
-      });
-      if (!res.ok) {
-        const resJson = await res.json();
-        logger.error(
-          "Error while adding course to search service: ",
-          resJson.error,
-        );
-      }
+      addCourse(course, logger);
     } catch (err: any) {
-      logger.error(
-        "Error while adding course to search service: ",
-        err.message,
-      );
       return res.status(500).json({ message: "Internal Server Error" });
     }
 

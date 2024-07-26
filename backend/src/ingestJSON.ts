@@ -1,8 +1,12 @@
 import { QueryRunner } from "typeorm";
 import { sectionTypeEnum } from "../../lib/src/index.js";
-import { env } from "./config/server.js";
 import { Course, Section, Timetable } from "./entity/entities.js";
-import { addTimetable, removeTimetable } from "./utils/search.js";
+import {
+  addCourse,
+  addTimetable,
+  removeCourse,
+  removeTimetable,
+} from "./utils/search.js";
 
 interface ExamJSON {
   midsem: string | null;
@@ -336,26 +340,7 @@ export const ingestJSON = async (
       .getManyAndCount();
     console.log(`${oldCourseCount} old courses found`);
     for (const { id } of oldCourseIds) {
-      try {
-        const searchServiceURL = `${env.SEARCH_SERVICE_URL}/course/remove`;
-        const res = await fetch(searchServiceURL, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ id }),
-        });
-        if (!res.ok) {
-          const resJson = await res.json();
-          console.log(
-            `error while removing course ${id} from search service: ${resJson.error}`,
-          );
-        }
-      } catch (err: any) {
-        console.log(
-          `error while removing course ${id} from search service: ${err.message}`,
-        );
-      }
+      removeCourse(id, console);
     }
     console.log("removed old courses from search service!");
 
@@ -373,27 +358,8 @@ export const ingestJSON = async (
         .from(Course, "course")
         .leftJoinAndSelect("course.sections", "section")
         .where("course.id = :id", { id: id })
-        .getOne();
-      try {
-        const searchServiceURL = `${env.SEARCH_SERVICE_URL}/course/add`;
-        const res = await fetch(searchServiceURL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(course),
-        });
-        if (!res.ok) {
-          const resJson = await res.json();
-          console.log(
-            `error while adding course ${id} to search service: ${resJson.error}`,
-          );
-        }
-      } catch (err: any) {
-        console.log(
-          `error while adding course ${id} to search service: ${err.message}`,
-        );
-      }
+        .getOneOrFail();
+      addCourse(course, console);
     }
     console.log("added updated courses to search service!");
 
