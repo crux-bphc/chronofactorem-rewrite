@@ -1,0 +1,64 @@
+name: Build code
+
+on:
+  pull_request:
+    types: [ labeled ]
+  merge_group:
+
+jobs:
+  linting:
+    if: ${{ github.event.label.name == 'ready' }}
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.14.0
+
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 8.13.1
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install lib dependencies
+        run: pnpm install --prod
+        working-directory: "./lib"
+
+      - name: Build lib
+        run: pnpm tsc --build
+        working-directory: "./lib"
+
+      - name: Install backend dependencies
+        run: pnpm install --prod
+        working-directory: "./backend"
+
+      - name: Build backend
+        run: pnpm tsc --build
+        working-directory: "./backend"
+
+      - name: Install frontend dependencies
+        run: pnpm install --prod
+        working-directory: "./frontend"
+
+      - name: Build frontend
+        run: pnpm run build
+        working-directory: "./frontend"
