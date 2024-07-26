@@ -37,14 +37,14 @@ export const addTimetable = async (
     if (!res.ok) {
       const resJson = await res.json();
       logger.error(
-        "Error while adding timetable to search service: ",
-        resJson.error,
+        `Error while adding timetable ${timetable.id} to search service: ${resJson.error}`,
       );
     }
   } catch (err: any) {
     logger.error(
-      "Error while adding timetable to search service: ",
-      err.message,
+      `Error while adding timetable ${timetable.id} to search service: ${
+        "message" in err ? err.message : err
+      }`,
     );
     throw err;
   }
@@ -67,14 +67,14 @@ export const removeTimetable = async (
     if (!res.ok) {
       const resJson = await res.json();
       logger.error(
-        "Error while removing timetable from search service: ",
-        resJson.error,
+        `Error while removing timetable ${timetableId} from search service: ${resJson.error}`,
       );
     }
   } catch (err: any) {
     logger.error(
-      "Error while removing timetable from search service: ",
-      err.message,
+      `Error while removing timetable ${timetableId} from search service: ${
+        "message" in err ? err.message : err
+      }`,
     );
     throw err;
   }
