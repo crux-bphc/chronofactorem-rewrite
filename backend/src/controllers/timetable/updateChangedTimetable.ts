@@ -240,11 +240,6 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
     // update course in search service
     try {
       removeCourse(course.id, logger);
-    } catch (err: any) {
-      return res.status(500).json({ message: "Internal Server Error" });
-    }
-
-    try {
       addCourse(course, logger);
     } catch (err: any) {
       return res.status(500).json({ message: "Internal Server Error" });
