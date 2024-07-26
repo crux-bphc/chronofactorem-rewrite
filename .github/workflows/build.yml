@@ -6,7 +6,7 @@ on:
   merge_group:
 
 jobs:
-  linting:
+  build:
     if: ${{ github.event.label.name == 'ready' }}
     runs-on: self-hosted
     steps:
