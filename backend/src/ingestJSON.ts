@@ -345,20 +345,14 @@ export const ingestJSON = async (
     console.log("removed old courses from search service!");
 
     console.log("adding updated courses into search service...");
-    const [updatedCourseIds, updatedCourseCount] = await queryRunner.manager
+    const [updatedCourses, updatedCourseCount] = await queryRunner.manager
       .createQueryBuilder()
-      .select("course.id")
+      .select("course")
       .from(Course, "course")
+      .leftJoinAndSelect("course.sections", "section")
       .getManyAndCount();
     console.log(`${updatedCourseCount} courses found`);
-    for (const { id } of updatedCourseIds) {
-      const course = await queryRunner.manager
-        .createQueryBuilder()
-        .select("course")
-        .from(Course, "course")
-        .leftJoinAndSelect("course.sections", "section")
-        .where("course.id = :id", { id: id })
-        .getOneOrFail();
+    for (const course of updatedCourses) {
       addCourse(course, console);
     }
     console.log("added updated courses to search service!");
@@ -366,20 +360,14 @@ export const ingestJSON = async (
     console.log("updating timetables in search service...");
     const [timetableIds, timetableCount] = await queryRunner.manager
       .createQueryBuilder()
-      .select("timetable.id")
+      .select("timetable")
       .from(Timetable, "timetable")
+      .leftJoinAndSelect("timetable.sections", "section")
       .where("timetable.archived = :archived", { archived: true })
       .getManyAndCount();
     console.log(`${timetableCount} timetables are to be updated`);
-    for (const { id } of timetableIds) {
-      removeTimetable(id, console);
-      const timetable = await queryRunner.manager
-        .createQueryBuilder()
-        .select("timetable")
-        .from(Timetable, "timetable")
-        .leftJoinAndSelect("timetable.sections", "section")
-        .where("timetable.id = :id", { id })
-        .getOneOrFail();
+    for (const timetable of timetableIds) {
+      removeTimetable(timetable.id, console);
       addTimetable(timetable, null, console);
     }
     console.log("updated timetables in search service!");
