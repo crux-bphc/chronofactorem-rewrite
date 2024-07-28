@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { namedNonEmptyStringType } from "../../../../lib/src/zodFieldTypes.js";
+import { namedNonEmptyStringType } from "../../../../lib/src/index.js";
 import { env } from "../../config/server.js";
 import { Timetable } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
