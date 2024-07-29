@@ -7,17 +7,15 @@ import authenticatedRoute from "./AuthenticatedRoute";
 import { ToastAction } from "./components/ui/toast";
 import { useToast } from "./components/ui/use-toast";
 import { router } from "./main";
-import { useEffect } from "react";
 
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Loader2 } from "lucide-react";
 
 const fetchSearchDetails = async (
@@ -167,16 +165,14 @@ function SearchResults() {
               <Loader2 className="h-10 w-10 animate-spin" />
             </p>
           </div>
-        ) : null
-        }
+        ) : null}
         {searchQueryResult.data?.length === 0 ? (
           <div className="w-md h-96 bg-background">
             <p className="text-center text-lg font-bold text-muted-foreground">
               No results found
             </p>
           </div>
-        ) : null
-        }
+        ) : null}
       </div>
     </main>
   );

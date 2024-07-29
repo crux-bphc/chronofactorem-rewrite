@@ -1,22 +1,32 @@
 import { router } from "@/main";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useToast } from "./ui/use-toast";
 
-import { Input } from "@/components/ui/input"
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import { ChevronDown, Search } from "lucide-react";
-import { yearType } from '../../../lib/src/zodFieldTypes';
 
 const SearchBar = () => {
-
-  const [open, setOpen] = useState(false)
-  const [query, setQuery] = useState<string | undefined>()
-  const [year, setYear] = useState<string | undefined>()
-  const [semester, setSemester] = useState<string | undefined>()
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState<string | undefined>();
+  const [year, setYear] = useState<string | undefined>();
+  const [semester, setSemester] = useState<string | undefined>();
 
   const { toast } = useToast();
-  const handleSearch = async (query: string | undefined, semester: string | undefined, year: string | undefined) => {
+  const handleSearch = async (
+    query: string | undefined,
+    semester: string | undefined,
+    year: string | undefined,
+  ) => {
     if (query === undefined || query.length < 2) {
       toast({
         title: "Error",
@@ -25,7 +35,10 @@ const SearchBar = () => {
       });
       return;
     }
-    const searchString = query + (semester ? `&semester=${semester}` : "") + (year ? `&year=${year}` : "");
+    const searchString =
+      query +
+      (semester ? `&semester=${semester}` : "") +
+      (year ? `&year=${year}` : "");
     router.navigate({
       to: `/search/${searchString}`,
       params: { query },
@@ -37,20 +50,26 @@ const SearchBar = () => {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         type="search"
-        placeholder="Search..."
+        placeholder="Search (optional)..."
         className="flex-1 rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
       />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="h-10 px-4 flex items-center gap-2">
-            <span>All</span>
+          <Button
+            variant="outline"
+            className="h-10 px-4 flex items-center gap-2"
+          >
+            <span>Filters</span>
             <ChevronDown className="w-4 h-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[200px]">
           <DropdownMenuLabel>Year</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuRadioGroup value={year} onValueChange={(value) => setYear(value)}>
+          <DropdownMenuRadioGroup
+            value={year}
+            onValueChange={(value) => setYear(value)}
+          >
             <DropdownMenuRadioItem value="1">Year 1</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="2">Year 2</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="3">Year 3</DropdownMenuRadioItem>
@@ -60,7 +79,10 @@ const SearchBar = () => {
           <DropdownMenuSeparator />
           <DropdownMenuLabel>Semester</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuRadioGroup value={semester} onValueChange={(value) => setSemester(value)}>
+          <DropdownMenuRadioGroup
+            value={semester}
+            onValueChange={(value) => setSemester(value)}
+          >
             <DropdownMenuRadioItem value="1">Sem 1</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="2">Sem 2</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
@@ -74,4 +96,3 @@ const SearchBar = () => {
 };
 
 export default SearchBar;
-
