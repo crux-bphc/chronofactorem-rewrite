@@ -66,7 +66,6 @@ export const searchTimetable = async (req: Request, res: Response) => {
     } = req.query;
 
     const usefulQueryParams = {
-      query,
       from,
       year,
       name,
@@ -78,16 +77,16 @@ export const searchTimetable = async (req: Request, res: Response) => {
       instructor: instructorQuery,
     };
 
-    let searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/search`;
+    let searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/search?query=${query}`;
 
     for (const [key, value] of Object.entries(usefulQueryParams)) {
       if (value === undefined) continue;
       if (Array.isArray(value)) {
         for (const v of value) {
-          searchServiceURL += `?${key}=${v}`;
+          searchServiceURL += `&${key}=${v}`;
         }
       } else {
-        searchServiceURL += `?${key}=${value}`;
+        searchServiceURL += `&${key}=${value}`;
       }
     }
 
