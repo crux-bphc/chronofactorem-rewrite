@@ -120,9 +120,9 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
   // update search service
   try {
     if (isDraft === false && isPrivate === false) {
-      addTimetable(updatedTimetable, req.session?.email ?? "", logger);
+      await addTimetable(updatedTimetable, req.session?.email ?? "", logger);
     } else {
-      removeTimetable(timetable.id, logger);
+      await removeTimetable(timetable.id, logger);
     }
   } catch (err: any) {
     return res.status(500).json({ message: "Internal Server Error" });

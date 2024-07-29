@@ -239,8 +239,8 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
 
     // update course in search service
     try {
-      removeCourse(course.id, logger);
-      addCourse(course, logger);
+      await removeCourse(course.id, logger);
+      await addCourse(course, logger);
     } catch (err: any) {
       return res.status(500).json({ message: "Internal Server Error" });
     }
@@ -248,7 +248,7 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
     // update timetables in search service
     for (const timetable of timetables) {
       try {
-        removeTimetable(timetable.id, logger);
+        await removeTimetable(timetable.id, logger);
       } catch (err: any) {
         return res.status(500).json({ message: "Internal Server Error" });
       }
@@ -259,7 +259,7 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
           .where("timetable.id = :id", { id: timetable.id })
           .getOneOrFail();
         try {
-          addTimetable(timetableWithSections, null, logger);
+          await addTimetable(timetableWithSections, null, logger);
         } catch (err: any) {
           return res.status(500).json({ message: "Internal Server Error" });
         }

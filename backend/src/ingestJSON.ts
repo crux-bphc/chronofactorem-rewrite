@@ -340,7 +340,7 @@ export const ingestJSON = async (
       .getManyAndCount();
     console.log(`${oldCourseCount} old courses found`);
     for (const { id } of oldCourseIds) {
-      removeCourse(id, console);
+      await removeCourse(id, console);
     }
     console.log("removed old courses from search service!");
 
@@ -353,7 +353,7 @@ export const ingestJSON = async (
       .getManyAndCount();
     console.log(`${updatedCourseCount} courses found`);
     for (const course of updatedCourses) {
-      addCourse(course, console);
+      await addCourse(course, console);
     }
     console.log("added updated courses to search service!");
 
@@ -367,8 +367,8 @@ export const ingestJSON = async (
       .getManyAndCount();
     console.log(`${timetableCount} timetables are to be updated`);
     for (const timetable of timetableIds) {
-      removeTimetable(timetable.id, console);
-      addTimetable(timetable, null, console);
+      await removeTimetable(timetable.id, console);
+      await addTimetable(timetable, null, console);
     }
     console.log("updated timetables in search service!");
 
