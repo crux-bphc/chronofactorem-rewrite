@@ -1,13 +1,39 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { namedNonEmptyStringType } from "../../../../lib/src/index.js";
+import {
+  namedCollegeYearType,
+  namedNonEmptyStringType,
+  namedSemesterType,
+  namedShortBITSIDType,
+  namedYearType,
+} from "../../../../lib/src/index.js";
+import { namedDegreeZodList } from "../../../../lib/src/index.js";
 import { env } from "../../config/server.js";
 import { Timetable } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 
 const searchTimetableSchema = z.object({
   query: z.object({
-    query: namedNonEmptyStringType("query"),
+    query: namedNonEmptyStringType("search query"),
+    year: namedCollegeYearType("search filter").optional(),
+    name: namedNonEmptyStringType("search filter timetable name").optional(),
+    authorId: namedShortBITSIDType("search filter").optional(),
+    acadYear: namedYearType("search filter acad").optional(),
+    semester: namedSemesterType("search filter").optional(),
+    degrees: namedDegreeZodList("search filter")
+      .min(1, {
+        message: "degrees must be a non-empty array of valid degree strings",
+      })
+      .max(2, {
+        message: "degrees may not contain more than two elements",
+      })
+      .optional(),
+    courseQuery: namedNonEmptyStringType("search filter course query")
+      .array()
+      .optional(),
+    instructorQuery: namedNonEmptyStringType("search filter instructor query")
+      .array()
+      .optional(),
   }),
 });
 
@@ -16,9 +42,42 @@ export const searchTimetableValidator = validate(searchTimetableSchema);
 export const searchTimetable = async (req: Request, res: Response) => {
   const logger = req.log;
   try {
-    const { query } = req.query;
+    const {
+      query,
+      year,
+      name,
+      authorId,
+      acadYear,
+      semester,
+      degrees,
+      courseQuery,
+      instructorQuery,
+    } = req.query;
 
-    const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/search?query=${query}`;
+    const usefulQueryParams = {
+      query,
+      year,
+      name,
+      authorId,
+      acadYear,
+      semester,
+      degree: degrees,
+      course: courseQuery,
+      instructor: instructorQuery,
+    };
+
+    let searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/search`;
+
+    for (const [key, value] of Object.entries(usefulQueryParams)) {
+      if (value === undefined) continue;
+      if (Array.isArray(value)) {
+        for (const v of value) {
+          searchServiceURL += `?${key}=${v}`;
+        }
+      } else {
+        searchServiceURL += `?${key}=${value}`;
+      }
+    }
 
     const response = await fetch(searchServiceURL, {
       method: "GET",
