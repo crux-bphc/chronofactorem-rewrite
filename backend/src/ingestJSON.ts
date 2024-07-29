@@ -1,8 +1,12 @@
 import { QueryRunner } from "typeorm";
 import { sectionTypeEnum } from "../../lib/src/index.js";
-import { env } from "./config/server.js";
 import { Course, Section, Timetable } from "./entity/entities.js";
-import sqids from "./utils/sqids.js";
+import {
+  addCourse,
+  addTimetable,
+  removeCourse,
+  removeTimetable,
+} from "./utils/search.js";
 
 interface ExamJSON {
   midsem: string | null;
@@ -336,128 +340,35 @@ export const ingestJSON = async (
       .getManyAndCount();
     console.log(`${oldCourseCount} old courses found`);
     for (const { id } of oldCourseIds) {
-      try {
-        const searchServiceURL = `${env.SEARCH_SERVICE_URL}/course/remove`;
-        const res = await fetch(searchServiceURL, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ id }),
-        });
-        if (!res.ok) {
-          const resJson = await res.json();
-          console.log(
-            `error while removing course ${id} from search service: ${resJson.error}`,
-          );
-        }
-      } catch (err: any) {
-        console.log(
-          `error while removing course ${id} from search service: ${err.message}`,
-        );
-      }
+      await removeCourse(id, console);
     }
     console.log("removed old courses from search service!");
 
     console.log("adding updated courses into search service...");
-    const [updatedCourseIds, updatedCourseCount] = await queryRunner.manager
+    const [updatedCourses, updatedCourseCount] = await queryRunner.manager
       .createQueryBuilder()
-      .select("course.id")
+      .select("course")
       .from(Course, "course")
+      .leftJoinAndSelect("course.sections", "section")
       .getManyAndCount();
     console.log(`${updatedCourseCount} courses found`);
-    for (const { id } of updatedCourseIds) {
-      const course = await queryRunner.manager
-        .createQueryBuilder()
-        .select("course")
-        .from(Course, "course")
-        .leftJoinAndSelect("course.sections", "section")
-        .where("course.id = :id", { id: id })
-        .getOne();
-      try {
-        const searchServiceURL = `${env.SEARCH_SERVICE_URL}/course/add`;
-        const res = await fetch(searchServiceURL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(course),
-        });
-        if (!res.ok) {
-          const resJson = await res.json();
-          console.log(
-            `error while adding course ${id} to search service: ${resJson.error}`,
-          );
-        }
-      } catch (err: any) {
-        console.log(
-          `error while adding course ${id} to search service: ${err.message}`,
-        );
-      }
+    for (const course of updatedCourses) {
+      await addCourse(course, console);
     }
     console.log("added updated courses to search service!");
 
     console.log("updating timetables in search service...");
     const [timetableIds, timetableCount] = await queryRunner.manager
       .createQueryBuilder()
-      .select("timetable.id")
+      .select("timetable")
       .from(Timetable, "timetable")
+      .leftJoinAndSelect("timetable.sections", "section")
       .where("timetable.archived = :archived", { archived: true })
       .getManyAndCount();
     console.log(`${timetableCount} timetables are to be updated`);
-    for (const { id } of timetableIds) {
-      const encodedId = sqids.encode([id]);
-      try {
-        const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/remove`;
-        const res = await fetch(searchServiceURL, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ id: encodedId }),
-        });
-        if (!res.ok) {
-          const resJson = await res.json();
-          console.log(
-            `error while removing timetable ${id} from search service: ${resJson.error}`,
-          );
-        }
-      } catch (err: any) {
-        console.log(
-          `error while removing timetable ${id} from search service: ${err.message}`,
-        );
-      }
-      const timetable = await queryRunner.manager
-        .createQueryBuilder()
-        .select("timetable")
-        .from(Timetable, "timetable")
-        .leftJoinAndSelect("timetable.sections", "section")
-        .where("timetable.id = :id", { id })
-        .getOne();
-      const timetableWithSqid = {
-        ...timetable,
-        id: encodedId,
-      };
-      try {
-        const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/add`;
-        const res = await fetch(searchServiceURL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(timetableWithSqid),
-        });
-        if (!res.ok) {
-          const resJson = await res.json();
-          console.log(
-            `error while adding timetable ${id} to search service: ${resJson.error}`,
-          );
-        }
-      } catch (err: any) {
-        console.log(
-          `error while adding timetable ${id} to search service: ${err.message}`,
-        );
-      }
+    for (const timetable of timetableIds) {
+      await removeTimetable(timetable.id, console);
+      await addTimetable(timetable, null, console);
     }
     console.log("updated timetables in search service!");
 

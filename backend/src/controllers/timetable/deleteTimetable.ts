@@ -2,11 +2,11 @@ import "dotenv/config";
 import { Request, Response } from "express";
 import { z } from "zod";
 import { timetableIDType } from "../../../../lib/src/index.js";
-import { env } from "../../config/server.js";
 import { Timetable, User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { userRepository } from "../../repositories/userRepository.js";
+import { removeTimetable } from "../../utils/search.js";
 import sqids, { validSqid } from "../../utils/sqids.js";
 
 const dataSchema = z.object({
@@ -74,27 +74,8 @@ export const deleteTimetable = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
   try {
-    const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/remove`;
-
-    const res = await fetch(searchServiceURL, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id: req.params.id }),
-    });
-    if (!res.ok) {
-      const resJson = await res.json();
-      logger.error(
-        "Error while removing timetable from search service: ",
-        resJson.error,
-      );
-    }
+    await removeTimetable(timetable.id, logger);
   } catch (err: any) {
-    logger.error(
-      "Error while removing timetable from search service: ",
-      err.message,
-    );
     return res.status(500).json({ message: "Internal Server Error" });
   }
   return res.json({ message: "timetable deleted" });

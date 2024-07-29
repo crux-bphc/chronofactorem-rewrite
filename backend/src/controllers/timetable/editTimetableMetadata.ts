@@ -6,11 +6,11 @@ import {
   namedNonEmptyStringType,
   timetableIDType,
 } from "../../../../lib/src/index.js";
-import { env } from "../../config/server.js";
 import { Timetable, User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { userRepository } from "../../repositories/userRepository.js";
+import { addTimetable, removeTimetable } from "../../utils/search.js";
 import sqids, { validSqid } from "../../utils/sqids.js";
 
 const dataSchema = z.object({
@@ -117,59 +117,15 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 
-  if (isDraft === false && isPrivate === false) {
-    try {
-      const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/add`;
-      const updatedTimetableStringID = {
-        ...updatedTimetable,
-        id: req.params.id,
-      };
-      const res = await fetch(searchServiceURL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedTimetableStringID),
-      });
-      const resJson = await res.json();
-      if (!res.ok) {
-        logger.error(
-          "Error while adding timetable to search service: ",
-          resJson.error,
-        );
-      }
-    } catch (err: any) {
-      logger.error(
-        "Error while adding timetable to search service: ",
-        err.message,
-      );
-      return res.status(500).json({ message: "Internal Server Error" });
+  // update search service
+  try {
+    if (isDraft === false && isPrivate === false) {
+      await addTimetable(updatedTimetable, req.session?.email ?? "", logger);
+    } else {
+      await removeTimetable(timetable.id, logger);
     }
-  } else {
-    try {
-      const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/remove`;
-
-      const res = await fetch(searchServiceURL, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id: req.params.id }),
-      });
-      if (!res.ok) {
-        const resJson = await res.json();
-        logger.error(
-          "Error while removing timetable from search service: ",
-          resJson.error,
-        );
-      }
-    } catch (err: any) {
-      logger.error(
-        "Error while removing timetable from search service: ",
-        err.message,
-      );
-      return res.status(500).json({ message: "Internal Server Error" });
-    }
+  } catch (err: any) {
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 
   return res.json({ message: "timetable edited" });

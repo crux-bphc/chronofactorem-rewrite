@@ -15,7 +15,12 @@ import {
   checkForClassHoursClash,
   checkForExamHoursClash,
 } from "../../utils/checkForClashes.js";
-import sqids from "../../utils/sqids.js";
+import {
+  addCourse,
+  addTimetable,
+  removeCourse,
+  removeTimetable,
+} from "../../utils/search.js";
 import { addExamTimings, removeSection } from "../../utils/updateSection.js";
 import { updateSectionWarnings } from "../../utils/updateWarnings.js";
 
@@ -234,112 +239,28 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
 
     // update course in search service
     try {
-      const searchServiceURL = `${env.SEARCH_SERVICE_URL}/course/remove`;
-      const res = await fetch(searchServiceURL, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id: course.id }),
-      });
-      if (!res.ok) {
-        const resJson = await res.json();
-        logger.error(
-          "Error while removing course from search service: ",
-          resJson.error,
-        );
-      }
+      await removeCourse(course.id, logger);
+      await addCourse(course, logger);
     } catch (err: any) {
-      logger.error(
-        "Error while removing course from search service: ",
-        err.message,
-      );
-      return res.status(500).json({ message: "Internal Server Error" });
-    }
-
-    try {
-      const searchServiceURL = `${env.SEARCH_SERVICE_URL}/course/add`;
-      const res = await fetch(searchServiceURL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(course),
-      });
-      if (!res.ok) {
-        const resJson = await res.json();
-        logger.error(
-          "Error while adding course to search service: ",
-          resJson.error,
-        );
-      }
-    } catch (err: any) {
-      logger.error(
-        "Error while adding course to search service: ",
-        err.message,
-      );
       return res.status(500).json({ message: "Internal Server Error" });
     }
 
     // update timetables in search service
     for (const timetable of timetables) {
       try {
-        const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/remove`;
-        const encodedId = sqids.encode([timetable.id]);
-        const res = await fetch(searchServiceURL, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ id: encodedId }),
-        });
-
-        if (!res.ok) {
-          const resJson = await res.json();
-          logger.error(
-            "Error while removing timetable from search service: ",
-            resJson.error,
-          );
-        }
+        await removeTimetable(timetable.id, logger);
       } catch (err: any) {
-        logger.error(
-          "Error while removing timetable from search service: ",
-          err.message,
-        );
         return res.status(500).json({ message: "Internal Server Error" });
       }
       if (!timetable.draft && !timetable.private) {
         const timetableWithSections = await timetableRepository
           .createQueryBuilder("timetable")
           .leftJoinAndSelect("timetable.sections", "section")
-          .where("timetable.id=:id", { id: timetable.id })
-          .getOne();
-        const encodedId = sqids.encode([timetable.id]);
-        const timetableWithSectionsString = {
-          ...timetableWithSections,
-          id: encodedId,
-        };
+          .where("timetable.id = :id", { id: timetable.id })
+          .getOneOrFail();
         try {
-          const searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/add`;
-          const res = await fetch(searchServiceURL, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(timetableWithSectionsString),
-          });
-          if (!res.ok) {
-            const resJson = await res.json();
-            logger.error(
-              "Error while adding timetable to search service: ",
-              resJson.error,
-            );
-          }
+          await addTimetable(timetableWithSections, null, logger);
         } catch (err: any) {
-          logger.error(
-            "Error while adding timetable to search service: ",
-            err.message,
-          );
           return res.status(500).json({ message: "Internal Server Error" });
         }
       }
