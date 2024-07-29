@@ -37,9 +37,6 @@ export const namedTimetableIDType = (name?: string) =>
     invalid_type_error: addNameToString("timetable id not a string", name),
     required_error: addNameToString("timetable id is required", name),
   });
-// .min(4, {
-//   message: addNameToString("timetable id is an invalid id", name),
-// });
 
 export const timetableIDType = namedTimetableIDType();
 
