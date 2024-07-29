@@ -1,22 +1,22 @@
 import { router } from "@/main";
-import { ListFilter, Search } from "lucide-react";
-import { useRef } from "react";
-import { Button } from "./ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { Input } from "./ui/input";
+import { useEffect, useRef, useState } from "react";
 import { useToast } from "./ui/use-toast";
 
+import { Input } from "@/components/ui/input"
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
+import { ChevronDown, Search } from "lucide-react";
+import { yearType } from '../../../lib/src/zodFieldTypes';
+
 const SearchBar = () => {
+
+  const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState<string | undefined>()
+  const [year, setYear] = useState<string | undefined>()
+  const [semester, setSemester] = useState<string | undefined>()
+
   const { toast } = useToast();
-  const searchRef = useRef<HTMLInputElement>(null);
-  const handleSearch = async (query: string | undefined) => {
+  const handleSearch = async (query: string | undefined, semester: string | undefined, year: string | undefined) => {
     if (query === undefined || query.length < 2) {
       toast({
         title: "Error",
@@ -25,47 +25,53 @@ const SearchBar = () => {
       });
       return;
     }
+    const searchString = query + (semester ? `&semester=${semester}` : "") + (year ? `&year=${year}` : "");
     router.navigate({
-      to: "/search/$query",
+      to: `/search/${searchString}`,
       params: { query },
     });
   };
   return (
-    <div className="flex items-center gap-2 m-1">
-      <div className="relative ml-auto flex-1 md:grow-0">
-        <Input
-          type="search"
-          placeholder="Search Timetables..."
-          className="w-full rounded-lg bg-background pl-4 md:w-48 lg:w-80"
-          ref={searchRef}
-        />
-        <Search
-          className="absolute right-4 top-2.5 h-4 w-4 text-muted-foreground cursor-pointer"
-          onClick={() => handleSearch(searchRef.current?.value)}
-        />
-      </div>
+    <div className="flex items-center w-full max-w-md gap-2 md:ml-10">
+      <Input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        type="search"
+        placeholder="Search..."
+        className="flex-1 rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+      />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="h-8 gap-1 hidden">
-            <ListFilter className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Filter
-            </span>
+          <Button variant="outline" className="h-10 px-4 flex items-center gap-2">
+            <span>All</span>
+            <ChevronDown className="w-4 h-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="end"
-          className="border border-slate-900 p-1 bg-slate-950 mt-2 rounded-sm"
-        >
-          <DropdownMenuLabel>Filter by</DropdownMenuLabel>
+        <DropdownMenuContent align="end" className="w-[200px]">
+          <DropdownMenuLabel>Year</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuCheckboxItem checked>Course</DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem>Name</DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem>Archived</DropdownMenuCheckboxItem>
+          <DropdownMenuRadioGroup value={year} onValueChange={(value) => setYear(value)}>
+            <DropdownMenuRadioItem value="1">Year 1</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="2">Year 2</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="3">Year 3</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="4">Year 4</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="5">Year 4</DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuLabel>Semester</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuRadioGroup value={semester} onValueChange={(value) => setSemester(value)}>
+            <DropdownMenuRadioItem value="1">Sem 1</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="2">Sem 2</DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
+      <Button onClick={() => handleSearch(query, semester, year)} size="icon">
+        <Search className="h-4 w-4" />
+      </Button>
     </div>
   );
 };
 
 export default SearchBar;
+

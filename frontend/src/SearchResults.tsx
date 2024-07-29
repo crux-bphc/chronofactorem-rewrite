@@ -18,6 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Loader2 } from "lucide-react";
 
 const fetchSearchDetails = async (
   query: string,
@@ -160,6 +161,22 @@ function SearchResults() {
             </Card>
           );
         })}
+        {searchQueryResult.isFetching ? (
+          <div className="w-md h-96 bg-background">
+            <p className="text-center text-lg font-bold text-muted-foreground">
+              <Loader2 className="h-10 w-10 animate-spin" />
+            </p>
+          </div>
+        ) : null
+        }
+        {searchQueryResult.data?.length === 0 ? (
+          <div className="w-md h-96 bg-background">
+            <p className="text-center text-lg font-bold text-muted-foreground">
+              No results found
+            </p>
+          </div>
+        ) : null
+        }
       </div>
     </main>
   );
