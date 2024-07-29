@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { z } from "zod";
 import {
   namedCollegeYearType,
+  namedIntegerType,
   namedNonEmptyStringType,
   namedSemesterType,
   namedShortBITSIDType,
@@ -15,6 +16,15 @@ import { validate } from "../../middleware/zodValidateRequest.js";
 const searchTimetableSchema = z.object({
   query: z.object({
     query: namedNonEmptyStringType("search query"),
+    // note that this implies a limit of 500 on the number of search results
+    from: namedIntegerType("search results start index")
+      .gte(0, {
+        message: "invalid search results start index",
+      })
+      .lte(500, {
+        message: "invalid search results start index",
+      })
+      .optional(),
     year: namedCollegeYearType("search filter").optional(),
     name: namedNonEmptyStringType("search filter timetable name").optional(),
     authorId: namedShortBITSIDType("search filter").optional(),
@@ -44,6 +54,7 @@ export const searchTimetable = async (req: Request, res: Response) => {
   try {
     const {
       query,
+      from,
       year,
       name,
       authorId,
@@ -56,6 +67,7 @@ export const searchTimetable = async (req: Request, res: Response) => {
 
     const usefulQueryParams = {
       query,
+      from,
       year,
       name,
       authorId,
