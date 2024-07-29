@@ -96,8 +96,12 @@ export const namedCollegeYearType = (name?: string) =>
     .int({
       message: addNameToString("college year is an invalid year", name),
     })
-    .lte(6)
-    .gte(1);
+    .lte(6, {
+      message: addNameToString("college year is an invalid year", name),
+    })
+    .gte(1, {
+      message: addNameToString("college year is an invalid year", name),
+    });
 export const collegeYearType = namedCollegeYearType();
 
 export const namedSemesterType = (name?: string) =>
@@ -133,6 +137,17 @@ export const namedISOTimestampType = (name?: string) =>
       message: addNameToString("time must be a non-empty string", name),
     })
     .datetime({
-      message: "time must be a valid ISO timestamp",
+      message: addNameToString("time must be a valid ISO timestamp", name),
     });
 export const isoTimestampType = namedISOTimestampType();
+
+export const namedShortBITSIDType = (name?: string) =>
+  z
+    .string({
+      invalid_type_error: addNameToString("BITS ID is not a string", name),
+      required_error: addNameToString("BITS ID is required", name),
+    })
+    .regex(new RegExp(/^f20[0-9]{6}$/), {
+      message: addNameToString("BITS ID is invalid", name),
+    });
+export const shortBITSIDType = namedShortBITSIDType();
