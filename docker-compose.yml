@@ -155,3 +155,4 @@ services:
 networks:
   default:
     name: "chrono_net"
+    external: true
