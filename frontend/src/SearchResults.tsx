@@ -22,7 +22,7 @@ const fetchSearchDetails = async (
   query: string,
 ): Promise<z.infer<typeof timetableWithSectionsType>[]> => {
   const response = await axios.get<z.infer<typeof timetableWithSectionsType>[]>(
-    `/api/timetable/search?query=${query}`,
+    `/api/timetable/search?${query}`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -32,19 +32,27 @@ const fetchSearchDetails = async (
   return response.data;
 };
 
-const searchQueryOptions = (query: string) =>
-  queryOptions({
+const searchQueryOptions = (deps: Record<string, any>) => {
+  console.log(deps);
+  for (const key of Object.keys(deps)) {
+    if (deps[key] === undefined) delete deps[key];
+  }
+  const query = new URLSearchParams(deps).toString();
+  return queryOptions({
     queryKey: ["search_timetables", query],
     queryFn: () => fetchSearchDetails(query),
   });
+};
 
 const searchRoute = new Route({
   getParentRoute: () => authenticatedRoute,
-  path: "/search/$query",
+  path: "/search",
   component: SearchResults,
-  loader: ({ context: { queryClient }, params }) =>
+  validateSearch: (search) => search,
+  loaderDeps: ({ search }) => search,
+  loader: ({ context: { queryClient }, deps }) =>
     queryClient
-      .ensureQueryData(searchQueryOptions(params.query))
+      .ensureQueryData(searchQueryOptions(deps))
       .catch((error: Error) => {
         if (
           error instanceof AxiosError &&
@@ -124,8 +132,8 @@ const searchRoute = new Route({
 });
 
 function SearchResults() {
-  const { query } = searchRoute.useParams();
-  const searchQueryResult = useQuery(searchQueryOptions(query));
+  const deps = searchRoute.useLoaderDeps();
+  const searchQueryResult = useQuery(searchQueryOptions(deps));
 
   return (
     <main className="text-foreground py-6 md:py-12 px-10 md:px-16">
@@ -146,8 +154,13 @@ function SearchResults() {
               </CardHeader>
               <CardContent>
                 <div className="flex gap-2">
-                  <Badge>{timetable.year}-{timetable.semester}</Badge>
-                  <Badge>{timetable.acadYear}-{(timetable.acadYear + 1).toString().substring(2)}</Badge>
+                  <Badge>
+                    {timetable.year}-{timetable.semester}
+                  </Badge>
+                  <Badge>
+                    {timetable.acadYear}-
+                    {(timetable.acadYear + 1).toString().substring(2)}
+                  </Badge>
                   <Badge>{timetable.degrees}</Badge>
                   {timetable.archived ? (
                     <Badge variant="destructive">Archived</Badge>

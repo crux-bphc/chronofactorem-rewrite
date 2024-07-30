@@ -16,7 +16,6 @@ import { Input } from "@/components/ui/input";
 import { ChevronDown, Search } from "lucide-react";
 
 const SearchBar = () => {
-  const [open, setOpen] = useState(false);
   const [query, setQuery] = useState<string | undefined>();
   const [year, setYear] = useState<string | undefined>();
   const [semester, setSemester] = useState<string | undefined>();
@@ -27,20 +26,19 @@ const SearchBar = () => {
     semester: string | undefined,
     year: string | undefined,
   ) => {
-    if (query === undefined || query.length < 2) {
+    if (query === undefined || !query.length) {
       toast({
         title: "Error",
         variant: "destructive",
-        description: "Search query has to be atleast 2 characters long",
+        description: "Search query cannot be empty",
       });
       return;
     }
-    const searchString =
-      query +
-      (semester ? `&semester=${semester}` : "") +
-      (year ? `&year=${year}` : "");
+    const searchString = `query=${query ?? ""}${
+      semester ?? `&semester=${semester}`
+    }${year ?? `&year=${year}`}`;
     router.navigate({
-      to: `/search/${searchString}`,
+      to: `/search?${searchString}`,
       params: { query },
     });
   };
