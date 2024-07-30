@@ -41,7 +41,6 @@ const fetchSearchDetails = async (
 };
 
 const searchQueryOptions = (deps: Record<string, any>) => {
-  console.log(deps);
   for (const key of Object.keys(deps)) {
     if (deps[key] === undefined) delete deps[key];
   }
@@ -152,7 +151,7 @@ function SearchResults() {
         </h1>
         <div className="flex flex-col items-center">
           <h2 className="text-muted-foreground font-bold">
-            Page {(deps.page as number ?? 0) + 1}
+            Page {((deps.page as number) ?? 0) + 1}
           </h2>
           <Pagination className="w-fit mx-0 text-2xl text-foreground">
             <PaginationContent>
