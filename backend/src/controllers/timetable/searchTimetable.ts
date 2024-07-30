@@ -17,12 +17,12 @@ const searchTimetableSchema = z.object({
   query: z.object({
     query: namedNonEmptyStringType("search query").optional(),
     // note that this implies a limit of 500 on the number of search results
-    from: namedIntegerType("search results start index")
+    page: namedIntegerType("search results page")
       .gte(0, {
-        message: "invalid search results start index",
+        message: "invalid search results page",
       })
-      .lte(500, {
-        message: "invalid search results start index",
+      .lte(50, {
+        message: "invalid search results page",
       })
       .optional(),
     year: namedCollegeYearType("search filter").optional(),
@@ -54,7 +54,7 @@ export const searchTimetable = async (req: Request, res: Response) => {
   try {
     const {
       query,
-      from,
+      page,
       year,
       name,
       authorId,
@@ -67,7 +67,7 @@ export const searchTimetable = async (req: Request, res: Response) => {
 
     const usefulQueryParams = {
       query,
-      from,
+      from: parseInt((page as string | undefined) ?? "0") * 12,
       year,
       name,
       authorId,
