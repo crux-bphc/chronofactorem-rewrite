@@ -30,10 +30,11 @@ const SearchBar = () => {
     if (searchString.endsWith("&") || searchString.endsWith("?"))
       searchString = searchString.substring(0, searchString.length - 1);
 
-    router.navigate({
-      to: `/search${searchString}`,
-      params: { query },
-    });
+    router.navigate({ to: "/" });
+    setTimeout(
+      () => router.navigate({ to: `/search${searchString}`, replace: true }),
+      100,
+    );
   };
   return (
     <div className="flex items-center w-full max-w-md gap-2 md:ml-10">
