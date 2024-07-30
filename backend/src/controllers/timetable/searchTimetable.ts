@@ -15,14 +15,14 @@ import { validate } from "../../middleware/zodValidateRequest.js";
 
 const searchTimetableSchema = z.object({
   query: z.object({
-    query: namedNonEmptyStringType("search query"),
+    query: namedNonEmptyStringType("search query").optional(),
     // note that this implies a limit of 500 on the number of search results
-    from: namedIntegerType("search results start index")
+    page: namedIntegerType("search results page")
       .gte(0, {
-        message: "invalid search results start index",
+        message: "invalid search results page",
       })
-      .lte(500, {
-        message: "invalid search results start index",
+      .lte(50, {
+        message: "invalid search results page",
       })
       .optional(),
     year: namedCollegeYearType("search filter").optional(),
@@ -54,7 +54,7 @@ export const searchTimetable = async (req: Request, res: Response) => {
   try {
     const {
       query,
-      from,
+      page,
       year,
       name,
       authorId,
@@ -66,7 +66,8 @@ export const searchTimetable = async (req: Request, res: Response) => {
     } = req.query;
 
     const usefulQueryParams = {
-      from,
+      query,
+      from: parseInt((page as string | undefined) ?? "0") * 12,
       year,
       name,
       authorId,
@@ -77,17 +78,24 @@ export const searchTimetable = async (req: Request, res: Response) => {
       instructor: instructorQuery,
     };
 
-    let searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/search?query=${query}`;
+    let searchServiceURL = `${env.SEARCH_SERVICE_URL}/timetable/search?`;
 
     for (const [key, value] of Object.entries(usefulQueryParams)) {
       if (value === undefined) continue;
       if (Array.isArray(value)) {
         for (const v of value) {
-          searchServiceURL += `&${key}=${v}`;
+          searchServiceURL += `${key}=${v}&`;
         }
       } else {
-        searchServiceURL += `&${key}=${value}`;
+        searchServiceURL += `${key}=${value}&`;
       }
+    }
+
+    if (searchServiceURL.endsWith("&")) {
+      searchServiceURL = searchServiceURL.substring(
+        0,
+        searchServiceURL.length - 1,
+      );
     }
 
     const response = await fetch(searchServiceURL, {
