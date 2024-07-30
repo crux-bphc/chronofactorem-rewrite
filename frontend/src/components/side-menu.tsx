@@ -103,10 +103,7 @@ export function SideMenu({
     mutationFn: async ({
       removeId,
       addId,
-    }: {
-      removeId: string;
-      addId: string;
-    }) => {
+    }: { removeId: string; addId: string }) => {
       await axios.post(
         `/api/timetable/${timetable.id}/remove`,
         { sectionId: removeId },
@@ -411,9 +408,6 @@ export function SideMenu({
                 code: string;
                 name: string;
               };
-              const clashCourse = courseSearchResults.find(
-                (e) => e.id === course.id,
-              );
               return (
                 <Button
                   variant={"secondary"}
@@ -421,25 +415,8 @@ export function SideMenu({
                     setCurrentCourseID(course.id);
                   }}
                   key={course.id}
-                  className={`rounded-none text-left py-8 ${
-                    clashCourse?.clashing
-                      ? "text-muted-foreground"
-                      : "cursor-pointer bg-secondary dark:hover:bg-slate-700 hover:bg-slate-200"
-                  }`}
+                  className="rounded-none text-left py-8 bg-secondary dark:hover:bg-slate-700 hover:bg-slate-200"
                 >
-                  {clashCourse?.clashing && (
-                    <div className="absolute left-0 top-8 py-1 dark:bg-slate-700/80 bg-slate-300/80 text-secondary-foreground text-center w-full">
-                      <span className="font-medium text-md">
-                        Clashing with{" "}
-                        {clashCourse.clashing
-                          .map((x) => {
-                            const [code, exam] = x.split("|");
-                            return `${code}'s ${exam.toLowerCase()}`;
-                          })
-                          .join(", ")}
-                      </span>
-                    </div>
-                  )}
                   <div className="flex justify-between w-full items-center">
                     <span>{`${course.code}: ${course.name}`}</span>
                     <ChevronRight />
@@ -462,35 +439,14 @@ export function SideMenu({
               };
 
               return courseOptions.options.map((course) => {
-                const clashCourse = courseSearchResults.find(
-                  (e) => e.id === course.id,
-                );
                 return (
                   <Button
                     onClick={() => {
                       setCurrentCourseID(course.id);
                     }}
                     key={course.id}
-                    className={`rounded-none text-left py-8 ${
-                      clashCourse?.clashing
-                        ? "text-muted-foreground"
-                        : "cursor-pointer bg-secondary dark:hover:bg-slate-700 hover:bg-slate-200"
-                    }`}
                   >
-                    {clashCourse?.clashing && (
-                      <div className="absolute left-0 top-8 py-1 dark:bg-slate-700/80 bg-slate-300/80 text-secondary-foreground text-center w-full">
-                        <span className="font-medium text-md">
-                          Clashing with{" "}
-                          {clashCourse.clashing
-                            .map((x) => {
-                              const [code, exam] = x.split("|");
-                              return `${code}'s ${exam.toLowerCase()}`;
-                            })
-                            .join(", ")}
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex justify-between w-full items-center">
+                    <div className="flex">
                       <span>{`${course.code}: ${course.name}`}</span>
                       <ChevronRight />
                     </div>
