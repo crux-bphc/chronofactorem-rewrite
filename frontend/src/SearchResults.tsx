@@ -125,7 +125,6 @@ const searchRoute = new Route({
 
 function SearchResults() {
   const { query } = searchRoute.useParams();
-  // @ts-ignore Suppress unused variable warning, needs to be removed when the page is finished
   const searchQueryResult = useQuery(searchQueryOptions(query));
 
   return (
@@ -133,7 +132,7 @@ function SearchResults() {
       <h1 className="text-xl font-bold text-center sm:text-left md:text-4xl">
         Search Results
       </h1>
-      <div className="my-10 flex flex-wrap gap-5">
+      <div className="my-10 grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-5">
         {searchQueryResult.data?.map((timetable) => {
           return (
             <Card
