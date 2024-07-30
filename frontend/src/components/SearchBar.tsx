@@ -1,6 +1,5 @@
 import { router } from "@/main";
 import { useState } from "react";
-import { useToast } from "./ui/use-toast";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,25 +19,19 @@ const SearchBar = () => {
   const [year, setYear] = useState<string | undefined>();
   const [semester, setSemester] = useState<string | undefined>();
 
-  const { toast } = useToast();
   const handleSearch = async (
     query: string | undefined,
     semester: string | undefined,
     year: string | undefined,
   ) => {
-    if (query === undefined || !query.length) {
-      toast({
-        title: "Error",
-        variant: "destructive",
-        description: "Search query cannot be empty",
-      });
-      return;
-    }
-    const searchString = `query=${query ?? ""}${
-      semester ?? `&semester=${semester}`
-    }${year ?? `&year=${year}`}`;
+    let searchString = `?${query ? `query=${query}&` : ""}${
+      semester ? `semester=${semester}&` : ""
+    }${year ? `year=${year}&` : ""}`;
+    if (searchString.endsWith("&") || searchString.endsWith("?"))
+      searchString = searchString.substring(0, searchString.length - 1);
+
     router.navigate({
-      to: `/search?${searchString}`,
+      to: `/search${searchString}`,
       params: { query },
     });
   };
@@ -72,7 +65,7 @@ const SearchBar = () => {
             <DropdownMenuRadioItem value="2">Year 2</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="3">Year 3</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="4">Year 4</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="5">Year 4</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="5">Year 5</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
           <DropdownMenuSeparator />
           <DropdownMenuLabel>Semester</DropdownMenuLabel>
