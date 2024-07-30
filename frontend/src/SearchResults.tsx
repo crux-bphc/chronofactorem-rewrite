@@ -146,9 +146,8 @@ function SearchResults() {
               </CardHeader>
               <CardContent>
                 <div className="flex gap-2">
-                  <Badge>Year {timetable.year}</Badge>
-                  <Badge>Sem {timetable.semester}</Badge>
-                  <Badge>{timetable.acadYear}</Badge>
+                  <Badge>{timetable.year}-{timetable.semester}</Badge>
+                  <Badge>{timetable.acadYear}-{(timetable.acadYear + 1).toString().substring(2)}</Badge>
                   <Badge>{timetable.degrees}</Badge>
                   {timetable.archived ? (
                     <Badge variant="destructive">Archived</Badge>
