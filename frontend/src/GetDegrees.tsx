@@ -303,7 +303,9 @@ function GetDegrees() {
             )}
           </div>
           <div className="scroll-m-20 text-lg tracking-tight text-foreground text-center w-2/3 pt-4">
-            <b>Note:</b> If your branch is Mathematics & Computing, please select A7 (Computer Science) as a temporary fix since both of these branches will have the same courses for this semester.
+            <b>Note:</b> If your branch is Mathematics & Computing, please
+            select A7 (Computer Science) as a temporary fix since both of these
+            branches will have the same courses for this semester.
           </div>
           <Button
             className="w-fit mt-6 bg-muted font-bold hover:bg-primary-foreground transition ease-in-out text-foreground"
