@@ -6966,9 +6966,9 @@
           "instructor": ["Soriful Momin Nazrul Haque", "G Geethakumari"],
           "schedule": [
             {
-              "room": "D313",
-              "days": ["W"],
-              "hours": [1]
+              "room": "I015",
+              "days": ["T"],
+              "hours": [4]
             }
           ]
         },
@@ -6977,8 +6977,8 @@
           "schedule": [
             {
               "room": "D313",
-              "days": ["M"],
-              "hours": [1]
+              "days": ["T"],
+              "hours": [5]
             }
           ]
         },
