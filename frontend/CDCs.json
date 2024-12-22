@@ -275,23 +275,23 @@
   },
 "AD": {
     "1-1": [
-      "MATH F111",
-      "BIO F110",
-      "BIO F111",
       "CHEM F110",
       "CHEM F111",
+      "EEE F111",
+      "ME F112",
       "PHY F110",
       "PHY F111",
-      "BITS F110"
+      "MATH F111"
     ],
     "1-2": [
-      "MATH F112",
-      "ME F112",
-      "CS F111",
-      "EEE F111",
+      "BIO F110",
+      "BIO F111",
+      "BITS F110",
+      "BITS F111",
       "BITS F112",
-      "MATH F113",
-      "BITS F111"
+      "CS F111",
+      "MATH F112",
+      "MATH F113"
     ],
     "2-1": [
       "MATH F211",
