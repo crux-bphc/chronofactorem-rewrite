@@ -299,7 +299,7 @@
       "MAC F212",
       "MAC F213",
       "MAC F214",
-      "BITS F225"
+      "ECON/MGTS F211/F211"
     ],
     "2-2": [
       "MAC F241",
@@ -307,7 +307,7 @@
       "MAC F243",
       "MAC F244",
       "MAC F245",
-      "ECON/MGTS F211/F211"
+      "BITS F225"
     ],
     "3-1": ["MAC F311", "MAC F312", "MAC F313", "MAC F314"],
     "3-2": ["MAC F341", "MAC F342"]
@@ -567,15 +567,9 @@
       "BIO F212",
       "BIO F213",
       "BIO F214",
-      "BITS F225"
-    ],
-    "2-2": [
-      "BIO F241",
-      "BIO F242",
-      "BIO F243",
-      "BIO F244",
       "ECON/MGTS F211/F211"
     ],
+    "2-2": ["BIO F241", "BIO F242", "BIO F243", "BIO F244", "BITS F225"],
     "3-1": [
       "BIO F311",
       "BIO F312",
@@ -860,16 +854,10 @@
       "CHEM F212",
       "CHEM F213",
       "CHEM F214",
-      "PHY F212"
+      "PHY F212",
+      "ECON/MGTS F211/F211"
     ],
-    "2-2": [
-      "ECON/MGTS F211/F211",
-      "CHEM F241",
-      "CHEM F242",
-      "CHEM F243",
-      "CHEM F244",
-      "BITS F225"
-    ],
+    "2-2": ["CHEM F241", "CHEM F242", "CHEM F243", "CHEM F244", "BITS F225"],
     "3-1": [
       "CHEM F313",
       "CHEM F311",
@@ -1426,15 +1414,9 @@
       "MATH F213",
       "MATH F214",
       "MATH F215",
-      "BITS F225"
+      "ECON/MGTS F211/F211"
     ],
-    "2-2": [
-      "ECON/MGTS F211/F211",
-      "MATH F241",
-      "MATH F242",
-      "MATH F243",
-      "MATH F244"
-    ],
+    "2-2": ["MATH F241", "MATH F242", "MATH F243", "MATH F244", "BITS F225"],
     "3-1": ["MATH F311", "MATH F312", "MATH F313", "MAC F211", "MAC F212"],
     "3-2": [
       "MATH F341",
