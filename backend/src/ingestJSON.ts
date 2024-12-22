@@ -1,12 +1,7 @@
 import { QueryRunner } from "typeorm";
 import { sectionTypeEnum } from "../../lib/src/index.js";
 import { Course, Section, Timetable } from "./entity/entities.js";
-import {
-  addCourse,
-  addTimetable,
-  removeCourse,
-  removeTimetable,
-} from "./utils/search.js";
+import { addCourse, addTimetable, removeCourse, removeTimetable } from "./utils/search.js";
 
 interface ExamJSON {
   midsem: string | null;
@@ -180,7 +175,27 @@ export const ingestJSON = async (
         archivedTimetablesUpdateResult.affected ?? 0;
       console.log("marked old non-draft timetables as archived!");
 
-      console.log("deleting all old draft timetables...");
+      console.log("archiving all old draft timetables with no warnings...");
+      const archiveDraftTimetablesUpdateResult = await queryRunner.manager
+        .createQueryBuilder()
+        .update(Timetable)
+        .set({ archived: true, draft: false, private: false })
+        .where("acad_year = :year", { year: latestCourse.acadYear })
+        .andWhere("semester = :semester", {
+          semester: latestCourse.semester,
+        })
+        .andWhere("draft = :draft", {
+          draft: true,
+        })
+        .andWhere("CARDINALITY(warnings) = 0")
+        .execute();
+      const archivedDraftTimetablesUpdateCount =
+        archiveDraftTimetablesUpdateResult.affected ?? 0;
+      console.log(
+        `archived ${archivedDraftTimetablesUpdateCount} old draft timetables with no warnings!`,
+      );
+
+      console.log("deleting all old draft timetables with warnings...");
       const archiveDeletedTimetablesUpdateResult = await queryRunner.manager
         .createQueryBuilder()
         .delete()
@@ -192,10 +207,13 @@ export const ingestJSON = async (
         .andWhere("draft = :draft", {
           draft: true,
         })
+        .andWhere("CARDINALITY(warnings) > 0")
         .execute();
       archivedTimetablesDeleteCount =
         archiveDeletedTimetablesUpdateResult.affected ?? 0;
-      console.log("deleted old draft timetables!");
+      console.log(
+        `deleted ${archivedTimetablesDeleteCount} old draft timetables with warnings!`,
+      );
 
       console.log("checking if all existing courses are archived...");
       const allCoursesCountResult = await queryRunner.manager
