@@ -1,7 +1,12 @@
 import { QueryRunner } from "typeorm";
 import { sectionTypeEnum } from "../../lib/src/index.js";
 import { Course, Section, Timetable } from "./entity/entities.js";
-import { addCourse, addTimetable, removeCourse, removeTimetable } from "./utils/search.js";
+import {
+  addCourse,
+  addTimetable,
+  removeCourse,
+  removeTimetable,
+} from "./utils/search.js";
 
 interface ExamJSON {
   midsem: string | null;
@@ -374,6 +379,13 @@ export const ingestJSON = async (
       await addCourse(course, console);
     }
     console.log("added updated courses to search service!");
+
+    console.log(
+      "waiting for 10 seconds to avoid potential race conditions in search service...",
+    );
+    await new Promise((resolve) => {
+      setTimeout(resolve, 10000);
+    });
 
     console.log("updating timetables in search service...");
     const [timetableIds, timetableCount] = await queryRunner.manager
