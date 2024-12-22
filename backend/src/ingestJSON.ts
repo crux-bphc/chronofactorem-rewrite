@@ -1,7 +1,12 @@
 import { QueryRunner } from "typeorm";
 import { sectionTypeEnum } from "../../lib/src/index.js";
 import { Course, Section, Timetable } from "./entity/entities.js";
-import { addCourse, addTimetable, removeCourse, removeTimetable } from "./utils/search.js";
+import {
+  addCourse,
+  addTimetable,
+  removeCourse,
+  removeTimetable,
+} from "./utils/search.js";
 
 interface ExamJSON {
   midsem: string | null;

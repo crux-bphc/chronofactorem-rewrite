@@ -273,6 +273,45 @@
     "3-1": ["PHA F311", "PHA F312", "PHA F244", "PHA F315"],
     "3-2": ["PHA F341", "PHA F342", "PHA F343", "PHA F344"]
   },
+  "AD": {
+    "1-1": [
+      "CHEM F110",
+      "CHEM F111",
+      "EEE F111",
+      "ME F112",
+      "PHY F110",
+      "PHY F111",
+      "MATH F111"
+    ],
+    "1-2": [
+      "BIO F110",
+      "BIO F111",
+      "BITS F110",
+      "BITS F111",
+      "BITS F112",
+      "CS F111",
+      "MATH F112",
+      "MATH F113"
+    ],
+    "2-1": [
+      "MATH F211",
+      "MAC F211",
+      "MAC F212",
+      "MAC F213",
+      "MAC F214",
+      "BITS F225"
+    ],
+    "2-2": [
+      "MAC F241",
+      "MAC F242",
+      "MAC F243",
+      "MAC F244",
+      "MAC F245",
+      "ECON/MGTS F211/F211"
+    ],
+    "3-1": ["MAC F311", "MAC F312", "MAC F313", "MAC F314"],
+    "3-2": ["MAC F341", "MAC F342"]
+  },
   "B1": {
     "1-1": [
       "BIO F110",
@@ -520,6 +559,44 @@
     ],
     "4-1": ["ECE F311", "ECE F314", "ECE F434"],
     "4-2": ["ECE F341", "ECE F343", "ECE F344"]
+  },
+  "B1AD": {
+    "2-1": [
+      "MATH F211",
+      "BIO F211",
+      "BIO F212",
+      "BIO F213",
+      "BIO F214",
+      "BITS F225"
+    ],
+    "2-2": [
+      "BIO F241",
+      "BIO F242",
+      "BIO F243",
+      "BIO F244",
+      "ECON/MGTS F211/F211"
+    ],
+    "3-1": [
+      "BIO F311",
+      "BIO F312",
+      "BIO F313",
+      "MAC F211",
+      "MAC F212",
+      "MAC F213",
+      "MAC F214"
+    ],
+    "3-2": [
+      "BIO F341",
+      "BIO F342",
+      "BIO F215",
+      "MAC F241",
+      "MAC F242",
+      "MAC F243",
+      "MAC F244",
+      "MAC F245"
+    ],
+    "4-1": ["MAC F311", "MAC F312", "MAC F313", "MAC F314"],
+    "4-2": ["MAC F341", "MAC F342"]
   },
   "B2": {
     "1-1": [
@@ -776,6 +853,45 @@
     "4-1": ["ECE F311", "ECE F314", "ECE F434"],
     "4-2": ["ECE F341", "ECE F343", "ECE F344"]
   },
+  "B2AD": {
+    "2-1": [
+      "MATH F211",
+      "CHEM F211",
+      "CHEM F212",
+      "CHEM F213",
+      "CHEM F214",
+      "PHY F212"
+    ],
+    "2-2": [
+      "ECON/MGTS F211/F211",
+      "CHEM F241",
+      "CHEM F242",
+      "CHEM F243",
+      "CHEM F244",
+      "BITS F225"
+    ],
+    "3-1": [
+      "CHEM F313",
+      "CHEM F311",
+      "CHEM F312",
+      "MAC F211",
+      "MAC F212",
+      "MAC F213",
+      "MAC F214"
+    ],
+    "3-2": [
+      "CHEM F341",
+      "CHEM F342",
+      "CHEM F343",
+      "MAC F241",
+      "MAC F242",
+      "MAC F243",
+      "MAC F244",
+      "MAC F245"
+    ],
+    "4-1": ["MAC F311", "MAC F312", "MAC F313", "MAC F314"],
+    "4-2": ["MAC F341", "MAC F342"]
+  },
   "B3": {
     "1-1": [
       "CHEM F110",
@@ -1024,6 +1140,38 @@
     "4-1": ["ECE F311", "ECE F314", "ECE F434"],
     "5-2": ["ECE F341", "ECE F343", "ECE F344"]
   },
+  "B3AD": {
+    "2-1": [
+      "MATH F211",
+      "ECON F211",
+      "ECON F212",
+      "ECON F213",
+      "ECON F214",
+      "BITS F225"
+    ],
+    "2-2": ["MGTS F211", "ECON F241", "ECON F242", "ECON F243", "ECON F244"],
+    "3-1": [
+      "ECON F311",
+      "ECON F312",
+      "ECON F313",
+      "MAC F211",
+      "MAC F212",
+      "MAC F213",
+      "MAC F214"
+    ],
+    "3-2": [
+      "ECON F341",
+      "ECON F342",
+      "ECON F343",
+      "MAC F241",
+      "MAC F242",
+      "MAC F243",
+      "MAC F244",
+      "MAC F245"
+    ],
+    "4-1": ["MAC F311", "MAC F312", "MAC F313", "MAC F314"],
+    "4-2": ["MAC F341", "MAC F342"]
+  },
   "B4": {
     "1-1": [
       "CHEM F110",
@@ -1270,6 +1418,35 @@
     ],
     "4-1": ["ECE F311", "ECE F314", "ECE F434"],
     "4-2": ["ECE F341", "ECE F343", "ECE F344"]
+  },
+  "B4AD": {
+    "2-1": [
+      "MATH F211",
+      "MATH F212",
+      "MATH F213",
+      "MATH F214",
+      "MATH F215",
+      "BITS F225"
+    ],
+    "2-2": [
+      "ECON/MGTS F211/F211",
+      "MATH F241",
+      "MATH F242",
+      "MATH F243",
+      "MATH F244"
+    ],
+    "3-1": ["MATH F311", "MATH F312", "MATH F313", "MAC F211", "MAC F212"],
+    "3-2": [
+      "MATH F341",
+      "MATH F342",
+      "MATH F343",
+      "MAC F242",
+      "MAC F243",
+      "MAC F244",
+      "MAC F245"
+    ],
+    "4-1": ["MAC F312", "MAC F313", "MAC F314"],
+    "4-2": ["MAC F341", "MAC F342"]
   },
   "B5": {
     "1-1": [
@@ -1566,5 +1743,43 @@
     ],
     "4-1": ["ECE F311", "ECE F314", "ECE F434"],
     "4-2": ["ECE F341", "ECE F343", "ECE F344", "PHY F344"]
+  },
+  "B5AD": {
+    "2-1": [
+      "MATH F211",
+      "PHY F211",
+      "PHY F212",
+      "PHY F213",
+      "PHY F214",
+      "BITS F225"
+    ],
+    "2-2": [
+      "ECON/MGTS F211/F211",
+      "PHY F241",
+      "PHY F242",
+      "PHY F243",
+      "PHY F244"
+    ],
+    "3-1": [
+      "PHY F311",
+      "PHY F312",
+      "PHY F313",
+      "MAC F211",
+      "MAC F212",
+      "MAC F213",
+      "MAC F214"
+    ],
+    "3-2": [
+      "PHY F341",
+      "PHY F342",
+      "PHY F343",
+      "PHY F344",
+      "MAC F242",
+      "MAC F243",
+      "MAC F244",
+      "MAC F245"
+    ],
+    "4-1": ["MAC F311", "MAC F312", "MAC F313", "MAC F314"],
+    "4-2": ["MAC F341", "MAC F342"]
   }
 }
