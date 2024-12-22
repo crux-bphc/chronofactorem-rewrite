@@ -49,9 +49,9 @@ export function NavBar() {
   const stateRouter = useRouter();
   const isCMSPage =
     stateRouter.state.resolvedLocation.pathname.includes("/CMS");
-  const isEditPage = stateRouter.state.resolvedLocation.pathname.includes(
-    "/edit/" || "/finalize/",
-  );
+  const isEditPage =
+    stateRouter.state.resolvedLocation.pathname.includes("/edit/") ||
+    stateRouter.state.resolvedLocation.pathname.includes("/finalize/");
 
   const [_cookies, _setCookie, removeCookie] = useCookies(["session"]);
   const userQueryResult = useQuery(userQueryOptions);
