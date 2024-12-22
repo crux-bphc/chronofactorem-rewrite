@@ -34,7 +34,7 @@ const fetchUserDetails = async (): Promise<
       headers: {
         "Content-Type": "application/json ",
       },
-    },
+    }
   );
   return response.data;
 };
@@ -258,6 +258,9 @@ function GetDegrees() {
                   <SelectItem value="AA">
                     AA: B.E. Electronics & Communication
                   </SelectItem>
+                  <SelectItem value="AD">
+                    AD: B.E. Mathematics & Computing
+                  </SelectItem>
                 </SelectGroup>
                 <SelectGroup>
                   <SelectLabel>Dual Degrees</SelectLabel>
@@ -297,16 +300,19 @@ function GetDegrees() {
                     <SelectItem value="AA">
                       AA: B.E. Electronics & Communication
                     </SelectItem>
+                    <SelectItem value="AD">
+                      AD: B.E. Mathematics & Computing
+                    </SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
             )}
           </div>
-          <div className="scroll-m-20 text-lg tracking-tight text-foreground text-center w-2/3 pt-4">
+          {/* <div className="scroll-m-20 text-lg tracking-tight text-foreground text-center w-2/3 pt-4">
             <b>Note:</b> If your branch is Mathematics & Computing, please
             select A7 (Computer Science) as a temporary fix since both of these
             branches will have the same courses for this semester.
-          </div>
+          </div> */}
           <Button
             className="w-fit mt-6 bg-muted font-bold hover:bg-primary-foreground transition ease-in-out text-foreground"
             onClick={handleSubmit}

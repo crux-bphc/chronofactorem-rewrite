@@ -321,6 +321,9 @@ function EditUserProfile() {
                 <SelectItem value="AA">
                   AA: B.E. Electronics & Communication
                 </SelectItem>
+                <SelectItem value="AD">
+                  AD: B.E. Mathematics & Computing
+                </SelectItem>
               </SelectGroup>
               <SelectGroup>
                 <SelectLabel>Dual Degrees</SelectLabel>
@@ -357,6 +360,9 @@ function EditUserProfile() {
                   </SelectItem>
                   <SelectItem value="AA">
                     AA: B.E. Electronics & Communication
+                  </SelectItem>
+                  <SelectItem value="AD">
+                    AD: B.E. Mathematics & Computing
                   </SelectItem>
                 </SelectGroup>
               </SelectContent>
