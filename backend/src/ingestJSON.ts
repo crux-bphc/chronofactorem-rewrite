@@ -380,6 +380,13 @@ export const ingestJSON = async (
     }
     console.log("added updated courses to search service!");
 
+    console.log(
+      "waiting for 10 seconds to avoid potential race conditions in search service...",
+    );
+    await new Promise((resolve) => {
+      setTimeout(resolve, 10000);
+    });
+
     console.log("updating timetables in search service...");
     const [timetableIds, timetableCount] = await queryRunner.manager
       .createQueryBuilder()
