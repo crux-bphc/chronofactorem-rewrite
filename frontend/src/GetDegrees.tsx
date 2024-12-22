@@ -34,7 +34,7 @@ const fetchUserDetails = async (): Promise<
       headers: {
         "Content-Type": "application/json ",
       },
-    }
+    },
   );
   return response.data;
 };
