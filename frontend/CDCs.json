@@ -273,6 +273,54 @@
     "3-1": ["PHA F311", "PHA F312", "PHA F244", "PHA F315"],
     "3-2": ["PHA F341", "PHA F342", "PHA F343", "PHA F344"]
   },
+"AD": {
+    "1-1": [
+      "MATH F111",
+      "BIO F110",
+      "BIO F111",
+      "CHEM F110",
+      "CHEM F111",
+      "PHY F110",
+      "PHY F111",
+      "BITS F110"
+    ],
+    "1-2": [
+      "MATH F112",
+      "ME F112",
+      "CS F111",
+      "EEE F111",
+      "BITS F112",
+      "MATH F113",
+      "BITS F111"
+    ],
+    "2-1": [
+      "MATH F211",
+      "MAC F211",
+      "MAC F212",
+      "MAC F213",
+      "MAC F214",
+      "BITS F225"
+    ],
+    "2-2": [
+      "MAC F241",
+      "MAC F242",
+      "MAC F243",
+      "MAC F244",
+      "MAC F245",
+      "MGTS F211",
+      "ECON F211"
+    ],
+    "3-1": [
+      "MAC F311",
+      "MAC F312",
+      "MAC F313",
+      "MAC F314"
+    ],
+    "3-2": [
+      "MAC F341",
+      "MAC F342"
+    ]
+  },
   "B1": {
     "1-1": [
       "BIO F110",
