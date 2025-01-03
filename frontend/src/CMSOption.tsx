@@ -22,7 +22,7 @@ const fetchTimetable = async (timetableId: string) => {
       headers: {
         "Content-Type": "application/json ",
       },
-    },
+    }
   );
   return response.data;
 };
@@ -134,7 +134,7 @@ function CMSOption() {
         {JSON.stringify(
           timetableQueryResult.error
             ? timetableQueryResult.error.message
-            : "timetable query result is undefined",
+            : "timetable query result is undefined"
         )}{" "}
         Please report this{" "}
         <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
@@ -164,7 +164,7 @@ function CMSOption() {
             <div className="flex flex-col">
               <div className="flex items-center">
                 <span className="xl:text-5xl lg:text-4xl md:text-3xl text-2xl font-bold">
-                  Auto-Enroll these Sections into CMS?
+                  Auto-Enroll these Sections into CMS? (Deprecated)
                 </span>
                 <Tooltip delayDuration={100}>
                   <TooltipTrigger asChild>
@@ -219,14 +219,15 @@ function CMSOption() {
                 from the dashboard.
               </span>
               <span className="lg:text-xl md:text-lg text-md inline items-center font-normal text-muted-foreground pt-2 w-2/3">
-                <span className="font-bold">Note:</span> This feature is
-                experimental.
-                <FlaskConical className="inline ml-1" />
-              </span>
-              <span className="lg:text-xl md:text-lg text-md inline items-center font-normal text-muted-foreground pt-2 w-2/3">
                 It won't break your CMS, but it might miss some sections. Such
                 cases are extremely rare, and the sections that error out are
                 reported to you, so you can go enroll into them manually.
+              </span>
+              <span className="lg:text-xl md:text-lg text-md inline items-center font-normal text-muted-foreground pt-2 w-2/3">
+                <span className="font-bold">Note:</span> This feature is
+                deprecated. CMS has not been functional since 2024-25 Sem 1 and
+                the new LMS does not have API access enabled currently, which
+                means that auto-enroll is not possible as of now.
               </span>
             </div>
             <div className="flex space-x-4 pt-4">

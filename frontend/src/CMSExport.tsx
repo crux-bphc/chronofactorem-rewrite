@@ -31,7 +31,7 @@ const fetchUserDetails = async (): Promise<
       headers: {
         "Content-Type": "application/json ",
       },
-    },
+    }
   );
   return response.data;
 };
@@ -184,7 +184,7 @@ function CMSExport() {
   const createMutation = useMutation({
     mutationFn: () => {
       return axios.post<{ message: string; id: string }>(
-        "/api/timetable/create",
+        "/api/timetable/create"
       );
     },
     onSuccess: (response) => {
@@ -293,7 +293,7 @@ function CMSExport() {
         <TooltipProvider>
           <div className="flex items-center py-2 md:py-4 px-4 md:px-8">
             <span className="xl:text-5xl lg:text-4xl md:text-3xl text-2xl font-bold m-4 text-foreground">
-              CMS Auto-Enroll
+              CMS Auto-Enroll (Deprecated)
             </span>
             <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
@@ -339,6 +339,12 @@ function CMSExport() {
                     here
                     <ArrowUpRightFromCircle className="inline w-4 h-4 ml-1 mr-1" />
                   </a>
+                  .
+                </span>
+                <span className="pt-2">
+                  NOTE: CMS has not been functional since 2024-25 Sem 1 and the
+                  new LMS does not have API access enabled currently, which
+                  means that auto-enroll is not possible as of now.
                 </span>
               </TooltipContent>
             </Tooltip>
