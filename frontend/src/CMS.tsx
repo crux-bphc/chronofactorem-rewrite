@@ -736,7 +736,7 @@ function CMS() {
             <div className="flex flex-col w-full text-foreground pl-12 sm:pl-24 pt-12 gap-2">
               <div className="flex gap-2 items-center">
                 <span className="text-3xl sm:text-5xl font-bold">
-                  Enter your CMS Details
+                  Enter your CMS Details (Deprecated)
                 </span>
 
                 <Tooltip delayDuration={100}>
@@ -782,6 +782,11 @@ function CMS() {
                       this webpage. All of ChronoFactorem's code is written, and
                       deployed publicly, and can be viewed and verified by
                       anyone that wishes to.
+                    </span>
+                    <span>
+                      NOTE: CMS has not been functional since 2024-25 Sem 1 and
+                      the new LMS does not have API access enabled currently,
+                      which means that auto-enroll is not possible as of now.
                     </span>
                   </TooltipContent>
                 </Tooltip>
