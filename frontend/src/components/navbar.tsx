@@ -47,8 +47,7 @@ const userQueryOptions = queryOptions({
 
 export function NavBar() {
   const stateRouter = useRouter();
-  const isCMSPage =
-    stateRouter.state.resolvedLocation.pathname.includes("/CMS");
+  // const isCMSPage = stateRouter.state.resolvedLocation.pathname.includes("/CMS");
   const isEditPage =
     stateRouter.state.resolvedLocation.pathname.includes("/edit/") ||
     stateRouter.state.resolvedLocation.pathname.includes("/finalize/");
