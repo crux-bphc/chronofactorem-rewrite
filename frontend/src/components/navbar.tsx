@@ -184,7 +184,7 @@ export function NavBar() {
             <Info className="h-6 w-6" />
           </div>
         </Link>
-        {!isCMSPage && (
+        {/* {!isCMSPage && (
           <Link
             to={userQueryResultData ? "/CMSExport" : undefined}
             className="text-primary py-2 px-2 md:ml-2 text-lg rounded-full hover:bg-muted transition h-fit whitespace-nowrap duration-200 ease-in-out"
@@ -194,11 +194,11 @@ export function NavBar() {
               <BookUp className="h-6 w-6" />
             </div>
           </Link>
-        )}
+        )} */}
         <div className="hidden md:flex md:ml-4">
           <SearchBar />
         </div>
-        <div className="text-primary py-2 px-2 md:ml-2 text-lg rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out">
+        <div className="text-primary py-3 px-2 md:ml-2 text-lg rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out">
           <div className="flex md:hidden">
             <Popover>
               <PopoverTrigger asChild className="cursor-pointer">

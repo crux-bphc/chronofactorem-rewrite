@@ -43,7 +43,7 @@ const SearchBar = () => {
     }
   };
   return (
-    <div className="flex items-center w-full max-w-md gap-2 md:ml-10">
+    <div className="flex items-center w-full max-w-md gap-2 md:ml-4">
       <Input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
