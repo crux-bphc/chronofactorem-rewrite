@@ -44,7 +44,7 @@ const fetchUserDetails = async (): Promise<
       headers: {
         "Content-Type": "application/json",
       },
-    }
+    },
   );
   return response.data;
 };
@@ -64,7 +64,7 @@ const fetchAllCoursesQueryOptions = () =>
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
       return res.data;
     },
@@ -80,7 +80,7 @@ const fetchTimetableDetailsQueryOptions = (timetableId: string) =>
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
       if (!res.data.draft) {
         return res.data;
@@ -106,7 +106,7 @@ const CMSRoute = new Route({
       .then(() => {
         queryClient.ensureQueryData(fetchAllCoursesQueryOptions());
         queryClient.ensureQueryData(
-          fetchTimetableDetailsQueryOptions(params.timetableId)
+          fetchTimetableDetailsQueryOptions(params.timetableId),
         );
       })
       .catch((error) => {
@@ -207,7 +207,7 @@ function CMS() {
   const [isExtensionInstalled, setIsExtensionInstalled] = useState(
     typeof chrome !== "undefined" &&
       chrome.runtime !== undefined &&
-      chrome.runtime !== null
+      chrome.runtime !== null,
   );
   const extensionIdRef = useRef<HTMLInputElement | null>(null);
   const [chooseManualMethod, setChooseManualMethod] = useState<boolean>(false);
@@ -218,7 +218,7 @@ function CMS() {
     [] as {
       id: number;
       displayname: string;
-    }[]
+    }[],
   );
   const getCMSDetails = async (extensionID: string) => {
     try {
@@ -270,7 +270,7 @@ function CMS() {
   };
   const fetchCourseDetailsQueryOptions = (
     section: z.infer<typeof sectionType>,
-    course: z.infer<typeof courseType>
+    course: z.infer<typeof courseType>,
   ) =>
     queryOptions({
       queryKey: ["course", course.id, "section", section.id],
@@ -281,10 +281,10 @@ function CMS() {
             headers: {
               "Content-Type": "application/json",
             },
-          }
+          },
         );
         const count = (res.data.sections as { type: string }[]).filter(
-          (e) => e.type === section.type
+          (e) => e.type === section.type,
         ).length;
         return count > 1
           ? [
@@ -303,14 +303,14 @@ function CMS() {
 
   const courseDetails = useQuery(fetchAllCoursesQueryOptions());
   const sectionsInTimetable = useQuery(
-    fetchTimetableDetailsQueryOptions(timetableId)
+    fetchTimetableDetailsQueryOptions(timetableId),
   );
   const userQueryResult = useQuery(userQueryOptions);
 
   const sectionNameList = useQueries({
     queries: (sectionsInTimetable.data?.sections ?? []).map((section) => {
       const course = (courseDetails.data ?? []).filter(
-        (course) => course.id === section.courseId
+        (course) => course.id === section.courseId,
       )[0];
       return fetchCourseDetailsQueryOptions(section, course);
     }),
@@ -345,7 +345,7 @@ function CMS() {
       ? tokenRef.current?.value
       : tokenFetchRef.current;
     const { data: userData, status: userStatus } = await axios.get(
-      `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_webservice_get_site_info&moodlewsrestformat=json&wstoken=${token}`
+      `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_webservice_get_site_info&moodlewsrestformat=json&wstoken=${token}`,
     );
     if (
       userStatus !== 200 ||
@@ -362,7 +362,7 @@ function CMS() {
       return;
     }
     const { data } = await axios.get(
-      `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_enrol_get_users_courses&moodlewsrestformat=json&wstoken=${token}&userid=${userData.userid}`
+      `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_enrol_get_users_courses&moodlewsrestformat=json&wstoken=${token}&userid=${userData.userid}`,
     );
     if (Array.isArray(data)) {
       if (data.length > 0) {
@@ -376,7 +376,7 @@ function CMS() {
             data as {
               id: number;
               displayname: string;
-            }[]
+            }[],
           );
         } else {
           toast({
@@ -411,8 +411,8 @@ function CMS() {
       if (ele === undefined) continue;
       const { data: courseData } = await axios.get(
         `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_course_search_courses&moodlewsrestformat=json&wstoken=${token}&criterianame=search&criteriavalue=${encodeURIComponent(
-          ele
-        )}`
+          ele,
+        )}`,
       );
       if (
         "courses" in courseData &&
@@ -433,7 +433,7 @@ function CMS() {
           sectionNameSplit[sectionNameSplit.length - 1]
         ) {
           const { status, data } = await axios.get(
-            `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=enrol_self_enrol_user&moodlewsrestformat=json&wstoken=${token}&courseid=${courseData.courses[0].id}`
+            `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=enrol_self_enrol_user&moodlewsrestformat=json&wstoken=${token}&courseid=${courseData.courses[0].id}`,
           );
           if (status !== 200 || !data.status) {
             errors.push(ele);
@@ -465,7 +465,7 @@ function CMS() {
       : sesskeyFetchRef.current;
     for (let i = 0; i < enrolledCourses.length; i++) {
       const res = await axios.get(
-        `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_enrol_get_course_enrolment_methods&moodlewsrestformat=json&wstoken=${token}&courseid=${enrolledCourses[i].id}`
+        `https://cms.bits-hyderabad.ac.in/webservice/rest/server.php?wsfunction=core_enrol_get_course_enrolment_methods&moodlewsrestformat=json&wstoken=${token}&courseid=${enrolledCourses[i].id}`,
       );
       const enrollmentInstance = res.data;
       const { data, status } = await axios.post(
@@ -479,13 +479,13 @@ function CMS() {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
       if (status !== 200) {
         toast({
           title: "Error",
           description: `Error when unenrolling from courses: ${JSON.stringify(
-            data
+            data,
           )}`,
           variant: "destructive",
         });
@@ -552,9 +552,9 @@ function CMS() {
                             onClick={async () => {
                               await getCMSDetails(
                                 extensionIdRef.current?.value !== undefined &&
-                                  extensionIdRef.current?.value !== ""
+                                extensionIdRef.current?.value !== ""
                                   ? extensionIdRef.current?.value
-                                  : defaultExtensionId
+                                  : defaultExtensionId,
                               );
                             }}
                           >
@@ -608,7 +608,7 @@ function CMS() {
                         </div>
                         {enrolledCourses
                           .sort((a, b) =>
-                            a.displayname.localeCompare(b.displayname)
+                            a.displayname.localeCompare(b.displayname),
                           )
                           .map((section, i) => (
                             <span key={2 * i} className="py-1">
@@ -969,7 +969,7 @@ function CMS() {
                       </div>
                       {enrolledCourses
                         .sort((a, b) =>
-                          a.displayname.localeCompare(b.displayname)
+                          a.displayname.localeCompare(b.displayname),
                         )
                         .map((section, i) => (
                           <span key={2 * i} className="py-1">

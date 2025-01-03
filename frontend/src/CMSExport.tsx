@@ -31,7 +31,7 @@ const fetchUserDetails = async (): Promise<
       headers: {
         "Content-Type": "application/json ",
       },
-    }
+    },
   );
   return response.data;
 };
@@ -184,7 +184,7 @@ function CMSExport() {
   const createMutation = useMutation({
     mutationFn: () => {
       return axios.post<{ message: string; id: string }>(
-        "/api/timetable/create"
+        "/api/timetable/create",
       );
     },
     onSuccess: (response) => {

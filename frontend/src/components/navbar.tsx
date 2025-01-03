@@ -16,7 +16,7 @@ import {
 } from "@tanstack/react-query";
 import { Link, useRouter } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
-import { BookUp, Info, LogOut, Pencil, Plus, Search } from "lucide-react";
+import { Info, LogOut, Pencil, Plus, Search } from "lucide-react";
 import { useCookies } from "react-cookie";
 import { z } from "zod";
 import { userWithTimetablesType } from "../../../lib/src/index";

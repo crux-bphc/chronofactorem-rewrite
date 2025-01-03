@@ -7,7 +7,7 @@ import {
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { ErrorComponent, Link, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
-import { ArrowUpRightFromCircle, FlaskConical, HelpCircle } from "lucide-react";
+import { ArrowUpRightFromCircle, HelpCircle } from "lucide-react";
 import { z } from "zod";
 import { timetableWithSectionsType } from "../../lib/src";
 import authenticatedRoute from "./AuthenticatedRoute";
@@ -22,7 +22,7 @@ const fetchTimetable = async (timetableId: string) => {
       headers: {
         "Content-Type": "application/json ",
       },
-    }
+    },
   );
   return response.data;
 };
@@ -134,7 +134,7 @@ function CMSOption() {
         {JSON.stringify(
           timetableQueryResult.error
             ? timetableQueryResult.error.message
-            : "timetable query result is undefined"
+            : "timetable query result is undefined",
         )}{" "}
         Please report this{" "}
         <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
