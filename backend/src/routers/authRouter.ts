@@ -1,5 +1,5 @@
+import type { Request, Response } from "express";
 import * as express from "express";
-import { Request, Response } from "express";
 import {
   authCallback,
   checkAuthStatus,
@@ -9,11 +9,11 @@ import {
 
 const authRouter = express.Router();
 
-authRouter.get("/", (req: Request, res: Response) => {
+authRouter.get("/", (_req: Request, res: Response) => {
   res.send("The routes for authentication");
 });
 
-authRouter.get("/login", (req: Request, res: Response) => {
+authRouter.get("/login", (_req: Request, res: Response) => {
   res.send('<a href="/auth/google">Authenticate with google</a>');
 });
 

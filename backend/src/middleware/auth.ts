@@ -1,5 +1,5 @@
-import { createHash } from "crypto";
-import { NextFunction, Request, Response } from "express";
+import { createHash } from "node:crypto";
+import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { env } from "../config/server.js";
 import { ZodFinishedUserSession } from "../types/auth.js";

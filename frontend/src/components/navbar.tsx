@@ -1,13 +1,3 @@
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ToastAction } from "@/components/ui/toast";
-import { useToast } from "@/components/ui/use-toast";
 import {
   queryOptions,
   useMutation,
@@ -18,12 +8,22 @@ import { Link, useRouter } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { Info, LogOut, Pencil, Plus, Search } from "lucide-react";
 import { useCookies } from "react-cookie";
-import { z } from "zod";
-import { userWithTimetablesType } from "../../../lib/src/index";
+import type { z } from "zod";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ToastAction } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
+import type { userWithTimetablesType } from "../../../lib/src/index";
 import { router } from "../main";
-import SearchBar from "./SearchBar";
 import Announcements from "./announcements";
 import { ModeToggle } from "./mode-toggle";
+import SearchBar from "./SearchBar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
 const fetchUserDetails = async (): Promise<
@@ -49,8 +49,8 @@ export function NavBar() {
   const stateRouter = useRouter();
   // const isCMSPage = stateRouter.state.resolvedLocation.pathname.includes("/CMS");
   const isEditPage =
-    stateRouter.state.resolvedLocation.pathname.includes("/edit/") ||
-    stateRouter.state.resolvedLocation.pathname.includes("/finalize/");
+    stateRouter.state.resolvedLocation?.pathname.includes("/edit/") ||
+    stateRouter.state.resolvedLocation?.pathname.includes("/finalize/");
 
   const [_cookies, _setCookie, removeCookie] = useCookies(["session"]);
   const userQueryResult = useQuery(userQueryOptions);
@@ -144,23 +144,31 @@ export function NavBar() {
     },
   });
 
+  const ChronoLogoText = (
+    <>
+      <div className="hidden md:flex">
+        <h1 className="scroll-m-20 cursor-pointer text-2xl font-extrabold tracking-tight lg:text-3xl m-4 text-foreground">
+          ChronoFactorem
+        </h1>
+      </div>
+      <div className="flex md:hidden">
+        <h1 className="scroll-m-20 cursor-pointer text-2xl font-extrabold tracking-tight lg:text-3xl mx-2 my-4 text-foreground">
+          Chrono
+        </h1>
+      </div>
+    </>
+  );
+
   const renderNavbarBasedOnQueryFetch = (
     userQueryResultData: typeof userQueryResult.data,
   ) => (
     <div className="flex flex-row w-full justify-between shadow-lg">
       <div className="flex items-center">
-        <Link to={userQueryResultData ? "/" : undefined}>
-          <div className="hidden md:flex">
-            <h1 className="scroll-m-20 cursor-pointer text-2xl font-extrabold tracking-tight lg:text-3xl m-4 text-foreground">
-              ChronoFactorem
-            </h1>
-          </div>
-          <div className="flex md:hidden">
-            <h1 className="scroll-m-20 cursor-pointer text-2xl font-extrabold tracking-tight lg:text-3xl mx-2 my-4 text-foreground">
-              Chrono
-            </h1>
-          </div>
-        </Link>
+        {userQueryResultData ? (
+          <Link to="/">{ChronoLogoText}</Link>
+        ) : (
+          ChronoLogoText
+        )}
         {!isEditPage && (
           <Button
             className="text-green-200 w-fit text-xl px-2 md:px-4 py-4 md:ml-4 bg-green-900 hover:bg-green-800"
@@ -175,7 +183,7 @@ export function NavBar() {
           </Button>
         )}
         <Link
-          to={userQueryResultData ? "/about" : undefined}
+          to="/about"
           className="text-primary py-2 px-2 md:ml-2 text-lg rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out"
         >
           <div className="hidden md:flex">About</div>
@@ -227,10 +235,12 @@ export function NavBar() {
           <DropdownMenuContent className="lg:w-56 w-fit">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuItem asChild>
-              <Link to={userQueryResultData ? "/editProfile" : undefined}>
-                <Pencil className="mr-2 h-4 w-4" />
-                <span>Edit Profile</span>
-              </Link>
+              {userQueryResultData && (
+                <Link to="/editProfile">
+                  <Pencil className="mr-2 h-4 w-4" />
+                  <span>Edit Profile</span>
+                </Link>
+              )}
             </DropdownMenuItem>
             <DropdownMenuItem
               asChild

@@ -1,5 +1,4 @@
-import { Route, redirect } from "@tanstack/react-router";
-import { Outlet } from "@tanstack/react-router";
+import { Outlet, Route, redirect } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { z } from "zod";
 import { NavBar } from "./components/navbar";

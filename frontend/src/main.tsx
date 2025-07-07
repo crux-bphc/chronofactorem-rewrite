@@ -1,4 +1,3 @@
-import { ThemeProvider } from "@/components/theme-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Router,
@@ -8,11 +7,10 @@ import {
 import React from "react";
 import { CookiesProvider } from "react-cookie";
 import ReactDOM from "react-dom/client";
+import { ThemeProvider } from "@/components/theme-provider";
 import aboutRoute from "./About";
 import authenticatedRoute from "./AuthenticatedRoute";
-import CMSRoute from "./CMS";
-import CMSExportRoute from "./CMSExport";
-import CMSOptionRoute from "./CMSOption";
+import NotFound from "./components/NotFound";
 import editTimetableRoute from "./EditTimetable";
 import editUserProfileRoute from "./EditUserProfile";
 import finalizeTimetableRoute from "./FinalizeTimetable";
@@ -22,7 +20,6 @@ import loginRoute from "./Login";
 import RootComponent from "./RootComponent";
 import searchRoute from "./SearchResults";
 import viewTimetableRoute from "./ViewTimetable";
-import NotFound from "./components/NotFound";
 import "./index.css";
 
 const queryClient = new QueryClient({
@@ -48,10 +45,7 @@ const routeTree = rootRoute.addChildren([
     editUserProfileRoute,
     editTimetableRoute,
     finalizeTimetableRoute,
-    CMSOptionRoute,
     viewTimetableRoute,
-    CMSExportRoute,
-    CMSRoute,
     searchRoute,
   ]),
 ]);

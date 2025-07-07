@@ -1,3 +1,8 @@
+import { queryOptions, useMutation } from "@tanstack/react-query";
+import { ErrorComponent, Route } from "@tanstack/react-router";
+import axios, { AxiosError } from "axios";
+import { useState } from "react";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -10,12 +15,10 @@ import {
 } from "@/components/ui/select";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
-import { queryOptions, useMutation } from "@tanstack/react-query";
-import { ErrorComponent, Route } from "@tanstack/react-router";
-import axios, { AxiosError } from "axios";
-import { useState } from "react";
-import { z } from "zod";
-import { collegeYearType, userWithTimetablesType } from "../../lib/src/index";
+import {
+  collegeYearType,
+  type userWithTimetablesType,
+} from "../../lib/src/index";
 import { rootRoute, router } from "./main";
 
 /*
@@ -67,7 +70,7 @@ const getDegreesRoute = new Route({
         }
       }),
   component: GetDegrees,
-  errorComponent: ({ error }) => {
+  errorComponent: ({ error }: { error: unknown }) => {
     const { toast } = useToast();
 
     if (error instanceof AxiosError) {

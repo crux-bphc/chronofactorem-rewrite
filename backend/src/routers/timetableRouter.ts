@@ -1,31 +1,29 @@
 import * as express from "express";
+import {
+  addSection,
+  addSectionValidator,
+} from "../controllers/timetable/addSection.js";
+import {
+  copyTimetable,
+  copyTimetableValidator,
+} from "../controllers/timetable/copyTimetable.js";
 import { createTimetable } from "../controllers/timetable/createTimetable.js";
 import {
   deleteTimeTableValidator,
   deleteTimetable,
 } from "../controllers/timetable/deleteTimetable.js";
 import {
-  getTimetableById,
-  getTimetableByIdValidator,
-} from "../controllers/timetable/getTimetableById.js";
-
-import {
-  addSection,
-  addSectionValidator,
-} from "../controllers/timetable/addSection.js";
-import {
   editTimetableMetadata,
   editTimetableMetadataValidator,
 } from "../controllers/timetable/editTimetableMetadata.js";
-
-import {
-  copyTimetable,
-  copyTimetableValidator,
-} from "../controllers/timetable/copyTimetable.js";
 import {
   getPublicTimetables,
   getPublicTimetablesValidator,
 } from "../controllers/timetable/getPublicTimetables.js";
+import {
+  getTimetableById,
+  getTimetableByIdValidator,
+} from "../controllers/timetable/getTimetableById.js";
 import {
   removeSection,
   removeSectionValidator,

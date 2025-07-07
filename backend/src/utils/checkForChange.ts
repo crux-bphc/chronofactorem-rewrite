@@ -1,4 +1,4 @@
-import { Course, Timetable } from "../entity/entities.js";
+import type { Course, Timetable } from "../entity/entities.js";
 
 export const checkForExamTimingsChange = (
   timetable: Timetable,

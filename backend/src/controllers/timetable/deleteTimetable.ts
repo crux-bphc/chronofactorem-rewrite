@@ -1,8 +1,8 @@
 import "dotenv/config";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { z } from "zod";
 import { timetableIDType } from "../../../../lib/src/index.js";
-import { Timetable, User } from "../../entity/entities.js";
+import type { Timetable, User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { userRepository } from "../../repositories/userRepository.js";
@@ -75,7 +75,7 @@ export const deleteTimetable = async (req: Request, res: Response) => {
   }
   try {
     await removeTimetable(timetable.id, logger);
-  } catch (err: any) {
+  } catch (_err: any) {
     return res.status(500).json({ message: "Internal Server Error" });
   }
   return res.json({ message: "timetable deleted" });

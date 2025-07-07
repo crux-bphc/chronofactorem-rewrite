@@ -1,3 +1,8 @@
+import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
+import { ErrorComponent, Route } from "@tanstack/react-router";
+import axios, { AxiosError } from "axios";
+import { useState } from "react";
+import type { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -9,12 +14,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ToastAction } from "@/components/ui/toast";
-import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
-import { ErrorComponent, Route } from "@tanstack/react-router";
-import axios, { AxiosError } from "axios";
-import { useState } from "react";
-import { z } from "zod";
-import { getBatchFromEmail, userWithTimetablesType } from "../../lib/src/index";
+import {
+  getBatchFromEmail,
+  type userWithTimetablesType,
+} from "../../lib/src/index";
 import authenticatedRoute from "./AuthenticatedRoute";
 import { useToast } from "./components/ui/use-toast";
 import { router } from "./main";
@@ -56,7 +59,7 @@ const editUserProfileRoute = new Route({
       throw error;
     }),
   component: EditUserProfile,
-  errorComponent: ({ error }) => {
+  errorComponent: ({ error }: { error: unknown }) => {
     const { toast } = useToast();
 
     if (error instanceof AxiosError) {

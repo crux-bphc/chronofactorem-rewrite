@@ -1,5 +1,5 @@
-import { QueryRunner } from "typeorm";
-import { sectionTypeEnum } from "../../lib/src/index.js";
+import type { QueryRunner } from "typeorm";
+import type { sectionTypeEnum } from "../../lib/src/index.js";
 import { Course, Section, Timetable } from "./entity/entities.js";
 import {
   addCourse,
@@ -339,7 +339,7 @@ export const ingestJSON = async (
             courses[courseValues[i].code as string].sections[courseSectionCode]
               .instructor,
           type: courseSectionCode.slice(0, 1) as sectionTypeEnum,
-          number: parseInt(courseSectionCode.slice(1)),
+          number: Number.parseInt(courseSectionCode.slice(1)),
           roomTime: roomTimes,
         });
       }
