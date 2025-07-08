@@ -54,7 +54,7 @@ const loginRoute = new Route({
         throw error;
       }),
   component: Login,
-  errorComponent: ({ error }) => {
+  errorComponent: ({ error }: { error: unknown }) => {
     const { toast } = useToast();
 
     if (error instanceof AxiosError) {

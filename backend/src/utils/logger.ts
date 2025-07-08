@@ -1,6 +1,6 @@
-import { Logger as PinoLogger, LoggerOptions, pino } from "pino";
+import { type LoggerOptions, type Logger as PinoLogger, pino } from "pino";
 import { pinoHttp } from "pino-http";
-import { Logger, QueryRunner } from "typeorm";
+import type { Logger, QueryRunner } from "typeorm";
 import { env } from "../config/server.js";
 
 const devOptions: LoggerOptions = {
@@ -32,7 +32,7 @@ const prodOptions: LoggerOptions = {
   base: undefined,
   // by default, `level` shows the level number instead of the label, which isn't very nice
   formatters: {
-    level(label: string, number: number) {
+    level(label: string, _number: number) {
       return { level: label };
     },
   },
@@ -68,7 +68,7 @@ export const databaseLogger = baseLogger.child(
 export class DatabaseLogger implements Logger {
   constructor(private readonly logger: PinoLogger) {}
 
-  logQuery(query: string, parameters?: any[], queryRunner?: QueryRunner) {
+  logQuery(query: string, parameters?: any[], _queryRunner?: QueryRunner) {
     this.logger.debug({ query, parameters });
   }
 
@@ -76,7 +76,7 @@ export class DatabaseLogger implements Logger {
     error: string,
     query: string,
     parameters?: any[],
-    queryRunner?: QueryRunner,
+    _queryRunner?: QueryRunner,
   ) {
     this.logger.error({ query, parameters, msg: `Query error: ${error}` });
   }
@@ -85,20 +85,24 @@ export class DatabaseLogger implements Logger {
     time: number,
     query: string,
     parameters?: any[],
-    queryRunner?: QueryRunner,
+    _queryRunner?: QueryRunner,
   ) {
     this.logger.warn({ query, parameters, msg: `Query slow: ${time}` });
   }
 
-  logSchemaBuild(message: string, queryRunner?: QueryRunner) {
+  logSchemaBuild(message: string, _queryRunner?: QueryRunner) {
     this.logger.warn(`Schema Build: ${message}`);
   }
 
-  logMigration(message: string, queryRunner?: QueryRunner) {
+  logMigration(message: string, _queryRunner?: QueryRunner) {
     this.logger.warn(`Migration: ${message}`);
   }
 
-  log(level: "log" | "info" | "warn", message: any, queryRunner?: QueryRunner) {
+  log(
+    level: "log" | "info" | "warn",
+    message: any,
+    _queryRunner?: QueryRunner,
+  ) {
     switch (level) {
       case "log":
         this.logger.debug(message);

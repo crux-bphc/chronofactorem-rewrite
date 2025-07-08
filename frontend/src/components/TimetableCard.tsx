@@ -1,3 +1,10 @@
+import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import axios, { AxiosError } from "axios";
+import { Edit2, Eye, EyeOff, Trash } from "lucide-react";
+import { useState } from "react";
+import type { z } from "zod";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -26,14 +33,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
-import axios, { AxiosError } from "axios";
-import { Edit2, Eye, EyeOff, Trash } from "lucide-react";
-import { useState } from "react";
-import { z } from "zod";
-import { timetableType } from "../../../lib/src/index";
+import type { timetableType } from "../../../lib/src/index";
 import { router } from "../main";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -50,10 +50,9 @@ import { useToast } from "./ui/use-toast";
 type Props = {
   timetable: z.infer<typeof timetableType>;
   showFooter: boolean;
-  isCMSPage: boolean;
 };
 
-function TimetableCard({ timetable, showFooter, isCMSPage }: Props) {
+function TimetableCard({ timetable, showFooter }: Props) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -323,13 +322,7 @@ function TimetableCard({ timetable, showFooter, isCMSPage }: Props) {
         <CardHeader className="pb-2">
           <CardTitle className="relative text-xl md:text-2xl text-wrap justify-between items-center">
             <Link
-              to={
-                timetable.draft
-                  ? "/edit/$timetableId"
-                  : isCMSPage
-                    ? "/CMS/$timetableId"
-                    : "/view/$timetableId"
-              }
+              to={timetable.draft ? "/edit/$timetableId" : "/view/$timetableId"}
               params={{
                 timetableId: timetable.id,
               }}

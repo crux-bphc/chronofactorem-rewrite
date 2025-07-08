@@ -1,4 +1,4 @@
-import { z } from "zod";
+import type { z } from "zod";
 // @ts-check
 import { serverSchema } from "./schema.js";
 

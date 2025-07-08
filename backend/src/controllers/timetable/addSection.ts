@@ -1,11 +1,16 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { z } from "zod";
 import {
   namedUUIDType,
-  sectionTypeList,
+  type sectionTypeList,
   timetableIDType,
 } from "../../../../lib/src/index.js";
-import { Course, Section, Timetable, User } from "../../entity/entities.js";
+import {
+  type Course,
+  type Section,
+  Timetable,
+  type User,
+} from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { courseRepository } from "../../repositories/courseRepository.js";
 import { sectionRepository } from "../../repositories/sectionRepository.js";

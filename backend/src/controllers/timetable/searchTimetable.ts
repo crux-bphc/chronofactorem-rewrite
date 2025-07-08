@@ -1,16 +1,16 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { z } from "zod";
 import {
   namedCollegeYearType,
+  namedDegreeZodList,
   namedIntegerType,
   namedNonEmptyStringType,
   namedSemesterType,
   namedShortBITSIDType,
   namedYearType,
 } from "../../../../lib/src/index.js";
-import { namedDegreeZodList } from "../../../../lib/src/index.js";
 import { env } from "../../config/server.js";
-import { Timetable } from "../../entity/entities.js";
+import type { Timetable } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 
 const searchTimetableSchema = z.object({
@@ -67,7 +67,7 @@ export const searchTimetable = async (req: Request, res: Response) => {
 
     const usefulQueryParams = {
       query,
-      from: parseInt((page as string | undefined) ?? "0") * 12,
+      from: Number.parseInt((page as string | undefined) ?? "0") * 12,
       year,
       name,
       authorId,

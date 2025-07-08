@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { z } from "zod";
-import { Course } from "../../entity/entities.js";
+import type { Course } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { courseRepository } from "../../repositories/courseRepository.js";
 

@@ -1,6 +1,6 @@
-import { router } from "@/main";
+import { useLocation } from "@tanstack/react-router";
+import { ChevronDown, Search } from "lucide-react";
 import { useState } from "react";
-
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,8 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { useLocation } from "@tanstack/react-router";
-import { ChevronDown, Search } from "lucide-react";
+import { router } from "@/main";
 
 const SearchBar = () => {
   const [query, setQuery] = useState<string | undefined>();
@@ -43,7 +42,7 @@ const SearchBar = () => {
     }
   };
   return (
-    <div className="flex items-center w-full max-w-md gap-2 md:ml-10">
+    <div className="flex items-center w-full max-w-md gap-2 md:ml-4">
       <Input
         value={query}
         onChange={(e) => setQuery(e.target.value)}

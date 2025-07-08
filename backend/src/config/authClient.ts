@@ -1,4 +1,4 @@
-import { BaseClient, Issuer } from "openid-client";
+import { type BaseClient, Issuer } from "openid-client";
 import { env } from "./server.js";
 
 let client: BaseClient | null = null;

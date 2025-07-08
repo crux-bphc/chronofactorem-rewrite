@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
-import { TokenSet, generators } from "openid-client";
+import type { Request, Response } from "express";
+import { generators, type TokenSet } from "openid-client";
 import {
-  degreeList,
+  type degreeList,
   getBatchFromEmail,
   isAValidDegreeCombination,
   namedDegreeZodList,
@@ -12,9 +12,9 @@ import { User } from "../../entity/entities.js";
 import { userRepository } from "../../repositories/userRepository.js";
 import timetableJSON from "../../timetable.json" with { type: "json" };
 import {
-  FinishedUserSession,
-  SignUpUserData,
-  UnfinishedUserSession,
+  type FinishedUserSession,
+  type SignUpUserData,
+  type UnfinishedUserSession,
   ZodFinishedUserSession,
   ZodUnfinishedUserSession,
 } from "../../types/auth.js";
@@ -100,7 +100,7 @@ export async function authCallback(req: Request, res: Response) {
       const userInfo = await client.userinfo(access_token as string | TokenSet);
 
       // tokenSet.claims() returns validated information contained upon accessing the token
-      const tokenExpiryTime = tokenSet.claims().exp;
+      const _tokenExpiryTime = tokenSet.claims().exp;
 
       // defines maxAge according to env vars
       const maxAge = env.SESSION_MAX_AGE_MS; // converts into milliseconds
@@ -153,12 +153,12 @@ export async function authCallback(req: Request, res: Response) {
 
         res.redirect(
           `${env.FRONTEND_URL}/getDegrees?year=${
-            timetableJSON.metadata.acadYear - parseInt(batch) + 1
+            timetableJSON.metadata.acadYear - Number.parseInt(batch) + 1
           }`,
         );
       }
     }
-  } catch (err: any) {
+  } catch (_err: any) {
     // If user exists on database, redirect them to frontpage, if not
     // redirect them to a /profile route where they fill their degrees
     // on the frontend
@@ -265,7 +265,7 @@ export async function getDegrees(req: Request, res: Response) {
       .insert()
       .into(User)
       .values({
-        batch: parseInt(batch),
+        batch: Number.parseInt(batch),
         name: name,
         degrees: userData.degrees,
         email: userData.email,
@@ -350,7 +350,7 @@ export async function checkAuthStatus(req: Request, res: Response) {
       return res.json({
         message: "user needs to get degrees",
         redirect: `/getDegrees?year=${
-          timetableJSON.metadata.acadYear - parseInt(batch) + 1
+          timetableJSON.metadata.acadYear - Number.parseInt(batch) + 1
         }`,
       });
     }

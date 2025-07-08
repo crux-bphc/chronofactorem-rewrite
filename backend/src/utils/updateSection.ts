@@ -1,4 +1,4 @@
-import { Course, Section, Timetable } from "../entity/entities.js";
+import type { Course, Section, Timetable } from "../entity/entities.js";
 
 export const removeSection = (timetable: Timetable, section: Section) => {
   const classTimings = section.roomTime.map((time) => {

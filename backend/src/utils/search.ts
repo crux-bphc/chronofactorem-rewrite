@@ -1,7 +1,7 @@
 import "dotenv/config";
-import { Logger } from "pino";
+import type { Logger } from "pino";
 import { env } from "../config/server.js";
-import { Course, Timetable } from "../entity/entities.js";
+import type { Course, Timetable } from "../entity/entities.js";
 import { userRepository } from "../repositories/userRepository.js";
 import sqids from "./sqids.js";
 

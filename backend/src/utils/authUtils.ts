@@ -1,5 +1,5 @@
-import { createHash } from "crypto";
-import { Response } from "express";
+import { createHash } from "node:crypto";
+import type { Response } from "express";
 import jwt from "jsonwebtoken";
 import { env } from "../config/server.js";
 

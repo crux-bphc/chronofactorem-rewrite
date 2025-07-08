@@ -3,7 +3,7 @@ import { z } from "zod";
 import {
   courseWithSectionsType,
   namedNonEmptyStringType,
-  sectionTypeList,
+  type sectionTypeList,
 } from "../../../../lib/src/index.js";
 import { env } from "../../config/server.js";
 import { AppDataSource } from "../../db.js";
@@ -241,7 +241,7 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
     try {
       await removeCourse(course.id, logger);
       await addCourse(course, logger);
-    } catch (err: any) {
+    } catch (_err: any) {
       return res.status(500).json({ message: "Internal Server Error" });
     }
 
@@ -249,7 +249,7 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
     for (const timetable of timetables) {
       try {
         await removeTimetable(timetable.id, logger);
-      } catch (err: any) {
+      } catch (_err: any) {
         return res.status(500).json({ message: "Internal Server Error" });
       }
       if (!timetable.draft && !timetable.private) {
@@ -260,7 +260,7 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
           .getOneOrFail();
         try {
           await addTimetable(timetableWithSections, null, logger);
-        } catch (err: any) {
+        } catch (_err: any) {
           return res.status(500).json({ message: "Internal Server Error" });
         }
       }

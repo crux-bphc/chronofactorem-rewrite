@@ -3,8 +3,10 @@ import {
   getAllCourses,
   getAllCoursesValidator,
 } from "../controllers/course/getAllCourses.js";
-import { getCourseById } from "../controllers/course/getCourseById.js";
-import { getCourseByIdValidator } from "../controllers/course/getCourseById.js";
+import {
+  getCourseById,
+  getCourseByIdValidator,
+} from "../controllers/course/getCourseById.js";
 import {
   updateChangedTimetable,
   updateChangedTimetableValidator,

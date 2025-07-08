@@ -1,13 +1,13 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { z } from "zod";
 import {
-  degreeList,
+  type degreeList,
   isAValidDegreeCombination,
   namedCollegeYearType,
   namedDegreeZodList,
   namedSemesterType,
 } from "../../../../lib/src/index.js";
-import { Timetable, User } from "../../entity/entities.js";
+import type { Timetable, User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { userRepository } from "../../repositories/userRepository.js";
@@ -54,8 +54,8 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
     }
 
     const branch: degreeList = req.query.branch as degreeList;
-    const year: number = parseInt(req.query.year as string);
-    const sem: number = parseInt(req.query.sem as string);
+    const year: number = Number.parseInt(req.query.year as string);
+    const sem: number = Number.parseInt(req.query.sem as string);
     // note that if archived is not passed as a param, (req.query.archived as string) evaluates to the string "undefined"
     const archived: boolean = (req.query.archived as string) === "true";
     const isPrivate = false;

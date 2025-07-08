@@ -1,5 +1,3 @@
-import CDCList from "@/../CDCs.json";
-import { ToastAction } from "@/components/ui/toast";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import {
   queryOptions,
@@ -7,7 +5,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { ErrorComponent, Route, notFound } from "@tanstack/react-router";
+import { ErrorComponent, notFound, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { toPng } from "html-to-image";
 import {
@@ -20,19 +18,21 @@ import {
   Trash,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { z } from "zod";
-import {
+import type { z } from "zod";
+import CDCList from "@/../CDCs.json";
+import { ToastAction } from "@/components/ui/toast";
+import type {
   courseType,
   courseWithSectionsType,
   sectionTypeZodEnum,
   timetableWithSectionsType,
+  userWithTimetablesType,
 } from "../../lib/src/index";
-import { userWithTimetablesType } from "../../lib/src/index";
 import authenticatedRoute from "./AuthenticatedRoute";
 import NotFound from "./components/NotFound";
-import { TimetableGrid } from "./components/TimetableGrid";
 import { SideMenu } from "./components/side-menu";
 import Spinner from "./components/spinner";
+import { TimetableGrid } from "./components/TimetableGrid";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -160,7 +160,7 @@ const viewTimetableRoute = new Route({
       }),
   component: ViewTimetable,
   notFoundComponent: NotFound,
-  errorComponent: ({ error }) => {
+  errorComponent: ({ error }: { error: unknown }) => {
     const { toast } = useToast();
 
     if (error instanceof AxiosError) {
@@ -221,6 +221,15 @@ function ViewTimetable() {
   const queryClient = useQueryClient();
   const screenshotContentRef = useRef<HTMLDivElement>(null);
   const [isScreenshotMode, setIsScreenshotMode] = useState(false);
+  const [screenIsLarge, setScreenIsLarge] = useState(
+    window.matchMedia("(min-width: 1024px)").matches,
+  );
+
+  useEffect(() => {
+    window
+      .matchMedia("(min-width: 1024px)")
+      .addEventListener("change", (e) => setScreenIsLarge(e.matches));
+  }, []);
 
   const deleteMutation = useMutation({
     mutationFn: () => {
@@ -525,7 +534,7 @@ function ViewTimetable() {
           ),
         });
       });
-  }, [isVertical]);
+  }, [isVertical, screenIsLarge]);
 
   const addSectionMutation = useMutation({
     mutationFn: async (body: { sectionId: string }) => {
@@ -604,9 +613,7 @@ function ViewTimetable() {
     const degree = (
       timetableQueryResult.data.degrees.length === 1
         ? timetableQueryResult.data.degrees[0]
-        : timetableQueryResult.data.degrees
-            .sort((a, b) => (b as any) - (a as any))
-            .join("")
+        : timetableQueryResult.data.degrees.sort().reverse().join("")
     ) as keyof typeof CDCList;
     const cdcListKey =
       `${timetableQueryResult.data.year}-${timetableQueryResult.data.semester}` as keyof (typeof CDCList)[typeof degree];
@@ -722,16 +729,6 @@ function ViewTimetable() {
     () => currentCourseID !== null,
     [currentCourseID],
   );
-
-  const [screenIsLarge, setScreenIsLarge] = useState(
-    window.matchMedia("(min-width: 1024px)").matches,
-  );
-
-  useEffect(() => {
-    window
-      .matchMedia("(min-width: 1024px)")
-      .addEventListener("change", (e) => setScreenIsLarge(e.matches));
-  }, []);
 
   if (courseQueryResult.isFetching) {
     return <span>Loading...</span>;

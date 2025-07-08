@@ -1,12 +1,12 @@
 import "dotenv/config";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { z } from "zod";
 import {
   namedBooleanType,
   namedNonEmptyStringType,
   timetableIDType,
 } from "../../../../lib/src/index.js";
-import { Timetable, User } from "../../entity/entities.js";
+import type { Timetable, User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { userRepository } from "../../repositories/userRepository.js";
@@ -104,7 +104,7 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
       message: "cannot publish timetable with warnings",
     });
   }
-  let updatedTimetable;
+  let updatedTimetable: Timetable;
   try {
     updatedTimetable = await timetableRepository.save({
       ...timetable,
@@ -124,7 +124,7 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
     } else {
       await removeTimetable(timetable.id, logger);
     }
-  } catch (err: any) {
+  } catch (_err: any) {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 

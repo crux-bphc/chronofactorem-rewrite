@@ -1,10 +1,10 @@
+import { X } from "lucide-react";
+import { useMemo, useState } from "react";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { X } from "lucide-react";
-import { useMemo, useState } from "react";
 
 export function TimetableGrid({
   isVertical,
@@ -88,7 +88,7 @@ export function TimetableGrid({
         const [code, room, day, hour] =
           timetableDetailsSections[i].roomTime[j].split(":");
         const remainder = daysOfWeek.indexOf(day);
-        const quotient = parseInt(hour) - 1;
+        const quotient = Number.parseInt(hour) - 1;
         grid[
           isVertical ? remainder + quotient * 6 : quotient + remainder * 13
         ] = {
@@ -133,8 +133,8 @@ export function TimetableGrid({
         >
           {timings
             .filter((_, i) => i < displayCols)
-            .map((e, i) => (
-              <div className="whitespace-nowrap mr-4" key={2 * i}>
+            .map((e) => (
+              <div className="whitespace-nowrap mr-4" key={e}>
                 <span>{e}</span>
               </div>
             ))}
@@ -163,8 +163,8 @@ export function TimetableGrid({
           >
             {timings
               .filter((_, i) => i < displayCols)
-              .map((e, i) => (
-                <div className="mb-4 flex flex-col" key={2 * i}>
+              .map((e) => (
+                <div className="mb-4 flex flex-col" key={e}>
                   <span>{e}</span>
                 </div>
               ))}
@@ -183,9 +183,11 @@ export function TimetableGrid({
             )
             .map((e, i) =>
               e !== null ? (
-                <Tooltip delayDuration={100} key={2 * i}>
+                <Tooltip delayDuration={100} key={`${e.id}-${i}`}>
                   <TooltipTrigger asChild>
-                    {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+                    {/* TODO: Deal with this lint error */}
+                    {/* biome-ignore lint/a11y/useKeyWithClickEvents: need to check if button works styling wise */}
+                    {/** biome-ignore lint/a11y/noStaticElementInteractions: need to check if button works styling wise */}
                     <div
                       className={`bg-background border border-muted dark:border-muted/70 cursor-pointer transition duration-200 ease-in-out text-foreground/65 p-1.5 ${
                         isVertical ? "min-h-28 sm:min-h-16" : "min-h-20"
@@ -236,6 +238,7 @@ export function TimetableGrid({
                   className={`bg-background border border-muted dark:border-muted/70 ${
                     isVertical ? "min-h-28 sm:min-h-16" : "min-h-20"
                   }`}
+                  // biome-ignore lint/suspicious/noArrayIndexKey: there's literally no other property this grid thing has
                   key={2 * i}
                 />
               ),
