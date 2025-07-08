@@ -53,7 +53,7 @@ const baseLogger = pino(
 export const httpLogger = pinoHttp({
   logger: baseLogger,
   // change this to modify the HTTP request log level
-  level: "debug",
+  level: env.LOG_LEVEL,
   // disables automatic request logging (our debug logs are more detailed)
   autoLogging: false,
 });
