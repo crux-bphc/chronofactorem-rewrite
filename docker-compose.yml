@@ -124,5 +124,5 @@ services:
       - "dev"
 networks:
   default:
-    name: "chrono_net"
+    name: "chrono_draft_net"
     external: true
