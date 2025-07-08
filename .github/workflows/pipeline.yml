@@ -10,7 +10,7 @@ jobs:
       - name: ssh into machine, and clone repo
         run: |
             cd /home/ubuntu/clones
-            cd chronofactorem-rewrite-staging
+            cd chronofactorem-rewrite-draft
             git reset --hard HEAD
             git pull
             docker compose --profile ingestion down
