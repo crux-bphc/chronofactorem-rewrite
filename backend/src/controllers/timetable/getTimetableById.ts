@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { z } from "zod";
 import { timetableIDType } from "../../../../lib/src/index.js";
 import { validate } from "../../middleware/zodValidateRequest.js";

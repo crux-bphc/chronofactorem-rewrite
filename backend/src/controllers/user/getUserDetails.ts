@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { z } from "zod";
 import { namedUUIDType } from "../../../../lib/src/index.js";
-import { User } from "../../entity/entities.js";
+import type { User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { userRepository } from "../../repositories/userRepository.js";
 import sqids from "../../utils/sqids.js";

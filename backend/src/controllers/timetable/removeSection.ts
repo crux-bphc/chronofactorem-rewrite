@@ -1,11 +1,16 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { z } from "zod";
 import {
   namedUUIDType,
-  sectionTypeList,
+  type sectionTypeList,
   timetableIDType,
 } from "../../../../lib/src/index.js";
-import { Course, Section, Timetable, User } from "../../entity/entities.js";
+import type {
+  Course,
+  Section,
+  Timetable,
+  User,
+} from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { courseRepository } from "../../repositories/courseRepository.js";
 import { sectionRepository } from "../../repositories/sectionRepository.js";
@@ -186,7 +191,7 @@ export const removeSection = async (req: Request, res: Response) => {
       false,
       timetable.warnings,
     );
-  } catch (err: any) {
+  } catch (_err: any) {
     logger.error(
       `user with id ${author.id} tried to remove section ${section.type}${section.number} of course ${course.code} but it isn't part of their timetable according to warnings`,
     );

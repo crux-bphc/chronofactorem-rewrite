@@ -1,11 +1,3 @@
-import CDCList from "@/../CDCs.json";
-import { ToastAction } from "@/components/ui/toast";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import {
   queryOptions,
@@ -13,7 +5,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { ErrorComponent, Route, notFound } from "@tanstack/react-router";
+import { ErrorComponent, notFound, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import {
   AlertOctagon,
@@ -27,19 +19,27 @@ import {
   Trash,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { z } from "zod";
+import type { z } from "zod";
+import CDCList from "@/../CDCs.json";
+import { ToastAction } from "@/components/ui/toast";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import type {
   courseType,
   courseWithSectionsType,
   sectionTypeZodEnum,
   timetableWithSectionsType,
 } from "../../lib/src";
-import { userWithTimetablesType } from "../../lib/src/index";
+import type { userWithTimetablesType } from "../../lib/src/index";
 import authenticatedRoute from "./AuthenticatedRoute";
 import NotFound from "./components/NotFound";
-import { TimetableGrid } from "./components/TimetableGrid";
 import { SideMenu } from "./components/side-menu";
 import Spinner from "./components/spinner";
+import { TimetableGrid } from "./components/TimetableGrid";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -161,7 +161,7 @@ const editTimetableRoute = new Route({
       }),
   component: EditTimetable,
   notFoundComponent: NotFound,
-  errorComponent: ({ error }) => {
+  errorComponent: ({ error }: { error: unknown }) => {
     const { toast } = useToast();
 
     if (error instanceof AxiosError) {
@@ -467,9 +467,7 @@ function EditTimetable() {
     const degree = (
       timetableQueryResult.data.degrees.length === 1
         ? timetableQueryResult.data.degrees[0]
-        : timetableQueryResult.data.degrees
-            .sort((a, b) => (b as any) - (a as any))
-            .join("")
+        : timetableQueryResult.data.degrees.sort().reverse().join("")
     ) as keyof typeof CDCList;
     const cdcListKey =
       `${timetableQueryResult.data.year}-${timetableQueryResult.data.semester}` as keyof (typeof CDCList)[typeof degree];

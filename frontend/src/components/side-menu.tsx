@@ -1,6 +1,6 @@
 import {
-  UseMutationResult,
-  UseQueryResult,
+  type UseMutationResult,
+  type UseQueryResult,
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
@@ -8,8 +8,8 @@ import axios, { AxiosError } from "axios";
 import { ArrowLeft, Bird, ChevronRight, HelpCircle } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useDebounce } from "usehooks-ts";
-import { z } from "zod";
-import {
+import type { z } from "zod";
+import type {
   courseType,
   courseWithSectionsType,
   sectionTypeList,
@@ -43,6 +43,8 @@ export function SideMenu({
   timetable: z.infer<typeof timetableWithSectionsType>;
   isOnEditPage: boolean;
   allCoursesDetails: z.infer<typeof courseType>[];
+  // TODO: Fix this
+  // biome-ignore lint/suspicious/noExplicitAny: hard to fix, will need some nontrivial solution
   cdcs: any[];
   setCurrentCourseID: React.Dispatch<React.SetStateAction<string | null>>;
   currentCourseDetails: UseQueryResult<
@@ -54,7 +56,7 @@ export function SideMenu({
     React.SetStateAction<z.infer<typeof sectionTypeZodEnum>>
   >;
   addSectionMutation: UseMutationResult<
-    any,
+    unknown,
     Error,
     {
       sectionId: string;
@@ -62,7 +64,7 @@ export function SideMenu({
     unknown
   >;
   removeSectionMutation: UseMutationResult<
-    any,
+    unknown,
     Error,
     {
       sectionId: string;
@@ -103,7 +105,10 @@ export function SideMenu({
     mutationFn: async ({
       removeId,
       addId,
-    }: { removeId: string; addId: string }) => {
+    }: {
+      removeId: string;
+      addId: string;
+    }) => {
       await axios.post(
         `/api/timetable/${timetable.id}/remove`,
         { sectionId: removeId },
@@ -287,11 +292,11 @@ export function SideMenu({
                         clashing: timings.get(tm ?? ""),
                       };
                     })
-                    .map((section, i) => {
+                    .map((section, _i) => {
                       return (
                         <span
                           className="w-full relative flex flex-col"
-                          key={2 * i}
+                          key={section.id}
                         >
                           <Button
                             variant={"secondary"}
@@ -461,22 +466,20 @@ export function SideMenu({
           className="flex h-full data-[state=inactive]:h-0 w-[26rem] overflow-y-scroll flex-col px-2 gap-2"
         >
           {coursesInTimetable.map((course) => {
-            if (course === undefined) return <></>;
+            if (course === undefined) return null;
             if (!isOnEditPage) {
               return (
-                <>
-                  <div className="flex flex-col border-muted-foreground/30 rounded-md pl-3 py-2 border">
-                    <div className="flex">
-                      <span className="font-bold">{`${course.code}`}</span>
-                      <span>{`: ${course.name}`}</span>
-                    </div>
-                    <span className="text-muted-foreground">{`${timetable.sections
-                      .filter((section) => section.courseId === course.id)
-                      .map((section) => `${section.type}${section.number}`)
-                      .sort()
-                      .join(", ")}`}</span>
+                <div className="flex flex-col border-muted-foreground/30 rounded-md pl-3 py-2 border">
+                  <div className="flex">
+                    <span className="font-bold">{`${course.code}`}</span>
+                    <span>{`: ${course.name}`}</span>
                   </div>
-                </>
+                  <span className="text-muted-foreground">{`${timetable.sections
+                    .filter((section) => section.courseId === course.id)
+                    .map((section) => `${section.type}${section.number}`)
+                    .sort()
+                    .join(", ")}`}</span>
+                </div>
               );
             }
             return (
@@ -611,7 +614,8 @@ export function SideMenu({
           <div className="h-[calc(100%-3rem)] overflow-y-scroll">
             {courseSearchResults.map((course) => (
               // TODO - deal with this biome rule
-              // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
+              // biome-ignore lint/a11y/useKeyWithClickEvents: bro come on really
+              // biome-ignore lint/a11y/noStaticElementInteractions: bro come on really
               <div
                 onClick={() => {
                   if (!course.clashing) {

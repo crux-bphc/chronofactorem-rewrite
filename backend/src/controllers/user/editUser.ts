@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { z } from "zod";
 import {
-  degreeList,
+  type degreeList,
   isAValidDegreeCombination,
   namedDegreeZodList,
 } from "../../../../lib/src/index.js";

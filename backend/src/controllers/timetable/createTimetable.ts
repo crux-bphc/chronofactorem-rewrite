@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
-import { degreeEnum } from "../../../../lib/src/index.js";
-import { Section, Timetable, User } from "../../entity/entities.js";
+import type { Request, Response } from "express";
+import type { degreeEnum } from "../../../../lib/src/index.js";
+import { type Section, Timetable, type User } from "../../entity/entities.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { userRepository } from "../../repositories/userRepository.js";
 import timetableJSON from "../../timetable.json" with { type: "json" };

@@ -1,5 +1,5 @@
-import supertest, { Response } from "supertest";
-import { degreeEnum } from "../../../../lib/src/index.js";
+import supertest, { type Response } from "supertest";
+import type { degreeEnum } from "../../../../lib/src/index.js";
 import app from "../../app.js";
 import { AppDataSource } from "../../db.js";
 import { Timetable, User } from "../../entity/entities.js";

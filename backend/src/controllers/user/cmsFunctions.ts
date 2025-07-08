@@ -1,5 +1,5 @@
 import fetch from "cross-fetch";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { z } from "zod";
 import {
   namedIntegerType,

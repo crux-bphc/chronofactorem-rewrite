@@ -15,8 +15,8 @@ import {
 import {
   approvedDegreeList,
   approvedSectionTypeList,
-  degreeEnum,
-  sectionTypeEnum,
+  type degreeEnum,
+  type sectionTypeEnum,
 } from "../../../lib/src/index.js";
 
 @Entity()

@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { default as onFinished } from "on-finished";
 import { ZodError } from "zod";
 
@@ -39,7 +39,7 @@ export const logger = async (
         `${rest.statusCode} ${
           isZodError(rest.body)
             ? JSON.stringify(rest.body)
-            : rest.body?.message ?? rest.statusMessage
+            : (rest.body?.message ?? rest.statusMessage)
         }`,
       );
     }

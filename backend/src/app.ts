@@ -2,8 +2,11 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import "dotenv/config";
-import express, { NextFunction } from "express";
-import { Request, Response } from "express";
+import express, {
+  type NextFunction,
+  type Request,
+  type Response,
+} from "express";
 import { env } from "./config/server.js";
 import { logger } from "./middleware/logging.js";
 import authRouter from "./routers/authRouter.js";
@@ -49,7 +52,7 @@ app.use("/timetable", timetableRouter);
 app.disable("x-powered-by");
 
 // Error handling
-app.use((err: any, req: Request, res: Response, _: NextFunction) => {
+app.use((err: any, _req: Request, res: Response, _: NextFunction) => {
   console.log(err);
   res.status(err.status || 500).send(err.stack);
 });

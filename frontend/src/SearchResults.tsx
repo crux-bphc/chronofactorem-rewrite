@@ -1,13 +1,9 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
 import type { z } from "zod";
-import type { timetableWithSectionsType } from "../../lib/src";
-import authenticatedRoute from "./AuthenticatedRoute";
-import { ToastAction } from "./components/ui/toast";
-import { useToast } from "./components/ui/use-toast";
-import { router } from "./main";
-
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -16,8 +12,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import type { timetableWithSectionsType } from "../../lib/src";
+import authenticatedRoute from "./AuthenticatedRoute";
 import {
   Pagination,
   PaginationContent,
@@ -25,6 +21,9 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "./components/ui/pagination";
+import { ToastAction } from "./components/ui/toast";
+import { useToast } from "./components/ui/use-toast";
+import { router } from "./main";
 
 const fetchSearchDetails = async (
   query: string,
@@ -40,6 +39,7 @@ const fetchSearchDetails = async (
   return response.data;
 };
 
+// biome-ignore lint/suspicious/noExplicitAny: will need nontrivial fix and maybe some kind of update since that Route function signature is deprecated
 const searchQueryOptions = (deps: Record<string, any>) => {
   for (const key of Object.keys(deps)) {
     if (deps[key] === undefined) delete deps[key];
@@ -73,7 +73,7 @@ const searchRoute = new Route({
 
         throw error;
       }),
-  errorComponent: ({ error }) => {
+  errorComponent: ({ error }: { error: unknown }) => {
     const { toast } = useToast();
 
     if (error instanceof AxiosError) {

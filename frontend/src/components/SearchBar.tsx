@@ -1,6 +1,6 @@
-import { router } from "@/main";
+import { useLocation } from "@tanstack/react-router";
+import { ChevronDown, Search } from "lucide-react";
 import { useState } from "react";
-
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,8 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { useLocation } from "@tanstack/react-router";
-import { ChevronDown, Search } from "lucide-react";
+import { router } from "@/main";
 
 const SearchBar = () => {
   const [query, setQuery] = useState<string | undefined>();
