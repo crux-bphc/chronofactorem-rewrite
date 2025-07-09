@@ -1,4 +1,4 @@
-FROM node:20.14.0-slim AS build-stage
+FROM node:22.17.0-bookworm-slim AS build-stage
 ENV NODE_ENV production
 WORKDIR /usr/src/app/frontend
 
@@ -8,7 +8,6 @@ ENV PATH="${PATH}:${PNPM_HOME}"
 COPY --chown=node:node frontend/tsconfig.json ./
 COPY --chown=node:node frontend/tsconfig.node.json ./
 COPY --chown=node:node frontend/public ./
-COPY --chown=node:node frontend/postcss.config.js ./
 COPY --chown=node:node frontend/tailwind.config.js ./
 COPY --chown=node:node frontend/vite.config.ts ./
 COPY --chown=node:node frontend/CDCs.json ./

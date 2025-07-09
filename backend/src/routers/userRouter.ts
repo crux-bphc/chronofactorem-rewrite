@@ -1,9 +1,5 @@
 import * as express from "express";
 import {
-  unenroll,
-  unenrollValidator,
-} from "../controllers/user/cmsFunctions.js";
-import {
   announcementValidator,
   createAnnouncement,
 } from "../controllers/user/createAnnouncement.js";
@@ -18,7 +14,6 @@ import { authenticate } from "../middleware/auth.js";
 const userRouter = express.Router();
 
 userRouter.post("/edit", authenticate, editUserValidator, editUser);
-userRouter.post("/unenroll", authenticate, unenrollValidator, unenroll);
 userRouter.post(
   "/announcements/create",
   authenticate,
@@ -26,6 +21,11 @@ userRouter.post(
   createAnnouncement,
 );
 userRouter.get("/announcements", authenticate, getAllAnnouncements);
-userRouter.get("/:id?", authenticate, getUserDetailsValidator, getUserDetails);
+userRouter.get(
+  "/{.:id}",
+  authenticate,
+  getUserDetailsValidator,
+  getUserDetails,
+);
 
 export default userRouter;

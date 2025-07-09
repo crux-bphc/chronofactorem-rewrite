@@ -1,4 +1,4 @@
-FROM node:20.14.0-slim AS build-stage
+FROM node:22.17.0-bookworm-slim AS build-stage
 ENV NODE_ENV production
 WORKDIR /usr/src/app/backend
 
@@ -34,7 +34,7 @@ WORKDIR /usr/src/app/backend
 
 RUN pnpm tsc --build
 
-FROM node:20.14.0-slim
+FROM node:22.17.0-bookworm-slim
 ENV NODE_ENV production
 WORKDIR /usr/src/app
 

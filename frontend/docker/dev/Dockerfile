@@ -1,4 +1,4 @@
-FROM node:20.14.0-slim
+FROM node:22.17.0-bookworm-slim
 ENV NODE_ENV development
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
