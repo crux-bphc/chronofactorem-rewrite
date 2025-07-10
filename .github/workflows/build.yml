@@ -40,24 +40,16 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install lib dependencies
-        run: pnpm install --prod
-        working-directory: "./lib"
+        run: pnpm install -r --prod
+        working-directory: "."
 
       - name: Build lib
         run: pnpm tsc --build
         working-directory: "./lib"
 
-      - name: Install backend dependencies
-        run: pnpm install --prod
-        working-directory: "./backend"
-
       - name: Build backend
         run: pnpm tsc --build
         working-directory: "./backend"
-
-      - name: Install frontend dependencies
-        run: pnpm install --prod
-        working-directory: "./frontend"
 
       - name: Build frontend
         run: pnpm run build
