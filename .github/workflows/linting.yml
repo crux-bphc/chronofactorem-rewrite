@@ -22,7 +22,7 @@ jobs:
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 8.13.1
+          version: 10.13.1
           run_install: false
 
       - name: Get pnpm store directory
@@ -39,25 +39,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      - name: Install lib dependencies
-        run: pnpm install
-        working-directory: "./lib"
+      - name: Install dependencies
+        run: pnpm install -r
+        working-directory: "."
 
       - name: Run biomejs linter and formatter on lib
         run: pnpm biome ci .
         working-directory: "./lib"
 
-      - name: Install backend dependencies
-        run: pnpm install
-        working-directory: "./backend"
-
       - name: Run biomejs linter and formatter on backend
         run: pnpm biome ci .
         working-directory: "./backend"
-
-      - name: Install frontend dependencies
-        run: pnpm install
-        working-directory: "./frontend"
 
       - name: Run biomejs linter and formatter on frontend
         run: pnpm biome ci .

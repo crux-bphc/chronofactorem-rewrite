@@ -1,55 +1,48 @@
 FROM node:22.17.0-bookworm-slim AS build-stage
 ENV NODE_ENV production
+
+RUN corepack enable pnpm && corepack install -g pnpm@latest-10
+
+WORKDIR /usr/src/app
+COPY --chown=node:node ./package.json ./
+COPY --chown=node:node ./pnpm-lock.yaml ./
+COPY --chown=node:node ./pnpm-workspace.yaml ./
+
 WORKDIR /usr/src/app/backend
-
-ENV PNPM_HOME="/root/.local/share/pnpm"
-ENV PATH="${PATH}:${PNPM_HOME}"
-
 COPY --chown=node:node ./backend/tsconfig.json ./
-COPY --chown=node:node ./backend/.env* ./
-
-RUN npm install -g pnpm
-
-COPY ./backend/package.json ./
-COPY ./backend/pnpm-lock.yaml ./
-
-RUN pnpm fetch --prod
-RUN pnpm install -r --offline --prod
-
-COPY --chown=node:node ./backend/src ./src
+COPY --chown=node:node ./backend/package.json ./
 
 WORKDIR /usr/src/app/lib
-
 COPY --chown=node:node ./lib/tsconfig.json ./
+COPY --chown=node:node ./lib/package.json ./
 
-COPY ./lib/package.json ./
-COPY ./lib/pnpm-lock.yaml ./
+WORKDIR /usr/src/app
+RUN pnpm install --prod -r
 
-RUN pnpm fetch --prod
-RUN pnpm install -r --offline --prod
-
+WORKDIR /usr/src/app/lib
 COPY --chown=node:node ./lib/src ./src
+RUN pnpm tsc --build
 
 WORKDIR /usr/src/app/backend
-
+COPY --chown=node:node ./backend/src ./src
 RUN pnpm tsc --build
+
+USER node
+CMD ["dumb-init", "node", "--enable-source-maps", "build/index.js"]
 
 FROM node:22.17.0-bookworm-slim
 ENV NODE_ENV production
 WORKDIR /usr/src/app
 
-ENV PNPM_HOME="/root/.local/share/pnpm"
-ENV PATH="${PATH}:${PNPM_HOME}"
+RUN corepack enable pnpm && corepack install -g pnpm@latest-10
 
 RUN apt-get update && apt-get install -y --no-install-recommends dumb-init && apt-get clean && rm -rf /var/lib/apt/lists/*
-COPY --chown=node:node --from=build-stage /usr/src/app/backend/node_modules /usr/src/app/backend/node_modules
-COPY --chown=node:node --from=build-stage /usr/src/app/lib/dist /usr/src/app/lib/src
-COPY --chown=node:node --from=build-stage /usr/src/app/lib/node_modules /usr/src/app/lib/node_modules
-COPY --chown=node:node --from=build-stage /usr/src/app/lib/package.json /usr/src/app/lib/package.json
 
-COPY --chown=node:node --from=build-stage /usr/src/app/backend/build /usr/src/app/backend/build
+COPY --chown=node:node --from=build-stage /usr/src/app/node_modules /usr/src/app/node_modules
+COPY --chown=node:node --from=build-stage /usr/src/app/backend/node_modules /usr/src/app/backend/node_modules
 COPY --chown=node:node --from=build-stage /usr/src/app/backend/package.json /usr/src/app/backend/package.json
+COPY --chown=node:node --from=build-stage /usr/src/app/backend/build /usr/src/app/backend/build
 
 USER node
-WORKDIR /usr/src/app/backend
-CMD ["dumb-init", "node", "--enable-source-maps", "build/index.js"]
+WORKDIR /usr/src/app/backend/build
+CMD ["dumb-init", "node", "--enable-source-maps", "backend/src/index.js"]
