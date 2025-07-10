@@ -82,7 +82,11 @@ services:
         source: ./frontend
         target: /usr/local/app/frontend
       - type: volume
+        target: /usr/local/app/node_modules
+      - type: volume
         target: /usr/local/app/frontend/node_modules
+      - type: volume
+        target: /usr/local/app/lib/node_modules
       - type: bind
         source: ./frontend/vite.config.ts
         target: /usr/local/app/frontend/vite.config.ts
