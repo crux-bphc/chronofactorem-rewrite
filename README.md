@@ -4,8 +4,8 @@
 
 ## Steps for setup:
 
-1. Install [nvm](https://github.com/nvm-sh/nvm) and install Node v20.14.0 LTS using `nvm install v20.14.0`. If you're using a different Node version manager, do the equivalent.
-2. Activate Node v20.14.0 using `nvm use v20.14.0`.
+1. Install [nvm](https://github.com/nvm-sh/nvm) and install Node v22.17.0 LTS using `nvm install v22.17.0`. If you're using a different Node version manager, do the equivalent.
+2. Activate Node v22.17.0 using `nvm use v22.17.0`.
 3. Install pnpm, using `npm i -g pnpm`.
 4. Install the packages in this repo by running `pnpm i` in the the `backend`, `lib` and `frontend` folders of this repository.
 
@@ -60,7 +60,6 @@ This project has 4 profiles as of now:
 
 - `dev`
 - `prod`
-- `testing`
 - `ingestion`
 
 ## Steps to run any given profile:
@@ -168,22 +167,6 @@ http {
 
 **NOTE:** This same `db` container is used in `dev` and `ingestion`.
 
-### Testing
-
-**NOTE:** As of this commit, testing containers for the frontend do not exist, and it is not verified whether or not the backend testing containers still work after the container reworking.
-
-Running the project with the `testing` profile copies the project into the container like dev would, but runs tests instead of running the code with `nodemon`. Testing uses the environment variables from [.env.testing](./.env.testing).
-
-**NOTE:** For `testing`, the tests insert test courses from [timetable.test.json](./src/backend/tests/timetable.test.json), runs the necessary tests, and then removes these test courses. For safety, it also clears the db before inserting these test courses, just like an auto-flushing toilet would. Two flushes: once before you start using it, and once after you're done.
-
-**NOTE:** This replicates the base environment of `dev`, not `prod`. So, unit tests running fine doesn't guarantee that the project will run fine in prod. It is better to sanity check this separately. This failure to replicate the `prod` env is due to how `ts-jest` runs tests for TypeScript files. (It transforms .ts files instead of transpiling them using some tool like Babel). The `prod` base environment assumes a kind of two-staged "build and then run" build, which is not possible because of `ts-jest`.
-
-#### Containers in the `testing` profile
-
-- db-testing
-- backend-testing
-
-**NOTE:** This `db-testing` container is NOT THE SAME as the one used in `prod`, `dev` and `ingestion`
 
 ### Ingestion
 

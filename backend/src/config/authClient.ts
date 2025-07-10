@@ -1,20 +1,17 @@
-import { type BaseClient, Issuer } from "openid-client";
+import * as client from "openid-client";
 import { env } from "./server.js";
 
-let client: BaseClient | null = null;
+let config: client.Configuration | null = null;
 
 // initializes and returns the google oauth client
-export async function getClient() {
-  if (!client) {
-    const googleIssuer = await Issuer.discover("https://accounts.google.com");
-
-    client = new googleIssuer.Client({
-      client_id: env.GOOGLE_CLIENT_ID,
-      client_secret: env.GOOGLE_CLIENT_SECRET,
-      redirect_uris: [`${env.BACKEND_URL}/auth/callback`],
-      response_types: ["code"],
-    });
+export async function getConfig() {
+  if (!config) {
+    config = await client.discovery(
+      new URL("https://accounts.google.com"),
+      env.GOOGLE_CLIENT_ID,
+      env.GOOGLE_CLIENT_SECRET,
+    );
   }
 
-  return client;
+  return config;
 }

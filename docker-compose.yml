@@ -19,22 +19,6 @@ services:
       - "prod"
       - "ingestion"
 
-  db-testing:
-    image: "postgres:15.3-bookworm"
-    env_file:
-      - .env.testing
-    ports:
-      - "${PGPORT}:${PGPORT}"
-    volumes:
-      - ./backend/data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB}"]
-      interval: 10s
-      timeout: 30s
-      retries: 3
-    profiles:
-      - "testing"
-
   backend-dev:
     build:
       context: ./
@@ -86,24 +70,6 @@ services:
     profiles:
       - "ingestion"
 
-  backend-testing:
-    command: ["pnpm", "jest", "--runInBand", "--verbose"]
-    build:
-      context: ./
-      dockerfile: ./backend/docker/dev/Dockerfile
-    env_file:
-      - .env.testing
-    depends_on:
-      db-testing:
-        condition: service_healthy
-    volumes:
-      - ./backend/src:/usr/local/app/src
-      - ./backend/tsconfig.json:/usr/local/app/tsconfig.json
-      - ./backend/jest.config.js:/usr/local/app/jest.config.js
-    tty: true
-    profiles:
-      - "testing"
-
   frontend-dev:
     init: true
     build:
@@ -116,7 +82,11 @@ services:
         source: ./frontend
         target: /usr/local/app/frontend
       - type: volume
+        target: /usr/local/app/node_modules
+      - type: volume
         target: /usr/local/app/frontend/node_modules
+      - type: volume
+        target: /usr/local/app/lib/node_modules
       - type: bind
         source: ./frontend/vite.config.ts
         target: /usr/local/app/frontend/vite.config.ts

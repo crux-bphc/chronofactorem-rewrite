@@ -7,7 +7,7 @@ import {
 import axios, { AxiosError } from "axios";
 import { ArrowLeft, Bird, ChevronRight, HelpCircle } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useDebounce } from "usehooks-ts";
+import { useDebounceValue } from "usehooks-ts";
 import type { z } from "zod";
 import type {
   courseType,
@@ -168,7 +168,7 @@ export function SideMenu({
   };
 
   const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
+  const [debouncedSearchTerm, _] = useDebounceValue<string>(searchTerm, 500);
   const courseSearchResults = useMemo(
     () =>
       (debouncedSearchTerm === ""

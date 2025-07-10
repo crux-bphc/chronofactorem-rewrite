@@ -16,13 +16,13 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20.14.0
+          node-version: 22.17.0
 
       - uses: pnpm/action-setup@v2
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 8.13.1
+          version: 10.13.1
           run_install: false
 
       - name: Get pnpm store directory
@@ -40,24 +40,16 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install lib dependencies
-        run: pnpm install --prod
-        working-directory: "./lib"
+        run: pnpm install -r --prod
+        working-directory: "."
 
       - name: Build lib
         run: pnpm tsc --build
         working-directory: "./lib"
 
-      - name: Install backend dependencies
-        run: pnpm install --prod
-        working-directory: "./backend"
-
       - name: Build backend
         run: pnpm tsc --build
         working-directory: "./backend"
-
-      - name: Install frontend dependencies
-        run: pnpm install --prod
-        working-directory: "./frontend"
 
       - name: Build frontend
         run: pnpm run build

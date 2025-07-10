@@ -5,6 +5,10 @@ import type { Course, Timetable } from "../entity/entities.js";
 import { userRepository } from "../repositories/userRepository.js";
 import sqids from "./sqids.js";
 
+interface SearchError {
+  error: unknown;
+}
+
 export const addTimetable = async (
   timetable: Timetable,
   authorEmail: string | null,
@@ -37,7 +41,7 @@ export const addTimetable = async (
     if (!res.ok) {
       const resJson = await res.json();
       logger.error(
-        `Error while adding timetable ${timetable.id} to search service: ${resJson.error}`,
+        `Error while adding timetable ${timetable.id} to search service: ${(resJson as SearchError).error}`,
       );
     }
   } catch (err: any) {
@@ -67,7 +71,7 @@ export const removeTimetable = async (
     if (!res.ok) {
       const resJson = await res.json();
       logger.error(
-        `Error while removing timetable ${timetableId} from search service: ${resJson.error}`,
+        `Error while removing timetable ${timetableId} from search service: ${(resJson as SearchError).error}`,
       );
     }
   } catch (err: any) {
@@ -93,7 +97,7 @@ export const addCourse = async (course: Course, logger: Logger | Console) => {
     if (!res.ok) {
       const resJson = await res.json();
       logger.error(
-        `Error while adding course ${course.id} to search service: ${resJson.error}`,
+        `Error while adding course ${course.id} to search service: ${(resJson as SearchError).error}`,
       );
     }
   } catch (err: any) {
@@ -122,7 +126,7 @@ export const removeCourse = async (
     if (!res.ok) {
       const resJson = await res.json();
       logger.error(
-        `Error while removing course ${courseId} from search service: ${resJson.error}`,
+        `Error while removing course ${courseId} from search service: ${(resJson as SearchError).error}`,
       );
     }
   } catch (err: any) {
