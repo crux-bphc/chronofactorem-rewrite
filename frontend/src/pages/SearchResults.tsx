@@ -12,18 +12,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { timetableWithSectionsType } from "../../lib/src";
-import authenticatedRoute from "./AuthenticatedRoute";
+import type { timetableWithSectionsType } from "../../../lib/src";
+import authenticatedRoute from "../AuthenticatedRoute";
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
   PaginationNext,
   PaginationPrevious,
-} from "./components/ui/pagination";
-import { ToastAction } from "./components/ui/toast";
-import { useToast } from "./components/ui/use-toast";
-import { router } from "./main";
+} from "../components/ui/pagination";
+import { ToastAction } from "../components/ui/toast";
+import { useToast } from "../components/ui/use-toast";
+import { router } from "../main";
 
 const fetchSearchDetails = async (
   query: string,

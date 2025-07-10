@@ -15,14 +15,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { timetableWithSectionsType } from "../../lib/src";
-import authenticatedRoute from "./AuthenticatedRoute";
-import { Button } from "./components/ui/button";
-import { Input } from "./components/ui/input";
-import { Label } from "./components/ui/label";
-import { ToastAction } from "./components/ui/toast";
-import { toast, useToast } from "./components/ui/use-toast";
-import { router } from "./main";
+import type { timetableWithSectionsType } from "../../../lib/src";
+import authenticatedRoute from "../AuthenticatedRoute";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { ToastAction } from "../components/ui/toast";
+import { toast, useToast } from "../components/ui/use-toast";
+import { router } from "../main";
 
 const fetchTimetable = async (timetableId: string) => {
   const response = await axios.get<z.infer<typeof timetableWithSectionsType>>(

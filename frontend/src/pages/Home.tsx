@@ -12,12 +12,12 @@ import { ToastAction } from "@/components/ui/toast";
 import type {
   timetableType,
   userWithTimetablesType,
-} from "../../lib/src/index";
-import authenticatedRoute from "./AuthenticatedRoute";
-import TimetableCard from "./components/TimetableCard";
-import { Button } from "./components/ui/button";
-import { toast, useToast } from "./components/ui/use-toast";
-import { router } from "./main";
+} from "../../../lib/src/index";
+import authenticatedRoute from "../AuthenticatedRoute";
+import TimetableCard from "../components/TimetableCard";
+import { Button } from "../components/ui/button";
+import { toast, useToast } from "../components/ui/use-toast";
+import { router } from "../main";
 
 const fetchUserDetails = async (): Promise<
   z.infer<typeof userWithTimetablesType>
