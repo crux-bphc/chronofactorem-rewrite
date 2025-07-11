@@ -8,6 +8,11 @@ import {
 import { notFound, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { toPng } from "html-to-image";
+import type {
+  courseWithSectionsType,
+  sectionTypeZodEnum,
+  timetableWithSectionsType,
+} from "lib";
 import {
   Copy,
   Download,
@@ -22,13 +27,8 @@ import type { z } from "zod";
 import CDCList from "@/../CDCs.json";
 import { ToastAction } from "@/components/ui/toast";
 import toastHandler from "@/data-access/errors/toastHandler";
-import type {
-  courseType,
-  courseWithSectionsType,
-  sectionTypeZodEnum,
-  timetableWithSectionsType,
-  userWithTimetablesType,
-} from "../../../lib/src/index";
+import useCourses, { courseQueryOptions } from "@/data-access/useCourses";
+import useUser from "@/data-access/useUser";
 import authenticatedRoute from "../AuthenticatedRoute";
 import NotFound from "../components/NotFound";
 import { SideMenu } from "../components/SideMenu";
@@ -83,46 +83,17 @@ const fetchTimetable = async (timetableId: string) => {
   });
 };
 
-const fetchUserDetails = async () => {
-  const response =
-    await axios.get<z.infer<typeof userWithTimetablesType>>("/api/user");
-  return response.data;
-};
-
 const timetableQueryOptions = (timetableId: string) =>
   queryOptions({
     queryKey: ["timetable", timetableId],
     queryFn: () => fetchTimetable(timetableId),
   });
 
-const fetchCourses = async () => {
-  const response = await axios.get<z.infer<typeof courseType>[]>(
-    "/api/course?archived=true",
-    {
-      headers: {
-        "Content-Type": "application/json ",
-      },
-    },
-  );
-  return response.data;
-};
-
-const courseQueryOptions = () =>
-  queryOptions({
-    queryKey: ["courses"],
-    queryFn: () => fetchCourses(),
-  });
-
-const userQueryOptions = queryOptions({
-  queryKey: ["user"],
-  queryFn: () => fetchUserDetails(),
-});
-
 const viewTimetableRoute = new Route({
   getParentRoute: () => authenticatedRoute,
   path: "view/$timetableId",
   beforeLoad: ({ context: { queryClient } }) =>
-    queryClient.ensureQueryData(courseQueryOptions()).catch((error: Error) => {
+    queryClient.ensureQueryData(courseQueryOptions).catch((error: Error) => {
       if (
         error instanceof AxiosError &&
         error.response &&
@@ -174,8 +145,13 @@ function ViewTimetable() {
   const { timetableId } = viewTimetableRoute.useParams();
 
   const timetableQueryResult = useQuery(timetableQueryOptions(timetableId));
-  const courseQueryResult = useQuery(courseQueryOptions());
-  const userQueryResult = useQuery(userQueryOptions);
+  const {
+    data: courses,
+    isError: isCoursesError,
+    isLoading: isCoursesLoading,
+    error: coursesError,
+  } = useCourses();
+  const { data: user, isLoading, isError } = useUser();
   const queryClient = useQueryClient();
   const screenshotContentRef = useRef<HTMLDivElement>(null);
   const [isScreenshotMode, setIsScreenshotMode] = useState(false);
@@ -322,29 +298,23 @@ function ViewTimetable() {
   });
 
   const coursesInTimetable = useMemo(() => {
-    if (
-      courseQueryResult.data === undefined ||
-      timetableQueryResult.data === undefined
-    )
+    if (courses === undefined || timetableQueryResult.data === undefined)
       return [];
 
-    return courseQueryResult.data
+    return courses
       .filter((e) =>
         timetableQueryResult.data?.sections
           .map((x) => x.courseId)
           .includes(e.id),
       )
       .sort();
-  }, [courseQueryResult.data, timetableQueryResult.data]);
+  }, [courses, timetableQueryResult.data]);
 
   const cdcs = useMemo(() => {
     let cdcs: string[];
     const coursesList = [];
 
-    if (
-      timetableQueryResult.data === undefined ||
-      courseQueryResult.data === undefined
-    )
+    if (timetableQueryResult.data === undefined || courses === undefined)
       return [];
 
     const degree = (
@@ -369,9 +339,7 @@ function ViewTimetable() {
         for (let j = 0; j < depts.split("/").length; j++) {
           options.push(`${depts.split("/")[j]} ${codes.split("/")[j]}`);
         }
-        const matchedCourses = courseQueryResult.data.filter((e) =>
-          options.includes(e.code),
-        );
+        const matchedCourses = courses.filter((e) => options.includes(e.code));
         if (matchedCourses.length < options.length) {
           coursesList.push({
             id: null,
@@ -386,9 +354,7 @@ function ViewTimetable() {
           });
         }
       } else {
-        const matchedCourses = courseQueryResult.data.filter(
-          (e) => e.code === cdcs[i],
-        );
+        const matchedCourses = courses.filter((e) => e.code === cdcs[i]);
         if (matchedCourses.length === 1) {
           coursesList.push(matchedCourses[0]);
         } else {
@@ -402,7 +368,7 @@ function ViewTimetable() {
     }
 
     return coursesList;
-  }, [timetableQueryResult, courseQueryResult]);
+  }, [timetableQueryResult, courses]);
 
   const [currentCourseID, setCurrentCourseID] = useState<string | null>(null);
   const currentCourseQueryResult = useQuery({
@@ -467,32 +433,20 @@ function ViewTimetable() {
     [currentCourseID],
   );
 
-  if (courseQueryResult.isFetching) {
+  if (isCoursesLoading || isLoading) {
     return <span>Loading...</span>;
   }
 
-  if (courseQueryResult.isError || courseQueryResult.data === undefined) {
+  if (isCoursesError || courses === undefined) {
     return (
       <span>
         Unexpected error:{" "}
         {JSON.stringify(
-          courseQueryResult.error
-            ? courseQueryResult.error.message
+          coursesError
+            ? coursesError.message
             : "course query result is undefined",
         )}{" "}
         Please report this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          <span className="text-blue-700 dark:text-blue-400">here</span>
-        </a>
-      </span>
-    );
-  }
-
-  if (courseQueryResult.data === undefined) {
-    return (
-      <span>
-        Unexpected error: courseQueryResult.data is undefined. Please report
-        this{" "}
         <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
           <span className="text-blue-700 dark:text-blue-400">here</span>
         </a>
@@ -533,7 +487,7 @@ function ViewTimetable() {
     );
   }
 
-  if (userQueryResult.data === undefined) {
+  if (isError || user === undefined) {
     return (
       <span>
         Unexpected error: timetableQueryResult.data is undefined. Please report
@@ -554,7 +508,6 @@ function ViewTimetable() {
     number: number;
     instructors: string[];
   }[] = [];
-  const courses = courseQueryResult.data;
   const timetable = timetableQueryResult.data;
 
   for (let i = 0; i < timetable.sections.length; i++) {
@@ -634,8 +587,7 @@ function ViewTimetable() {
                     </TooltipContent>
                   </Tooltip>
                 )}
-                {userQueryResult.data.id ===
-                  timetableQueryResult.data.authorId && (
+                {user.id === timetableQueryResult.data.authorId && (
                   <Tooltip>
                     <TooltipTrigger
                       className={
@@ -698,8 +650,7 @@ function ViewTimetable() {
                     </p>
                   </TooltipContent>
                 </Tooltip>
-                {userQueryResult.data.id ===
-                  timetableQueryResult.data.authorId && (
+                {user.id === timetableQueryResult.data.authorId && (
                   <AlertDialog>
                     <Tooltip>
                       <AlertDialogTrigger asChild>

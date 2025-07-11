@@ -5,17 +5,17 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
-import { ArrowLeft, Bird, ChevronRight, HelpCircle } from "lucide-react";
-import { useMemo, useState } from "react";
-import { useDebounceValue } from "usehooks-ts";
-import type { z } from "zod";
 import type {
   courseType,
   courseWithSectionsType,
   sectionTypeList,
   sectionTypeZodEnum,
   timetableWithSectionsType,
-} from "../../../lib/src";
+} from "lib";
+import { ArrowLeft, Bird, ChevronRight, HelpCircle } from "lucide-react";
+import { useMemo, useState } from "react";
+import { useDebounceValue } from "usehooks-ts";
+import type { z } from "zod";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";

@@ -7,6 +7,11 @@ import {
 } from "@tanstack/react-query";
 import { notFound, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
+import type {
+  courseWithSectionsType,
+  sectionTypeZodEnum,
+  timetableWithSectionsType,
+} from "lib";
 import {
   AlertOctagon,
   AlertTriangle,
@@ -28,13 +33,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import toastHandler from "@/data-access/errors/toastHandler";
-import type {
-  courseType,
-  courseWithSectionsType,
-  sectionTypeZodEnum,
-  timetableWithSectionsType,
-} from "../../../lib/src";
-import type { userWithTimetablesType } from "../../../lib/src/index";
+import useCourses, { courseQueryOptions } from "@/data-access/useCourses";
+import useUser from "@/data-access/useUser";
 import authenticatedRoute from "../AuthenticatedRoute";
 import NotFound from "../components/NotFound";
 import { SideMenu } from "../components/SideMenu";
@@ -89,40 +89,11 @@ const timetableQueryOptions = (timetableId: string) =>
     queryFn: () => fetchTimetable(timetableId),
   });
 
-const fetchUserDetails = async () => {
-  const response =
-    await axios.get<z.infer<typeof userWithTimetablesType>>("/api/user");
-  return response.data;
-};
-
-const userQueryOptions = queryOptions({
-  queryKey: ["user"],
-  queryFn: () => fetchUserDetails(),
-});
-
-const fetchCourses = async () => {
-  const response = await axios.get<z.infer<typeof courseType>[]>(
-    "/api/course",
-    {
-      headers: {
-        "Content-Type": "application/json ",
-      },
-    },
-  );
-  return response.data;
-};
-
-const courseQueryOptions = () =>
-  queryOptions({
-    queryKey: ["courses"],
-    queryFn: () => fetchCourses(),
-  });
-
 const editTimetableRoute = new Route({
   getParentRoute: () => authenticatedRoute,
   path: "edit/$timetableId",
   beforeLoad: ({ context: { queryClient } }) =>
-    queryClient.ensureQueryData(courseQueryOptions()).catch((error: Error) => {
+    queryClient.ensureQueryData(courseQueryOptions).catch((error: Error) => {
       if (
         error instanceof AxiosError &&
         error.response &&
@@ -174,8 +145,17 @@ function EditTimetable() {
   const { timetableId } = editTimetableRoute.useParams();
 
   const timetableQueryResult = useQuery(timetableQueryOptions(timetableId));
-  const courseQueryResult = useQuery(courseQueryOptions());
-  const userQueryResult = useQuery(userQueryOptions);
+  const {
+    data: user,
+    isLoading: isUserLoading,
+    isError: isUserError,
+  } = useUser();
+  const {
+    data: courses,
+    isError: isCoursesError,
+    isLoading: isCoursesLoading,
+    error: coursesError,
+  } = useCourses();
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
@@ -246,29 +226,23 @@ function EditTimetable() {
   });
 
   const coursesInTimetable = useMemo(() => {
-    if (
-      courseQueryResult.data === undefined ||
-      timetableQueryResult.data === undefined
-    )
+    if (courses === undefined || timetableQueryResult.data === undefined)
       return [];
 
-    return courseQueryResult.data
+    return courses
       .filter((e) =>
         timetableQueryResult.data?.sections
           .map((x) => x.courseId)
           .includes(e.id),
       )
       .sort();
-  }, [courseQueryResult.data, timetableQueryResult.data]);
+  }, [courses, timetableQueryResult.data]);
 
   const cdcs = useMemo(() => {
     let cdcs: string[];
     const coursesList = [];
 
-    if (
-      timetableQueryResult.data === undefined ||
-      courseQueryResult.data === undefined
-    )
+    if (timetableQueryResult.data === undefined || courses === undefined)
       return [];
 
     const degree = (
@@ -293,9 +267,7 @@ function EditTimetable() {
         for (let j = 0; j < depts.split("/").length; j++) {
           options.push(`${depts.split("/")[j]} ${codes.split("/")[j]}`);
         }
-        const matchedCourses = courseQueryResult.data.filter((e) =>
-          options.includes(e.code),
-        );
+        const matchedCourses = courses.filter((e) => options.includes(e.code));
         if (matchedCourses.length < options.length) {
           coursesList.push({
             id: null,
@@ -310,9 +282,7 @@ function EditTimetable() {
           });
         }
       } else {
-        const matchedCourses = courseQueryResult.data.filter(
-          (e) => e.code === cdcs[i],
-        );
+        const matchedCourses = courses.filter((e) => e.code === cdcs[i]);
         if (matchedCourses.length === 1) {
           coursesList.push(matchedCourses[0]);
         } else {
@@ -326,7 +296,7 @@ function EditTimetable() {
     }
 
     return coursesList;
-  }, [timetableQueryResult, courseQueryResult]);
+  }, [timetableQueryResult, courses]);
 
   const cdcNotFoundWarning = useMemo(
     () =>
@@ -475,32 +445,20 @@ function EditTimetable() {
     }
   };
 
-  if (courseQueryResult.isFetching) {
+  if (isCoursesLoading || isUserLoading) {
     return <span>Loading...</span>;
   }
 
-  if (courseQueryResult.isError || courseQueryResult.data === undefined) {
+  if (isCoursesError || courses === undefined) {
     return (
       <span>
         Unexpected error:{" "}
         {JSON.stringify(
-          courseQueryResult.error
-            ? courseQueryResult.error.message
+          coursesError
+            ? coursesError.message
             : "course query result is undefined",
         )}{" "}
         Please report this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          <span className="text-blue-700 dark:text-blue-400">here</span>
-        </a>
-      </span>
-    );
-  }
-
-  if (courseQueryResult.data === undefined) {
-    return (
-      <span>
-        Unexpected error: courseQueryResult.data is undefined. Please report
-        this{" "}
         <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
           <span className="text-blue-700 dark:text-blue-400">here</span>
         </a>
@@ -541,7 +499,7 @@ function EditTimetable() {
     );
   }
 
-  if (userQueryResult.data === undefined) {
+  if (isUserError || user === undefined) {
     return (
       <span>
         Unexpected error: timetableQueryResult.data is undefined. Please report
@@ -553,7 +511,7 @@ function EditTimetable() {
     );
   }
 
-  if (userQueryResult.data.id !== timetableQueryResult.data.authorId) {
+  if (user.id !== timetableQueryResult.data.authorId) {
     toast({
       title: "Error",
       description: "You are not authorized to edit this timetable",
@@ -573,7 +531,6 @@ function EditTimetable() {
     number: number;
     instructors: string[];
   }[] = [];
-  const courses = courseQueryResult.data;
   const timetable = timetableQueryResult.data;
 
   for (let i = 0; i < timetable.sections.length; i++) {
@@ -735,8 +692,7 @@ function EditTimetable() {
                     </p>
                   </TooltipContent>
                 </Tooltip>
-                {userQueryResult.data.id ===
-                  timetableQueryResult.data.authorId && (
+                {user.id === timetableQueryResult.data.authorId && (
                   <AlertDialog>
                     <Tooltip>
                       <AlertDialogTrigger asChild>

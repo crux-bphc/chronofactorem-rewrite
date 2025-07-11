@@ -1,9 +1,6 @@
 import { DialogTrigger } from "@radix-ui/react-dialog";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { Megaphone } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { z } from "zod";
 import {
   Dialog,
   DialogContent,
@@ -12,26 +9,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import type { announcementWithIDType } from "../../../lib/src";
+import useAnnouncements from "@/data-access/useAnnouncements";
+import Spinner from "./Spinner";
 import { Button } from "./ui/button";
 
-const fetchAnnouncements = async (): Promise<
-  z.infer<typeof announcementWithIDType>[]
-> => {
-  const response = await axios.get<z.infer<typeof announcementWithIDType>[]>(
-    "/api/user/announcements",
-  );
-  return response.data;
-};
-
 function Announcements() {
-  const { data: announcements } = useQuery({
-    queryKey: ["announcements"],
-    queryFn: fetchAnnouncements,
-  });
-
   const { toast } = useToast();
-
+  const { data: announcements, isLoading, isError, error } = useAnnouncements();
   const [readAnnouncements, setReadAnnouncements] = useState<string[]>(() => {
     const storedReadAnnouncements = localStorage.getItem("readAnnouncements");
     return storedReadAnnouncements ? JSON.parse(storedReadAnnouncements) : [];
@@ -75,6 +59,16 @@ function Announcements() {
           <DialogTitle className="text-xl -mt-1">Announcements</DialogTitle>
         </DialogHeader>
         <DialogDescription asChild>
+          {isLoading && <Spinner />}
+          {isError && (
+            <span>
+              Unexpected error: {JSON.stringify(error.message)} Please report
+              this{" "}
+              <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
+                here
+              </a>
+            </span>
+          )}
           <div className="flex flex-col-reverse mx-3 mt-1 gap-3 divide-y divide-y-reverse">
             {Array.isArray(announcements) && announcements?.length ? (
               announcements

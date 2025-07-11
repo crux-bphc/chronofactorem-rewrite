@@ -1,7 +1,7 @@
 import { AxiosError } from "axios";
 import { router } from "@/main";
 
-const handleLoginRedirect = (error: Error) => {
+const handleLoginRedirect = (error: unknown) => {
   if (
     error instanceof AxiosError &&
     error.response &&

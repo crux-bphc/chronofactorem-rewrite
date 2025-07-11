@@ -1,7 +1,7 @@
-import { queryOptions } from "@tanstack/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import type { timetableType, userWithTimetablesType } from "lib";
 import type z from "zod";
-import type { timetableType, userWithTimetablesType } from "../../../lib/src";
 
 type Timetable = z.infer<typeof timetableType>;
 const filterTimetables = (timetables: Timetable[]) => {
@@ -44,7 +44,7 @@ const fetchUserDetails = async (): Promise<
   return response.data;
 };
 
-const userQueryOptions = queryOptions({
+export const userQueryOptions = queryOptions({
   queryKey: ["user"],
   queryFn: () => fetchUserDetails(),
   select: (data) => {
@@ -52,4 +52,6 @@ const userQueryOptions = queryOptions({
   },
 });
 
-export default userQueryOptions;
+const useUser = () => useQuery(userQueryOptions);
+
+export default useUser;

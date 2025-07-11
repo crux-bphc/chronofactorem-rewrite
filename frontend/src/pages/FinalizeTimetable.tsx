@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
+import type { timetableWithSectionsType } from "lib";
 import { Clipboard, ClipboardCheck, Globe, Lock } from "lucide-react";
 import { useRef, useState } from "react";
 import type { z } from "zod";
@@ -16,7 +17,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import toastHandler from "@/data-access/errors/toastHandler";
-import type { timetableWithSectionsType } from "../../../lib/src";
 import authenticatedRoute from "../AuthenticatedRoute";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";

@@ -1,6 +1,7 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
+import type { timetableWithSectionsType } from "lib";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import type { z } from "zod";
@@ -13,7 +14,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import toastHandler from "@/data-access/errors/toastHandler";
-import type { timetableWithSectionsType } from "../../../lib/src";
 import authenticatedRoute from "../AuthenticatedRoute";
 import {
   Pagination,

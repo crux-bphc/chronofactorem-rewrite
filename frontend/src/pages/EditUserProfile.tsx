@@ -1,6 +1,7 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Route } from "@tanstack/react-router";
 import axios from "axios";
+import { getBatchFromEmail } from "lib";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,8 +15,7 @@ import {
 } from "@/components/ui/select";
 import handleLoginRedirect from "@/data-access/errors/redirectToLogin";
 import toastHandler from "@/data-access/errors/toastHandler";
-import userQueryOptions from "@/data-access/fetchUserDetails";
-import { getBatchFromEmail } from "../../../lib/src/index";
+import useUser, { userQueryOptions } from "@/data-access/useUser";
 import authenticatedRoute from "../AuthenticatedRoute";
 import { useToast } from "../components/ui/use-toast";
 import { router } from "../main";
@@ -23,11 +23,14 @@ import { router } from "../main";
 const editUserProfileRoute = new Route({
   getParentRoute: () => authenticatedRoute,
   path: "editProfile",
-  loader: ({ context: { queryClient } }) =>
-    queryClient.ensureQueryData(userQueryOptions).catch((error) => {
+  loader: async ({ context: { queryClient } }) => {
+    try {
+      return await queryClient.ensureQueryData(userQueryOptions);
+    } catch (error: unknown) {
       handleLoginRedirect(error);
       throw error;
-    }),
+    }
+  },
   component: EditUserProfile,
   errorComponent: ({ error }) => {
     const { toast } = useToast();
@@ -36,17 +39,13 @@ const editUserProfileRoute = new Route({
 });
 
 function EditUserProfile() {
-  const userQueryResult = useQuery(userQueryOptions);
+  const { data: user, isLoading, isError, error } = useUser();
 
   const [firstDegree, setFirstDegree] = useState<string | null>(
-    userQueryResult.data?.degrees?.[0] ?? null,
+    user?.degrees?.[0] ?? null,
   );
   const [secondDegree, setSecondDegree] = useState<string | null>(
-    userQueryResult.data
-      ? userQueryResult.data.degrees.length > 1
-        ? userQueryResult.data.degrees[1]
-        : null
-      : null,
+    user ? (user.degrees.length > 1 ? user.degrees[1] : null) : null,
   );
 
   const { toast } = useToast();
@@ -63,22 +62,16 @@ function EditUserProfile() {
     onError: (error) => toastHandler(error, toast),
   });
 
-  if (userQueryResult.isFetching) {
+  if (isLoading) {
     return <span>Loading...</span>;
   }
 
-  if (
-    userQueryResult.isError ||
-    userQueryResult.data === undefined ||
-    firstDegree === null
-  ) {
+  if (isError || user === undefined || firstDegree === null) {
     return (
       <span>
         Unexpected error:{" "}
         {JSON.stringify(
-          userQueryResult.error
-            ? userQueryResult.error.message
-            : "user query result is undefined",
+          error ? error.message : "user query result is undefined",
         )}{" "}
         Please report this{" "}
         <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
@@ -88,7 +81,7 @@ function EditUserProfile() {
     );
   }
 
-  const batch = getBatchFromEmail(userQueryResult.data.email);
+  const batch = getBatchFromEmail(user.email);
 
   const handleSubmit = async () => {
     if (firstDegree.includes("B") && secondDegree === null) {
@@ -107,17 +100,6 @@ function EditUserProfile() {
     mutation.mutate({ degrees });
   };
 
-  if (userQueryResult.data === undefined) {
-    return (
-      <span>
-        Unexpected error: userQueryResult.data is undefined. Please report this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          <span className="text-blue-700 dark:text-blue-400">here</span>
-        </a>
-      </span>
-    );
-  }
-
   return (
     <>
       <div className="flex flex-col lg:pt-28 pt-20 lg:mx-60 mx-12">
@@ -125,13 +107,13 @@ function EditUserProfile() {
           Edit User Profile
         </h1>
         <div className="rounded-full text-foreground bg-accent lg:text-6xl text-4xl lg:h-28 lg:w-28 h-20 w-20 flex justify-center items-center">
-          <span>{userQueryResult.data.name[0]}</span>
+          <span>{user.name[0]}</span>
         </div>
         <h3 className="scroll-m-20 text-xl tracking-tight lg:text-2xl text-foreground font-bold lg:mt-4 mt-2">
-          {userQueryResult.data.name}
+          {user.name}
         </h3>
         <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-foreground">
-          {userQueryResult.data.email}
+          {user.email}
         </h5>
         <div className="flex">
           <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-foregroun mt-4 mb-4 font-bold">

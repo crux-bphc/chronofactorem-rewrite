@@ -2,6 +2,7 @@ import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import axios from "axios";
+import type { timetableType } from "lib";
 import { Edit2, Eye, EyeOff, Trash } from "lucide-react";
 import { useState } from "react";
 import type { z } from "zod";
@@ -33,7 +34,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import toastHandler from "@/data-access/errors/toastHandler";
-import type { timetableType } from "../../../lib/src/index";
 import { router } from "../main";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";

@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
+import { collegeYearType } from "lib";
 import { useState } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -15,8 +16,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import toastHandler from "@/data-access/errors/toastHandler";
-import userQueryOptions from "@/data-access/fetchUserDetails";
-import { collegeYearType } from "../../../lib/src/index";
+import { userQueryOptions } from "@/data-access/useUser";
 import { rootRoute, router } from "../main";
 
 /*

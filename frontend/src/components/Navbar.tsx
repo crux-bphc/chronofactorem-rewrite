@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link, useRouter } from "@tanstack/react-router";
 import { Info, LogOut, Pencil, Plus, Search } from "lucide-react";
 import { useCookies } from "react-cookie";
@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
 import toastHandler from "@/data-access/errors/toastHandler";
-import userQueryOptions from "@/data-access/fetchUserDetails";
 import useCreateTimetable from "@/data-access/useCreateTimetable";
+import useUser from "@/data-access/useUser";
 import { router } from "../main";
 import Announcements from "./Announcements";
 import { ModeToggle } from "./ModeToggle";
@@ -27,7 +27,7 @@ export function NavBar() {
     stateRouter.state.resolvedLocation?.pathname.includes("/finalize/");
 
   const [_cookies, _setCookie, removeCookie] = useCookies(["session"]);
-  const userQueryResult = useQuery(userQueryOptions);
+  const { data: user, error, isError, isFetching } = useUser();
   const { toast } = useToast();
   const { mutate: createTimetable } = useCreateTimetable();
   const queryClient = useQueryClient();
@@ -47,9 +47,7 @@ export function NavBar() {
     </>
   );
 
-  const renderNavbarBasedOnQueryFetch = (
-    userQueryResultData: typeof userQueryResult.data,
-  ) => (
+  const renderNavbarBasedOnQueryFetch = (userQueryResultData: typeof user) => (
     <div className="flex flex-row w-full justify-between shadow-lg">
       <div className="flex items-center">
         {userQueryResultData ? (
@@ -159,21 +157,20 @@ export function NavBar() {
       </div>
     </div>
   );
-  if (userQueryResult.isFetching) {
+  if (isFetching) {
     return renderNavbarBasedOnQueryFetch(undefined);
   }
-  if (userQueryResult.isError) {
+  if (isError) {
     return (
       <span>
-        Unexpected error: {JSON.stringify(userQueryResult.error.message)} Please
-        report this{" "}
+        Unexpected error: {JSON.stringify(error.message)} Please report this{" "}
         <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
           here
         </a>
       </span>
     );
   }
-  if (userQueryResult.data === undefined) {
+  if (user === undefined) {
     return (
       <span>
         Unexpected error: userQueryResult.data is undefined. Please report this{" "}
@@ -183,5 +180,5 @@ export function NavBar() {
       </span>
     );
   }
-  return renderNavbarBasedOnQueryFetch(userQueryResult.data);
+  return renderNavbarBasedOnQueryFetch(user);
 }
