@@ -121,7 +121,7 @@ export function NavBar() {
           <DropdownMenuTrigger asChild>
             <div className="rounded-full text-foreground bg-accent p-1 px-3 text-xl h-fit lg:mx-8 mx-2 mt-4">
               <span>
-                {userQueryResultData ? userQueryResultData.name[0] : " "}
+                {userQueryResultData ? userQueryResultData.name[0] : "?"}
               </span>
             </div>
           </DropdownMenuTrigger>
