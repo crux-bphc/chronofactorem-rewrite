@@ -1,23 +1,15 @@
-import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Route } from "@tanstack/react-router";
 import axios from "axios";
 import { toPng } from "html-to-image";
 import type { courseWithSectionsType, sectionTypeZodEnum } from "lib";
-import {
-  Copy,
-  Download,
-  Edit2,
-  GripHorizontal,
-  GripVertical,
-  Menu,
-  Trash,
-} from "lucide-react";
+import { Menu } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { z } from "zod";
 import CDCList from "@/../CDCs.json";
 import ReportIssue from "@/components/ReportIssue";
 import ReportIssueToastAction from "@/components/ReportIssueToastAction";
+import TimetableHeader from "@/components/TimetableHeader";
 import handleNotFound from "@/data-access/errors/handleNotFound";
 import handleLoginRedirect from "@/data-access/errors/redirectToLogin";
 import toastHandler from "@/data-access/errors/toastHandler";
@@ -31,31 +23,14 @@ import NotFound from "../components/NotFound";
 import { SideMenu } from "../components/SideMenu";
 import Spinner from "../components/Spinner";
 import { TimetableGrid } from "../components/TimetableGrid";
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "../components/ui/alert-dialog";
-import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "../components/ui/popover";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../components/ui/tooltip";
+import { TooltipProvider } from "../components/ui/tooltip";
 import { toast, useToast } from "../components/ui/use-toast";
-import { router } from "../main";
 
 const viewTimetableRoute = new Route({
   getParentRoute: () => authenticatedRoute,
@@ -105,7 +80,6 @@ function ViewTimetable() {
     isError: isUserError,
     error: userError,
   } = useUser();
-  const queryClient = useQueryClient();
   const screenshotContentRef = useRef<HTMLDivElement>(null);
   const [isScreenshotMode, setIsScreenshotMode] = useState(false);
   const [screenIsLarge, setScreenIsLarge] = useState(
@@ -117,48 +91,6 @@ function ViewTimetable() {
       .matchMedia("(min-width: 1024px)")
       .addEventListener("change", (e) => setScreenIsLarge(e.matches));
   }, []);
-
-  const deleteMutation = useMutation({
-    mutationFn: () => {
-      return axios.post(`/api/timetable/${timetableId}/delete`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-      router.navigate({ to: "/" });
-    },
-    onError: (error) => toastHandler(error, toast),
-  });
-
-  const copyMutation = useMutation({
-    mutationFn: () => {
-      return axios.post<{ message: string; id: string }>(
-        `/api/timetable/${timetableId}/copy`,
-      );
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-      router.navigate({
-        to: "/edit/$timetableId",
-        params: { timetableId: data.data.id },
-      });
-    },
-    onError: (error) => toastHandler(error, toast),
-  });
-
-  const editMutation = useMutation({
-    mutationFn: (body: {
-      name: string;
-      isPrivate: boolean;
-      isDraft: boolean;
-    }) => {
-      return axios.post(`/api/timetable/${timetableId}/edit`, body);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-      router.navigate({ to: "/edit/$timetableId", params: { timetableId } });
-    },
-    onError: (error) => toastHandler(error, toast),
-  });
 
   const generateScreenshot = useCallback(() => {
     const screenShotContent = screenshotContentRef.current;
@@ -203,46 +135,6 @@ function ViewTimetable() {
         });
       });
   }, [isVertical, screenIsLarge]);
-
-  const addSectionMutation = useMutation({
-    mutationFn: async (body: { sectionId: string }) => {
-      const result = await axios.post(
-        `/api/timetable/${timetable?.id}/add`,
-        body,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      return result.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["timetable"] });
-    },
-    onError: (error) => toastHandler(error, toast),
-  });
-
-  const removeSectionMutation = useMutation({
-    mutationFn: async (body: { sectionId: string }) => {
-      const result = await axios.post(
-        `/api/timetable/${timetable?.id}/remove`,
-        body,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      return result.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["timetable"] });
-    },
-    onError: (error) => toastHandler(error, toast),
-  });
 
   const coursesInTimetable = useMemo(() => {
     if (courses === undefined || timetable === undefined) return [];
@@ -369,11 +261,6 @@ function ViewTimetable() {
 
   const [currentTab, setCurrentTab] = useState("currentCourses");
 
-  const isOnCourseDetails = useMemo(
-    () => currentCourseID !== null,
-    [currentCourseID],
-  );
-
   if (isCoursesLoading || isUserLoading) {
     return <span>Loading...</span>;
   }
@@ -442,190 +329,48 @@ function ViewTimetable() {
     }
   }
 
+  const SideBar = (
+    <SideMenu
+      timetable={timetable}
+      isOnEditPage={false}
+      allCoursesDetails={courses}
+      cdcs={cdcs}
+      setCurrentCourseID={setCurrentCourseID}
+      coursesInTimetable={coursesInTimetable}
+      currentTab={currentTab}
+      setCurrentTab={setCurrentTab}
+      isScreenshotMode={isScreenshotMode}
+    />
+  );
+
   return (
     <>
       {!isSpinner ? (
         <div className="grow h-[calc(100vh-12rem)]">
           <TooltipProvider>
-            <div className="flex justify-between p-4">
-              <span>
-                <p className="font-bold lg:text-3xl text-md sm:text-lg md:text-xl">
-                  {timetable.name}
-                </p>
-                <span className="flex lg:flex-row flex-col lg:items-center justify-normal gap-2">
-                  <Badge variant="default" className="w-fit">
-                    <p className="flex items-center gap-1">
-                      <span>{timetable.acadYear}</span>
-                      <span>|</span>
-                      <span>{timetable.degrees.join("")}</span>
-                      <span>|</span>
-                      <span className="flex-none">{`${timetable.year}-${timetable.semester}`}</span>
-                    </p>
-                  </Badge>
-                  <span className="lg:text-md md:text-sm text-xs text-muted-foreground">
-                    <p className="font-bold inline">Last Updated: </p>
-                    <p className="inline">
-                      {new Date(timetable.lastUpdated).toLocaleString()}
-                    </p>
-                  </span>
-                </span>
-              </span>
-              <span className="flex justify-center items-center gap-2">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      onClick={generateScreenshot}
-                      className="flex justify-between items-center gap-2 md:text-md text-sm"
-                    >
-                      <Download className="w-5 h-5 md:w-6 md:h-6" />
-                      PNG
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Download timetable as image</p>
-                  </TooltipContent>
-                </Tooltip>
-                {screenIsLarge && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="rounded-full p-3"
-                        onClick={() => setIsVertical(!isVertical)}
-                      >
-                        {isVertical ? <GripVertical /> : <GripHorizontal />}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>
-                        Make timetable {isVertical ? "horizontal" : "vertical"}
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                )}
-                {user.id === timetable.authorId && (
-                  <Tooltip>
-                    <TooltipTrigger
-                      className={timetable.archived ? "cursor-not-allowed" : ""}
-                    >
-                      <Button
-                        disabled={timetable.archived}
-                        variant="ghost"
-                        className="rounded-full p-3"
-                        onClick={() =>
-                          editMutation.mutate({
-                            isDraft: true,
-                            isPrivate: true,
-                            name: timetable?.name ?? "",
-                          })
-                        }
-                      >
-                        <Edit2 className="w-5 h-5 md:w-6 md:h-6" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>
-                        {timetable.archived
-                          ? "Cannot edit archived timetable"
-                          : "Edit Timetable"}
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                )}
-                <Tooltip>
-                  <TooltipTrigger
-                    className={timetable.archived ? "cursor-not-allowed" : ""}
-                  >
-                    <Button
-                      disabled={timetable.archived}
-                      variant="ghost"
-                      className="rounded-full p-3"
-                      onClick={() => {
-                        setIsSpinner(true);
-                        setTimeout(() => {
-                          copyMutation.mutate();
-                        }, 2000);
-                      }}
-                    >
-                      <Copy className="w-5 h-5 md:w-6 md:h-6" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>
-                      {timetable.archived
-                        ? "Cannot copy archived timetable"
-                        : "Copy Timetable"}
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-                {user.id === timetable.authorId && (
-                  <AlertDialog>
-                    <Tooltip>
-                      <AlertDialogTrigger asChild>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
-                          >
-                            <Trash className="w-5 h-5 md:w-6 md:h-6" />
-                          </Button>
-                        </TooltipTrigger>
-                      </AlertDialogTrigger>
-                      <TooltipContent>
-                        <p>Delete Timetable</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    <AlertDialogContent className="p-8">
-                      <AlertDialogHeader>
-                        <AlertDialogTitle className="text-2xl">
-                          Are you sure?
-                        </AlertDialogTitle>
-                        <AlertDialogDescription className="text-destructive text-lg font-bold">
-                          All your progress on this timetable will be lost, and
-                          unrecoverable.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogPrimitive.Action asChild>
-                          <Button
-                            variant="destructive"
-                            onClick={() => deleteMutation.mutate()}
-                          >
-                            Delete
-                          </Button>
-                        </AlertDialogPrimitive.Action>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
-              </span>
-            </div>
+            <TimetableHeader
+              user={user}
+              courses={courses}
+              timetable={timetable}
+              isOnEditPage={false}
+              screenIsLarge={screenIsLarge}
+              isVertical={isVertical}
+              generateScreenshot={generateScreenshot}
+              setIsVertical={setIsVertical}
+              setIsSpinner={setIsSpinner}
+              cdcs={cdcs}
+              setCurrentCourseID={setCurrentCourseID}
+              coursesInTimetable={coursesInTimetable}
+              setCurrentTab={setCurrentTab}
+              setSectionTypeChangeRequest={setCurrentSectionType}
+            />
             {/* the bg-background here is necessary so the generated image has the background in it */}
             <div
               className="flex flex-row gap-4 bg-background h-full relative"
               ref={screenshotContentRef}
             >
               {screenIsLarge ? (
-                <SideMenu
-                  timetable={timetable}
-                  isOnEditPage={false}
-                  allCoursesDetails={courses}
-                  cdcs={cdcs}
-                  setCurrentCourseID={setCurrentCourseID}
-                  currentCourseDetails={currentCourseQueryResult}
-                  uniqueSectionTypes={uniqueSectionTypes}
-                  currentSectionType={currentSectionType}
-                  setCurrentSectionType={setCurrentSectionType}
-                  addSectionMutation={addSectionMutation}
-                  removeSectionMutation={removeSectionMutation}
-                  coursesInTimetable={coursesInTimetable}
-                  currentTab={currentTab}
-                  setCurrentTab={setCurrentTab}
-                  isOnCourseDetails={isOnCourseDetails}
-                  setSectionTypeChangeRequest={setSectionTypeChangeRequest}
-                  isScreenshotMode={isScreenshotMode}
-                />
+                SideBar
               ) : (
                 <Popover>
                   <PopoverTrigger className="absolute left-2 top-[-1rem]">
@@ -633,27 +378,7 @@ function ViewTimetable() {
                       <Menu />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent>
-                    <SideMenu
-                      timetable={timetable}
-                      isOnEditPage={false}
-                      allCoursesDetails={courses}
-                      cdcs={cdcs}
-                      setCurrentCourseID={setCurrentCourseID}
-                      currentCourseDetails={currentCourseQueryResult}
-                      uniqueSectionTypes={uniqueSectionTypes}
-                      currentSectionType={currentSectionType}
-                      setCurrentSectionType={setCurrentSectionType}
-                      addSectionMutation={addSectionMutation}
-                      removeSectionMutation={removeSectionMutation}
-                      coursesInTimetable={coursesInTimetable}
-                      currentTab={currentTab}
-                      setCurrentTab={setCurrentTab}
-                      isOnCourseDetails={isOnCourseDetails}
-                      setSectionTypeChangeRequest={setSectionTypeChangeRequest}
-                      isScreenshotMode={isScreenshotMode}
-                    />
-                  </PopoverContent>
+                  <PopoverContent>{SideBar}</PopoverContent>
                 </Popover>
               )}
               <TimetableGrid

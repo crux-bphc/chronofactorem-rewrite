@@ -1,0 +1,261 @@
+import {
+  type UseMutationResult,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import axios, { AxiosError } from "axios";
+import type {
+  courseWithSectionsType,
+  sectionTypeList,
+  sectionTypeZodEnum,
+  timetableWithSectionsType,
+} from "lib";
+import { ArrowLeft } from "lucide-react";
+import { useMemo } from "react";
+import type z from "zod";
+import { Button } from "./ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+
+const CourseDetailsMenu = ({
+  timetable,
+  setCurrentCourseID,
+  currentCourse,
+  uniqueSectionTypes,
+  currentSectionType,
+  setCurrentSectionType,
+  addSectionMutation,
+  removeSectionMutation,
+  setSectionTypeChangeRequest,
+}: {
+  timetable: z.infer<typeof timetableWithSectionsType>;
+  setCurrentCourseID: React.Dispatch<React.SetStateAction<string | null>>;
+  currentCourse: z.infer<typeof courseWithSectionsType> | null | undefined;
+  uniqueSectionTypes: sectionTypeList;
+  currentSectionType: z.infer<typeof sectionTypeZodEnum>;
+  setCurrentSectionType: React.Dispatch<
+    React.SetStateAction<z.infer<typeof sectionTypeZodEnum>>
+  >;
+  addSectionMutation: UseMutationResult<
+    unknown,
+    Error,
+    {
+      sectionId: string;
+    },
+    unknown
+  >;
+  removeSectionMutation: UseMutationResult<
+    unknown,
+    Error,
+    {
+      sectionId: string;
+    },
+    unknown
+  >;
+  setSectionTypeChangeRequest: React.Dispatch<
+    React.SetStateAction<"" | "L" | "P" | "T">
+  >;
+}) => {
+  const queryClient = useQueryClient();
+
+  const swapCourseMutation = useMutation({
+    mutationFn: async ({
+      removeId,
+      addId,
+    }: {
+      removeId: string;
+      addId: string;
+    }) => {
+      await axios.post(
+        `/api/timetable/${timetable.id}/remove`,
+        { sectionId: removeId },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      const result2 = await axios.post(
+        `/api/timetable/${timetable.id}/add`,
+        { sectionId: addId },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      return result2.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["timetable", timetable.id] });
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError && error.response) {
+        console.log(error.response.data.message);
+      }
+    },
+  });
+
+  const handleSectionClick = (section: (typeof timetable.sections)[number]) => {
+    if (timetable.sections.find((e) => e.id === section.id)) {
+      removeSectionMutation.mutate({ sectionId: section.id });
+    } else {
+      const other = timetable.sections.find(
+        (e) => e.type === section.type && e.courseId === section.courseId,
+      );
+      if (other !== undefined) {
+        swapCourseMutation.mutate({
+          removeId: other.id,
+          addId: section.id,
+        });
+      } else {
+        addSectionMutation.mutate({ sectionId: section.id });
+        if (
+          uniqueSectionTypes.indexOf(currentSectionType) <
+          uniqueSectionTypes.length - 1
+        ) {
+          setCurrentSectionType(
+            uniqueSectionTypes[
+              uniqueSectionTypes.indexOf(currentSectionType) + 1
+            ],
+          );
+        }
+      }
+    }
+  };
+
+  const timings = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const section of timetable.sections) {
+      for (const roomTime of section.roomTime) {
+        m.set(
+          roomTime.charAt(roomTime.lastIndexOf(":") - 1) +
+            roomTime.substring(roomTime.lastIndexOf(":") + 1),
+          `${section.roomTime[0].substring(
+            0,
+            section.roomTime[0].indexOf(":"),
+          )} ${section.type}${section.number}`,
+        );
+      }
+    }
+    return m;
+  }, [timetable]);
+
+  return (
+    <div className="bg-secondary w-[26rem] h-[calc(100vh-13rem)]">
+      <div className="flex items-center py-2 w-full">
+        <Button
+          variant={"ghost"}
+          className="rounded-full flex ml-2 px-2 mr-2 items-center hover:bg-secondary-foreground/10"
+          onClick={() => {
+            setCurrentCourseID(null);
+          }}
+        >
+          <ArrowLeft />
+        </Button>
+        <span className="font-semibold text-md h-full">
+          {currentCourse?.code}: {` ${currentCourse?.name}`}
+        </span>
+      </div>
+      <Tabs value={currentSectionType} className=" h-[calc(100vh-20rem)]">
+        <TabsList className="w-full mb-2">
+          {uniqueSectionTypes.map((sectionType) => {
+            return (
+              <TabsTrigger
+                value={sectionType}
+                onClick={() => {
+                  setCurrentSectionType(sectionType);
+                  setSectionTypeChangeRequest("");
+                }}
+                key={sectionType}
+                className="text-xl font-bold w-full"
+              >
+                {sectionType}
+              </TabsTrigger>
+            );
+          })}
+        </TabsList>
+
+        {uniqueSectionTypes.map((sectionType) => {
+          return (
+            <TabsContent
+              value={sectionType}
+              className="h-[calc(100vh-20rem)]"
+              key={sectionType}
+            >
+              <div className="flex flex-col gap-2 p-0 m-0 px-2 overflow-y-scroll w-[26rem] h-[calc(100vh-20rem)]">
+                {currentCourse?.sections
+                  .filter((section) => section.type === sectionType)
+                  .map((section) => {
+                    const tm = section.roomTime
+                      .map(
+                        (e) =>
+                          e.charAt(e.lastIndexOf(":") - 1) +
+                          e.substring(e.lastIndexOf(":") + 1),
+                      )
+                      .find((e) => timings.has(e));
+
+                    return {
+                      ...section,
+                      clashing: timings.get(tm ?? ""),
+                    };
+                  })
+                  .map((section, _i) => {
+                    return (
+                      <span
+                        className="w-full relative flex flex-col"
+                        key={section.id}
+                      >
+                        <Button
+                          variant={"secondary"}
+                          className={`flex flex-col w-full h-fit border-slate-300 border-2 dark:border-slate-600/60 ${
+                            timetable.sections.find((e) => e.id === section.id)
+                              ? "dark:bg-slate-700 bg-slate-300 hover:dark:bg-slate-700 hover:bg-slate-300"
+                              : "bg-transparent"
+                          }`}
+                          onClick={() => handleSectionClick(section)}
+                          key={section.number}
+                          disabled={
+                            section.clashing !== undefined &&
+                            !timetable.sections.find((e) => e.id === section.id)
+                          }
+                        >
+                          <div className="flex items-center h-full w-full gap-4">
+                            <span className="">
+                              {section.type}
+                              {section.number}
+                            </span>
+                            <div className="flex flex-col h-full min-h-16 justify-between text-left py-2">
+                              <span className="font-semibold whitespace-pre-wrap text-md">
+                                {section.instructors.join(", ")}
+                              </span>
+                              <span className="font-normal whitespace-pre-wrap">
+                                {section.roomTime
+                                  .map((e) => e.split(":").splice(1).join(" "))
+                                  .join(", ")}
+                              </span>
+                            </div>
+                          </div>
+                        </Button>
+                        {section.clashing &&
+                          !timetable.sections.find(
+                            (e) => e.id === section.id,
+                          ) && (
+                            <div className="absolute left-0 top-8 bg-slate-700/80 text-center w-full">
+                              <span className="text-slate-100 font-bold text-md">
+                                Clashing with {section.clashing}
+                              </span>
+                            </div>
+                          )}
+                      </span>
+                    );
+                  })}
+              </div>
+            </TabsContent>
+          );
+        })}
+      </Tabs>
+    </div>
+  );
+};
+
+export default CourseDetailsMenu;
