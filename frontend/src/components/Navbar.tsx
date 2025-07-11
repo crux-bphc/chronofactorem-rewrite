@@ -1,14 +1,7 @@
-import {
-  queryOptions,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useRouter } from "@tanstack/react-router";
-import axios, { AxiosError } from "axios";
 import { Info, LogOut, Pencil, Plus, Search } from "lucide-react";
 import { useCookies } from "react-cookie";
-import type { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,37 +10,18 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
-import type { userWithTimetablesType } from "../../../lib/src/index";
+import toastHandler from "@/data-access/errors/toastHandler";
+import userQueryOptions from "@/data-access/fetchUserDetails";
+import useCreateTimetable from "@/data-access/useCreateTimetable";
 import { router } from "../main";
 import Announcements from "./Announcements";
 import { ModeToggle } from "./ModeToggle";
 import SearchBar from "./SearchBar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
-const fetchUserDetails = async (): Promise<
-  z.infer<typeof userWithTimetablesType>
-> => {
-  const response = await axios.get<z.infer<typeof userWithTimetablesType>>(
-    "/api/user",
-    {
-      headers: {
-        "Content-Type": "application/json ",
-      },
-    },
-  );
-  return response.data;
-};
-
-const userQueryOptions = queryOptions({
-  queryKey: ["user"],
-  queryFn: () => fetchUserDetails(),
-});
-
 export function NavBar() {
   const stateRouter = useRouter();
-  // const isCMSPage = stateRouter.state.resolvedLocation.pathname.includes("/CMS");
   const isEditPage =
     stateRouter.state.resolvedLocation?.pathname.includes("/edit/") ||
     stateRouter.state.resolvedLocation?.pathname.includes("/finalize/");
@@ -55,94 +29,8 @@ export function NavBar() {
   const [_cookies, _setCookie, removeCookie] = useCookies(["session"]);
   const userQueryResult = useQuery(userQueryOptions);
   const { toast } = useToast();
+  const { mutate: createTimetable } = useCreateTimetable();
   const queryClient = useQueryClient();
-
-  const createMutation = useMutation({
-    mutationFn: () => {
-      return axios.post<{ message: string; id: string }>(
-        "/api/timetable/create",
-      );
-    },
-    onSuccess: (_response) => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-      router.navigate({
-        to: "/edit/$timetableId",
-        params: { timetableId: _response.data.id },
-      });
-    },
-    onError: (error) => {
-      if (error instanceof AxiosError && error.response) {
-        if (error.response.status === 401) {
-          router.navigate({ to: "/login" });
-        }
-        if (error.response.status === 400) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 400",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 404) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 404",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 500) {
-          toast({
-            title: "Server Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 500",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else {
-          toast({
-            title: "Unknown Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : `API returned ${error.response.status}`,
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        }
-      }
-    },
-  });
 
   const ChronoLogoText = (
     <>
@@ -173,7 +61,19 @@ export function NavBar() {
           <Button
             className="text-green-200 w-fit text-xl px-2 md:px-4 py-4 md:ml-4 bg-green-900 hover:bg-green-800"
             onClick={
-              userQueryResultData ? () => createMutation.mutate() : undefined
+              userQueryResultData
+                ? () =>
+                    createTimetable(void null, {
+                      onError: (error) => toastHandler(error, toast),
+                      onSuccess: (_response) => {
+                        queryClient.invalidateQueries({ queryKey: ["user"] });
+                        router.navigate({
+                          to: "/edit/$timetableId",
+                          params: { timetableId: _response.data.id },
+                        });
+                      },
+                    })
+                : undefined
             }
           >
             <div className="hidden md:flex">Create a timetable</div>
@@ -191,17 +91,6 @@ export function NavBar() {
             <Info className="h-6 w-6" />
           </div>
         </Link>
-        {/* {!isCMSPage && (
-          <Link
-            to={userQueryResultData ? "/CMSExport" : undefined}
-            className="text-primary py-2 px-2 md:ml-2 text-lg rounded-full hover:bg-muted transition h-fit whitespace-nowrap duration-200 ease-in-out"
-          >
-            <div className="hidden md:flex">CMS Auto-Enroll</div>
-            <div className="flex md:hidden">
-              <BookUp className="h-6 w-6" />
-            </div>
-          </Link>
-        )} */}
         <div className="hidden md:flex md:ml-4">
           <SearchBar />
         </div>

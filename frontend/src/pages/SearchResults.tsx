@@ -1,5 +1,5 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
-import { ErrorComponent, Route } from "@tanstack/react-router";
+import { Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
@@ -12,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import toastHandler from "@/data-access/errors/toastHandler";
 import type { timetableWithSectionsType } from "../../../lib/src";
 import authenticatedRoute from "../AuthenticatedRoute";
 import {
@@ -21,7 +22,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "../components/ui/pagination";
-import { ToastAction } from "../components/ui/toast";
 import { useToast } from "../components/ui/use-toast";
 import { router } from "../main";
 
@@ -73,68 +73,9 @@ const searchRoute = new Route({
 
         throw error;
       }),
-  errorComponent: ({ error }: { error: unknown }) => {
+  errorComponent: ({ error }) => {
     const { toast } = useToast();
-
-    if (error instanceof AxiosError) {
-      if (error.response) {
-        switch (error.response.status) {
-          case 404:
-            toast({
-              title: "Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : "API returned 404",
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-            break;
-          case 500:
-            toast({
-              title: "Server Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : "API returned 500",
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-            break;
-
-          default:
-            toast({
-              title: "Unknown Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : `API returned ${error.response.status}`,
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-        }
-      } else {
-        return <ErrorComponent error={error} />;
-      }
-    }
+    toastHandler(error, toast);
   },
 });
 

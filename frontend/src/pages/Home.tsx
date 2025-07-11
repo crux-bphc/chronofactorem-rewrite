@@ -1,67 +1,19 @@
-import {
-  queryOptions,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
-import { ErrorComponent, Route } from "@tanstack/react-router";
-import axios, { AxiosError } from "axios";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Route } from "@tanstack/react-router";
 import { CalendarX2 } from "lucide-react";
 import type { z } from "zod";
-import { ToastAction } from "@/components/ui/toast";
-import type {
-  timetableType,
-  userWithTimetablesType,
-} from "../../../lib/src/index";
+import handleLoginRedirect from "@/data-access/errors/redirectToLogin";
+import toastHandler from "@/data-access/errors/toastHandler";
+import userQueryOptions from "@/data-access/fetchUserDetails";
+import useCreateTimetable from "@/data-access/useCreateTimetable";
+import type { timetableType } from "../../../lib/src/index";
 import authenticatedRoute from "../AuthenticatedRoute";
 import TimetableCard from "../components/TimetableCard";
 import { Button } from "../components/ui/button";
 import { toast, useToast } from "../components/ui/use-toast";
 import { router } from "../main";
 
-const fetchUserDetails = async (): Promise<
-  z.infer<typeof userWithTimetablesType>
-> => {
-  const response = await axios.get<z.infer<typeof userWithTimetablesType>>(
-    "/api/user",
-    {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json ",
-      },
-    },
-  );
-  return response.data;
-};
-
 type Timetable = z.infer<typeof timetableType>;
-
-const filterTimetables = (timetables: Timetable[]) => {
-  const publicTimetables: Timetable[] = [];
-  const privateTimetables: Timetable[] = [];
-  const draftTimetables: Timetable[] = [];
-  const archivedTimetables: Timetable[] = [];
-
-  for (const timetable of timetables) {
-    if (timetable.archived) {
-      archivedTimetables.push(timetable);
-    } else if (timetable.draft) {
-      draftTimetables.push(timetable);
-    } else if (timetable.private) {
-      privateTimetables.push(timetable);
-    } else {
-      publicTimetables.push(timetable);
-    }
-  }
-
-  return {
-    publicTimetables,
-    privateTimetables,
-    draftTimetables,
-    archivedTimetables,
-  };
-};
-
 const renderTimetableSection = (title: string, timetables: Timetable[]) => {
   if (timetables.length === 0) return null;
 
@@ -81,187 +33,25 @@ const renderTimetableSection = (title: string, timetables: Timetable[]) => {
   );
 };
 
-const userQueryOptions = queryOptions({
-  queryKey: ["user"],
-  queryFn: () => fetchUserDetails(),
-  select: (data) => {
-    return filterTimetables(data.timetables);
-  },
-});
-
 const homeRoute = new Route({
   getParentRoute: () => authenticatedRoute,
   path: "/",
   loader: ({ context: { queryClient } }) =>
     queryClient.ensureQueryData(userQueryOptions).catch((error) => {
-      if (
-        error instanceof AxiosError &&
-        error.response &&
-        error.response.status === 401
-      ) {
-        router.navigate({
-          to: "/login",
-        });
-      }
-
+      handleLoginRedirect(error);
       throw error;
     }),
   component: Home,
-  errorComponent: ({ error }: { error: unknown }) => {
+  errorComponent: ({ error }) => {
     const { toast } = useToast();
-
-    if (error instanceof AxiosError) {
-      if (error.response) {
-        switch (error.response.status) {
-          case 404:
-            toast({
-              title: "Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : "API returned 404",
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-            break;
-          case 500:
-            toast({
-              title: "Server Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : "API returned 500",
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-            break;
-
-          default:
-            toast({
-              title: "Unknown Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : `API returned ${error.response.status}`,
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-        }
-      } else {
-        // Fallback to the default ErrorComponent
-        return <ErrorComponent error={error} />;
-      }
-    }
+    toastHandler(error, toast);
   },
 });
 
 function Home() {
   const userQueryResult = useQuery(userQueryOptions);
   const queryClient = useQueryClient();
-  const createMutation = useMutation({
-    mutationFn: () => {
-      return axios.post<{ message: string; id: string }>(
-        "/api/timetable/create",
-      );
-    },
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-      router.navigate({
-        to: "/edit/$timetableId",
-        params: { timetableId: response.data.id },
-      });
-    },
-    onError: (error) => {
-      if (error instanceof AxiosError && error.response) {
-        if (error.response.status === 401) {
-          router.navigate({ to: "/login" });
-        }
-        if (error.response.status === 400) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 400",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 404) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 404",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 500) {
-          toast({
-            title: "Server Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 500",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else {
-          toast({
-            title: "Unknown Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : `API returned ${error.response.status}`,
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        }
-      }
-    },
-  });
+  const { mutate: createTimetable } = useCreateTimetable();
 
   if (userQueryResult.isFetching) {
     return <span>Loading...</span>;
@@ -303,7 +93,18 @@ function Home() {
               <h2 className="text-xl sm:text-2xl">It's empty in here.</h2>
               <Button
                 className="text-lg sm:text-2xl py-6 px-10 font-bold"
-                onClick={() => createMutation.mutate()}
+                onClick={() =>
+                  createTimetable(void null, {
+                    onError: (error) => toastHandler(error, toast),
+                    onSuccess: (_response) => {
+                      queryClient.invalidateQueries({ queryKey: ["user"] });
+                      router.navigate({
+                        to: "/edit/$timetableId",
+                        params: { timetableId: _response.data.id },
+                      });
+                    },
+                  })
+                }
               >
                 Create Timetable
               </Button>
@@ -312,11 +113,8 @@ function Home() {
 
         <div>
           {renderTimetableSection("Draft Timetables:", draftTimetables)}
-
           {renderTimetableSection("Private Timetables:", privateTimetables)}
-
           {renderTimetableSection("Public Timetables:", publicTimetables)}
-
           {renderTimetableSection("Archived Timetables:", archivedTimetables)}
         </div>
       </main>

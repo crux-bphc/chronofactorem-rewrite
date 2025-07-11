@@ -5,7 +5,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { ErrorComponent, notFound, Route } from "@tanstack/react-router";
+import { notFound, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { toPng } from "html-to-image";
 import {
@@ -21,6 +21,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { z } from "zod";
 import CDCList from "@/../CDCs.json";
 import { ToastAction } from "@/components/ui/toast";
+import toastHandler from "@/data-access/errors/toastHandler";
 import type {
   courseType,
   courseWithSectionsType,
@@ -160,52 +161,9 @@ const viewTimetableRoute = new Route({
       }),
   component: ViewTimetable,
   notFoundComponent: NotFound,
-  errorComponent: ({ error }: { error: unknown }) => {
+  errorComponent: ({ error }) => {
     const { toast } = useToast();
-
-    if (error instanceof AxiosError) {
-      if (error.response) {
-        switch (error.response.status) {
-          case 500:
-            toast({
-              title: "Server Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : "API returned 500",
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-            break;
-
-          default:
-            toast({
-              title: "Unknown Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : `API returned ${error.response.status}`,
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-        }
-      } else {
-        // Fallback to the default ErrorComponent
-        return <ErrorComponent error={error} />;
-      }
-    }
+    toastHandler(error, toast);
   },
 });
 
@@ -239,78 +197,7 @@ function ViewTimetable() {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       router.navigate({ to: "/" });
     },
-    onError: (error) => {
-      if (error instanceof AxiosError && error.response) {
-        if (error.response.status === 401) {
-          router.navigate({ to: "/login" });
-        }
-        if (error.response.status === 400) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 400",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 404) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 404",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 500) {
-          toast({
-            title: "Server Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 500",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else {
-          toast({
-            title: "Unknown Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : `API returned ${error.response.status}`,
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        }
-      }
-    },
+    onError: (error) => toastHandler(error, toast),
   });
 
   const copyMutation = useMutation({
@@ -326,78 +213,7 @@ function ViewTimetable() {
         params: { timetableId: data.data.id },
       });
     },
-    onError: (error) => {
-      if (error instanceof AxiosError && error.response) {
-        if (error.response.status === 401) {
-          router.navigate({ to: "/login" });
-        }
-        if (error.response.status === 400) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 400",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 404) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 404",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 500) {
-          toast({
-            title: "Server Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 500",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else {
-          toast({
-            title: "Unknown Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : `API returned ${error.response.status}`,
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        }
-      }
-    },
+    onError: (error) => toastHandler(error, toast),
   });
 
   const editMutation = useMutation({
@@ -412,78 +228,7 @@ function ViewTimetable() {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       router.navigate({ to: "/edit/$timetableId", params: { timetableId } });
     },
-    onError: (error) => {
-      if (error instanceof AxiosError && error.response) {
-        if (error.response.status === 401) {
-          router.navigate({ to: "/login" });
-        }
-        if (error.response.status === 400) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 400",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 404) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 404",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 500) {
-          toast({
-            title: "Server Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 500",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else {
-          toast({
-            title: "Unknown Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : `API returned ${error.response.status}`,
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        }
-      }
-    },
+    onError: (error) => toastHandler(error, toast),
   });
 
   const generateScreenshot = useCallback(() => {
@@ -553,11 +298,7 @@ function ViewTimetable() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["timetable"] });
     },
-    onError: (error) => {
-      if (error instanceof AxiosError && error.response) {
-        console.log(error.response.data.message);
-      }
-    },
+    onError: (error) => toastHandler(error, toast),
   });
 
   const removeSectionMutation = useMutation({
@@ -577,11 +318,7 @@ function ViewTimetable() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["timetable"] });
     },
-    onError: (error) => {
-      if (error instanceof AxiosError && error.response) {
-        console.log(error.response.data.message);
-      }
-    },
+    onError: (error) => toastHandler(error, toast),
   });
 
   const coursesInTimetable = useMemo(() => {

@@ -1,5 +1,5 @@
-import { queryOptions, useMutation } from "@tanstack/react-query";
-import { ErrorComponent, Route } from "@tanstack/react-router";
+import { useMutation } from "@tanstack/react-query";
+import { Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { useState } from "react";
 import { z } from "zod";
@@ -13,12 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  collegeYearType,
-  type userWithTimetablesType,
-} from "../../../lib/src/index";
+import toastHandler from "@/data-access/errors/toastHandler";
+import userQueryOptions from "@/data-access/fetchUserDetails";
+import { collegeYearType } from "../../../lib/src/index";
 import { rootRoute, router } from "../main";
 
 /*
@@ -28,25 +26,6 @@ If this succeeds, they have already filled this out and so we redirect them away
 If they have not filled out their degrees, they will not exist in the DB and so /api/user will return a 401 response. 
 Then, we do nothing (no error toasts) and just let them fill out their degrees.
 */
-const fetchUserDetails = async (): Promise<
-  z.infer<typeof userWithTimetablesType>
-> => {
-  const response = await axios.get<z.infer<typeof userWithTimetablesType>>(
-    "/api/user",
-    {
-      headers: {
-        "Content-Type": "application/json ",
-      },
-    },
-  );
-  return response.data;
-};
-
-const userQueryOptions = queryOptions({
-  queryKey: ["user"],
-  queryFn: () => fetchUserDetails(),
-});
-
 const getDegreesRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "getDegrees",
@@ -65,74 +44,14 @@ const getDegreesRoute = new Route({
         ) {
           // The one exception to doing nothing is if they don't have a valid session cookie (from Google OAuth)
           if (error.response.data.error === "user session expired") {
-            router.navigate({ to: "/" });
+            router.navigate({ to: "/login" });
           }
         }
       }),
   component: GetDegrees,
-  errorComponent: ({ error }: { error: unknown }) => {
+  errorComponent: ({ error }) => {
     const { toast } = useToast();
-
-    if (error instanceof AxiosError) {
-      if (error.response) {
-        switch (error.response.status) {
-          case 404:
-            toast({
-              title: "Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : "API returned 404",
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-            break;
-          case 500:
-            toast({
-              title: "Server Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : "API returned 500",
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-            break;
-
-          default:
-            toast({
-              title: "Unknown Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : `API returned ${error.response.status}`,
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-        }
-      } else {
-        // Fallback to the default ErrorComponent
-        return <ErrorComponent error={error} />;
-      }
-    }
+    toastHandler(error, toast);
   },
 });
 
@@ -151,61 +70,7 @@ function GetDegrees() {
     onSuccess: () => {
       router.navigate({ to: "/" });
     },
-    onError: (error) => {
-      if (error instanceof AxiosError && error.response) {
-        if (error.response.status === 401) {
-          router.navigate({ to: "/login" });
-        } else if (error.response.status === 400) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 400",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 500) {
-          toast({
-            title: "Server Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 500",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else {
-          toast({
-            title: "Unknown Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : `API returned ${error.response.status}`,
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        }
-      }
-    },
+    onError: (error) => toastHandler(error, toast),
   });
 
   const handleSubmit = async () => {
