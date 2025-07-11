@@ -1,4 +1,3 @@
-import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Megaphone } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
@@ -13,6 +12,7 @@ import useAnnouncements from "@/data-access/useAnnouncements";
 import ReportIssue from "./ReportIssue";
 import Spinner from "./Spinner";
 import { Button } from "./ui/button";
+import { DialogTrigger } from "./ui/dialog";
 
 function Announcements() {
   const { toast } = useToast();
