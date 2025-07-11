@@ -17,6 +17,7 @@ import useUser from "@/data-access/useUser";
 import { router } from "../main";
 import Announcements from "./Announcements";
 import { ModeToggle } from "./ModeToggle";
+import ReportIssue from "./ReportIssue";
 import SearchBar from "./SearchBar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
@@ -27,7 +28,12 @@ export function NavBar() {
     stateRouter.state.resolvedLocation?.pathname.includes("/finalize/");
 
   const [_cookies, _setCookie, removeCookie] = useCookies(["session"]);
-  const { data: user, error, isError, isFetching } = useUser();
+  const {
+    data: user,
+    error: userError,
+    isError: isUserError,
+    isFetching: isUserFetching,
+  } = useUser();
   const { toast } = useToast();
   const { mutate: createTimetable } = useCreateTimetable();
   const queryClient = useQueryClient();
@@ -157,27 +163,16 @@ export function NavBar() {
       </div>
     </div>
   );
-  if (isFetching) {
+  if (isUserFetching) {
     return renderNavbarBasedOnQueryFetch(undefined);
   }
-  if (isError) {
+  if (isUserError || user === undefined) {
     return (
-      <span>
-        Unexpected error: {JSON.stringify(error.message)} Please report this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          here
-        </a>
-      </span>
-    );
-  }
-  if (user === undefined) {
-    return (
-      <span>
-        Unexpected error: userQueryResult.data is undefined. Please report this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          here
-        </a>
-      </span>
+      <ReportIssue
+        error={JSON.stringify(
+          userError ? userError.message : "user query result is undefined",
+        )}
+      />
     );
   }
   return renderNavbarBasedOnQueryFetch(user);

@@ -16,7 +16,8 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { z } from "zod";
 import CDCList from "@/../CDCs.json";
-import { ToastAction } from "@/components/ui/toast";
+import ReportIssue from "@/components/ReportIssue";
+import ReportIssueToastAction from "@/components/ReportIssueToastAction";
 import toastHandler from "@/data-access/errors/toastHandler";
 import useCourses, { courseQueryOptions } from "@/data-access/useCourses";
 import useTimetable, {
@@ -121,7 +122,12 @@ function ViewTimetable() {
     isLoading: isCoursesLoading,
     error: coursesError,
   } = useCourses();
-  const { data: user, isLoading, isError } = useUser();
+  const {
+    data: user,
+    isLoading: isUserLoading,
+    isError: isUserError,
+    error: userError,
+  } = useUser();
   const queryClient = useQueryClient();
   const screenshotContentRef = useRef<HTMLDivElement>(null);
   const [isScreenshotMode, setIsScreenshotMode] = useState(false);
@@ -216,13 +222,7 @@ function ViewTimetable() {
           title: "Error",
           description: err.message,
           variant: "destructive",
-          action: (
-            <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-              <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                Report
-              </a>
-            </ToastAction>
-          ),
+          action: <ReportIssueToastAction />,
         });
       });
   }, [isVertical, screenIsLarge]);
@@ -397,24 +397,19 @@ function ViewTimetable() {
     [currentCourseID],
   );
 
-  if (isCoursesLoading || isLoading) {
+  if (isCoursesLoading || isUserLoading) {
     return <span>Loading...</span>;
   }
 
   if (isCoursesError || courses === undefined) {
     return (
-      <span>
-        Unexpected error:{" "}
-        {JSON.stringify(
+      <ReportIssue
+        error={JSON.stringify(
           coursesError
             ? coursesError.message
             : "course query result is undefined",
-        )}{" "}
-        Please report this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          <span className="text-blue-700 dark:text-blue-400">here</span>
-        </a>
-      </span>
+        )}
+      />
     );
   }
 
@@ -424,29 +419,23 @@ function ViewTimetable() {
 
   if (isTimetableError || timetable === undefined) {
     return (
-      <span>
-        Unexpected error:{" "}
-        {JSON.stringify(
+      <ReportIssue
+        error={JSON.stringify(
           timetableError
             ? timetableError.message
             : "timetable query result is undefined",
-        )}{" "}
-        Please report this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          <span className="text-blue-700 dark:text-blue-400">here</span>
-        </a>
-      </span>
+        )}
+      />
     );
   }
 
-  if (isError || user === undefined) {
+  if (isUserError || user === undefined) {
     return (
-      <span>
-        Unexpected error: timetable is undefined. Please report this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          <span className="text-blue-700 dark:text-blue-400">here</span>
-        </a>
-      </span>
+      <ReportIssue
+        error={JSON.stringify(
+          userError ? userError.message : "user query result is undefined",
+        )}
+      />
     );
   }
 

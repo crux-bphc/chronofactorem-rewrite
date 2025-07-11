@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import useAnnouncements from "@/data-access/useAnnouncements";
+import ReportIssue from "./ReportIssue";
 import Spinner from "./Spinner";
 import { Button } from "./ui/button";
 
@@ -60,15 +61,7 @@ function Announcements() {
         </DialogHeader>
         <DialogDescription asChild>
           {isLoading && <Spinner />}
-          {isError && (
-            <span>
-              Unexpected error: {JSON.stringify(error.message)} Please report
-              this{" "}
-              <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                here
-              </a>
-            </span>
-          )}
+          {isError && <ReportIssue error={JSON.stringify(error)} />}
           <div className="flex flex-col-reverse mx-3 mt-1 gap-3 divide-y divide-y-reverse">
             {Array.isArray(announcements) && announcements?.length ? (
               announcements

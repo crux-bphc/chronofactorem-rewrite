@@ -3,6 +3,7 @@ import { Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { Clipboard, ClipboardCheck, Globe, Lock } from "lucide-react";
 import { useRef, useState } from "react";
+import ReportIssue from "@/components/ReportIssue";
 import {
   Tooltip,
   TooltipContent,
@@ -95,18 +96,13 @@ function FinalizeTimetable() {
 
   if (isTimetableError || timetable === undefined) {
     return (
-      <span>
-        Unexpected error:{" "}
-        {JSON.stringify(
+      <ReportIssue
+        error={JSON.stringify(
           timetableError
             ? timetableError.message
             : "timetable query result is undefined",
-        )}{" "}
-        Please report this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          <span className="text-blue-700 dark:text-blue-400">here</span>
-        </a>
-      </span>
+        )}
+      />
     );
   }
 

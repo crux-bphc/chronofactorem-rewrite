@@ -1,5 +1,5 @@
 import type { AxiosResponse } from "axios";
-import ReportIssue from "@/components/ReportIssue";
+import ReportIssue from "@/components/ReportIssueToastAction";
 
 const errorTitleMap = {
   400: "Error",

@@ -17,6 +17,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import type { z } from "zod";
 import CDCList from "@/../CDCs.json";
+import ReportIssue from "@/components/ReportIssue";
 import {
   Tooltip,
   TooltipContent,
@@ -113,6 +114,7 @@ function EditTimetable() {
     data: user,
     isLoading: isUserLoading,
     isError: isUserError,
+    error: userError,
   } = useUser();
   const {
     data: courses,
@@ -429,18 +431,13 @@ function EditTimetable() {
 
   if (isCoursesError || courses === undefined) {
     return (
-      <span>
-        Unexpected error:{" "}
-        {JSON.stringify(
+      <ReportIssue
+        error={JSON.stringify(
           coursesError
             ? coursesError.message
             : "course query result is undefined",
-        )}{" "}
-        Please report this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          <span className="text-blue-700 dark:text-blue-400">here</span>
-        </a>
-      </span>
+        )}
+      />
     );
   }
 
@@ -450,42 +447,23 @@ function EditTimetable() {
 
   if (isTimetableError || timetable === undefined) {
     return (
-      <span>
-        Unexpected error:{" "}
-        {JSON.stringify(
+      <ReportIssue
+        error={JSON.stringify(
           timetableError
             ? timetableError.message
             : "timetable query result is undefined",
-        )}{" "}
-        Please report this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          <span className="text-blue-700 dark:text-blue-400">here</span>
-        </a>
-      </span>
-    );
-  }
-
-  if (timetable === undefined) {
-    return (
-      <span>
-        Unexpected error: timetableQueryResult.data is undefined. Please report
-        this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          <span className="text-blue-700 dark:text-blue-400">here</span>
-        </a>
-      </span>
+        )}
+      />
     );
   }
 
   if (isUserError || user === undefined) {
     return (
-      <span>
-        Unexpected error: timetableQueryResult.data is undefined. Please report
-        this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          <span className="text-blue-700 dark:text-blue-400">here</span>
-        </a>
-      </span>
+      <ReportIssue
+        error={JSON.stringify(
+          userError ? userError.message : "user query result is undefined",
+        )}
+      />
     );
   }
 

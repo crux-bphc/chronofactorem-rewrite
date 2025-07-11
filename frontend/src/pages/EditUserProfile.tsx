@@ -3,6 +3,7 @@ import { Route } from "@tanstack/react-router";
 import axios from "axios";
 import { getBatchFromEmail } from "lib";
 import { useState } from "react";
+import ReportIssue from "@/components/ReportIssue";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -68,16 +69,11 @@ function EditUserProfile() {
 
   if (isError || user === undefined || firstDegree === null) {
     return (
-      <span>
-        Unexpected error:{" "}
-        {JSON.stringify(
+      <ReportIssue
+        error={JSON.stringify(
           error ? error.message : "user query result is undefined",
-        )}{" "}
-        Please report this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          <span className="text-blue-700 dark:text-blue-400">here</span>
-        </a>
-      </span>
+        )}
+      />
     );
   }
 

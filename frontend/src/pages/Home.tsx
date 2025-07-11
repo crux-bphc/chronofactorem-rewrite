@@ -3,6 +3,7 @@ import { Route } from "@tanstack/react-router";
 import type { timetableType } from "lib";
 import { CalendarX2 } from "lucide-react";
 import type { z } from "zod";
+import ReportIssue from "@/components/ReportIssue";
 import handleLoginRedirect from "@/data-access/errors/redirectToLogin";
 import toastHandler from "@/data-access/errors/toastHandler";
 import useCreateTimetable from "@/data-access/useCreateTimetable";
@@ -59,14 +60,9 @@ function Home() {
 
   if (isError || user === undefined) {
     return (
-      <span>
-        Unexpected error:{" "}
-        {error ? JSON.stringify(error.message) : "user is undefined"} Please
-        report this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          <span className="text-blue-700 dark:text-blue-400">here</span>
-        </a>
-      </span>
+      <ReportIssue
+        error={error ? JSON.stringify(error.message) : "user is undefined"}
+      />
     );
   }
 
