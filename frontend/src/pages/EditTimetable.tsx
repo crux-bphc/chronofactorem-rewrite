@@ -1,7 +1,7 @@
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { notFound, Route } from "@tanstack/react-router";
-import axios, { AxiosError } from "axios";
+import { Route } from "@tanstack/react-router";
+import axios from "axios";
 import type { courseWithSectionsType, sectionTypeZodEnum } from "lib";
 import {
   AlertOctagon,
@@ -24,6 +24,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import handleNotFound from "@/data-access/errors/handleNotFound";
+import handleLoginRedirect from "@/data-access/errors/redirectToLogin";
 import toastHandler from "@/data-access/errors/toastHandler";
 import useCourses, { courseQueryOptions } from "@/data-access/useCourses";
 import useTimetable, {
@@ -60,40 +62,15 @@ const editTimetableRoute = new Route({
   path: "edit/$timetableId",
   beforeLoad: ({ context: { queryClient } }) =>
     queryClient.ensureQueryData(courseQueryOptions).catch((error: Error) => {
-      if (
-        error instanceof AxiosError &&
-        error.response &&
-        error.response.status === 401
-      ) {
-        router.navigate({
-          to: "/login",
-        });
-      }
-
+      handleLoginRedirect(error);
       throw error;
     }),
   loader: ({ context: { queryClient }, params: { timetableId } }) =>
     queryClient
       .ensureQueryData(timetableQueryOptions(timetableId))
       .catch((error: Error) => {
-        if (
-          error instanceof AxiosError &&
-          error.response &&
-          error.response.status === 401
-        ) {
-          router.navigate({
-            to: "/login",
-          });
-        }
-
-        if (
-          error instanceof AxiosError &&
-          error.response &&
-          error.response.status === 404
-        ) {
-          throw notFound();
-        }
-
+        handleLoginRedirect(error);
+        handleNotFound(error);
         throw error;
       }),
   component: EditTimetable,

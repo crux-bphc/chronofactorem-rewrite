@@ -1,7 +1,7 @@
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { notFound, Route } from "@tanstack/react-router";
-import axios, { AxiosError } from "axios";
+import { Route } from "@tanstack/react-router";
+import axios from "axios";
 import { toPng } from "html-to-image";
 import type { courseWithSectionsType, sectionTypeZodEnum } from "lib";
 import {
@@ -18,6 +18,8 @@ import type { z } from "zod";
 import CDCList from "@/../CDCs.json";
 import ReportIssue from "@/components/ReportIssue";
 import ReportIssueToastAction from "@/components/ReportIssueToastAction";
+import handleNotFound from "@/data-access/errors/handleNotFound";
+import handleLoginRedirect from "@/data-access/errors/redirectToLogin";
 import toastHandler from "@/data-access/errors/toastHandler";
 import useCourses, { courseQueryOptions } from "@/data-access/useCourses";
 import useTimetable, {
@@ -60,40 +62,15 @@ const viewTimetableRoute = new Route({
   path: "view/$timetableId",
   beforeLoad: ({ context: { queryClient } }) =>
     queryClient.ensureQueryData(courseQueryOptions).catch((error: Error) => {
-      if (
-        error instanceof AxiosError &&
-        error.response &&
-        error.response.status === 401
-      ) {
-        router.navigate({
-          to: "/login",
-        });
-      }
-
+      handleLoginRedirect(error);
       throw error;
     }),
   loader: ({ context: { queryClient }, params: { timetableId } }) =>
     queryClient
       .ensureQueryData(timetableQueryOptions(timetableId))
       .catch((error: Error) => {
-        if (
-          error instanceof AxiosError &&
-          error.response &&
-          error.response.status === 401
-        ) {
-          router.navigate({
-            to: "/login",
-          });
-        }
-
-        if (
-          error instanceof AxiosError &&
-          error.response &&
-          error.response.status === 404
-        ) {
-          throw notFound();
-        }
-
+        handleLoginRedirect(error);
+        handleNotFound(error);
         throw error;
       }),
   component: ViewTimetable,

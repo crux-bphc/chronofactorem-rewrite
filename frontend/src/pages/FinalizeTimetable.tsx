@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Route } from "@tanstack/react-router";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { Clipboard, ClipboardCheck, Globe, Lock } from "lucide-react";
 import { useRef, useState } from "react";
 import ReportIssue from "@/components/ReportIssue";
@@ -10,6 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import handleLoginRedirect from "@/data-access/errors/redirectToLogin";
 import toastHandler from "@/data-access/errors/toastHandler";
 import useTimetable, {
   timetableQueryOptions,
@@ -28,16 +29,7 @@ const finalizeTimetableRoute = new Route({
     queryClient
       .ensureQueryData(timetableQueryOptions(timetableId))
       .catch((error: Error) => {
-        if (
-          error instanceof AxiosError &&
-          error.response &&
-          error.response.status === 401
-        ) {
-          router.navigate({
-            to: "/login",
-          });
-        }
-
+        handleLoginRedirect(error);
         throw error;
       }),
   component: FinalizeTimetable,

@@ -1,6 +1,6 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { Route } from "@tanstack/react-router";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import type { timetableWithSectionsType } from "lib";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import handleLoginRedirect from "@/data-access/errors/redirectToLogin";
 import toastHandler from "@/data-access/errors/toastHandler";
 import authenticatedRoute from "../AuthenticatedRoute";
 import {
@@ -61,16 +62,7 @@ const searchRoute = new Route({
     queryClient
       .ensureQueryData(searchQueryOptions(deps))
       .catch((error: Error) => {
-        if (
-          error instanceof AxiosError &&
-          error.response &&
-          error.response.status === 401
-        ) {
-          router.navigate({
-            to: "/login",
-          });
-        }
-
+        handleLoginRedirect(error);
         throw error;
       }),
   errorComponent: ({ error }) => {
