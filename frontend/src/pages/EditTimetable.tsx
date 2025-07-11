@@ -1,17 +1,8 @@
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
-import {
-  queryOptions,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { notFound, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
-import type {
-  courseWithSectionsType,
-  sectionTypeZodEnum,
-  timetableWithSectionsType,
-} from "lib";
+import type { courseWithSectionsType, sectionTypeZodEnum } from "lib";
 import {
   AlertOctagon,
   AlertTriangle,
@@ -34,6 +25,9 @@ import {
 } from "@/components/ui/tooltip";
 import toastHandler from "@/data-access/errors/toastHandler";
 import useCourses, { courseQueryOptions } from "@/data-access/useCourses";
+import useTimetable, {
+  timetableQueryOptions,
+} from "@/data-access/useTimetable";
 import useUser from "@/data-access/useUser";
 import authenticatedRoute from "../AuthenticatedRoute";
 import NotFound from "../components/NotFound";
@@ -59,35 +53,6 @@ import {
 } from "../components/ui/popover";
 import { toast, useToast } from "../components/ui/use-toast";
 import { router } from "../main";
-
-const fetchTimetable = async (timetableId: string) => {
-  const response = await axios.get<z.infer<typeof timetableWithSectionsType>>(
-    `/api/timetable/${timetableId}`,
-    {
-      headers: {
-        "Content-Type": "application/json ",
-      },
-    },
-  );
-  if (response.data.draft) {
-    return response.data;
-  }
-  toast({
-    title: "Error",
-    description: "Non-draft timetables cannot be edited",
-    variant: "destructive",
-  });
-  router.navigate({
-    to: "/view/$timetableId",
-    params: { timetableId: timetableId },
-  });
-};
-
-const timetableQueryOptions = (timetableId: string) =>
-  queryOptions({
-    queryKey: ["timetable", timetableId],
-    queryFn: () => fetchTimetable(timetableId),
-  });
 
 const editTimetableRoute = new Route({
   getParentRoute: () => authenticatedRoute,
@@ -144,7 +109,6 @@ function EditTimetable() {
 
   const { timetableId } = editTimetableRoute.useParams();
 
-  const timetableQueryResult = useQuery(timetableQueryOptions(timetableId));
   const {
     data: user,
     isLoading: isUserLoading,
@@ -156,7 +120,27 @@ function EditTimetable() {
     isLoading: isCoursesLoading,
     error: coursesError,
   } = useCourses();
+  const {
+    data: timetable,
+    isLoading: isTimetableLoading,
+    isError: isTimetableError,
+    error: timetableError,
+  } = useTimetable(timetableId);
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!timetable?.draft) {
+      toast({
+        title: "Error",
+        description: "Non-draft timetables cannot be edited",
+        variant: "destructive",
+      });
+      router.navigate({
+        to: "/view/$timetableId",
+        params: { timetableId: timetableId },
+      });
+    }
+  }, [timetable?.draft, timetableId]);
 
   const deleteMutation = useMutation({
     mutationFn: () => {
@@ -188,7 +172,7 @@ function EditTimetable() {
   const addSectionMutation = useMutation({
     mutationFn: async (body: { sectionId: string }) => {
       const result = await axios.post(
-        `/api/timetable/${timetable.id}/add`,
+        `/api/timetable/${timetable?.id}/add`,
         body,
         {
           headers: {
@@ -208,7 +192,7 @@ function EditTimetable() {
   const removeSectionMutation = useMutation({
     mutationFn: async (body: { sectionId: string }) => {
       const result = await axios.post(
-        `/api/timetable/${timetable.id}/remove`,
+        `/api/timetable/${timetable?.id}/remove`,
         body,
         {
           headers: {
@@ -226,32 +210,26 @@ function EditTimetable() {
   });
 
   const coursesInTimetable = useMemo(() => {
-    if (courses === undefined || timetableQueryResult.data === undefined)
-      return [];
+    if (courses === undefined || timetable === undefined) return [];
 
     return courses
-      .filter((e) =>
-        timetableQueryResult.data?.sections
-          .map((x) => x.courseId)
-          .includes(e.id),
-      )
+      .filter((e) => timetable.sections.map((x) => x.courseId).includes(e.id))
       .sort();
-  }, [courses, timetableQueryResult.data]);
+  }, [courses, timetable]);
 
   const cdcs = useMemo(() => {
     let cdcs: string[];
     const coursesList = [];
 
-    if (timetableQueryResult.data === undefined || courses === undefined)
-      return [];
+    if (timetable === undefined || courses === undefined) return [];
 
     const degree = (
-      timetableQueryResult.data.degrees.length === 1
-        ? timetableQueryResult.data.degrees[0]
-        : timetableQueryResult.data.degrees.sort().reverse().join("")
+      timetable.degrees.length === 1
+        ? timetable.degrees[0]
+        : timetable.degrees.sort().reverse().join("")
     ) as keyof typeof CDCList;
     const cdcListKey =
-      `${timetableQueryResult.data.year}-${timetableQueryResult.data.semester}` as keyof (typeof CDCList)[typeof degree];
+      `${timetable.year}-${timetable.semester}` as keyof (typeof CDCList)[typeof degree];
 
     if (degree in CDCList && cdcListKey in CDCList[degree]) {
       cdcs = CDCList[degree][cdcListKey];
@@ -296,7 +274,7 @@ function EditTimetable() {
     }
 
     return coursesList;
-  }, [timetableQueryResult, courses]);
+  }, [timetable, courses]);
 
   const cdcNotFoundWarning = useMemo(
     () =>
@@ -466,17 +444,17 @@ function EditTimetable() {
     );
   }
 
-  if (timetableQueryResult.isFetching && timetableQueryResult.isPending) {
+  if (isTimetableLoading) {
     return <span>Loading...</span>;
   }
 
-  if (timetableQueryResult.isError || timetableQueryResult.data === undefined) {
+  if (isTimetableError || timetable === undefined) {
     return (
       <span>
         Unexpected error:{" "}
         {JSON.stringify(
-          timetableQueryResult.error
-            ? timetableQueryResult.error.message
+          timetableError
+            ? timetableError.message
             : "timetable query result is undefined",
         )}{" "}
         Please report this{" "}
@@ -487,7 +465,7 @@ function EditTimetable() {
     );
   }
 
-  if (timetableQueryResult.data === undefined) {
+  if (timetable === undefined) {
     return (
       <span>
         Unexpected error: timetableQueryResult.data is undefined. Please report
@@ -511,7 +489,7 @@ function EditTimetable() {
     );
   }
 
-  if (user.id !== timetableQueryResult.data.authorId) {
+  if (user.id !== timetable?.authorId) {
     toast({
       title: "Error",
       description: "You are not authorized to edit this timetable",
@@ -531,7 +509,6 @@ function EditTimetable() {
     number: number;
     instructors: string[];
   }[] = [];
-  const timetable = timetableQueryResult.data;
 
   for (let i = 0; i < timetable.sections.length; i++) {
     const sections = timetable.sections;
@@ -661,14 +638,10 @@ function EditTimetable() {
                 )}
                 <Tooltip>
                   <TooltipTrigger
-                    className={
-                      timetableQueryResult.data.archived
-                        ? "cursor-not-allowed"
-                        : ""
-                    }
+                    className={timetable.archived ? "cursor-not-allowed" : ""}
                   >
                     <Button
-                      disabled={timetableQueryResult.data.archived}
+                      disabled={timetable.archived}
                       variant="ghost"
                       className="rounded-full p-3"
                       onClick={() => {
@@ -686,13 +659,13 @@ function EditTimetable() {
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>
-                      {timetableQueryResult.data.archived
+                      {timetable.archived
                         ? "Cannot copy archived timetable"
                         : "Copy Timetable"}
                     </p>
                   </TooltipContent>
                 </Tooltip>
-                {user.id === timetableQueryResult.data.authorId && (
+                {user.id === timetable.authorId && (
                   <AlertDialog>
                     <Tooltip>
                       <AlertDialogTrigger asChild>

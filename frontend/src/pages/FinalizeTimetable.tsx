@@ -1,15 +1,8 @@
-import {
-  queryOptions,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
-import type { timetableWithSectionsType } from "lib";
 import { Clipboard, ClipboardCheck, Globe, Lock } from "lucide-react";
 import { useRef, useState } from "react";
-import type { z } from "zod";
 import {
   Tooltip,
   TooltipContent,
@@ -17,30 +10,15 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import toastHandler from "@/data-access/errors/toastHandler";
+import useTimetable, {
+  timetableQueryOptions,
+} from "@/data-access/useTimetable";
 import authenticatedRoute from "../AuthenticatedRoute";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { toast, useToast } from "../components/ui/use-toast";
 import { router } from "../main";
-
-const fetchTimetable = async (timetableId: string) => {
-  const response = await axios.get<z.infer<typeof timetableWithSectionsType>>(
-    `/api/timetable/${timetableId}`,
-    {
-      headers: {
-        "Content-Type": "application/json ",
-      },
-    },
-  );
-  return response.data;
-};
-
-const timetableQueryOptions = (timetableId: string) =>
-  queryOptions({
-    queryKey: ["timetable", timetableId],
-    queryFn: () => fetchTimetable(timetableId),
-  });
 
 const finalizeTimetableRoute = new Route({
   getParentRoute: () => authenticatedRoute,
@@ -83,7 +61,12 @@ function FinalizeTimetable() {
   const [copied, setCopied] = useState(false);
   const nameInput = useRef<HTMLInputElement>(null);
   const { timetableId } = finalizeTimetableRoute.useParams();
-  const timetableQueryResult = useQuery(timetableQueryOptions(timetableId));
+  const {
+    data: timetable,
+    isError: isTimetableError,
+    isLoading: isTimetableLoading,
+    error: timetableError,
+  } = useTimetable(timetableId);
   const queryClient = useQueryClient();
 
   const submitMutation = useMutation({
@@ -106,32 +89,20 @@ function FinalizeTimetable() {
     onError: (error) => toastHandler(error, toast),
   });
 
-  if (timetableQueryResult.isFetching) {
+  if (isTimetableLoading) {
     return <span>Loading...</span>;
   }
 
-  if (timetableQueryResult.isError || timetableQueryResult.data === undefined) {
+  if (isTimetableError || timetable === undefined) {
     return (
       <span>
         Unexpected error:{" "}
         {JSON.stringify(
-          timetableQueryResult.error
-            ? timetableQueryResult.error.message
+          timetableError
+            ? timetableError.message
             : "timetable query result is undefined",
         )}{" "}
         Please report this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          <span className="text-blue-700 dark:text-blue-400">here</span>
-        </a>
-      </span>
-    );
-  }
-
-  if (timetableQueryResult.data === undefined) {
-    return (
-      <span>
-        Unexpected error: timetableQueryResult.data is undefined. Please report
-        this{" "}
         <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
           <span className="text-blue-700 dark:text-blue-400">here</span>
         </a>
@@ -149,7 +120,7 @@ function FinalizeTimetable() {
         <Input
           ref={nameInput}
           id="name"
-          defaultValue={timetableQueryResult.data.name}
+          defaultValue={timetable.name}
           placeholder="Timetable Name"
           className="text-xl lg:w-1/3 w-4/5 bg-muted ring-primary-foreground ring-offset-slate-700 border-slate-700"
         />
