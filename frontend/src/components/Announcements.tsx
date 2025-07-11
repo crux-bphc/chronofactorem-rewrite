@@ -60,59 +60,63 @@ function Announcements() {
           <DialogTitle className="text-xl -mt-1">Announcements</DialogTitle>
         </DialogHeader>
         <DialogDescription asChild>
-          {isLoading && <Spinner />}
-          {isError && <ReportIssue error={JSON.stringify(error)} />}
-          <div className="flex flex-col-reverse mx-3 mt-1 gap-3 divide-y divide-y-reverse">
-            {Array.isArray(announcements) && announcements?.length ? (
-              announcements
-                ?.sort((a, b) => {
-                  const isUnreadA = !readAnnouncements.includes(a.id);
-                  const isUnreadB = !readAnnouncements.includes(b.id);
+          {isLoading ? (
+            <Spinner />
+          ) : isError ? (
+            <ReportIssue error={JSON.stringify(error)} />
+          ) : (
+            <div className="flex flex-col-reverse mx-3 mt-1 gap-3 divide-y divide-y-reverse">
+              {Array.isArray(announcements) && announcements?.length ? (
+                announcements
+                  ?.sort((a, b) => {
+                    const isUnreadA = !readAnnouncements.includes(a.id);
+                    const isUnreadB = !readAnnouncements.includes(b.id);
 
-                  if (isUnreadA !== isUnreadB) {
-                    return isUnreadA ? -1 : 1;
-                  }
+                    if (isUnreadA !== isUnreadB) {
+                      return isUnreadA ? -1 : 1;
+                    }
 
-                  return (
-                    new Date(b.createdAt as string).getTime() -
-                    new Date(a.createdAt as string).getTime()
-                  );
-                })
-                .reverse()
-                .map((announcement) => (
-                  <div
-                    key={announcement.id}
-                    className={`flex gap-1 flex-col ${
-                      readAnnouncements.includes(announcement.id)
-                        ? "opacity-50"
-                        : ""
-                    }`}
-                  >
-                    <h1 className="font-bold text-base">
-                      {announcement.title}
-                    </h1>
-                    <p className="opacity-70 text-xs">
-                      {new Date(
-                        announcement.createdAt as string,
-                      ).toLocaleString()}
-                    </p>
-                    <p className="opacity-90 mb-3">{announcement.message}</p>
-                    {!readAnnouncements.includes(announcement.id) && (
-                      <Button
-                        onClick={() => markAsRead(announcement.id)}
-                        className="mb-3"
-                        size="sm"
-                        variant="outline"
-                      >
-                        Mark as Read
-                      </Button>
-                    )}
-                  </div>
-                ))
-            ) : (
-              <p>No announcements</p>
-            )}
-          </div>
+                    return (
+                      new Date(b.createdAt as string).getTime() -
+                      new Date(a.createdAt as string).getTime()
+                    );
+                  })
+                  .reverse()
+                  .map((announcement) => (
+                    <div
+                      key={announcement.id}
+                      className={`flex gap-1 flex-col ${
+                        readAnnouncements.includes(announcement.id)
+                          ? "opacity-50"
+                          : ""
+                      }`}
+                    >
+                      <h1 className="font-bold text-base">
+                        {announcement.title}
+                      </h1>
+                      <p className="opacity-70 text-xs">
+                        {new Date(
+                          announcement.createdAt as string,
+                        ).toLocaleString()}
+                      </p>
+                      <p className="opacity-90 mb-3">{announcement.message}</p>
+                      {!readAnnouncements.includes(announcement.id) && (
+                        <Button
+                          onClick={() => markAsRead(announcement.id)}
+                          className="mb-3"
+                          size="sm"
+                          variant="outline"
+                        >
+                          Mark as Read
+                        </Button>
+                      )}
+                    </div>
+                  ))
+              ) : (
+                <p>No announcements</p>
+              )}
+            </div>
+          )}
         </DialogDescription>
       </DialogContent>
     </Dialog>
