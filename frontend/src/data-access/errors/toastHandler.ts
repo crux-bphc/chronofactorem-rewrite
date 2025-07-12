@@ -1,7 +1,7 @@
 import { AxiosError } from "axios";
 import type { toast } from "@/components/ui/use-toast";
 import { HTTPError, UnknownError } from ".";
-import handleLoginRedirect from "./redirectToLogin";
+import { handleLoginRedirect } from "./handlers";
 
 const toastHandler = (error: Error, toaster: typeof toast) => {
   if (error instanceof AxiosError && error.response) {

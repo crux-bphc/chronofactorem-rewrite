@@ -4,7 +4,7 @@ import { useState } from "react";
 import DegreeDropDown from "@/components/DegreeDropDown";
 import ReportIssue from "@/components/ReportIssue";
 import { Button } from "@/components/ui/button";
-import handleLoginRedirect from "@/data-access/errors/redirectToLogin";
+import { handleLoginRedirect } from "@/data-access/errors/handlers";
 import toastHandler from "@/data-access/errors/toastHandler";
 import useEditUser from "@/data-access/useEditUser";
 import useUser, { userQueryOptions } from "@/data-access/useUser";

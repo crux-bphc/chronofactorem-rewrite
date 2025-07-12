@@ -10,8 +10,10 @@ import {
   TimetableProvider,
   useTimetableState,
 } from "@/context";
-import handleNotFound from "@/data-access/errors/handleNotFound";
-import handleLoginRedirect from "@/data-access/errors/redirectToLogin";
+import {
+  handleLoginRedirect,
+  handleNotFound,
+} from "@/data-access/errors/handlers";
 import toastHandler from "@/data-access/errors/toastHandler";
 import { courseQueryOptions } from "@/data-access/useCourses";
 import { timetableQueryOptions } from "@/data-access/useTimetable";

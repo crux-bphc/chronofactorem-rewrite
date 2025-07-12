@@ -3,7 +3,7 @@ import type { timetableType } from "lib";
 import { CalendarX2 } from "lucide-react";
 import type { z } from "zod";
 import ReportIssue from "@/components/ReportIssue";
-import handleLoginRedirect from "@/data-access/errors/redirectToLogin";
+import { handleLoginRedirect } from "@/data-access/errors/handlers";
 import toastHandler from "@/data-access/errors/toastHandler";
 import useCreateTimetable from "@/data-access/useCreateTimetable";
 import useUser, { userQueryOptions } from "@/data-access/useUser";

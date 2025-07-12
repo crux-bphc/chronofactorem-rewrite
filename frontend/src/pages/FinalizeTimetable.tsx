@@ -8,7 +8,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import handleLoginRedirect from "@/data-access/errors/redirectToLogin";
+import {
+  handleLoginRedirect,
+  handleNotFound,
+} from "@/data-access/errors/handlers";
 import toastHandler from "@/data-access/errors/toastHandler";
 import useEditTimetable from "@/data-access/useEditTimetable";
 import useTimetable, {
@@ -30,6 +33,7 @@ const finalizeTimetableRoute = new Route({
   errorComponent: ({ error }) => {
     const { toast } = useToast();
     handleLoginRedirect(error);
+    handleNotFound(error);
     toastHandler(error, toast);
   },
 });

@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import handleLoginRedirect from "@/data-access/errors/redirectToLogin";
+import { handleLoginRedirect } from "@/data-access/errors/handlers";
 import toastHandler from "@/data-access/errors/toastHandler";
 import useSearchQuery, {
   searchQueryOptions,
