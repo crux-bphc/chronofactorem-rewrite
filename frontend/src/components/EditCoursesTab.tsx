@@ -19,8 +19,9 @@ const EditCoursesTab = () => {
             variant={"secondary"}
             onClick={() => {
               dispatch({
-                type: TimetableActionType.SetSelectedCourseID,
+                type: TimetableActionType.SetSelectedCourseAndSection,
                 courseID: course.id,
+                sectionType: null,
               });
             }}
             key={course.id}

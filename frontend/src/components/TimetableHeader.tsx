@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/tooltip";
 import { TimetableActionType, useTimetableState } from "@/context";
 import toastHandler from "@/data-access/errors/toastHandler";
+import useDeleteTimetable from "@/data-access/useDeleteTimetable";
+import useEditTimetable from "@/data-access/useEditTimetable";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -56,16 +58,8 @@ const TimetableHeader = ({
     dispatch,
   } = useTimetableState();
   const queryClient = useQueryClient();
-  const deleteMutation = useMutation({
-    mutationFn: () => {
-      return axios.post(`/api/timetable/${timetable?.id}/delete`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-      router.navigate({ to: "/" });
-    },
-    onError: (error) => toastHandler(error, toast),
-  });
+  const { mutate: deleteTimetable } = useDeleteTimetable();
+  const { mutate: editTimetable } = useEditTimetable();
 
   const copyMutation = useMutation({
     mutationFn: () => {
@@ -91,24 +85,6 @@ const TimetableHeader = ({
       }[],
     [cdcs],
   );
-  const editMutation = useMutation({
-    mutationFn: (body: {
-      name: string;
-      isPrivate: boolean;
-      isDraft: boolean;
-    }) => {
-      return axios.post(`/api/timetable/${timetable?.id}/edit`, body);
-    },
-    onSuccess: () => {
-      if (timetable === undefined) return;
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-      router.navigate({
-        to: "/edit/$timetableId",
-        params: { timetableId: timetable?.id },
-      });
-    },
-    onError: (error) => toastHandler(error, toast),
-  });
 
   const missingCDCs = useMemo(() => {
     const missing: {
@@ -171,8 +147,9 @@ const TimetableHeader = ({
       tab: "CDCs",
     });
     dispatch({
-      type: TimetableActionType.SetSelectedCourseID,
+      type: TimetableActionType.SetSelectedCourseAndSection,
       courseID: courseId === "" ? null : courseId,
+      sectionType: null,
     });
   };
 
@@ -314,11 +291,23 @@ const TimetableHeader = ({
                 variant="ghost"
                 className="rounded-full p-3"
                 onClick={() =>
-                  editMutation.mutate({
-                    isDraft: true,
-                    isPrivate: true,
-                    name: timetable?.name ?? "",
-                  })
+                  editTimetable(
+                    {
+                      id: timetable.id,
+                      body: {
+                        isDraft: true,
+                        isPrivate: true,
+                        name: timetable?.name ?? "",
+                      },
+                    },
+                    {
+                      onSuccess: () =>
+                        router.navigate({
+                          to: "/edit/$timetableId",
+                          params: { timetableId: timetable.id },
+                        }),
+                    },
+                  )
                 }
               >
                 <Edit2 className="w-5 h-5 md:w-6 md:h-6" />
@@ -400,7 +389,11 @@ const TimetableHeader = ({
                 <AlertDialogPrimitive.Action asChild>
                   <Button
                     variant="destructive"
-                    onClick={() => deleteMutation.mutate()}
+                    onClick={() =>
+                      deleteTimetable(timetable.id, {
+                        onSuccess: () => router.navigate({ to: "/" }),
+                      })
+                    }
                   >
                     Delete
                   </Button>
@@ -451,14 +444,11 @@ const TimetableHeader = ({
                           <Button
                             onClick={() => {
                               dispatch({
-                                type: TimetableActionType.SetSelectedCourseID,
+                                type: TimetableActionType.SetSelectedCourseAndSection,
                                 courseID: courses.filter(
                                   (x) => x.code === warning.split(":")[0],
                                 )[0].id,
-                              });
-                              dispatch({
-                                type: TimetableActionType.SetSelectedSectionType,
-                                courseType: x as "L" | "P" | "T",
+                                sectionType: x as "L" | "P" | "T",
                               });
                             }}
                             className="p-2 w-fit h-fit ml-2 mb-1 bg-transparent hover:bg-slate-300 dark:hover:bg-muted-foreground/30 text-secondary-foreground rounded-full"

@@ -1,6 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Route } from "@tanstack/react-router";
-import axios from "axios";
 import { Clipboard, ClipboardCheck, Globe, Lock } from "lucide-react";
 import { useRef, useState } from "react";
 import ReportIssue from "@/components/ReportIssue";
@@ -12,6 +10,7 @@ import {
 } from "@/components/ui/tooltip";
 import handleLoginRedirect from "@/data-access/errors/redirectToLogin";
 import toastHandler from "@/data-access/errors/toastHandler";
+import useEditTimetable from "@/data-access/useEditTimetable";
 import useTimetable, {
   timetableQueryOptions,
 } from "@/data-access/useTimetable";
@@ -19,22 +18,18 @@ import authenticatedRoute from "../AuthenticatedRoute";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { toast, useToast } from "../components/ui/use-toast";
+import { useToast } from "../components/ui/use-toast";
 import { router } from "../main";
 
 const finalizeTimetableRoute = new Route({
   getParentRoute: () => authenticatedRoute,
   path: "finalize/$timetableId",
   loader: ({ context: { queryClient }, params: { timetableId } }) =>
-    queryClient
-      .ensureQueryData(timetableQueryOptions(timetableId))
-      .catch((error: Error) => {
-        handleLoginRedirect(error);
-        throw error;
-      }),
+    queryClient.ensureQueryData(timetableQueryOptions(timetableId)),
   component: FinalizeTimetable,
   errorComponent: ({ error }) => {
     const { toast } = useToast();
+    handleLoginRedirect(error);
     toastHandler(error, toast);
   },
 });
@@ -60,27 +55,8 @@ function FinalizeTimetable() {
     isLoading: isTimetableLoading,
     error: timetableError,
   } = useTimetable(timetableId);
-  const queryClient = useQueryClient();
 
-  const submitMutation = useMutation({
-    mutationFn: (body: {
-      name: string | undefined;
-      isPrivate: boolean;
-      isDraft: boolean;
-    }) => {
-      return axios.post(`/api/timetable/${timetableId}/edit`, body, {
-        headers: { "Content-Type": "application/json" },
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-      router.navigate({
-        to: "/",
-        params: { timetableId: timetableId },
-      });
-    },
-    onError: (error) => toastHandler(error, toast),
-  });
+  const { mutate: editTimetable } = useEditTimetable();
 
   if (isTimetableLoading) {
     return <span>Loading...</span>;
@@ -163,11 +139,24 @@ function FinalizeTimetable() {
         <Button
           className="bg-green-700 hover:bg-green-600 w-1/3 mt-8 text-green-100 px-4 mr-0 text-lg font-bold"
           onClick={() =>
-            submitMutation.mutate({
-              name: nameInput.current?.value,
-              isPrivate: privateTimetable,
-              isDraft: false,
-            })
+            editTimetable(
+              {
+                id: timetable.id,
+                body: {
+                  name: nameInput.current?.value || timetable.name,
+                  isPrivate: privateTimetable,
+                  isDraft: false,
+                },
+              },
+              {
+                onSuccess: () => {
+                  router.navigate({
+                    to: "/",
+                    params: { timetableId: timetableId },
+                  });
+                },
+              },
+            )
           }
         >
           Finish

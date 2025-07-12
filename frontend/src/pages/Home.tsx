@@ -1,4 +1,3 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { Route } from "@tanstack/react-router";
 import type { timetableType } from "lib";
 import { CalendarX2 } from "lucide-react";
@@ -11,7 +10,7 @@ import useUser, { userQueryOptions } from "@/data-access/useUser";
 import authenticatedRoute from "../AuthenticatedRoute";
 import TimetableCard from "../components/TimetableCard";
 import { Button } from "../components/ui/button";
-import { toast, useToast } from "../components/ui/use-toast";
+import { useToast } from "../components/ui/use-toast";
 import { router } from "../main";
 
 type Timetable = z.infer<typeof timetableType>;
@@ -51,7 +50,6 @@ const homeRoute = new Route({
 
 function Home() {
   const { data: user, isLoading, isError, error } = useUser();
-  const queryClient = useQueryClient();
   const { mutate: createTimetable } = useCreateTimetable();
 
   if (isLoading) {
@@ -91,9 +89,7 @@ function Home() {
               className="text-lg sm:text-2xl py-6 px-10 font-bold"
               onClick={() =>
                 createTimetable(void null, {
-                  onError: (error) => toastHandler(error, toast),
                   onSuccess: (_response) => {
-                    queryClient.invalidateQueries({ queryKey: ["user"] });
                     router.navigate({
                       to: "/edit/$timetableId",
                       params: { timetableId: _response.data.id },

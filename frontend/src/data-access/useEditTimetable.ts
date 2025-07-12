@@ -3,22 +3,27 @@ import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
 import toastHandler from "./errors/toastHandler";
 
-const useCreateTimetable = () => {
+type EditTimetableParams = {
+  id: string;
+  body: {
+    name: string;
+    isPrivate: boolean;
+    isDraft: boolean;
+  };
+};
+
+const useEditTimetable = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () => {
-      return axios.post<{ message: string; id: string }>(
-        "/api/timetable/create",
-      );
+    mutationFn: (data: EditTimetableParams) => {
+      return axios.post(`/api/timetable/${data.id}/edit`, data.body);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["user"],
-      });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
     onError: (e) => toastHandler(e, toast),
   });
 };
 
-export default useCreateTimetable;
+export default useEditTimetable;

@@ -1,104 +1,44 @@
-import {
-  type UseMutationResult,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
-import axios, { AxiosError } from "axios";
 import type { sectionType } from "lib";
 import { ArrowLeft } from "lucide-react";
 import { useMemo } from "react";
 import type z from "zod";
 import { TimetableActionType, useTimetableState } from "@/context";
+import useTimetableSectionAction from "@/data-access/useTimetableSectionAction";
 import { Button } from "./ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
-const CourseDetailsMenu = ({
-  addSectionMutation,
-  removeSectionMutation,
-}: {
-  addSectionMutation: UseMutationResult<
-    unknown,
-    Error,
-    {
-      sectionId: string;
-    },
-    unknown
-  >;
-  removeSectionMutation: UseMutationResult<
-    unknown,
-    Error,
-    {
-      sectionId: string;
-    },
-    unknown
-  >;
-}) => {
+const CourseDetailsMenu = () => {
   const {
     state: { timetable, course, uniqueSectionTypes, currentSectionType },
     dispatch,
   } = useTimetableState();
-  const queryClient = useQueryClient();
-
-  const swapCourseMutation = useMutation({
-    mutationFn: async ({
-      removeId,
-      addId,
-    }: {
-      removeId: string;
-      addId: string;
-    }) => {
-      await axios.post(
-        `/api/timetable/${timetable?.id}/remove`,
-        { sectionId: removeId },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-      const result2 = await axios.post(
-        `/api/timetable/${timetable?.id}/add`,
-        { sectionId: addId },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-      return result2.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["timetable", timetable?.id] });
-    },
-    onError: (error) => {
-      if (error instanceof AxiosError && error.response) {
-        console.log(error.response.data.message);
-      }
-    },
-  });
+  const { mutate: sectionAction } = useTimetableSectionAction(timetable?.id);
 
   const handleSectionClick = (section: z.infer<typeof sectionType>) => {
-    if (timetable === undefined) return;
+    if (timetable === undefined || currentSectionType === null) return;
     if (timetable.sections.find((e) => e.id === section.id)) {
-      removeSectionMutation.mutate({ sectionId: section.id });
+      sectionAction({ sectionId: section.id, action: "remove" });
     } else {
       const other = timetable.sections.find(
         (e) => e.type === section.type && e.courseId === section.courseId,
       );
       if (other !== undefined) {
-        swapCourseMutation.mutate({
-          removeId: other.id,
-          addId: section.id,
-        });
+        sectionAction(
+          { sectionId: other.id, action: "remove" },
+          {
+            onSuccess: () =>
+              sectionAction({ sectionId: section.id, action: "add" }),
+          },
+        );
       } else {
-        addSectionMutation.mutate({ sectionId: section.id });
+        sectionAction({ sectionId: section.id, action: "add" });
         if (
           uniqueSectionTypes.indexOf(currentSectionType) <
           uniqueSectionTypes.length - 1
         ) {
           dispatch({
             type: TimetableActionType.SetSelectedSectionType,
-            courseType:
+            sectionType:
               uniqueSectionTypes[
                 uniqueSectionTypes.indexOf(currentSectionType) + 1
               ],
@@ -136,8 +76,9 @@ const CourseDetailsMenu = ({
           className="rounded-full flex ml-2 px-2 mr-2 items-center hover:bg-secondary-foreground/10"
           onClick={() =>
             dispatch({
-              type: TimetableActionType.SetSelectedCourseID,
+              type: TimetableActionType.SetSelectedCourseAndSection,
               courseID: null,
+              sectionType: null,
             })
           }
         >
@@ -147,7 +88,10 @@ const CourseDetailsMenu = ({
           {course?.code}: {` ${course?.name}`}
         </span>
       </div>
-      <Tabs value={currentSectionType} className=" h-[calc(100vh-20rem)]">
+      <Tabs
+        value={currentSectionType ?? undefined}
+        className=" h-[calc(100vh-20rem)]"
+      >
         <TabsList className="w-full mb-2">
           {uniqueSectionTypes.map((sectionType) => {
             return (
@@ -156,7 +100,7 @@ const CourseDetailsMenu = ({
                 onClick={() => {
                   dispatch({
                     type: TimetableActionType.SetSelectedSectionType,
-                    courseType: sectionType,
+                    sectionType: sectionType,
                   });
                 }}
                 key={sectionType}

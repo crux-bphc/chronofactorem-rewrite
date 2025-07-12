@@ -3,14 +3,12 @@ import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
 import toastHandler from "./errors/toastHandler";
 
-const useCreateTimetable = () => {
+const useDeleteTimetable = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () => {
-      return axios.post<{ message: string; id: string }>(
-        "/api/timetable/create",
-      );
+    mutationFn: (id: string) => {
+      return axios.post(`/api/timetable/${id}/delete`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -21,4 +19,4 @@ const useCreateTimetable = () => {
   });
 };
 
-export default useCreateTimetable;
+export default useDeleteTimetable;

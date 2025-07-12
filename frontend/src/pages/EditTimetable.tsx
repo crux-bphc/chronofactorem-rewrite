@@ -1,6 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Route } from "@tanstack/react-router";
-import axios from "axios";
 import { Menu } from "lucide-react";
 import { useEffect } from "react";
 import CourseDetailsMenu from "@/components/CourseDetailsMenu";
@@ -17,6 +15,7 @@ import handleLoginRedirect from "@/data-access/errors/redirectToLogin";
 import toastHandler from "@/data-access/errors/toastHandler";
 import { courseQueryOptions } from "@/data-access/useCourses";
 import { timetableQueryOptions } from "@/data-access/useTimetable";
+import useTimetableSectionAction from "@/data-access/useTimetableSectionAction";
 import { userQueryOptions } from "@/data-access/useUser";
 import authenticatedRoute from "../AuthenticatedRoute";
 import NotFound from "../components/NotFound";
@@ -67,7 +66,6 @@ function EditTimetable() {
     },
     dispatch,
   } = useTimetableState();
-  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!timetable) return;
@@ -96,45 +94,7 @@ function EditTimetable() {
     });
   }, [timetable, user]);
 
-  const addSectionMutation = useMutation({
-    mutationFn: async (body: { sectionId: string }) => {
-      const result = await axios.post(
-        `/api/timetable/${timetable?.id}/add`,
-        body,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      return result.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["timetable", timetable?.id] });
-    },
-    onError: (error) => toastHandler(error, toast),
-  });
-
-  const removeSectionMutation = useMutation({
-    mutationFn: async (body: { sectionId: string }) => {
-      const result = await axios.post(
-        `/api/timetable/${timetable?.id}/remove`,
-        body,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      return result.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["timetable", timetable?.id] });
-    },
-    onError: (error) => toastHandler(error, toast),
-  });
+  const { mutate: sectionAction } = useTimetableSectionAction(timetable?.id);
 
   if (timetable === undefined || courses === undefined || user === undefined) {
     return <ReportIssue error={"Error fetching queries"} />;
@@ -142,10 +102,7 @@ function EditTimetable() {
 
   const SideBar =
     currentCourseID !== null ? (
-      <CourseDetailsMenu
-        addSectionMutation={addSectionMutation}
-        removeSectionMutation={removeSectionMutation}
-      />
+      <CourseDetailsMenu />
     ) : (
       <SideMenu isOnEditPage={true} isScreenshotMode={false} />
     );
@@ -183,18 +140,15 @@ function EditTimetable() {
                   if (e?.courseId && e?.type) {
                     if (event.detail === 1) {
                       dispatch({
-                        type: TimetableActionType.SetSelectedCourseID,
+                        type: TimetableActionType.SetSelectedCourseAndSection,
                         courseID: courses.filter(
                           (x) => x.code === e?.courseId,
                         )[0].id,
-                      });
-                      dispatch({
-                        type: TimetableActionType.SetSelectedSectionType,
-                        courseType: e?.type as "L" | "P" | "T",
+                        sectionType: e?.type as "L" | "P" | "T",
                       });
                     } else if (event.detail >= 2) {
                       e?.id
-                        ? removeSectionMutation.mutate({ sectionId: e?.id })
+                        ? sectionAction({ sectionId: e?.id, action: "remove" })
                         : console.log("error:", e);
                     }
                   } else {
@@ -203,7 +157,7 @@ function EditTimetable() {
                 }}
                 handleUnitDelete={(e) => {
                   e?.id
-                    ? removeSectionMutation.mutate({ sectionId: e?.id })
+                    ? sectionAction({ sectionId: e?.id, action: "remove" })
                     : console.log("error:", e);
                 }}
                 isOnEditPage={true}

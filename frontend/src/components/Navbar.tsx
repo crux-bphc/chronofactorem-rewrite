@@ -1,4 +1,3 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { Link, useRouter } from "@tanstack/react-router";
 import { Info, LogOut, Pencil, Plus, Search } from "lucide-react";
 import { useCookies } from "react-cookie";
@@ -10,8 +9,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useToast } from "@/components/ui/use-toast";
-import toastHandler from "@/data-access/errors/toastHandler";
 import useCreateTimetable from "@/data-access/useCreateTimetable";
 import useUser from "@/data-access/useUser";
 import { router } from "../main";
@@ -34,9 +31,7 @@ export function NavBar() {
     isError: isUserError,
     isFetching: isUserFetching,
   } = useUser();
-  const { toast } = useToast();
   const { mutate: createTimetable } = useCreateTimetable();
-  const queryClient = useQueryClient();
 
   const ChronoLogoText = (
     <>
@@ -68,9 +63,7 @@ export function NavBar() {
               userQueryResultData
                 ? () =>
                     createTimetable(void null, {
-                      onError: (error) => toastHandler(error, toast),
                       onSuccess: (_response) => {
-                        queryClient.invalidateQueries({ queryKey: ["user"] });
                         router.navigate({
                           to: "/edit/$timetableId",
                           params: { timetableId: _response.data.id },

@@ -36,7 +36,7 @@ export type TimetableStateType = {
   currentCourseID: string | null;
   course: z.infer<typeof courseWithSectionsType> | undefined;
   uniqueSectionTypes: sectionTypeList;
-  currentSectionType: sectionTypeEnum;
+  currentSectionType: sectionTypeEnum | null;
   currentTab: TabType;
   screenIsLarge: boolean;
   timetableDetailsSections: TimetableSectionType[];
@@ -45,7 +45,7 @@ export type TimetableStateType = {
 export enum TimetableActionType {
   ToggleVertical = 0,
   SetLoading = 1,
-  SetSelectedCourseID = 2,
+  SetSelectedCourseAndSection = 2,
   SetSelectedSectionType = 3,
   SetMenuTab = 4,
   UpdateScreenIsLarge = 5,
@@ -63,12 +63,13 @@ export type Action =
       loading: boolean;
     }
   | {
-      type: TimetableActionType.SetSelectedCourseID;
+      type: TimetableActionType.SetSelectedCourseAndSection;
       courseID: string | null;
+      sectionType: sectionTypeEnum | null;
     }
   | {
       type: TimetableActionType.SetSelectedSectionType;
-      courseType: sectionTypeEnum;
+      sectionType: sectionTypeEnum;
     }
   | {
       type: TimetableActionType.SetMenuTab;
