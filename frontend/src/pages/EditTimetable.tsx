@@ -136,15 +136,6 @@ function EditTimetable() {
     onError: (error) => toastHandler(error, toast),
   });
 
-  useEffect(() => {
-    window.matchMedia("(min-width: 1024px)").addEventListener("change", (e) =>
-      dispatch({
-        type: TimetableActionType.UpdateScreenIsLarge,
-        screenIsLarge: e.matches,
-      }),
-    );
-  }, [dispatch]);
-
   if (timetable === undefined || courses === undefined || user === undefined) {
     return <ReportIssue error={"Error fetching queries"} />;
   }
@@ -161,14 +152,19 @@ function EditTimetable() {
 
   return (
     <>
-      {!isLoading ? (
+      {isLoading ? (
+        <div className="flex flex-col text-muted-foreground gap-8 xl:text-xl lg:text-lg md:text-md text-sm bg-background h-[calc(100dvh-5rem)] justify-center w-full items-center">
+          <Spinner />
+          <span>Please wait while we copy over your timetable...</span>
+        </div>
+      ) : (
         <div className="grow h-[calc(100vh-12rem)]">
           <TooltipProvider>
             <TimetableHeader
               isOnEditPage={true}
               generateScreenshot={() => null}
             />
-            <div className="flex flex-row gap-4 sm:h-full relative">
+            <div className="flex flex-row gap-4 h-full relative">
               {screenIsLarge ? (
                 SideBar
               ) : (
@@ -214,11 +210,6 @@ function EditTimetable() {
               />
             </div>
           </TooltipProvider>
-        </div>
-      ) : (
-        <div className="flex flex-col text-muted-foreground gap-8 xl:text-xl lg:text-lg md:text-md text-sm bg-background h-[calc(100dvh-5rem)] justify-center w-full items-center">
-          <Spinner />
-          <span>Please wait while we copy over your timetable...</span>
         </div>
       )}
     </>

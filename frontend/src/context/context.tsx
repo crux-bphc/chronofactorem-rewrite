@@ -83,6 +83,15 @@ export const TimetableProvider = ({
     });
   }, [course]);
 
+  useEffect(() => {
+    window.matchMedia("(min-width: 1024px)").addEventListener("change", (e) =>
+      dispatch({
+        type: TimetableActionType.UpdateScreenIsLarge,
+        screenIsLarge: e.matches,
+      }),
+    );
+  }, []);
+
   if (isUserLoading || isCoursesLoading || isTimetableLoading) {
     return <Spinner />;
   }

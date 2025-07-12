@@ -1,7 +1,7 @@
 import { Route } from "@tanstack/react-router";
 import { toPng } from "html-to-image";
 import { Menu } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import ReportIssue from "@/components/ReportIssue";
 import ReportIssueToastAction from "@/components/ReportIssueToastAction";
 import TimetableHeader from "@/components/TimetableHeader";
@@ -60,15 +60,6 @@ function ViewTimetable() {
 
   const screenshotContentRef = useRef<HTMLDivElement>(null);
   const [isScreenshotMode, setIsScreenshotMode] = useState(false);
-
-  useEffect(() => {
-    window.matchMedia("(min-width: 1024px)").addEventListener("change", (e) =>
-      dispatch({
-        type: TimetableActionType.UpdateScreenIsLarge,
-        screenIsLarge: e.matches,
-      }),
-    );
-  }, [dispatch]);
 
   const generateScreenshot = useCallback(() => {
     const screenShotContent = screenshotContentRef.current;
@@ -133,7 +124,12 @@ function ViewTimetable() {
 
   return (
     <>
-      {!isLoading ? (
+      {isLoading ? (
+        <div className="flex flex-col text-muted-foreground gap-8 xl:text-xl lg:text-lg md:text-md text-sm bg-background h-[calc(100dvh-5rem)] justify-center w-full items-center">
+          <Spinner />
+          <span>Please wait while we copy over your timetable...</span>
+        </div>
+      ) : (
         <div className="grow h-[calc(100vh-12rem)]">
           <TooltipProvider>
             <TimetableHeader
@@ -165,11 +161,6 @@ function ViewTimetable() {
               />
             </div>
           </TooltipProvider>
-        </div>
-      ) : (
-        <div className="flex flex-col text-muted-foreground gap-8 xl:text-xl lg:text-lg md:text-md text-sm bg-background h-[calc(100dvh-5rem)] justify-center w-full items-center">
-          <Spinner />
-          <span>Please wait while we copy over your timetable...</span>
         </div>
       )}
     </>
