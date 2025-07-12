@@ -1,6 +1,4 @@
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import {
   AlertOctagon,
   AlertTriangle,
@@ -20,7 +18,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { TimetableActionType, useTimetableState } from "@/context";
-import toastHandler from "@/data-access/errors/toastHandler";
+import useCopyTimetable from "@/data-access/useCopyTimetable";
 import useDeleteTimetable from "@/data-access/useDeleteTimetable";
 import useEditTimetable from "@/data-access/useEditTimetable";
 import {
@@ -36,7 +34,6 @@ import {
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { router } from "../main";
-import { toast } from "./ui/use-toast";
 
 const TimetableHeader = ({
   isOnEditPage,
@@ -57,25 +54,10 @@ const TimetableHeader = ({
     },
     dispatch,
   } = useTimetableState();
-  const queryClient = useQueryClient();
   const { mutate: deleteTimetable } = useDeleteTimetable();
   const { mutate: editTimetable } = useEditTimetable();
+  const { mutate: copyTimetable } = useCopyTimetable();
 
-  const copyMutation = useMutation({
-    mutationFn: () => {
-      return axios.post<{ message: string; id: string }>(
-        `/api/timetable/${timetable?.id}/copy`,
-      );
-    },
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-      router.navigate({
-        to: "/edit/$timetableId",
-        params: { timetableId: response.data.id },
-      });
-    },
-    onError: (error) => toastHandler(error, toast),
-  });
   const cdcNotFoundWarning = useMemo(
     () =>
       cdcs.filter((e) => e.id === null && e.type === "warning") as {
@@ -336,7 +318,13 @@ const TimetableHeader = ({
                   loading: true,
                 });
                 setTimeout(() => {
-                  copyMutation.mutate();
+                  copyTimetable(timetable.id, {
+                    onSuccess: (res) =>
+                      router.navigate({
+                        to: "/edit/$timetableId",
+                        params: { timetableId: res.data.id },
+                      }),
+                  });
                   setTimeout(() => {
                     dispatch({
                       type: TimetableActionType.SetLoading,

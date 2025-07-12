@@ -1,10 +1,6 @@
-import { queryOptions, useQuery } from "@tanstack/react-query";
 import { Route } from "@tanstack/react-router";
-import axios from "axios";
-import type { timetableWithSectionsType } from "lib";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
-import type { z } from "zod";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -15,6 +11,9 @@ import {
 } from "@/components/ui/card";
 import handleLoginRedirect from "@/data-access/errors/redirectToLogin";
 import toastHandler from "@/data-access/errors/toastHandler";
+import useSearchQuery, {
+  searchQueryOptions,
+} from "@/data-access/useSearchQuery";
 import authenticatedRoute from "../AuthenticatedRoute";
 import {
   Pagination,
@@ -26,32 +25,6 @@ import {
 import { useToast } from "../components/ui/use-toast";
 import { router } from "../main";
 
-const fetchSearchDetails = async (
-  query: string,
-): Promise<z.infer<typeof timetableWithSectionsType>[]> => {
-  const response = await axios.get<z.infer<typeof timetableWithSectionsType>[]>(
-    `/api/timetable/search?${query}`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    },
-  );
-  return response.data;
-};
-
-// biome-ignore lint/suspicious/noExplicitAny: will need nontrivial fix and maybe some kind of update since that Route function signature is deprecated
-const searchQueryOptions = (deps: Record<string, any>) => {
-  for (const key of Object.keys(deps)) {
-    if (deps[key] === undefined) delete deps[key];
-  }
-  const query = new URLSearchParams(deps).toString();
-  return queryOptions({
-    queryKey: ["search_timetables", query],
-    queryFn: () => fetchSearchDetails(query),
-  });
-};
-
 const searchRoute = new Route({
   getParentRoute: () => authenticatedRoute,
   path: "/search",
@@ -59,14 +32,10 @@ const searchRoute = new Route({
   validateSearch: (search) => search,
   loaderDeps: ({ search }) => search,
   loader: ({ context: { queryClient }, deps }) =>
-    queryClient
-      .ensureQueryData(searchQueryOptions(deps))
-      .catch((error: Error) => {
-        handleLoginRedirect(error);
-        throw error;
-      }),
+    queryClient.ensureQueryData(searchQueryOptions(deps)),
   errorComponent: ({ error }) => {
     const { toast } = useToast();
+    handleLoginRedirect(error);
     toastHandler(error, toast);
   },
 });
@@ -74,7 +43,7 @@ const searchRoute = new Route({
 function SearchResults() {
   const initDeps = searchRoute.useLoaderDeps();
   const [deps, setDeps] = useState(initDeps);
-  const searchQueryResult = useQuery(searchQueryOptions(deps));
+  const searchQueryResult = useSearchQuery(deps);
 
   return (
     <main className="text-foreground py-6 md:py-12 px-10 md:px-16">

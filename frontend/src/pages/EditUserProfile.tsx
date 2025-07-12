@@ -1,6 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
 import { Route } from "@tanstack/react-router";
-import axios from "axios";
 import { getBatchFromEmail } from "lib";
 import { useState } from "react";
 import DegreeDropDown from "@/components/DegreeDropDown";
@@ -8,6 +6,7 @@ import ReportIssue from "@/components/ReportIssue";
 import { Button } from "@/components/ui/button";
 import handleLoginRedirect from "@/data-access/errors/redirectToLogin";
 import toastHandler from "@/data-access/errors/toastHandler";
+import useEditUser from "@/data-access/useEditUser";
 import useUser, { userQueryOptions } from "@/data-access/useUser";
 import authenticatedRoute from "../AuthenticatedRoute";
 import { useToast } from "../components/ui/use-toast";
@@ -33,6 +32,8 @@ const editUserProfileRoute = new Route({
 
 function EditUserProfile() {
   const { data: user, isLoading, isError, error } = useUser();
+  const { mutate: editUser } = useEditUser();
+  const { toast } = useToast();
 
   const [firstDegree, setFirstDegree] = useState<string | null>(
     user?.degrees?.[0] ?? null,
@@ -40,20 +41,6 @@ function EditUserProfile() {
   const [secondDegree, setSecondDegree] = useState<string | null>(
     user ? (user.degrees.length > 1 ? user.degrees[1] : null) : null,
   );
-
-  const { toast } = useToast();
-
-  const mutation = useMutation({
-    mutationFn: (body: { degrees: (string | null)[] }) => {
-      return axios.post("/api/user/edit", body, {
-        headers: { "Content-Type": "application/json" },
-      });
-    },
-    onSuccess: () => {
-      router.navigate({ to: "/" });
-    },
-    onError: (error) => toastHandler(error, toast),
-  });
 
   if (isLoading) {
     return <span>Loading...</span>;
@@ -73,7 +60,10 @@ function EditUserProfile() {
 
   const handleSubmit = async () => {
     if (firstDegree.includes("B") && secondDegree === null) {
-      alert("Select your second degree!");
+      toast({
+        title: "Select your second degree!",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -85,7 +75,12 @@ function EditUserProfile() {
         : [firstDegree]
       : [firstDegree];
 
-    mutation.mutate({ degrees });
+    editUser(
+      { degrees },
+      {
+        onSuccess: () => router.navigate({ to: "/" }),
+      },
+    );
   };
 
   return (

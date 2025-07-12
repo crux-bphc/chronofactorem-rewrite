@@ -1,6 +1,5 @@
-import { useMutation } from "@tanstack/react-query";
 import { Route } from "@tanstack/react-router";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { collegeYearType } from "lib";
 import { useState } from "react";
 import { z } from "zod";
@@ -8,6 +7,7 @@ import DegreeDropDown from "@/components/DegreeDropDown";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import toastHandler from "@/data-access/errors/toastHandler";
+import useCreateUser from "@/data-access/useCreateUser";
 import { userQueryOptions } from "@/data-access/useUser";
 import { rootRoute, router } from "../main";
 
@@ -52,18 +52,7 @@ function GetDegrees() {
   const [firstDegree, setFirstDegree] = useState<string | null>(null);
   const [secondDegree, setSecondDegree] = useState<string | null>(null);
   const { toast } = useToast();
-
-  const mutation = useMutation({
-    mutationFn: (body: { degrees: (string | null)[] }) => {
-      return axios.post("/api/auth/submit", body, {
-        headers: { "Content-Type": "application/json" },
-      });
-    },
-    onSuccess: () => {
-      router.navigate({ to: "/" });
-    },
-    onError: (error) => toastHandler(error, toast),
-  });
+  const { mutate: createUser } = useCreateUser();
 
   const handleSubmit = async () => {
     if (firstDegree) {
@@ -78,7 +67,14 @@ function GetDegrees() {
         firstDegree?.includes("B") && year >= 2 && secondDegree !== "A0"
           ? [firstDegree, secondDegree]
           : [firstDegree];
-      mutation.mutate({ degrees });
+      createUser(
+        { degrees },
+        {
+          onSuccess: () => {
+            router.navigate({ to: "/" });
+          },
+        },
+      );
     } else {
       toast({
         title: "Select your degree!",
