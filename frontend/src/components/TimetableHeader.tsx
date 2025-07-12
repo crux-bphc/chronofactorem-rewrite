@@ -1,11 +1,6 @@
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import type {
-  courseType,
-  timetableWithSectionsType,
-  userWithTimetablesType,
-} from "lib";
 import {
   AlertOctagon,
   AlertTriangle,
@@ -18,13 +13,13 @@ import {
   Send,
   Trash,
 } from "lucide-react";
-import { type SetStateAction, useMemo } from "react";
-import type z from "zod";
+import { useMemo } from "react";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { TimetableActionType, useTimetableState } from "@/context";
 import toastHandler from "@/data-access/errors/toastHandler";
 import {
   AlertDialog,
@@ -42,42 +37,28 @@ import { router } from "../main";
 import { toast } from "./ui/use-toast";
 
 const TimetableHeader = ({
-  user,
-  courses,
-  timetable,
   isOnEditPage,
-  isVertical,
   generateScreenshot,
-  screenIsLarge,
-  setIsVertical,
-  setIsSpinner,
-  cdcs,
-  setCurrentCourseID,
-  coursesInTimetable,
-  setCurrentTab,
-  setSectionTypeChangeRequest,
 }: {
-  user: z.infer<typeof userWithTimetablesType>;
-  courses: z.infer<typeof courseType>[];
-  timetable: z.infer<typeof timetableWithSectionsType>;
   isOnEditPage: boolean;
-  screenIsLarge: boolean;
-  isVertical: boolean;
   generateScreenshot: () => void;
-  setIsVertical: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsSpinner: React.Dispatch<React.SetStateAction<boolean>>;
-  // TODO: Fix this
-  // biome-ignore lint/suspicious/noExplicitAny: hard to fix, will need some nontrivial solution
-  cdcs: any[];
-  setCurrentCourseID: React.Dispatch<React.SetStateAction<string | null>>;
-  coursesInTimetable: z.infer<typeof courseType>[];
-  setCurrentTab: React.Dispatch<React.SetStateAction<string>>;
-  setSectionTypeChangeRequest: React.Dispatch<SetStateAction<"L" | "P" | "T">>;
 }) => {
+  const {
+    state: {
+      isVertical,
+      user,
+      courses,
+      timetable,
+      coursesInTimetable,
+      cdcs,
+      screenIsLarge,
+    },
+    dispatch,
+  } = useTimetableState();
   const queryClient = useQueryClient();
   const deleteMutation = useMutation({
     mutationFn: () => {
-      return axios.post(`/api/timetable/${timetable.id}/delete`);
+      return axios.post(`/api/timetable/${timetable?.id}/delete`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
@@ -89,7 +70,7 @@ const TimetableHeader = ({
   const copyMutation = useMutation({
     mutationFn: () => {
       return axios.post<{ message: string; id: string }>(
-        `/api/timetable/${timetable.id}/copy`,
+        `/api/timetable/${timetable?.id}/copy`,
       );
     },
     onSuccess: (response) => {
@@ -116,13 +97,14 @@ const TimetableHeader = ({
       isPrivate: boolean;
       isDraft: boolean;
     }) => {
-      return axios.post(`/api/timetable/${timetable.id}/edit`, body);
+      return axios.post(`/api/timetable/${timetable?.id}/edit`, body);
     },
     onSuccess: () => {
+      if (timetable === undefined) return;
       queryClient.invalidateQueries({ queryKey: ["user"] });
       router.navigate({
         to: "/edit/$timetableId",
-        params: { timetableId: timetable.id },
+        params: { timetableId: timetable?.id },
       });
     },
     onError: (error) => toastHandler(error, toast),
@@ -184,13 +166,18 @@ const TimetableHeader = ({
   }, [coursesInTimetable, cdcs]);
 
   const handleMissingCDCClick = (courseId: string) => {
-    setCurrentTab("CDCs");
-    if (courseId === "") {
-      setCurrentCourseID(null);
-    } else {
-      setCurrentCourseID(courseId);
-    }
+    dispatch({
+      type: TimetableActionType.SetMenuTab,
+      tab: "CDCs",
+    });
+    dispatch({
+      type: TimetableActionType.SetSelectedCourseID,
+      courseID: courseId === "" ? null : courseId,
+    });
   };
+
+  if (timetable === undefined || user === undefined || courses === undefined)
+    return;
 
   return (
     <div className="flex justify-between p-4">
@@ -303,7 +290,11 @@ const TimetableHeader = ({
               <Button
                 variant="ghost"
                 className="rounded-full p-3"
-                onClick={() => setIsVertical(!isVertical)}
+                onClick={() =>
+                  dispatch({
+                    type: TimetableActionType.ToggleVertical,
+                  })
+                }
               >
                 {isVertical ? <GripVertical /> : <GripHorizontal />}
               </Button>
@@ -351,11 +342,17 @@ const TimetableHeader = ({
               variant="ghost"
               className="rounded-full p-3"
               onClick={() => {
-                setIsSpinner(true);
+                dispatch({
+                  type: TimetableActionType.SetLoading,
+                  loading: true,
+                });
                 setTimeout(() => {
                   copyMutation.mutate();
                   setTimeout(() => {
-                    setIsSpinner(false);
+                    dispatch({
+                      type: TimetableActionType.SetLoading,
+                      loading: false,
+                    });
                   }, 1000);
                 }, 1000);
               }}
@@ -453,12 +450,16 @@ const TimetableHeader = ({
                           <span>missing a {x} section</span>
                           <Button
                             onClick={() => {
-                              setCurrentCourseID(
-                                courses.filter(
+                              dispatch({
+                                type: TimetableActionType.SetSelectedCourseID,
+                                courseID: courses.filter(
                                   (x) => x.code === warning.split(":")[0],
                                 )[0].id,
-                              );
-                              setSectionTypeChangeRequest(x as "L" | "P" | "T");
+                              });
+                              dispatch({
+                                type: TimetableActionType.SetSelectedSectionType,
+                                courseType: x as "L" | "P" | "T",
+                              });
                             }}
                             className="p-2 w-fit h-fit ml-2 mb-1 bg-transparent hover:bg-slate-300 dark:hover:bg-muted-foreground/30 text-secondary-foreground rounded-full"
                           >

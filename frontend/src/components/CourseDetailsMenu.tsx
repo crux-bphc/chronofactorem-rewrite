@@ -4,37 +4,18 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
-import type {
-  courseWithSectionsType,
-  sectionTypeList,
-  sectionTypeZodEnum,
-  timetableWithSectionsType,
-} from "lib";
+import type { sectionType } from "lib";
 import { ArrowLeft } from "lucide-react";
 import { useMemo } from "react";
 import type z from "zod";
+import { TimetableActionType, useTimetableState } from "@/context";
 import { Button } from "./ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 const CourseDetailsMenu = ({
-  timetable,
-  setCurrentCourseID,
-  currentCourse,
-  uniqueSectionTypes,
-  currentSectionType,
-  setCurrentSectionType,
   addSectionMutation,
   removeSectionMutation,
-  setSectionTypeChangeRequest,
 }: {
-  timetable: z.infer<typeof timetableWithSectionsType>;
-  setCurrentCourseID: React.Dispatch<React.SetStateAction<string | null>>;
-  currentCourse: z.infer<typeof courseWithSectionsType> | null | undefined;
-  uniqueSectionTypes: sectionTypeList;
-  currentSectionType: z.infer<typeof sectionTypeZodEnum>;
-  setCurrentSectionType: React.Dispatch<
-    React.SetStateAction<z.infer<typeof sectionTypeZodEnum>>
-  >;
   addSectionMutation: UseMutationResult<
     unknown,
     Error,
@@ -51,10 +32,11 @@ const CourseDetailsMenu = ({
     },
     unknown
   >;
-  setSectionTypeChangeRequest: React.Dispatch<
-    React.SetStateAction<"" | "L" | "P" | "T">
-  >;
 }) => {
+  const {
+    state: { timetable, course, uniqueSectionTypes, currentSectionType },
+    dispatch,
+  } = useTimetableState();
   const queryClient = useQueryClient();
 
   const swapCourseMutation = useMutation({
@@ -66,7 +48,7 @@ const CourseDetailsMenu = ({
       addId: string;
     }) => {
       await axios.post(
-        `/api/timetable/${timetable.id}/remove`,
+        `/api/timetable/${timetable?.id}/remove`,
         { sectionId: removeId },
         {
           headers: {
@@ -75,7 +57,7 @@ const CourseDetailsMenu = ({
         },
       );
       const result2 = await axios.post(
-        `/api/timetable/${timetable.id}/add`,
+        `/api/timetable/${timetable?.id}/add`,
         { sectionId: addId },
         {
           headers: {
@@ -86,7 +68,7 @@ const CourseDetailsMenu = ({
       return result2.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["timetable", timetable.id] });
+      queryClient.invalidateQueries({ queryKey: ["timetable", timetable?.id] });
     },
     onError: (error) => {
       if (error instanceof AxiosError && error.response) {
@@ -95,7 +77,8 @@ const CourseDetailsMenu = ({
     },
   });
 
-  const handleSectionClick = (section: (typeof timetable.sections)[number]) => {
+  const handleSectionClick = (section: z.infer<typeof sectionType>) => {
+    if (timetable === undefined) return;
     if (timetable.sections.find((e) => e.id === section.id)) {
       removeSectionMutation.mutate({ sectionId: section.id });
     } else {
@@ -113,17 +96,20 @@ const CourseDetailsMenu = ({
           uniqueSectionTypes.indexOf(currentSectionType) <
           uniqueSectionTypes.length - 1
         ) {
-          setCurrentSectionType(
-            uniqueSectionTypes[
-              uniqueSectionTypes.indexOf(currentSectionType) + 1
-            ],
-          );
+          dispatch({
+            type: TimetableActionType.SetSelectedSectionType,
+            courseType:
+              uniqueSectionTypes[
+                uniqueSectionTypes.indexOf(currentSectionType) + 1
+              ],
+          });
         }
       }
     }
   };
 
   const timings = useMemo(() => {
+    if (timetable === undefined) return new Map();
     const m = new Map<string, string>();
     for (const section of timetable.sections) {
       for (const roomTime of section.roomTime) {
@@ -140,20 +126,25 @@ const CourseDetailsMenu = ({
     return m;
   }, [timetable]);
 
+  if (timetable === undefined) return;
+
   return (
     <div className="bg-secondary w-[26rem] h-[calc(100vh-13rem)]">
       <div className="flex items-center py-2 w-full">
         <Button
           variant={"ghost"}
           className="rounded-full flex ml-2 px-2 mr-2 items-center hover:bg-secondary-foreground/10"
-          onClick={() => {
-            setCurrentCourseID(null);
-          }}
+          onClick={() =>
+            dispatch({
+              type: TimetableActionType.SetSelectedCourseID,
+              courseID: null,
+            })
+          }
         >
           <ArrowLeft />
         </Button>
         <span className="font-semibold text-md h-full">
-          {currentCourse?.code}: {` ${currentCourse?.name}`}
+          {course?.code}: {` ${course?.name}`}
         </span>
       </div>
       <Tabs value={currentSectionType} className=" h-[calc(100vh-20rem)]">
@@ -163,8 +154,10 @@ const CourseDetailsMenu = ({
               <TabsTrigger
                 value={sectionType}
                 onClick={() => {
-                  setCurrentSectionType(sectionType);
-                  setSectionTypeChangeRequest("");
+                  dispatch({
+                    type: TimetableActionType.SetSelectedSectionType,
+                    courseType: sectionType,
+                  });
                 }}
                 key={sectionType}
                 className="text-xl font-bold w-full"
@@ -183,7 +176,7 @@ const CourseDetailsMenu = ({
               key={sectionType}
             >
               <div className="flex flex-col gap-2 p-0 m-0 px-2 overflow-y-scroll w-[26rem] h-[calc(100vh-20rem)]">
-                {currentCourse?.sections
+                {course?.sections
                   .filter((section) => section.type === sectionType)
                   .map((section) => {
                     const tm = section.roomTime

@@ -1,8 +1,7 @@
-import type { courseType, timetableWithSectionsType } from "lib";
 import { Bird, ChevronRight, HelpCircle } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
-import type { z } from "zod";
+import { TimetableActionType, useTimetableState } from "@/context";
 import EditCoursesTab from "./EditCoursesTab";
 import ExamTab from "./ExamTab";
 import SideMenuTabs from "./SideMenuTabs";
@@ -13,90 +12,79 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import ViewCoursesTab from "./ViewCoursesTab";
 
 export function SideMenu({
-  timetable,
   isOnEditPage,
-  allCoursesDetails,
-  cdcs,
-  setCurrentCourseID,
-  coursesInTimetable,
-  currentTab,
-  setCurrentTab,
   isScreenshotMode,
 }: {
-  timetable: z.infer<typeof timetableWithSectionsType>;
   isOnEditPage: boolean;
-  allCoursesDetails: z.infer<typeof courseType>[];
-  // TODO: Fix this
-  // biome-ignore lint/suspicious/noExplicitAny: hard to fix, will need some nontrivial solution
-  cdcs: any[];
-  setCurrentCourseID: React.Dispatch<React.SetStateAction<string | null>>;
-  coursesInTimetable: z.infer<typeof courseType>[];
-  currentTab: string;
-  setCurrentTab: React.Dispatch<React.SetStateAction<string>>;
   isScreenshotMode: boolean;
 }) {
   const [searchTerm, setSearchTerm] = useState("");
+  const {
+    state: { courses, timetable, cdcs, currentTab },
+    dispatch,
+  } = useTimetableState();
   const [debouncedSearchTerm, _] = useDebounceValue<string>(searchTerm, 500);
-  const courseSearchResults = useMemo(
-    () =>
-      (debouncedSearchTerm === ""
-        ? allCoursesDetails
-        : allCoursesDetails.filter((e) =>
+
+  const courseSearchResults = useMemo(() => {
+    if (courses === undefined || timetable === undefined) return [];
+    return (
+      debouncedSearchTerm === ""
+        ? courses
+        : courses.filter((e) =>
             `${e.code}: ${e.name}`
               .toLowerCase()
               .includes(debouncedSearchTerm.toLowerCase()),
           )
-      ).map((e) => {
-        const withClash = e as unknown as {
-          id: string;
-          code: string;
-          name: string;
-          midsemStartTime: string | null;
-          midsemEndTime: string | null;
-          compreStartTime: string | null;
-          compreEndTime: string | null;
-          clashing: null | string[];
-        };
-        if (e.midsemStartTime === null && e.compreStartTime === null) {
-          withClash.clashing = null;
-          return withClash;
-        }
-        if (e.midsemStartTime === null && e.compreStartTime !== null) {
-          const clashes = timetable.examTimes.filter((x) => {
-            if (x.split("|")[0] === e.code) return false;
-            return x.includes(
-              `${withClash.compreStartTime}|${withClash.compreEndTime}`,
-            );
-          });
-          withClash.clashing = clashes.length === 0 ? null : clashes;
-          return withClash;
-        }
-        if (e.midsemStartTime !== null && e.compreStartTime === null) {
-          const clashes = timetable.examTimes.filter((x) => {
-            if (x.split("|")[0] === e.code) return false;
-            return x.includes(
-              `${withClash.midsemStartTime}|${withClash.midsemStartTime}`,
-            );
-          });
-          withClash.clashing = clashes.length === 0 ? null : clashes;
-          return withClash;
-        }
+    ).map((e) => {
+      const withClash = e as unknown as {
+        id: string;
+        code: string;
+        name: string;
+        midsemStartTime: string | null;
+        midsemEndTime: string | null;
+        compreStartTime: string | null;
+        compreEndTime: string | null;
+        clashing: null | string[];
+      };
+      if (e.midsemStartTime === null && e.compreStartTime === null) {
+        withClash.clashing = null;
+        return withClash;
+      }
+      if (e.midsemStartTime === null && e.compreStartTime !== null) {
         const clashes = timetable.examTimes.filter((x) => {
           if (x.split("|")[0] === e.code) return false;
-          return (
-            x.includes(
-              `${withClash.midsemStartTime}|${withClash.midsemEndTime}`,
-            ) ||
-            x.includes(
-              `${withClash.compreStartTime}|${withClash.compreEndTime}`,
-            )
+          return x.includes(
+            `${withClash.compreStartTime}|${withClash.compreEndTime}`,
           );
         });
         withClash.clashing = clashes.length === 0 ? null : clashes;
         return withClash;
-      }),
-    [allCoursesDetails, debouncedSearchTerm, timetable.examTimes],
-  );
+      }
+      if (e.midsemStartTime !== null && e.compreStartTime === null) {
+        const clashes = timetable.examTimes.filter((x) => {
+          if (x.split("|")[0] === e.code) return false;
+          return x.includes(
+            `${withClash.midsemStartTime}|${withClash.midsemStartTime}`,
+          );
+        });
+        withClash.clashing = clashes.length === 0 ? null : clashes;
+        return withClash;
+      }
+      const clashes = timetable.examTimes.filter((x) => {
+        if (x.split("|")[0] === e.code) return false;
+        return (
+          x.includes(
+            `${withClash.midsemStartTime}|${withClash.midsemEndTime}`,
+          ) ||
+          x.includes(`${withClash.compreStartTime}|${withClash.compreEndTime}`)
+        );
+      });
+      withClash.clashing = clashes.length === 0 ? null : clashes;
+      return withClash;
+    });
+  }, [courses, debouncedSearchTerm, timetable]);
+
+  if (timetable === undefined) return;
 
   // user is not in course details
   return (
@@ -105,10 +93,7 @@ export function SideMenu({
         value={isScreenshotMode ? "exams" : currentTab}
         className="py-2 h-[calc(100vh-16rem)]"
       >
-        <SideMenuTabs
-          isOnEditPage={isOnEditPage}
-          setCurrentTab={setCurrentTab}
-        />
+        <SideMenuTabs isOnEditPage={isOnEditPage} />
         <TabsContent
           value="CDCs"
           className="border-muted-foreground/80 w-[26rem] data-[state=inactive]:h-0 flex flex-col h-full overflow-y-scroll"
@@ -124,9 +109,12 @@ export function SideMenu({
               return (
                 <Button
                   variant={"secondary"}
-                  onClick={() => {
-                    setCurrentCourseID(course.id);
-                  }}
+                  onClick={() =>
+                    dispatch({
+                      type: TimetableActionType.SetSelectedCourseID,
+                      courseID: course.id,
+                    })
+                  }
                   key={course.id}
                   className="rounded-none text-left py-8 bg-secondary dark:hover:bg-slate-700 hover:bg-slate-200"
                 >
@@ -154,9 +142,12 @@ export function SideMenu({
               return courseOptions.options.map((course) => {
                 return (
                   <Button
-                    onClick={() => {
-                      setCurrentCourseID(course.id);
-                    }}
+                    onClick={() =>
+                      dispatch({
+                        type: TimetableActionType.SetSelectedCourseID,
+                        courseID: course.id,
+                      })
+                    }
                     key={course.id}
                   >
                     <div className="flex">
@@ -169,18 +160,8 @@ export function SideMenu({
             })}
         </TabsContent>
 
-        {isOnEditPage ? (
-          <EditCoursesTab
-            coursesInTimetable={coursesInTimetable}
-            setCurrentCourseID={setCurrentCourseID}
-          />
-        ) : (
-          <ViewCoursesTab
-            timetable={timetable}
-            coursesInTimetable={coursesInTimetable}
-          />
-        )}
-        <ExamTab timetable={timetable} />
+        {isOnEditPage ? <EditCoursesTab /> : <ViewCoursesTab />}
+        <ExamTab />
 
         <TabsContent
           value="search"
@@ -203,7 +184,10 @@ export function SideMenu({
               <div
                 onClick={() => {
                   if (!course.clashing) {
-                    setCurrentCourseID(course.id);
+                    dispatch({
+                      type: TimetableActionType.SetSelectedCourseID,
+                      courseID: course.id,
+                    });
                   }
                 }}
                 key={course.id}
