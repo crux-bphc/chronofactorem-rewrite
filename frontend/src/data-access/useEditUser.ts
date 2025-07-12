@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
+import chronoAPI from "./axios";
 import toastHandler from "./errors/toastHandler";
 
 const useEditUser = () => {
@@ -8,9 +8,7 @@ const useEditUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (body: { degrees: (string | null)[] }) => {
-      return axios.post("/api/user/edit", body, {
-        headers: { "Content-Type": "application/json" },
-      });
+      return chronoAPI.post("/api/user/edit", body);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({

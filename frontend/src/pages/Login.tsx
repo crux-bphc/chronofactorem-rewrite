@@ -1,35 +1,12 @@
-import { queryOptions } from "@tanstack/react-query";
 import { Route } from "@tanstack/react-router";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { AtSign } from "lucide-react";
-import { z } from "zod";
 import toastHandler from "@/data-access/errors/toastHandler";
+import { authStatusQueryOptions } from "@/data-access/useAuthStatus";
 import { ModeToggle } from "../components/ModeToggle";
 import { Button } from "../components/ui/button";
 import { useToast } from "../components/ui/use-toast";
 import { rootRoute, router } from "../main";
-
-const userAuthStatusType = z.object({
-  message: z.string(),
-  redirect: z.string().optional(),
-  error: z.string().optional(),
-});
-
-const fetchUserAuthStatus = async (): Promise<
-  z.infer<typeof userAuthStatusType>
-> => {
-  const response = await axios.get("/api/auth/check", {
-    headers: {
-      "Content-Type": "application/json ",
-    },
-  });
-  return response.data;
-};
-
-const authStatusQueryOptions = queryOptions({
-  queryKey: ["authStatusCheck"],
-  queryFn: () => fetchUserAuthStatus(),
-});
 
 const loginRoute = new Route({
   getParentRoute: () => rootRoute,

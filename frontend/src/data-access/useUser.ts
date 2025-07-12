@@ -1,7 +1,7 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import type { timetableType, userWithTimetablesType } from "lib";
 import type z from "zod";
+import chronoAPI from "./axios";
 
 type Timetable = z.infer<typeof timetableType>;
 const filterTimetables = (timetables: Timetable[]) => {
@@ -33,14 +33,8 @@ const filterTimetables = (timetables: Timetable[]) => {
 const fetchUserDetails = async (): Promise<
   z.infer<typeof userWithTimetablesType>
 > => {
-  const response = await axios.get<z.infer<typeof userWithTimetablesType>>(
-    "/api/user",
-    {
-      headers: {
-        "Content-Type": "application/json ",
-      },
-    },
-  );
+  const response =
+    await chronoAPI.get<z.infer<typeof userWithTimetablesType>>("/api/user");
   return response.data;
 };
 

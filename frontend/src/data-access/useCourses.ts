@@ -1,17 +1,11 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import type { courseType } from "lib";
 import type z from "zod";
+import chronoAPI from "./axios";
 
 const fetchCourses = async () => {
-  const response = await axios.get<z.infer<typeof courseType>[]>(
-    "/api/course",
-    {
-      headers: {
-        "Content-Type": "application/json ",
-      },
-    },
-  );
+  const response =
+    await chronoAPI.get<z.infer<typeof courseType>[]>("/api/course");
   return response.data;
 };
 

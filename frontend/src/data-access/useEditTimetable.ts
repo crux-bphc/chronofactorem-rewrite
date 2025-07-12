@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
+import chronoAPI from "./axios";
 import toastHandler from "./errors/toastHandler";
 
 type EditTimetableParams = {
@@ -17,7 +17,7 @@ const useEditTimetable = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: EditTimetableParams) => {
-      return axios.post(`/api/timetable/${data.id}/edit`, data.body);
+      return chronoAPI.post(`/api/timetable/${data.id}/edit`, data.body);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });

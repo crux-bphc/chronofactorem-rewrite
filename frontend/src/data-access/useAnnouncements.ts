@@ -1,14 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import type { announcementWithIDType } from "lib";
 import type z from "zod";
+import chronoAPI from "./axios";
 
 const fetchAnnouncements = async (): Promise<
   z.infer<typeof announcementWithIDType>[]
 > => {
-  const response = await axios.get<z.infer<typeof announcementWithIDType>[]>(
-    "/api/user/announcements",
-  );
+  const response = await chronoAPI.get<
+    z.infer<typeof announcementWithIDType>[]
+  >("/api/user/announcements");
   return response.data;
 };
 
