@@ -7,19 +7,19 @@ import {
 import React from "react";
 import { CookiesProvider } from "react-cookie";
 import ReactDOM from "react-dom/client";
-import { ThemeProvider } from "@/components/theme-provider";
-import aboutRoute from "./About";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import authenticatedRoute from "./AuthenticatedRoute";
 import NotFound from "./components/NotFound";
-import editTimetableRoute from "./EditTimetable";
-import editUserProfileRoute from "./EditUserProfile";
-import finalizeTimetableRoute from "./FinalizeTimetable";
-import getDegreesRoute from "./GetDegrees";
-import homeRoute from "./Home";
-import loginRoute from "./Login";
+import aboutRoute from "./pages/About";
+import editTimetableRoute from "./pages/EditTimetable";
+import editUserProfileRoute from "./pages/EditUserProfile";
+import finalizeTimetableRoute from "./pages/FinalizeTimetable";
+import getDegreesRoute from "./pages/GetDegrees";
+import homeRoute from "./pages/Home";
+import loginRoute from "./pages/Login";
+import searchRoute from "./pages/SearchResults";
+import viewTimetableRoute from "./pages/ViewTimetable";
 import RootComponent from "./RootComponent";
-import searchRoute from "./SearchResults";
-import viewTimetableRoute from "./ViewTimetable";
 import "./index.css";
 
 const queryClient = new QueryClient({

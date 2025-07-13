@@ -18,8 +18,8 @@ import { useToast } from "@/components/ui/use-toast";
 import {
   collegeYearType,
   type userWithTimetablesType,
-} from "../../lib/src/index";
-import { rootRoute, router } from "./main";
+} from "../../../lib/src/index";
+import { rootRoute, router } from "../main";
 
 /*
 Although users are always redirected to /getDegrees after login, we don't want to show them the page if they've already filled it out.

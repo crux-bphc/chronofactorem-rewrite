@@ -17,10 +17,10 @@ import { ToastAction } from "@/components/ui/toast";
 import {
   getBatchFromEmail,
   type userWithTimetablesType,
-} from "../../lib/src/index";
-import authenticatedRoute from "./AuthenticatedRoute";
-import { useToast } from "./components/ui/use-toast";
-import { router } from "./main";
+} from "../../../lib/src/index";
+import authenticatedRoute from "../AuthenticatedRoute";
+import { useToast } from "../components/ui/use-toast";
+import { router } from "../main";
 
 const fetchUserDetails = async (): Promise<
   z.infer<typeof userWithTimetablesType>

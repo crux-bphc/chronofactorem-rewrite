@@ -1,6 +1,6 @@
 import { Route } from "@tanstack/react-router";
 import { ArrowUpRightFromCircle } from "lucide-react";
-import { rootRoute } from "./main";
+import { rootRoute } from "../main";
 
 const aboutRoute = new Route({
   getParentRoute: () => rootRoute,

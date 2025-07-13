@@ -27,12 +27,12 @@ import type {
   sectionTypeZodEnum,
   timetableWithSectionsType,
   userWithTimetablesType,
-} from "../../lib/src/index";
-import authenticatedRoute from "./AuthenticatedRoute";
-import NotFound from "./components/NotFound";
-import { SideMenu } from "./components/side-menu";
-import Spinner from "./components/spinner";
-import { TimetableGrid } from "./components/TimetableGrid";
+} from "../../../lib/src/index";
+import authenticatedRoute from "../AuthenticatedRoute";
+import NotFound from "../components/NotFound";
+import { SideMenu } from "../components/SideMenu";
+import Spinner from "../components/Spinner";
+import { TimetableGrid } from "../components/TimetableGrid";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -42,22 +42,22 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "./components/ui/alert-dialog";
-import { Badge } from "./components/ui/badge";
-import { Button } from "./components/ui/button";
+} from "../components/ui/alert-dialog";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "./components/ui/popover";
+} from "../components/ui/popover";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "./components/ui/tooltip";
-import { toast, useToast } from "./components/ui/use-toast";
-import { router } from "./main";
+} from "../components/ui/tooltip";
+import { toast, useToast } from "../components/ui/use-toast";
+import { router } from "../main";
 
 const fetchTimetable = async (timetableId: string) => {
   const response = await axios.get<z.infer<typeof timetableWithSectionsType>>(

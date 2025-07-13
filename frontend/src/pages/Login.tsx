@@ -4,10 +4,10 @@ import { ErrorComponent, Route } from "@tanstack/react-router";
 import axios, { AxiosError } from "axios";
 import { AtSign } from "lucide-react";
 import { z } from "zod";
-import { ModeToggle } from "./components/mode-toggle";
-import { Button } from "./components/ui/button";
-import { useToast } from "./components/ui/use-toast";
-import { rootRoute, router } from "./main";
+import { ModeToggle } from "../components/ModeToggle";
+import { Button } from "../components/ui/button";
+import { useToast } from "../components/ui/use-toast";
+import { rootRoute, router } from "../main";
 
 const userAuthStatusType = z.object({
   message: z.string(),

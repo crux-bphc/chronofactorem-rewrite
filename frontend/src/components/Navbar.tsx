@@ -21,8 +21,8 @@ import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
 import type { userWithTimetablesType } from "../../../lib/src/index";
 import { router } from "../main";
-import Announcements from "./announcements";
-import { ModeToggle } from "./mode-toggle";
+import Announcements from "./Announcements";
+import { ModeToggle } from "./ModeToggle";
 import SearchBar from "./SearchBar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
