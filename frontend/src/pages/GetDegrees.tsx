@@ -7,8 +7,8 @@ import DegreeDropDown from "@/components/DegreeDropDown";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import toastHandler from "@/data-access/errors/toastHandler";
-import useCreateUser from "@/data-access/useCreateUser";
-import { userQueryOptions } from "@/data-access/useUser";
+import useCreateUser from "@/data-access/hooks/useCreateUser";
+import { userQueryOptions } from "@/data-access/hooks/useUser";
 import { rootRoute, router } from "../main";
 
 /*

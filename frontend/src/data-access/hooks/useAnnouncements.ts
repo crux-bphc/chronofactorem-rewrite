@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { announcementWithIDType } from "lib";
 import type z from "zod";
-import chronoAPI from "./axios";
+import chronoAPI from "../axios";
 
 const fetchAnnouncements = async (): Promise<
   z.infer<typeof announcementWithIDType>[]

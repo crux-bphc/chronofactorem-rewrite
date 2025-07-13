@@ -13,10 +13,10 @@ import {
   handleNotFound,
 } from "@/data-access/errors/handlers";
 import toastHandler from "@/data-access/errors/toastHandler";
-import useEditTimetable from "@/data-access/useEditTimetable";
+import useEditTimetable from "@/data-access/hooks/useEditTimetable";
 import useTimetable, {
   timetableQueryOptions,
-} from "@/data-access/useTimetable";
+} from "@/data-access/hooks/useTimetable";
 import authenticatedRoute from "../AuthenticatedRoute";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";

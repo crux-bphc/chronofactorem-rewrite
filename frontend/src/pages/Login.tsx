@@ -2,7 +2,7 @@ import { Route } from "@tanstack/react-router";
 import { AxiosError } from "axios";
 import { AtSign } from "lucide-react";
 import toastHandler from "@/data-access/errors/toastHandler";
-import { authStatusQueryOptions } from "@/data-access/useAuthStatus";
+import { authStatusQueryOptions } from "@/data-access/hooks/useAuthStatus";
 import { ModeToggle } from "../components/ModeToggle";
 import { Button } from "../components/ui/button";
 import { useToast } from "../components/ui/use-toast";

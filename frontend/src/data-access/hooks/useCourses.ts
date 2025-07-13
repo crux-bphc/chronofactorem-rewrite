@@ -1,7 +1,7 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import type { courseType } from "lib";
 import type z from "zod";
-import chronoAPI from "./axios";
+import chronoAPI from "../axios";
 
 const fetchCourses = async () => {
   const response =

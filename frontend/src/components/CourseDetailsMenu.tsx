@@ -3,7 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { useMemo } from "react";
 import type z from "zod";
 import { TimetableActionType, useTimetableState } from "@/context";
-import useTimetableSectionAction from "@/data-access/useTimetableSectionAction";
+import useTimetableSectionAction from "@/data-access/hooks/useTimetableSectionAction";
 import { Button } from "./ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 

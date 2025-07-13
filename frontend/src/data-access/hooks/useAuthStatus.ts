@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import chronoAPI from "./axios";
+import chronoAPI from "../axios";
 
 type userAuthStatusType = {
   message: string;

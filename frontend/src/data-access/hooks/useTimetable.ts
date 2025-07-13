@@ -1,7 +1,7 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import type { timetableWithSectionsType } from "lib";
 import type z from "zod";
-import chronoAPI from "./axios";
+import chronoAPI from "../axios";
 
 const fetchTimetable = async (timetableId: string) => {
   const response = await chronoAPI.get<

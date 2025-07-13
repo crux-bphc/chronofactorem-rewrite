@@ -15,9 +15,9 @@ import {
   handleNotFound,
 } from "@/data-access/errors/handlers";
 import toastHandler from "@/data-access/errors/toastHandler";
-import { courseQueryOptions } from "@/data-access/useCourses";
-import { timetableQueryOptions } from "@/data-access/useTimetable";
-import { userQueryOptions } from "@/data-access/useUser";
+import { courseQueryOptions } from "@/data-access/hooks/useCourses";
+import { timetableQueryOptions } from "@/data-access/hooks/useTimetable";
+import { userQueryOptions } from "@/data-access/hooks/useUser";
 import authenticatedRoute from "../AuthenticatedRoute";
 import NotFound from "../components/NotFound";
 import { SideMenu } from "../components/SideMenu";

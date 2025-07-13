@@ -2,10 +2,10 @@ import { notFound, useParams } from "@tanstack/react-router";
 import type React from "react";
 import { createContext, useContext, useEffect, useReducer } from "react";
 import Spinner from "@/components/Spinner";
-import useCourse from "@/data-access/useCourse";
-import useCourses from "@/data-access/useCourses";
-import useTimetable from "@/data-access/useTimetable";
-import useUser from "@/data-access/useUser";
+import useCourse from "@/data-access/hooks/useCourse";
+import useCourses from "@/data-access/hooks/useCourses";
+import useTimetable from "@/data-access/hooks/useTimetable";
+import useUser from "@/data-access/hooks/useUser";
 import reducer from "./reducer";
 import {
   type Action,

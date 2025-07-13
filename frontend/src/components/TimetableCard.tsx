@@ -31,8 +31,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import useDeleteTimetable from "@/data-access/useDeleteTimetable";
-import useEditTimetable from "@/data-access/useEditTimetable";
+import useDeleteTimetable from "@/data-access/hooks/useDeleteTimetable";
+import useEditTimetable from "@/data-access/hooks/useEditTimetable";
 import { router } from "../main";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";

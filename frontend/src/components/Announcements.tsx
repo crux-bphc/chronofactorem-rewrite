@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import useAnnouncements from "@/data-access/useAnnouncements";
+import useAnnouncements from "@/data-access/hooks/useAnnouncements";
 import ReportIssue from "./ReportIssue";
 import Spinner from "./Spinner";
 import { Button } from "./ui/button";

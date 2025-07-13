@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { courseWithSectionsType } from "lib";
 import type z from "zod";
-import chronoAPI from "./axios";
+import chronoAPI from "../axios";
 
 const fetchCourse = async (currentCourseID: string | null) => {
   if (currentCourseID === null) return null;

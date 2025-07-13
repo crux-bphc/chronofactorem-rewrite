@@ -18,9 +18,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { TimetableActionType, useTimetableState } from "@/context";
-import useCopyTimetable from "@/data-access/useCopyTimetable";
-import useDeleteTimetable from "@/data-access/useDeleteTimetable";
-import useEditTimetable from "@/data-access/useEditTimetable";
+import useCopyTimetable from "@/data-access/hooks/useCopyTimetable";
+import useDeleteTimetable from "@/data-access/hooks/useDeleteTimetable";
+import useEditTimetable from "@/data-access/hooks/useEditTimetable";
 import {
   AlertDialog,
   AlertDialogCancel,

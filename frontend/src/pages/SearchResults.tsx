@@ -13,7 +13,7 @@ import { handleLoginRedirect } from "@/data-access/errors/handlers";
 import toastHandler from "@/data-access/errors/toastHandler";
 import useSearchQuery, {
   searchQueryOptions,
-} from "@/data-access/useSearchQuery";
+} from "@/data-access/hooks/useSearchQuery";
 import authenticatedRoute from "../AuthenticatedRoute";
 import {
   Pagination,

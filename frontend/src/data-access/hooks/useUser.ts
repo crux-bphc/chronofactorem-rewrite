@@ -1,7 +1,7 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import type { timetableType, userWithTimetablesType } from "lib";
 import type z from "zod";
-import chronoAPI from "./axios";
+import chronoAPI from "../axios";
 
 type Timetable = z.infer<typeof timetableType>;
 const filterTimetables = (timetables: Timetable[]) => {

@@ -1,14 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
-import chronoAPI from "./axios";
-import toastHandler from "./errors/toastHandler";
+import chronoAPI from "../axios";
+import toastHandler from "../errors/toastHandler";
 
-const useDeleteTimetable = () => {
+const useCreateTimetable = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => {
-      return chronoAPI.post(`/api/timetable/${id}/delete`);
+    mutationFn: () => {
+      return chronoAPI.post<{ message: string; id: string }>(
+        "/api/timetable/create",
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -19,4 +21,4 @@ const useDeleteTimetable = () => {
   });
 };
 
-export default useDeleteTimetable;
+export default useCreateTimetable;
