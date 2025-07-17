@@ -112,8 +112,8 @@ export function TimetableGrid({
     "7 - 8",
     "8 - 9",
   ];
-  const displayRows = 6;
   const [displayCols, setDisplayCols] = useState(13);
+  const [displayRows, setDisplayRows] = useState(6);
 
   const timetableGrid = useMemo(() => {
     const grid: ({
@@ -168,6 +168,24 @@ export function TimetableGrid({
     }
     setDisplayCols(nonNullColumns);
 
+    const minDisplayRows = 5;
+    let nonNullRows = 6;
+    for (let j = 5; j >= minDisplayRows; j--) {
+      let flag = true;
+      for (let i = 0; i < 13; i++) {
+        if ((isVertical ? grid[i * 6 + j] : grid[j * 13 + i]) !== null) {
+          flag = false;
+          break;
+        }
+      }
+      if (flag) {
+        nonNullRows = j;
+      } else {
+        break;
+      }
+    }
+    setDisplayRows(nonNullRows);
+
     return grid;
   }, [timetableDetailsSections, isVertical]);
 
@@ -189,7 +207,7 @@ export function TimetableGrid({
         <div
           className={`grid ${gridRowClasses[displayRows - 1]} items-center mr-4 mt-12 md:text-lg text-md text-center font-bold text-foreground/80`}
         >
-          {daysOfWeek.map((e) => (
+          {daysOfWeek.slice(0, displayRows).map((e) => (
             <span key={e}>{e}</span>
           ))}
         </div>
@@ -199,7 +217,7 @@ export function TimetableGrid({
           <div
             className={`grid ${gridColClasses[displayRows - 1]} items-center pr-2 md:text-lg text-md text-center font-bold text-foreground/80 `}
           >
-            {daysOfWeek.map((e) => (
+            {daysOfWeek.slice(0, displayRows).map((e) => (
               <span key={e}>{e}</span>
             ))}
           </div>
@@ -225,7 +243,9 @@ export function TimetableGrid({
         >
           {timetableGrid
             .filter((_, i) =>
-              isVertical ? i < 6 * displayCols : i % 13 < displayCols,
+              isVertical
+                ? i < 6 * displayCols && i % 6 < displayRows
+                : i % 13 < displayCols && i < 13 * displayRows,
             )
             .map((e, i) =>
               e !== null ? (

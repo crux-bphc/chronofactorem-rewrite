@@ -128,7 +128,7 @@ function EditTimetable() {
                 SideBar
               ) : (
                 <Popover>
-                  <PopoverTrigger className="absolute left-2 top-[-1rem]">
+                  <PopoverTrigger className="absolute left-2">
                     <Button variant={"default"} className="rounded-full">
                       <Menu />
                     </Button>
