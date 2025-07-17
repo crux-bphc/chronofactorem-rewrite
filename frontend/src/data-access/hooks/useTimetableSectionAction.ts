@@ -5,7 +5,9 @@ import toastHandler from "../errors/toastHandler";
 
 type SectionAction = "add" | "remove";
 
-const useTimetableSectionAction = (timetableId: string | undefined) => {
+export const useAddRemoveTimetableSection = (
+  timetableId: string | undefined,
+) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   return useMutation({
@@ -31,4 +33,28 @@ const useTimetableSectionAction = (timetableId: string | undefined) => {
   });
 };
 
-export default useTimetableSectionAction;
+export const useSwapTimetableSections = (timetableId: string | undefined) => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      sectionId,
+      newSectionId,
+    }: {
+      sectionId: string;
+      newSectionId: string;
+    }) => {
+      if (timetableId === undefined) return;
+      await chronoAPI.post(`/api/timetable/${timetableId}/remove`, {
+        sectionId,
+      });
+      await chronoAPI.post(`/api/timetable/${timetableId}/add`, {
+        sectionId: newSectionId,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["timetable", timetableId] });
+    },
+    onError: (error) => toastHandler(error, toast),
+  });
+};

@@ -17,7 +17,7 @@ import {
 import toastHandler from "@/data-access/errors/toastHandler";
 import { courseQueryOptions } from "@/data-access/hooks/useCourses";
 import { timetableQueryOptions } from "@/data-access/hooks/useTimetable";
-import useTimetableSectionAction from "@/data-access/hooks/useTimetableSectionAction";
+import { useAddRemoveTimetableSection } from "@/data-access/hooks/useTimetableSectionAction";
 import { userQueryOptions } from "@/data-access/hooks/useUser";
 import authenticatedRoute from "../AuthenticatedRoute";
 import NotFound from "../components/NotFound";
@@ -96,7 +96,7 @@ function EditTimetable() {
     });
   }, [timetable, user]);
 
-  const { mutate: sectionAction } = useTimetableSectionAction(timetable?.id);
+  const { mutate: sectionAction } = useAddRemoveTimetableSection(timetable?.id);
 
   if (timetable === undefined || courses === undefined || user === undefined) {
     return <ReportIssue error={"Error fetching queries"} />;

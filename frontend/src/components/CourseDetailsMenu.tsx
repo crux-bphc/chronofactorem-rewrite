@@ -3,7 +3,10 @@ import { ArrowLeft } from "lucide-react";
 import { useMemo } from "react";
 import type z from "zod";
 import { TimetableActionType, useTimetableState } from "@/context";
-import useTimetableSectionAction from "@/data-access/hooks/useTimetableSectionAction";
+import {
+  useAddRemoveTimetableSection,
+  useSwapTimetableSections,
+} from "@/data-access/hooks/useTimetableSectionAction";
 import { Button } from "./ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
@@ -12,38 +15,33 @@ const CourseDetailsMenu = () => {
     state: { timetable, course, uniqueSectionTypes, currentSectionType },
     dispatch,
   } = useTimetableState();
-  const { mutate: sectionAction } = useTimetableSectionAction(timetable?.id);
+  const { mutate: sectionAction } = useAddRemoveTimetableSection(timetable?.id);
+  const { mutate: swapSections } = useSwapTimetableSections(timetable?.id);
 
   const handleSectionClick = (section: z.infer<typeof sectionType>) => {
     if (timetable === undefined || currentSectionType === null) return;
     if (timetable.sections.find((e) => e.id === section.id)) {
       sectionAction({ sectionId: section.id, action: "remove" });
+      return;
+    }
+    const other = timetable.sections.find(
+      (e) => e.type === section.type && e.courseId === section.courseId,
+    );
+    if (other !== undefined) {
+      swapSections({ sectionId: other.id, newSectionId: section.id });
     } else {
-      const other = timetable.sections.find(
-        (e) => e.type === section.type && e.courseId === section.courseId,
-      );
-      if (other !== undefined) {
-        sectionAction(
-          { sectionId: other.id, action: "remove" },
-          {
-            onSuccess: () =>
-              sectionAction({ sectionId: section.id, action: "add" }),
-          },
-        );
-      } else {
-        sectionAction({ sectionId: section.id, action: "add" });
-        if (
-          uniqueSectionTypes.indexOf(currentSectionType) <
-          uniqueSectionTypes.length - 1
-        ) {
-          dispatch({
-            type: TimetableActionType.SetSelectedSectionType,
-            sectionType:
-              uniqueSectionTypes[
-                uniqueSectionTypes.indexOf(currentSectionType) + 1
-              ],
-          });
-        }
+      sectionAction({ sectionId: section.id, action: "add" });
+      if (
+        uniqueSectionTypes.indexOf(currentSectionType) <
+        uniqueSectionTypes.length - 1
+      ) {
+        dispatch({
+          type: TimetableActionType.SetSelectedSectionType,
+          sectionType:
+            uniqueSectionTypes[
+              uniqueSectionTypes.indexOf(currentSectionType) + 1
+            ],
+        });
       }
     }
   };
