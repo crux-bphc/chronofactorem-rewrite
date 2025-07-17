@@ -51,7 +51,7 @@ function Announcements() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="mr-1 md:mr-9" variant="outline" size="icon">
+        <Button variant="outline" size="icon">
           <Megaphone className="h-5 w-5" />
         </Button>
       </DialogTrigger>

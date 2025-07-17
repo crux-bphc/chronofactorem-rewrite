@@ -36,12 +36,12 @@ export function NavBar() {
   const ChronoLogoText = (
     <>
       <div className="hidden md:flex">
-        <h1 className="scroll-m-20 cursor-pointer text-2xl font-extrabold tracking-tight lg:text-3xl m-4 text-foreground">
+        <h1 className="scroll-m-20 cursor-pointer text-2xl mb-1 font-extrabold tracking-tight lg:text-3xl text-foreground">
           ChronoFactorem
         </h1>
       </div>
       <div className="flex md:hidden">
-        <h1 className="scroll-m-20 cursor-pointer text-2xl font-extrabold tracking-tight lg:text-3xl mx-2 my-4 text-foreground">
+        <h1 className="scroll-m-20 cursor-pointer text-2xl mb-1 font-extrabold tracking-tight lg:text-3xl text-foreground">
           Chrono
         </h1>
       </div>
@@ -49,8 +49,8 @@ export function NavBar() {
   );
 
   const renderNavbarBasedOnQueryFetch = (userQueryResultData: typeof user) => (
-    <div className="flex flex-row w-full justify-between shadow-lg">
-      <div className="flex items-center">
+    <div className="flex flex-row w-full justify-between shadow-lg py-4 px-4">
+      <div className="flex items-center md:gap-4 gap-2">
         {userQueryResultData ? (
           <Link to="/">{ChronoLogoText}</Link>
         ) : (
@@ -58,7 +58,7 @@ export function NavBar() {
         )}
         {!isEditPage && (
           <Button
-            className="text-green-200 w-fit text-xl px-2 md:px-4 py-4 md:ml-4 bg-green-900 hover:bg-green-800"
+            className="text-green-200 w-fit text-xl px-2 md:px-4 py-4 bg-green-900 hover:bg-green-800"
             onClick={
               userQueryResultData
                 ? () =>
@@ -79,40 +79,38 @@ export function NavBar() {
             </div>
           </Button>
         )}
+        <div className="hidden md:flex">
+          <SearchBar />
+        </div>
+        <div className="text-primary p-2 text-lg rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out">
+          <div className="flex md:hidden">
+            <Popover>
+              <PopoverTrigger asChild className="cursor-pointer">
+                <Search />
+              </PopoverTrigger>
+              <PopoverContent className="w-80 mt-4">
+                <SearchBar />
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
         <Link
           to="/about"
-          className="text-primary py-2 px-2 md:ml-2 text-lg rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out"
+          className="text-primary text-lg p-2 rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out"
         >
           <div className="hidden md:flex">About</div>
           <div className="flex md:hidden">
             <Info className="h-6 w-6" />
           </div>
         </Link>
-        <div className="hidden md:flex md:ml-4">
-          <SearchBar />
-        </div>
-        <div className="text-primary py-3 px-2 md:ml-2 text-lg rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out">
-          <div className="flex md:hidden">
-            <Popover>
-              <PopoverTrigger asChild className="cursor-pointer">
-                <Search />
-              </PopoverTrigger>
-              <PopoverContent className="w-80 mt-4 mr-8">
-                <SearchBar />
-              </PopoverContent>
-            </Popover>
-          </div>
-        </div>
       </div>
 
-      <div className="flex flex-row">
-        <div className="flex pt-3">
-          <Announcements />
-          <ModeToggle />
-        </div>
+      <div className="flex flex-row items-center md:gap-4 gap-2">
+        <Announcements />
+        <ModeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div className="rounded-full text-foreground bg-accent p-1 px-3 text-xl h-fit lg:mx-8 mx-2 mt-4">
+            <div className="rounded-full text-foreground bg-accent p-1 px-3 text-xl h-fit">
               <span>
                 {userQueryResultData ? userQueryResultData.name[0] : "?"}
               </span>
