@@ -5,24 +5,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useTimetableState } from "@/context";
 
 export function TimetableGrid({
   isVertical,
-  timetableDetailsSections,
   handleUnitClick,
   handleUnitDelete,
   isOnEditPage,
 }: {
   isVertical: boolean;
-  timetableDetailsSections: {
-    id: string;
-    name: string;
-    roomTime: string[];
-    courseId: string;
-    type: string;
-    number: number;
-    instructors: string[];
-  }[];
   handleUnitClick: (
     e: {
       id: string;
@@ -50,6 +41,9 @@ export function TimetableGrid({
   ) => void;
   isOnEditPage: boolean;
 }) {
+  const {
+    state: { timetableDetailsSections },
+  } = useTimetableState();
   const gridRowClasses = [
     "grid-rows-1",
     "grid-rows-2",

@@ -1,130 +1,40 @@
-import {
-  queryOptions,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
-import { ErrorComponent, Route } from "@tanstack/react-router";
-import axios, { AxiosError } from "axios";
+import { Route } from "@tanstack/react-router";
 import { Clipboard, ClipboardCheck, Globe, Lock } from "lucide-react";
 import { useRef, useState } from "react";
-import type { z } from "zod";
+import ReportIssue from "@/components/ReportIssue";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { timetableWithSectionsType } from "../../../lib/src";
+import {
+  handleLoginRedirect,
+  handleNotFound,
+} from "@/data-access/errors/handlers";
+import toastHandler from "@/data-access/errors/toastHandler";
+import useEditTimetable from "@/data-access/hooks/useEditTimetable";
+import useTimetable, {
+  timetableQueryOptions,
+} from "@/data-access/hooks/useTimetable";
 import authenticatedRoute from "../AuthenticatedRoute";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { ToastAction } from "../components/ui/toast";
-import { toast, useToast } from "../components/ui/use-toast";
+import { useToast } from "../components/ui/use-toast";
 import { router } from "../main";
-
-const fetchTimetable = async (timetableId: string) => {
-  const response = await axios.get<z.infer<typeof timetableWithSectionsType>>(
-    `/api/timetable/${timetableId}`,
-    {
-      headers: {
-        "Content-Type": "application/json ",
-      },
-    },
-  );
-  return response.data;
-};
-
-const timetableQueryOptions = (timetableId: string) =>
-  queryOptions({
-    queryKey: ["timetable", timetableId],
-    queryFn: () => fetchTimetable(timetableId),
-  });
 
 const finalizeTimetableRoute = new Route({
   getParentRoute: () => authenticatedRoute,
   path: "finalize/$timetableId",
   loader: ({ context: { queryClient }, params: { timetableId } }) =>
-    queryClient
-      .ensureQueryData(timetableQueryOptions(timetableId))
-      .catch((error: Error) => {
-        if (
-          error instanceof AxiosError &&
-          error.response &&
-          error.response.status === 401
-        ) {
-          router.navigate({
-            to: "/login",
-          });
-        }
-
-        throw error;
-      }),
+    queryClient.ensureQueryData(timetableQueryOptions(timetableId)),
   component: FinalizeTimetable,
-  errorComponent: ({ error }: { error: unknown }) => {
+  errorComponent: ({ error }) => {
     const { toast } = useToast();
-
-    if (error instanceof AxiosError) {
-      if (error.response) {
-        switch (error.response.status) {
-          case 404:
-            toast({
-              title: "Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : "API returned 404",
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-            break;
-          case 500:
-            toast({
-              title: "Server Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : "API returned 500",
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-            break;
-
-          default:
-            toast({
-              title: "Unknown Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : `API returned ${error.response.status}`,
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-        }
-      } else {
-        // Fallback to the default ErrorComponent
-        return <ErrorComponent error={error} />;
-      }
-    }
+    handleLoginRedirect(error);
+    handleNotFound(error);
+    toastHandler(error, toast);
   },
 });
 
@@ -143,146 +53,28 @@ function FinalizeTimetable() {
   const [copied, setCopied] = useState(false);
   const nameInput = useRef<HTMLInputElement>(null);
   const { timetableId } = finalizeTimetableRoute.useParams();
-  const timetableQueryResult = useQuery(timetableQueryOptions(timetableId));
-  const queryClient = useQueryClient();
+  const {
+    data: timetable,
+    isError: isTimetableError,
+    isLoading: isTimetableLoading,
+    error: timetableError,
+  } = useTimetable(timetableId);
 
-  const submitMutation = useMutation({
-    mutationFn: (body: {
-      name: string | undefined;
-      isPrivate: boolean;
-      isDraft: boolean;
-    }) => {
-      return axios.post(`/api/timetable/${timetableId}/edit`, body, {
-        headers: { "Content-Type": "application/json" },
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-      router.navigate({
-        to: "/",
-        params: { timetableId: timetableId },
-      });
-    },
-    onError: (error) => {
-      if (error instanceof AxiosError && error.response) {
-        if (error.response.status === 401) {
-          router.navigate({ to: "/login" });
-        }
-        if (error.response.status === 400) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 400",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 403) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 403",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 404) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 404",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 500) {
-          toast({
-            title: "Server Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 500",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else {
-          toast({
-            title: "Unknown Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : `API returned ${error.response.status}`,
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        }
-      }
-    },
-  });
+  const { mutate: editTimetable } = useEditTimetable();
 
-  if (timetableQueryResult.isFetching) {
+  if (isTimetableLoading) {
     return <span>Loading...</span>;
   }
 
-  if (timetableQueryResult.isError || timetableQueryResult.data === undefined) {
+  if (isTimetableError || timetable === undefined) {
     return (
-      <span>
-        Unexpected error:{" "}
-        {JSON.stringify(
-          timetableQueryResult.error
-            ? timetableQueryResult.error.message
+      <ReportIssue
+        error={JSON.stringify(
+          timetableError
+            ? timetableError.message
             : "timetable query result is undefined",
-        )}{" "}
-        Please report this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          <span className="text-blue-700 dark:text-blue-400">here</span>
-        </a>
-      </span>
-    );
-  }
-
-  if (timetableQueryResult.data === undefined) {
-    return (
-      <span>
-        Unexpected error: timetableQueryResult.data is undefined. Please report
-        this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          <span className="text-blue-700 dark:text-blue-400">here</span>
-        </a>
-      </span>
+        )}
+      />
     );
   }
 
@@ -296,7 +88,7 @@ function FinalizeTimetable() {
         <Input
           ref={nameInput}
           id="name"
-          defaultValue={timetableQueryResult.data.name}
+          defaultValue={timetable.name}
           placeholder="Timetable Name"
           className="text-xl lg:w-1/3 w-4/5 bg-muted ring-primary-foreground ring-offset-slate-700 border-slate-700"
         />
@@ -351,11 +143,24 @@ function FinalizeTimetable() {
         <Button
           className="bg-green-700 hover:bg-green-600 w-1/3 mt-8 text-green-100 px-4 mr-0 text-lg font-bold"
           onClick={() =>
-            submitMutation.mutate({
-              name: nameInput.current?.value,
-              isPrivate: privateTimetable,
-              isDraft: false,
-            })
+            editTimetable(
+              {
+                id: timetable.id,
+                body: {
+                  name: nameInput.current?.value || timetable.name,
+                  isPrivate: privateTimetable,
+                  isDraft: false,
+                },
+              },
+              {
+                onSuccess: () => {
+                  router.navigate({
+                    to: "/",
+                    params: { timetableId: timetableId },
+                  });
+                },
+              },
+            )
           }
         >
           Finish

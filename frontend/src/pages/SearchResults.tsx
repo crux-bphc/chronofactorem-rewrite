@@ -1,9 +1,6 @@
-import { queryOptions, useQuery } from "@tanstack/react-query";
-import { ErrorComponent, Route } from "@tanstack/react-router";
-import axios, { AxiosError } from "axios";
+import { Route } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
-import type { z } from "zod";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -12,7 +9,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { timetableWithSectionsType } from "../../../lib/src";
+import { handleLoginRedirect } from "@/data-access/errors/handlers";
+import toastHandler from "@/data-access/errors/toastHandler";
+import useSearchQuery, {
+  searchQueryOptions,
+} from "@/data-access/hooks/useSearchQuery";
 import authenticatedRoute from "../AuthenticatedRoute";
 import {
   Pagination,
@@ -21,35 +22,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "../components/ui/pagination";
-import { ToastAction } from "../components/ui/toast";
 import { useToast } from "../components/ui/use-toast";
 import { router } from "../main";
-
-const fetchSearchDetails = async (
-  query: string,
-): Promise<z.infer<typeof timetableWithSectionsType>[]> => {
-  const response = await axios.get<z.infer<typeof timetableWithSectionsType>[]>(
-    `/api/timetable/search?${query}`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    },
-  );
-  return response.data;
-};
-
-// biome-ignore lint/suspicious/noExplicitAny: will need nontrivial fix and maybe some kind of update since that Route function signature is deprecated
-const searchQueryOptions = (deps: Record<string, any>) => {
-  for (const key of Object.keys(deps)) {
-    if (deps[key] === undefined) delete deps[key];
-  }
-  const query = new URLSearchParams(deps).toString();
-  return queryOptions({
-    queryKey: ["search_timetables", query],
-    queryFn: () => fetchSearchDetails(query),
-  });
-};
 
 const searchRoute = new Route({
   getParentRoute: () => authenticatedRoute,
@@ -58,90 +32,18 @@ const searchRoute = new Route({
   validateSearch: (search) => search,
   loaderDeps: ({ search }) => search,
   loader: ({ context: { queryClient }, deps }) =>
-    queryClient
-      .ensureQueryData(searchQueryOptions(deps))
-      .catch((error: Error) => {
-        if (
-          error instanceof AxiosError &&
-          error.response &&
-          error.response.status === 401
-        ) {
-          router.navigate({
-            to: "/login",
-          });
-        }
-
-        throw error;
-      }),
-  errorComponent: ({ error }: { error: unknown }) => {
+    queryClient.ensureQueryData(searchQueryOptions(deps)),
+  errorComponent: ({ error }) => {
     const { toast } = useToast();
-
-    if (error instanceof AxiosError) {
-      if (error.response) {
-        switch (error.response.status) {
-          case 404:
-            toast({
-              title: "Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : "API returned 404",
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-            break;
-          case 500:
-            toast({
-              title: "Server Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : "API returned 500",
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-            break;
-
-          default:
-            toast({
-              title: "Unknown Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : `API returned ${error.response.status}`,
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-        }
-      } else {
-        return <ErrorComponent error={error} />;
-      }
-    }
+    handleLoginRedirect(error);
+    toastHandler(error, toast);
   },
 });
 
 function SearchResults() {
   const initDeps = searchRoute.useLoaderDeps();
   const [deps, setDeps] = useState(initDeps);
-  const searchQueryResult = useQuery(searchQueryOptions(deps));
+  const searchQueryResult = useSearchQuery(deps);
 
   return (
     <main className="text-foreground py-6 md:py-12 px-10 md:px-16">

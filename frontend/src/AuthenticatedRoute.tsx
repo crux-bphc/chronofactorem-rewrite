@@ -1,7 +1,8 @@
 import { Outlet, Route, redirect } from "@tanstack/react-router";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { z } from "zod";
 import { NavBar } from "./components/Navbar";
+import chronoAPI from "./data-access/axios";
 import { rootRoute } from "./main";
 
 const userAuthStatusType = z.object({
@@ -15,11 +16,9 @@ const authenticatedRoute = new Route({
   getParentRoute: () => rootRoute,
   beforeLoad: async () => {
     try {
-      await axios.get<z.infer<typeof userAuthStatusType>>("/api/auth/check", {
-        headers: {
-          "Content-Type": "application/json ",
-        },
-      });
+      await chronoAPI.get<z.infer<typeof userAuthStatusType>>(
+        "/api/auth/check",
+      );
     } catch (e) {
       if (e instanceof AxiosError && e.response) {
         if (

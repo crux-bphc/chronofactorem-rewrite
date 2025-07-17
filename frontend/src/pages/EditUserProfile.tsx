@@ -1,259 +1,69 @@
-import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
-import { ErrorComponent, Route } from "@tanstack/react-router";
-import axios, { AxiosError } from "axios";
+import { Route } from "@tanstack/react-router";
+import { getBatchFromEmail } from "lib";
 import { useState } from "react";
-import type { z } from "zod";
+import DegreeDropDown from "@/components/DegreeDropDown";
+import ReportIssue from "@/components/ReportIssue";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ToastAction } from "@/components/ui/toast";
-import {
-  getBatchFromEmail,
-  type userWithTimetablesType,
-} from "../../../lib/src/index";
+import { handleLoginRedirect } from "@/data-access/errors/handlers";
+import toastHandler from "@/data-access/errors/toastHandler";
+import useEditUser from "@/data-access/hooks/useEditUser";
+import useUser, { userQueryOptions } from "@/data-access/hooks/useUser";
 import authenticatedRoute from "../AuthenticatedRoute";
 import { useToast } from "../components/ui/use-toast";
 import { router } from "../main";
 
-const fetchUserDetails = async (): Promise<
-  z.infer<typeof userWithTimetablesType>
-> => {
-  const response = await axios.get<z.infer<typeof userWithTimetablesType>>(
-    "/api/user",
-    {
-      headers: {
-        "Content-Type": "application/json ",
-      },
-    },
-  );
-  return response.data;
-};
-
-const userQueryOptions = queryOptions({
-  queryKey: ["user"],
-  queryFn: () => fetchUserDetails(),
-});
-
 const editUserProfileRoute = new Route({
   getParentRoute: () => authenticatedRoute,
   path: "editProfile",
-  loader: ({ context: { queryClient } }) =>
-    queryClient.ensureQueryData(userQueryOptions).catch((error) => {
-      if (
-        error instanceof AxiosError &&
-        error.response &&
-        error.response.status === 401
-      ) {
-        router.navigate({
-          to: "/login",
-        });
-      }
-
+  loader: async ({ context: { queryClient } }) => {
+    try {
+      return await queryClient.ensureQueryData(userQueryOptions);
+    } catch (error: unknown) {
+      handleLoginRedirect(error);
       throw error;
-    }),
-  component: EditUserProfile,
-  errorComponent: ({ error }: { error: unknown }) => {
-    const { toast } = useToast();
-
-    if (error instanceof AxiosError) {
-      if (error.response) {
-        switch (error.response.status) {
-          case 404:
-            toast({
-              title: "Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : "API returned 404",
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-            break;
-          case 500:
-            toast({
-              title: "Server Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : "API returned 500",
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-            break;
-
-          default:
-            toast({
-              title: "Unknown Error",
-              description:
-                "message" in error.response.data
-                  ? error.response.data.message
-                  : `API returned ${error.response.status}`,
-              variant: "destructive",
-              action: (
-                <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                    Report
-                  </a>
-                </ToastAction>
-              ),
-            });
-        }
-      } else {
-        // Fallback to the default ErrorComponent
-        return <ErrorComponent error={error} />;
-      }
     }
+  },
+  component: EditUserProfile,
+  errorComponent: ({ error }) => {
+    const { toast } = useToast();
+    toastHandler(error, toast);
   },
 });
 
 function EditUserProfile() {
-  const userQueryResult = useQuery(userQueryOptions);
-
-  const [firstDegree, setFirstDegree] = useState<string | null>(
-    userQueryResult.data?.degrees?.[0] ?? null,
-  );
-  const [secondDegree, setSecondDegree] = useState<string | null>(
-    userQueryResult.data
-      ? userQueryResult.data.degrees.length > 1
-        ? userQueryResult.data.degrees[1]
-        : null
-      : null,
-  );
-
+  const { data: user, isLoading, isError, error } = useUser();
+  const { mutate: editUser } = useEditUser();
   const { toast } = useToast();
 
-  const mutation = useMutation({
-    mutationFn: (body: { degrees: (string | null)[] }) => {
-      return axios.post("/api/user/edit", body, {
-        headers: { "Content-Type": "application/json" },
-      });
-    },
-    onSuccess: () => {
-      router.navigate({ to: "/" });
-    },
-    onError: (error) => {
-      if (error instanceof AxiosError && error.response) {
-        if (error.response.status === 401) {
-          router.navigate({ to: "/login" });
-        }
-        if (error.response.status === 400) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 400",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 404) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 404",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 500) {
-          toast({
-            title: "Server Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 500",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else {
-          toast({
-            title: "Unknown Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : `API returned ${error.response.status}`,
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        }
-      }
-    },
-  });
+  const [firstDegree, setFirstDegree] = useState<string | null>(
+    user?.degrees?.[0] ?? null,
+  );
+  const [secondDegree, setSecondDegree] = useState<string | null>(
+    user ? (user.degrees.length > 1 ? user.degrees[1] : null) : null,
+  );
 
-  if (userQueryResult.isFetching) {
+  if (isLoading) {
     return <span>Loading...</span>;
   }
 
-  if (
-    userQueryResult.isError ||
-    userQueryResult.data === undefined ||
-    firstDegree === null
-  ) {
+  if (isError || user === undefined || firstDegree === null) {
     return (
-      <span>
-        Unexpected error:{" "}
-        {JSON.stringify(
-          userQueryResult.error
-            ? userQueryResult.error.message
-            : "user query result is undefined",
-        )}{" "}
-        Please report this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          <span className="text-blue-700 dark:text-blue-400">here</span>
-        </a>
-      </span>
+      <ReportIssue
+        error={JSON.stringify(
+          error ? error.message : "user query result is undefined",
+        )}
+      />
     );
   }
 
-  const batch = getBatchFromEmail(userQueryResult.data.email);
+  const batch = getBatchFromEmail(user.email);
 
   const handleSubmit = async () => {
     if (firstDegree.includes("B") && secondDegree === null) {
-      alert("Select your second degree!");
+      toast({
+        title: "Select your second degree!",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -265,19 +75,13 @@ function EditUserProfile() {
         : [firstDegree]
       : [firstDegree];
 
-    mutation.mutate({ degrees });
-  };
-
-  if (userQueryResult.data === undefined) {
-    return (
-      <span>
-        Unexpected error: userQueryResult.data is undefined. Please report this{" "}
-        <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-          <span className="text-blue-700 dark:text-blue-400">here</span>
-        </a>
-      </span>
+    editUser(
+      { degrees },
+      {
+        onSuccess: () => router.navigate({ to: "/" }),
+      },
     );
-  }
+  };
 
   return (
     <>
@@ -286,13 +90,13 @@ function EditUserProfile() {
           Edit User Profile
         </h1>
         <div className="rounded-full text-foreground bg-accent lg:text-6xl text-4xl lg:h-28 lg:w-28 h-20 w-20 flex justify-center items-center">
-          <span>{userQueryResult.data.name[0]}</span>
+          <span>{user.name[0]}</span>
         </div>
         <h3 className="scroll-m-20 text-xl tracking-tight lg:text-2xl text-foreground font-bold lg:mt-4 mt-2">
-          {userQueryResult.data.name}
+          {user.name}
         </h3>
         <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-foreground">
-          {userQueryResult.data.email}
+          {user.email}
         </h5>
         <div className="flex">
           <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-foregroun mt-4 mb-4 font-bold">
@@ -303,74 +107,13 @@ function EditUserProfile() {
           </h5>
         </div>
         <div className="flex sm:flex-row flex-col">
-          <Select onValueChange={setFirstDegree} value={firstDegree}>
-            <SelectTrigger className="w-84 bg-muted border-primary-foreground focus:ring-muted focus:ring-offset-muted text-foreground mt-2">
-              <SelectValue placeholder="Select a degree" />
-            </SelectTrigger>
-            <SelectContent className="bg-primary-foreground border-muted text-foreground">
-              <SelectGroup>
-                <SelectLabel>Single Degrees</SelectLabel>
-                <SelectItem value="A1">A1: B.E. Chemical</SelectItem>
-                <SelectItem value="A2">A2: B.E. Civil</SelectItem>
-                <SelectItem value="A3">
-                  A3: B.E. Electrical & Electronics
-                </SelectItem>
-                <SelectItem value="A4">A4: B.E. Mechanical</SelectItem>
-                <SelectItem value="A5">A5: B. Pharmacy</SelectItem>
-                <SelectItem value="A7">A7: B.E. Computer Science</SelectItem>
-                <SelectItem value="A8">
-                  A8: B.E. Electronics & Instrumentation
-                </SelectItem>
-                <SelectItem value="AA">
-                  AA: B.E. Electronics & Communication
-                </SelectItem>
-                <SelectItem value="AD">
-                  AD: B.E. Mathematics & Computing
-                </SelectItem>
-              </SelectGroup>
-              <SelectGroup>
-                <SelectLabel>Dual Degrees</SelectLabel>
-                <SelectItem value="B1">B1: M.Sc. Biology</SelectItem>
-                <SelectItem value="B2">B2: M.Sc. Chemistry</SelectItem>
-                <SelectItem value="B3">B3: M.Sc. Economics</SelectItem>
-                <SelectItem value="B4">B4: M.Sc. Mathematics</SelectItem>
-                <SelectItem value="B5">B5: M.Sc. Physics</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          {firstDegree.includes("B") && (
-            <Select
-              onValueChange={setSecondDegree}
-              value={secondDegree ?? undefined}
-            >
-              <SelectTrigger className="w-84 sm:mx-4 bg-muted border-primary-foreground focus:ring-muted focus:ring-offset-muted text-foreground mt-2">
-                <SelectValue placeholder="Select a degree" />
-              </SelectTrigger>
-              <SelectContent className="bg-primary-foreground border-muted text-foreground">
-                <SelectGroup>
-                  <SelectLabel>Single Degrees</SelectLabel>
-                  {/* A0 is used for single degree MSc people since empty string denotes no selection */}
-                  <SelectItem value="A0">None (Single degree M.Sc.)</SelectItem>
-                  <SelectItem value="A1">A1: B.E. Chemical</SelectItem>
-                  <SelectItem value="A2">A2: B.E. Civil</SelectItem>
-                  <SelectItem value="A3">
-                    A3: B.E. Electrical & Electronics
-                  </SelectItem>
-                  <SelectItem value="A4">A4: B.E. Mechanical</SelectItem>
-                  <SelectItem value="A7">A7: B.E. Computer Science</SelectItem>
-                  <SelectItem value="A8">
-                    A8: B.E. Electronics & Instrumentation
-                  </SelectItem>
-                  <SelectItem value="AA">
-                    AA: B.E. Electronics & Communication
-                  </SelectItem>
-                  <SelectItem value="AD">
-                    AD: B.E. Mathematics & Computing
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          )}
+          <DegreeDropDown
+            firstDegree={firstDegree}
+            secondDegree={secondDegree}
+            setFirstDegree={setFirstDegree}
+            setSecondDegree={setSecondDegree}
+            year={undefined}
+          />
         </div>
         <Button
           className="w-fit mt-12 bg-muted font-bold hover:bg-primary-foreground transition ease-in-out text-foreground"

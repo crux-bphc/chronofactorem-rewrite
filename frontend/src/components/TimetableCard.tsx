@@ -1,7 +1,6 @@
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import axios, { AxiosError } from "axios";
+import type { timetableType } from "lib";
 import { Edit2, Eye, EyeOff, Trash } from "lucide-react";
 import { useState } from "react";
 import type { z } from "zod";
@@ -26,14 +25,14 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ToastAction } from "@/components/ui/toast";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { timetableType } from "../../../lib/src/index";
+import useDeleteTimetable from "@/data-access/hooks/useDeleteTimetable";
+import useEditTimetable from "@/data-access/hooks/useEditTimetable";
 import { router } from "../main";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -45,7 +44,6 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Switch } from "./ui/switch";
-import { useToast } from "./ui/use-toast";
 
 type Props = {
   timetable: z.infer<typeof timetableType>;
@@ -53,268 +51,13 @@ type Props = {
 };
 
 function TimetableCard({ timetable, showFooter }: Props) {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
   const [timetableName, setTimetableName] = useState<null | string>(null);
   const [timetableVisibility, setTimetableVisibility] = useState<
     null | boolean
   >(null);
 
-  const deleteMutation = useMutation({
-    mutationFn: () => {
-      return axios.post(`/api/timetable/${timetable.id}/delete`);
-    },
-    onSuccess: () => {
-      return queryClient.invalidateQueries({ queryKey: ["user"] });
-    },
-    onError: (error) => {
-      if (error instanceof AxiosError && error.response) {
-        if (error.response.status === 401) {
-          router.navigate({ to: "/login" });
-        }
-        if (error.response.status === 400) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 400",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 404) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 404",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 500) {
-          toast({
-            title: "Server Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 500",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else {
-          toast({
-            title: "Unknown Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : `API returned ${error.response.status}`,
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        }
-      }
-    },
-  });
-
-  const editMutation = useMutation({
-    mutationFn: (body: {
-      name: string;
-      isPrivate: boolean;
-      isDraft: boolean;
-    }) => {
-      return axios.post(`/api/timetable/${timetable.id}/edit`, body);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-    },
-    onError: (error) => {
-      if (error instanceof AxiosError && error.response) {
-        if (error.response.status === 401) {
-          router.navigate({ to: "/login" });
-        }
-        if (error.response.status === 400) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 400",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 404) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 404",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 500) {
-          toast({
-            title: "Server Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 500",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else {
-          toast({
-            title: "Unknown Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : `API returned ${error.response.status}`,
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        }
-      }
-    },
-  });
-
-  const editAndNavigateMutation = useMutation({
-    mutationFn: (body: {
-      name: string;
-      isPrivate: boolean;
-      isDraft: boolean;
-    }) => {
-      return axios.post(`/api/timetable/${timetable.id}/edit`, body);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-      router.navigate({
-        to: "/edit/$timetableId",
-        params: { timetableId: timetable.id },
-      });
-    },
-    onError: (error) => {
-      if (error instanceof AxiosError && error.response) {
-        if (error.response.status === 401) {
-          router.navigate({ to: "/login" });
-        }
-        if (error.response.status === 400) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 400",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 404) {
-          toast({
-            title: "Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 404",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else if (error.response.status === 500) {
-          toast({
-            title: "Server Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : "API returned 500",
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        } else {
-          toast({
-            title: "Unknown Error",
-            description:
-              "message" in error.response.data
-                ? error.response.data.message
-                : `API returned ${error.response.status}`,
-            variant: "destructive",
-            action: (
-              <ToastAction altText="Report issue: https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
-                  Report
-                </a>
-              </ToastAction>
-            ),
-          });
-        }
-      }
-    },
-  });
+  const { mutate: deleteTimetable } = useDeleteTimetable();
+  const { mutate: editTimetable } = useEditTimetable();
 
   return (
     <TooltipProvider>
@@ -354,10 +97,13 @@ function TimetableCard({ timetable, showFooter }: Props) {
               <Button
                 variant="outline"
                 onClick={() =>
-                  editMutation.mutate({
-                    name: timetable.name,
-                    isPrivate: !timetable.private,
-                    isDraft: timetable.draft,
+                  editTimetable({
+                    id: timetable.id,
+                    body: {
+                      name: timetable.name,
+                      isPrivate: !timetable.private,
+                      isDraft: timetable.draft,
+                    },
                   })
                 }
               >
@@ -365,21 +111,7 @@ function TimetableCard({ timetable, showFooter }: Props) {
               </Button>
             )}
 
-            {!timetable.archived ? (
-              <Button
-                variant="ghost"
-                className="rounded-full p-3"
-                onClick={() => {
-                  editAndNavigateMutation.mutate({
-                    name: timetable.name,
-                    isPrivate: true,
-                    isDraft: true,
-                  });
-                }}
-              >
-                <Edit2 />
-              </Button>
-            ) : (
+            {timetable.archived ? (
               <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="ghost" className="rounded-full p-3">
@@ -418,10 +150,14 @@ function TimetableCard({ timetable, showFooter }: Props) {
                       <Button
                         type="submit"
                         onClick={() => {
-                          editMutation.mutate({
-                            name: timetableName ?? timetable.name,
-                            isPrivate: timetableVisibility ?? timetable.private,
-                            isDraft: false,
+                          editTimetable({
+                            id: timetable.id,
+                            body: {
+                              name: timetableName ?? timetable.name,
+                              isPrivate:
+                                timetableVisibility ?? timetable.private,
+                              isDraft: false,
+                            },
                           });
                         }}
                       >
@@ -431,6 +167,33 @@ function TimetableCard({ timetable, showFooter }: Props) {
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
+            ) : (
+              <Button
+                variant="ghost"
+                className="rounded-full p-3"
+                onClick={() => {
+                  editTimetable(
+                    {
+                      id: timetable.id,
+                      body: {
+                        name: timetable.name,
+                        isPrivate: true,
+                        isDraft: true,
+                      },
+                    },
+                    {
+                      onSuccess: () => {
+                        router.navigate({
+                          to: "/edit/$timetableId",
+                          params: { timetableId: timetable.id },
+                        });
+                      },
+                    },
+                  );
+                }}
+              >
+                <Edit2 />
+              </Button>
             )}
 
             <AlertDialog>
@@ -464,7 +227,7 @@ function TimetableCard({ timetable, showFooter }: Props) {
                   <AlertDialogPrimitive.Action asChild>
                     <Button
                       variant="destructive"
-                      onClick={() => deleteMutation.mutate()}
+                      onClick={() => deleteTimetable(timetable.id)}
                     >
                       Delete
                     </Button>

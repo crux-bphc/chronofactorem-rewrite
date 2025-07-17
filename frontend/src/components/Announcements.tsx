@@ -1,9 +1,5 @@
-import { DialogTrigger } from "@radix-ui/react-dialog";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { Megaphone } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { z } from "zod";
 import {
   Dialog,
   DialogContent,
@@ -12,26 +8,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import type { announcementWithIDType } from "../../../lib/src";
+import useAnnouncements from "@/data-access/hooks/useAnnouncements";
+import ReportIssue from "./ReportIssue";
+import Spinner from "./Spinner";
 import { Button } from "./ui/button";
-
-const fetchAnnouncements = async (): Promise<
-  z.infer<typeof announcementWithIDType>[]
-> => {
-  const response = await axios.get<z.infer<typeof announcementWithIDType>[]>(
-    "/api/user/announcements",
-  );
-  return response.data;
-};
+import { DialogTrigger } from "./ui/dialog";
 
 function Announcements() {
-  const { data: announcements } = useQuery({
-    queryKey: ["announcements"],
-    queryFn: fetchAnnouncements,
-  });
-
   const { toast } = useToast();
-
+  const { data: announcements, isLoading, isError, error } = useAnnouncements();
   const [readAnnouncements, setReadAnnouncements] = useState<string[]>(() => {
     const storedReadAnnouncements = localStorage.getItem("readAnnouncements");
     return storedReadAnnouncements ? JSON.parse(storedReadAnnouncements) : [];
@@ -75,57 +60,63 @@ function Announcements() {
           <DialogTitle className="text-xl -mt-1">Announcements</DialogTitle>
         </DialogHeader>
         <DialogDescription asChild>
-          <div className="flex flex-col-reverse mx-3 mt-1 gap-3 divide-y divide-y-reverse">
-            {Array.isArray(announcements) && announcements?.length ? (
-              announcements
-                ?.sort((a, b) => {
-                  const isUnreadA = !readAnnouncements.includes(a.id);
-                  const isUnreadB = !readAnnouncements.includes(b.id);
+          {isLoading ? (
+            <Spinner />
+          ) : isError ? (
+            <ReportIssue error={JSON.stringify(error)} />
+          ) : (
+            <div className="flex flex-col-reverse mx-3 mt-1 gap-3 divide-y divide-y-reverse">
+              {Array.isArray(announcements) && announcements?.length ? (
+                announcements
+                  ?.sort((a, b) => {
+                    const isUnreadA = !readAnnouncements.includes(a.id);
+                    const isUnreadB = !readAnnouncements.includes(b.id);
 
-                  if (isUnreadA !== isUnreadB) {
-                    return isUnreadA ? -1 : 1;
-                  }
+                    if (isUnreadA !== isUnreadB) {
+                      return isUnreadA ? -1 : 1;
+                    }
 
-                  return (
-                    new Date(b.createdAt as string).getTime() -
-                    new Date(a.createdAt as string).getTime()
-                  );
-                })
-                .reverse()
-                .map((announcement) => (
-                  <div
-                    key={announcement.id}
-                    className={`flex gap-1 flex-col ${
-                      readAnnouncements.includes(announcement.id)
-                        ? "opacity-50"
-                        : ""
-                    }`}
-                  >
-                    <h1 className="font-bold text-base">
-                      {announcement.title}
-                    </h1>
-                    <p className="opacity-70 text-xs">
-                      {new Date(
-                        announcement.createdAt as string,
-                      ).toLocaleString()}
-                    </p>
-                    <p className="opacity-90 mb-3">{announcement.message}</p>
-                    {!readAnnouncements.includes(announcement.id) && (
-                      <Button
-                        onClick={() => markAsRead(announcement.id)}
-                        className="mb-3"
-                        size="sm"
-                        variant="outline"
-                      >
-                        Mark as Read
-                      </Button>
-                    )}
-                  </div>
-                ))
-            ) : (
-              <p>No announcements</p>
-            )}
-          </div>
+                    return (
+                      new Date(b.createdAt as string).getTime() -
+                      new Date(a.createdAt as string).getTime()
+                    );
+                  })
+                  .reverse()
+                  .map((announcement) => (
+                    <div
+                      key={announcement.id}
+                      className={`flex gap-1 flex-col ${
+                        readAnnouncements.includes(announcement.id)
+                          ? "opacity-50"
+                          : ""
+                      }`}
+                    >
+                      <h1 className="font-bold text-base">
+                        {announcement.title}
+                      </h1>
+                      <p className="opacity-70 text-xs">
+                        {new Date(
+                          announcement.createdAt as string,
+                        ).toLocaleString()}
+                      </p>
+                      <p className="opacity-90 mb-3">{announcement.message}</p>
+                      {!readAnnouncements.includes(announcement.id) && (
+                        <Button
+                          onClick={() => markAsRead(announcement.id)}
+                          className="mb-3"
+                          size="sm"
+                          variant="outline"
+                        >
+                          Mark as Read
+                        </Button>
+                      )}
+                    </div>
+                  ))
+              ) : (
+                <p>No announcements</p>
+              )}
+            </div>
+          )}
         </DialogDescription>
       </DialogContent>
     </Dialog>
