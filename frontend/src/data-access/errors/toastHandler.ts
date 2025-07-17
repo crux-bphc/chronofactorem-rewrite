@@ -14,6 +14,7 @@ const toastHandler = (error: Error, toaster: typeof toast) => {
         return;
     }
   }
+  console.error(error);
   toaster(UnknownError());
 };
 
