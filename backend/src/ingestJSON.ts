@@ -63,7 +63,7 @@ export const ingestJSON = async (
     const latestCourse = await queryRunner.manager
       .createQueryBuilder(Course, "course")
       .orderBy("course.acad_year", "DESC")
-      .orderBy("course.semester", "DESC")
+      .addOrderBy("course.semester", "DESC")
       .getOne();
 
     if (latestCourse !== null) {
