@@ -139,26 +139,53 @@ export function SideMenu({
                   name: string;
                 }[];
               };
-
-              return courseOptions.options.map((course) => {
-                return (
-                  <Button
-                    onClick={() =>
-                      dispatch({
-                        type: TimetableActionType.SetSelectedCourseAndSection,
-                        courseID: course.id,
-                        sectionType: null,
-                      })
-                    }
-                    key={course.id}
-                  >
-                    <div className="flex">
-                      <span>{`${course.code}: ${course.name}`}</span>
-                      <ChevronRight />
-                    </div>
-                  </Button>
-                );
-              });
+              return (
+                <>
+                  <div className="border-slate-300 dark:border-slate-600 border-t-2 w-full h-fit" />
+                  {courseOptions.options
+                    .map((course) => (
+                      // biome-ignore lint/a11y/noStaticElementInteractions: need to check if button works styling wise
+                      // biome-ignore lint/a11y/useKeyWithClickEvents: need to check if button works styling wise
+                      <div
+                        key={course.id}
+                        onClick={() =>
+                          dispatch({
+                            type: TimetableActionType.SetSelectedCourseAndSection,
+                            courseID: course.id,
+                            sectionType: null,
+                          })
+                        }
+                        className="px-4 dark:hover:bg-slate-700 hover:bg-slate-200 transition duration-200 ease-in-out cursor-pointer h-14 border-slate-300 dark:border-slate-600 items-center flex justify-between"
+                      >
+                        <span className="w-fit text-sm">
+                          {course.code}: {course.name}
+                        </span>
+                        <ChevronRight className="w-6 h-6" />
+                      </div>
+                    ))
+                    .reduce((prev, curr) => (
+                      <>
+                        <div className="flex flex-col">
+                          {prev}
+                          <div className="w-full flex justify-center font-bold text-lg">
+                            <Tooltip delayDuration={100}>
+                              <TooltipTrigger asChild>
+                                <div className="border-2 flex justify-center items-center border-slate-300 dark:border-slate-600 text-secondary-foreground p-1 w-12 h-8 rounded-full z-20 text-center">
+                                  OR
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent className="bg-secondary text-secondary-foreground border-slate-300 dark:border-slate-600 text-sm">
+                                You have to pick only one of these options
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                          {curr}
+                        </div>
+                      </>
+                    ))}
+                  <div className="border-slate-300 dark:border-slate-600 border-t-2 w-full h-fit" />
+                </>
+              );
             })}
         </TabsContent>
 
