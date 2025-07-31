@@ -1,5 +1,5 @@
-import type { sectionType } from "lib";
-import { ArrowLeft } from "lucide-react";
+import type { sectionType, sectionTypeEnum } from "lib";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import { useMemo } from "react";
 import type z from "zod";
 import { TimetableActionType, useTimetableState } from "@/context";
@@ -46,18 +46,27 @@ const CourseDetailsMenu = () => {
     }
   };
 
-  const timings = useMemo(() => {
+  interface ClashingSection {
+    tm: string;
+    courseId: string;
+    sectionType: sectionTypeEnum;
+  }
+  const timings: Map<string, ClashingSection> = useMemo(() => {
     if (timetable === undefined) return new Map();
-    const m = new Map<string, string>();
+    const m = new Map<string, ClashingSection>();
     for (const section of timetable.sections) {
       for (const roomTime of section.roomTime) {
         m.set(
           roomTime.charAt(roomTime.lastIndexOf(":") - 1) +
             roomTime.substring(roomTime.lastIndexOf(":") + 1),
-          `${section.roomTime[0].substring(
-            0,
-            section.roomTime[0].indexOf(":"),
-          )} ${section.type}${section.number}`,
+          {
+            tm: `${section.roomTime[0].substring(
+              0,
+              section.roomTime[0].indexOf(":"),
+            )} ${section.type}${section.number}`,
+            courseId: section.courseId,
+            sectionType: section.type,
+          },
         );
       }
     }
@@ -151,7 +160,11 @@ const CourseDetailsMenu = () => {
                           key={section.number}
                           disabled={
                             section.clashing !== undefined &&
-                            !timetable.sections.find((e) => e.id === section.id)
+                            !timetable.sections.find(
+                              (e) =>
+                                e.courseId === section.courseId &&
+                                e.type === section.type,
+                            )
                           }
                         >
                           <div className="flex items-center h-full w-full gap-4">
@@ -172,15 +185,32 @@ const CourseDetailsMenu = () => {
                           </div>
                         </Button>
                         {section.clashing &&
-                          !timetable.sections.find(
-                            (e) => e.id === section.id,
-                          ) && (
-                            <div className="absolute left-0 top-8 bg-slate-700/80 text-center w-full">
-                              <span className="text-slate-100 font-bold text-md">
-                                Clashing with {section.clashing}
-                              </span>
-                            </div>
-                          )}
+                        !timetable.sections.find(
+                          (e) =>
+                            e.courseId === section.courseId &&
+                            e.type === section.type,
+                        ) ? (
+                          <div className="absolute left-0 top-8 bg-slate-700/80 text-center w-full">
+                            <span className="text-slate-100 font-bold text-md">
+                              Clashing with{" "}
+                              <button
+                                type="button"
+                                className="text-blue-700 dark:text-blue-400 cursor-pointer inline-flex items-baseline gap-1"
+                                onClick={() =>
+                                  dispatch({
+                                    type: TimetableActionType.SetSelectedCourseAndSection,
+                                    courseID: section.clashing?.courseId ?? "",
+                                    sectionType:
+                                      section.clashing?.sectionType ?? "L",
+                                  })
+                                }
+                              >
+                                {section.clashing.tm}
+                                <ExternalLink size={16} />
+                              </button>
+                            </span>
+                          </div>
+                        ) : null}
                       </span>
                     );
                   })}
