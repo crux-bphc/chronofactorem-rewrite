@@ -159,11 +159,10 @@ const CourseDetailsMenu = () => {
                           onClick={() => handleSectionClick(section)}
                           key={section.number}
                           disabled={
-                            section.clashing !== undefined &&
-                            !timetable.sections.find(
-                              (e) =>
-                                e.courseId === section.courseId &&
-                                e.type === section.type,
+                            section.clashing &&
+                            !(
+                              section.clashing.courseId === section.courseId &&
+                              section.clashing.sectionType === section.type
                             )
                           }
                         >
@@ -185,10 +184,9 @@ const CourseDetailsMenu = () => {
                           </div>
                         </Button>
                         {section.clashing &&
-                        !timetable.sections.find(
-                          (e) =>
-                            e.courseId === section.courseId &&
-                            e.type === section.type,
+                        !(
+                          section.clashing.courseId === section.courseId &&
+                          section.clashing.sectionType === section.type
                         ) ? (
                           <div className="absolute left-0 top-8 bg-slate-700/80 text-center w-full">
                             <span className="text-slate-100 font-bold text-md">
