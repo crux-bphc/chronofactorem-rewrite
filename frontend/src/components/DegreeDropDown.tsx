@@ -53,6 +53,9 @@ const DegreeDropDown = ({
             <SelectItem value="B3">B3: M.Sc. Economics</SelectItem>
             <SelectItem value="B4">B4: M.Sc. Mathematics</SelectItem>
             <SelectItem value="B5">B5: M.Sc. Physics</SelectItem>
+            <SelectItem value="B7">
+              B7: M.Sc. Semiconductor and Nanoscience
+            </SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>
@@ -84,6 +87,9 @@ const DegreeDropDown = ({
               </SelectItem>
               <SelectItem value="AD">
                 AD: B.E. Mathematics & Computing
+              </SelectItem>
+              <SelectItem value="AJ">
+                AJ: B.E. Environmental and Sustainability
               </SelectItem>
             </SelectGroup>
           </SelectContent>

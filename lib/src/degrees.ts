@@ -17,6 +17,7 @@ export const approvedDegreeList = [
   "B3",
   "B4",
   "B5",
+  "B7",
 ] as const;
 
 export const approvedBEDegreeList = [
@@ -28,9 +29,17 @@ export const approvedBEDegreeList = [
   "A8",
   "AA",
   "AD",
+  "AJ",
 ] as const;
 
-export const approvedMScDegreeList = ["B1", "B2", "B3", "B4", "B5"] as const;
+export const approvedMScDegreeList = [
+  "B1",
+  "B2",
+  "B3",
+  "B4",
+  "B5",
+  "B7",
+] as const;
 
 export const approvedBPharmDegreeList = ["A5"] as const;
 
