@@ -1,23 +1,23 @@
 {
   "A1": {
     "1-1": [
-      "BIO F110",
-      "BIO F111",
-      "BITS F110",
-      "BITS F111",
-      "BITS F112",
-      "CS F111",
-      "MATH F111"
-    ],
-    "1-2": [
-      "CHEM F110",
-      "CHEM F111",
+      "MATH F101",
+      "PHY F101",
+      "CHEM F101",
       "EEE F111",
       "ME F112",
-      "PHY F110",
-      "PHY F111",
-      "MATH F112",
-      "MATH F113"
+      "BITS F101",
+      "BITS K101",
+      "BITS F102"
+    ],
+    "1-2": [
+      "MATH F102",
+      "MATH F113",
+      "BITS F111",
+      "BIO F101",
+      "CS F111",
+      "BITS F110",
+      "BITS F112"
     ],
     "2-1": [
       "MATH F211",
@@ -33,23 +33,23 @@
   },
   "A2": {
     "1-1": [
-      "CHEM F110",
-      "CHEM F111",
+      "MATH F101",
+      "PHY F101",
+      "CHEM F101",
       "EEE F111",
       "ME F112",
-      "PHY F110",
-      "PHY F111",
-      "MATH F111"
+      "BITS F101",
+      "BITS K101",
+      "BITS F102"
     ],
     "1-2": [
-      "BIO F110",
-      "BIO F111",
-      "BITS F110",
+      "MATH F102",
+      "MATH F113",
       "BITS F111",
-      "BITS F112",
+      "BIO F101",
       "CS F111",
-      "MATH F112",
-      "MATH F113"
+      "BITS F110",
+      "BITS F112"
     ],
     "2-1": [
       "MATH F211",
@@ -65,23 +65,23 @@
   },
   "A3": {
     "1-1": [
-      "BIO F110",
-      "BIO F111",
-      "BITS F110",
+      "MATH F101",
       "BITS F111",
-      "BITS F112",
+      "BIO F101",
       "CS F111",
-      "MATH F111"
+      "BITS F110",
+      "BITS F112",
+      "BITS K101"
     ],
     "1-2": [
-      "CHEM F110",
-      "CHEM F111",
+      "MATH F102",
+      "MATH F113",
+      "PHY F101",
+      "CHEM F101",
       "EEE F111",
       "ME F112",
-      "PHY F110",
-      "PHY F111",
-      "MATH F112",
-      "MATH F113"
+      "BITS F101",
+      "BITS F102"
     ],
     "2-1": [
       "MATH F211",
@@ -103,23 +103,23 @@
   },
   "A4": {
     "1-1": [
-      "CHEM F110",
-      "CHEM F111",
-      "EEE F111",
-      "ME F112",
-      "PHY F110",
-      "PHY F111",
-      "MATH F111"
+      "MATH F101",
+      "BITS F111",
+      "BIO F101",
+      "CS F111",
+      "BITS F110",
+      "BITS F112",
+      "BITS K101"
     ],
     "1-2": [
-      "BIO F110",
-      "BIO F111",
-      "BITS F110",
-      "BITS F111",
-      "BITS F112",
-      "CS F111",
-      "MATH F112",
-      "MATH F113"
+      "MATH F102",
+      "MATH F113",
+      "PHY F101",
+      "CHEM F101",
+      "EEE F111",
+      "ME F112",
+      "BITS F101",
+      "BITS F102"
     ],
     "2-1": [
       "MATH F211",
@@ -135,23 +135,23 @@
   },
   "A7": {
     "1-1": [
-      "CHEM F110",
-      "CHEM F111",
-      "EEE F111",
-      "ME F112",
-      "PHY F110",
-      "PHY F111",
-      "MATH F111"
+      "MATH F101",
+      "BITS F111",
+      "BIO F101",
+      "CS F111",
+      "BITS F110",
+      "BITS F112",
+      "BITS K101"
     ],
     "1-2": [
-      "BIO F110",
-      "BIO F111",
-      "BITS F110",
-      "BITS F111",
-      "BITS F112",
-      "CS F111",
-      "MATH F112",
-      "MATH F113"
+      "MATH F102",
+      "MATH F113",
+      "PHY F101",
+      "CHEM F101",
+      "EEE F111",
+      "ME F112",
+      "BITS F101",
+      "BITS F102"
     ],
     "2-1": [
       "MATH F211",
@@ -167,23 +167,23 @@
   },
   "A8": {
     "1-1": [
-      "BIO F110",
-      "BIO F111",
-      "BITS F110",
+      "MATH F101",
       "BITS F111",
-      "BITS F112",
+      "BIO F101",
       "CS F111",
-      "MATH F111"
+      "BITS F110",
+      "BITS F112",
+      "BITS K101"
     ],
     "1-2": [
-      "CHEM F110",
-      "CHEM F111",
+      "MATH F102",
+      "MATH F113",
+      "PHY F101",
+      "CHEM F101",
       "EEE F111",
       "ME F112",
-      "PHY F110",
-      "PHY F111",
-      "MATH F112",
-      "MATH F113"
+      "BITS F101",
+      "BITS F102"
     ],
     "2-1": [
       "MATH F211",
@@ -205,23 +205,23 @@
   },
   "AA": {
     "1-1": [
-      "BIO F110",
-      "BIO F111",
-      "BITS F110",
+      "MATH F101",
       "BITS F111",
-      "BITS F112",
+      "BIO F101",
       "CS F111",
-      "MATH F111"
+      "BITS F110",
+      "BITS F112",
+      "BITS K101"
     ],
     "1-2": [
-      "CHEM F110",
-      "CHEM F111",
+      "MATH F102",
+      "MATH F113",
+      "PHY F101",
+      "CHEM F101",
       "EEE F111",
       "ME F112",
-      "PHY F110",
-      "PHY F111",
-      "MATH F112",
-      "MATH F113"
+      "BITS F101",
+      "BITS F102"
     ],
     "2-1": [
       "MATH F211",
@@ -244,7 +244,7 @@
   "A5": {
     "1-1": [
       "BIO F110",
-      "BIO F111",
+      "BIO F101",
       "BITS F110",
       "BITS F112",
       "BITS F113",
@@ -255,7 +255,7 @@
       "BITS F114",
       "PHY F110",
       "CHEM F110",
-      "CHEM F111",
+      "CHEM F101",
       "ME F112",
       "PHA F214",
       "PHA F216",
@@ -275,23 +275,23 @@
   },
   "AD": {
     "1-1": [
-      "CHEM F110",
-      "CHEM F111",
-      "EEE F111",
-      "ME F112",
-      "PHY F110",
-      "PHY F111",
-      "MATH F111"
+      "MATH F101",
+      "BITS F111",
+      "BIO F101",
+      "CS F111",
+      "BITS F110",
+      "BITS F112",
+      "BITS K101"
     ],
     "1-2": [
-      "BIO F110",
-      "BIO F111",
-      "BITS F110",
-      "BITS F111",
-      "BITS F112",
-      "CS F111",
-      "MATH F112",
-      "MATH F113"
+      "MATH F102",
+      "MATH F113",
+      "PHY F101",
+      "CHEM F101",
+      "EEE F111",
+      "ME F112",
+      "BITS F101",
+      "BITS F102"
     ],
     "2-1": [
       "MATH F211",
@@ -312,25 +312,46 @@
     "3-1": ["MAC F311", "MAC F312", "MAC F313", "MAC F314"],
     "3-2": ["MAC F341", "MAC F342"]
   },
-  "B1": {
+  "AJ": {
     "1-1": [
-      "BIO F110",
-      "BIO F111",
-      "BITS F110",
+      "MATH F101",
       "BITS F111",
-      "BITS F112",
+      "BIO F101",
       "CS F111",
-      "MATH F111"
+      "BITS F110",
+      "BITS F112",
+      "BITS K101"
     ],
     "1-2": [
-      "CHEM F110",
-      "CHEM F111",
+      "MATH F102",
+      "MATH F113",
+      "PHY F101",
+      "CHEM F101",
       "EEE F111",
       "ME F112",
-      "PHY F110",
-      "PHY F111",
-      "MATH F112",
-      "MATH F113"
+      "BITS F101",
+      "BITS F102"
+    ]
+  },
+  "B1": {
+    "1-1": [
+      "MATH F101",
+      "PHY F101",
+      "CHEM F101",
+      "EEE F111",
+      "ME F112",
+      "BITS F101",
+      "BITS K101",
+      "BITS F102"
+    ],
+    "1-2": [
+      "MATH F102",
+      "MATH F113",
+      "BITS F111",
+      "BIO F101",
+      "CS F111",
+      "BITS F110",
+      "BITS F112"
     ],
     "2-1": [
       "MATH F211",
@@ -594,23 +615,23 @@
   },
   "B2": {
     "1-1": [
-      "BIO F110",
-      "BIO F111",
-      "BITS F110",
-      "BITS F111",
-      "BITS F112",
-      "CS F111",
-      "MATH F111"
-    ],
-    "1-2": [
-      "CHEM F110",
-      "CHEM F111",
+      "MATH F101",
+      "PHY F101",
+      "CHEM F101",
       "EEE F111",
       "ME F112",
-      "PHY F110",
-      "PHY F111",
-      "MATH F112",
-      "MATH F113"
+      "BITS F101",
+      "BITS K101",
+      "BITS F102"
+    ],
+    "1-2": [
+      "MATH F102",
+      "MATH F113",
+      "BITS F111",
+      "BIO F101",
+      "CS F111",
+      "BITS F110",
+      "BITS F112"
     ],
     "2-1": [
       "MATH F211",
@@ -882,23 +903,23 @@
   },
   "B3": {
     "1-1": [
-      "CHEM F110",
-      "CHEM F111",
+      "MATH F101",
+      "PHY F101",
+      "CHEM F101",
       "EEE F111",
       "ME F112",
-      "PHY F110",
-      "PHY F111",
-      "MATH F111"
+      "BITS F101",
+      "BITS K101",
+      "BITS F102"
     ],
     "1-2": [
-      "BIO F110",
-      "BIO F111",
-      "BITS F110",
+      "MATH F102",
+      "MATH F113",
       "BITS F111",
-      "BITS F112",
+      "BIO F101",
       "CS F111",
-      "MATH F112",
-      "MATH F113"
+      "BITS F110",
+      "BITS F112"
     ],
     "2-1": [
       "MATH F211",
@@ -1162,23 +1183,23 @@
   },
   "B4": {
     "1-1": [
-      "CHEM F110",
-      "CHEM F111",
+      "MATH F101",
+      "PHY F101",
+      "CHEM F101",
       "EEE F111",
       "ME F112",
-      "PHY F110",
-      "PHY F111",
-      "MATH F111"
+      "BITS F101",
+      "BITS K101",
+      "BITS F102"
     ],
     "1-2": [
-      "BIO F110",
-      "BIO F111",
-      "BITS F110",
+      "MATH F102",
+      "MATH F113",
       "BITS F111",
-      "BITS F112",
+      "BIO F101",
       "CS F111",
-      "MATH F112",
-      "MATH F113"
+      "BITS F110",
+      "BITS F112"
     ],
     "2-1": [
       "MATH F211",
@@ -1432,23 +1453,23 @@
   },
   "B5": {
     "1-1": [
-      "BIO F110",
-      "BIO F111",
-      "BITS F110",
-      "BITS F111",
-      "BITS F112",
-      "CS F111",
-      "MATH F111"
-    ],
-    "1-2": [
-      "CHEM F110",
-      "CHEM F111",
+      "MATH F101",
+      "PHY F101",
+      "CHEM F101",
       "EEE F111",
       "ME F112",
-      "PHY F110",
-      "PHY F111",
-      "MATH F112",
-      "MATH F113"
+      "BITS F101",
+      "BITS K101",
+      "BITS F102"
+    ],
+    "1-2": [
+      "MATH F102",
+      "MATH F113",
+      "BITS F111",
+      "BIO F101",
+      "CS F111",
+      "BITS F110",
+      "BITS F112"
     ],
     "2-1": [
       "MATH F211",
@@ -1763,5 +1784,26 @@
     ],
     "4-1": ["MAC F311", "MAC F312", "MAC F313", "MAC F314"],
     "4-2": ["MAC F341", "MAC F342"]
+  },
+  "B7": {
+    "1-1": [
+      "MATH F101",
+      "PHY F101",
+      "CHEM F101",
+      "EEE F111",
+      "ME F112",
+      "BITS F101",
+      "BITS K101",
+      "BITS F102"
+    ],
+    "1-2": [
+      "MATH F102",
+      "MATH F113",
+      "BITS F111",
+      "BIO F101",
+      "CS F111",
+      "BITS F110",
+      "BITS F112"
+    ]
   }
 }
