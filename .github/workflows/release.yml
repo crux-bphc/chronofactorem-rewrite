@@ -1,6 +1,7 @@
 name: Host a new release of ChronoFactorem
 
 on:
+  workflow_dispatch:
   release:
     types:
       - published
