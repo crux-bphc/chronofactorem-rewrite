@@ -17,7 +17,7 @@ type DepsType = {
 };
 export const searchQueryOptions = (deps: DepsType) => {
   const filteredDeps = Object.keys(deps)
-    .filter((key) => typeof deps[key] === "string")
+    .filter((key) => typeof deps[key] === "number")
     .map((key) => {
       return [key, deps[key] as string];
     });
