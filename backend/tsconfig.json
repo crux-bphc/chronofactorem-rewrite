@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
-    "lib": ["ES2022"],
+    "lib": [
+      "ES2022"
+    ],
     "target": "ES2022",
     "downlevelIteration": true,
     // Has to be NodeNext to allow for required "with { type: 'json' }" syntax: https://stackoverflow.com/a/70106896
@@ -13,12 +15,13 @@
     "esModuleInterop": true,
     "sourceMap": true,
     "strict": true,
-    "typeRoots": ["src/types/*/**", "./node_modules/@types"]
+    "typeRoots": [
+      "src/types/*/**",
+      "./node_modules/@types"
+    ]
   },
-  "include": ["src/**/*", "../lib/**/*"],
-  "references": [
-    {
-      "path": "../lib"
-    }
-  ]
+  "include": [
+    "src/**/*",
+    "../lib/**/*"
+  ],
 }

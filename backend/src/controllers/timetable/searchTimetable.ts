@@ -105,8 +105,19 @@ export const searchTimetable = async (req: Request, res: Response) => {
 
     const searchResults = await response.json();
 
-    if (!response.ok) {
-      logger.error("Error while searching timetable: ", searchResults.error);
+    interface SearchError {
+      error: unknown;
+    }
+
+    if (
+      !response.ok ||
+      typeof searchResults !== "object" ||
+      !Array.isArray(searchResults)
+    ) {
+      logger.error(
+        "Error while searching timetable: ",
+        (searchResults as SearchError).error,
+      );
       return res.status(500).json({ message: "Internal Server Error" });
     }
 

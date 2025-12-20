@@ -1,12 +1,12 @@
 import type { Request, Response } from "express";
-import { generators, type TokenSet } from "openid-client";
+import * as client from "openid-client";
 import {
   type degreeList,
   getBatchFromEmail,
   isAValidDegreeCombination,
   namedDegreeZodList,
 } from "../../../../lib/src/index.js";
-import { getClient } from "../../config/authClient.js";
+import { getConfig } from "../../config/authClient.js";
 import { env } from "../../config/server.js";
 import { User } from "../../entity/entities.js";
 import { userRepository } from "../../repositories/userRepository.js";
@@ -34,20 +34,35 @@ import {
 // on the frontend, for accessing routes, send requests with credentials:true
 
 // openid code_verifier
-const code_verifier = generators.codeVerifier();
+const code_verifier = client.randomPKCECodeVerifier();
+let pkceState: string;
 
 // redirects to the redirect URL for signing in
 export async function manageAuthRedirect(req: Request, res: Response) {
   const logger = req.log;
   try {
-    const client = await getClient();
-    const code_challenge = generators.codeChallenge(code_verifier);
+    const config = await getConfig();
+    const code_challenge =
+      await client.calculatePKCECodeChallenge(code_verifier);
 
-    const authRedirect = client.authorizationUrl({
+    const parameters: Record<string, string> = {
+      redirect_uri: `${env.BACKEND_URL}/auth/callback`,
       scope: "openid email profile",
       code_challenge,
       code_challenge_method: "S256",
-    });
+    };
+
+    if (!config.serverMetadata().supportsPKCE()) {
+      /**
+       * We cannot be sure the server supports PKCE so we're going to use state too.
+       * Use of PKCE is backwards compatible even if the AS doesn't support it which
+       * is why we're using it regardless. Like PKCE, random state must be generated
+       * for every redirect to the authorization_endpoint.
+       */
+      pkceState = client.randomState();
+      parameters.state = pkceState;
+    }
+    const authRedirect = client.buildAuthorizationUrl(config, parameters);
 
     if (req.cookies.session && req.cookies.fingerprint) {
       const sessionCookie = req.cookies.session;
@@ -60,13 +75,12 @@ export async function manageAuthRedirect(req: Request, res: Response) {
         sessionData.fingerprintHash !== hashFingerprint(fingerprintCookie)
       ) {
         clearAuthCookies(res);
-        return res.redirect(authRedirect);
+        return res.redirect(authRedirect.href);
       }
 
       return res.redirect(`${env.BACKEND_URL}/auth/callback`);
     }
-
-    return res.redirect(authRedirect);
+    return res.redirect(authRedirect.href);
   } catch (err: any) {
     logger.error("Authentication failure: ", err);
     return res.status(500).json({
@@ -83,24 +97,29 @@ export async function authCallback(req: Request, res: Response) {
     } else {
       // sets session cookie
 
-      const client = await getClient();
-      const params = client.callbackParams(req);
-
-      // tokenSet contains the refresh_token and access_token codes
-      const tokenSet = await client.callback(
-        `${env.BACKEND_URL}/auth/callback`,
-        params,
-        { code_verifier },
+      const config = await getConfig();
+      const tokenSet = await client.authorizationCodeGrant(
+        config,
+        new URL(`${env.BACKEND_URL}${req.originalUrl}`),
+        {
+          pkceCodeVerifier: code_verifier,
+          idTokenExpected: true,
+          expectedState: pkceState,
+        },
       );
 
       // obtaining the access_token from tokenSet
       const access_token = tokenSet.access_token;
 
       // obtaining userInfo from the access_token code
-      const userInfo = await client.userinfo(access_token as string | TokenSet);
+      const userInfo = await client.fetchUserInfo(
+        config,
+        access_token,
+        tokenSet.claims()?.sub || "",
+      );
 
       // tokenSet.claims() returns validated information contained upon accessing the token
-      const _tokenExpiryTime = tokenSet.claims().exp;
+      const _tokenExpiryTime = tokenSet.claims()?.exp;
 
       // defines maxAge according to env vars
       const maxAge = env.SESSION_MAX_AGE_MS; // converts into milliseconds

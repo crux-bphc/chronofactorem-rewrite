@@ -6,6 +6,8 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+vite.config.d.ts
+vite.config.js
 
 node_modules
 dist

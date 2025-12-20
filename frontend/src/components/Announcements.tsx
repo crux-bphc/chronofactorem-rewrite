@@ -1,0 +1,126 @@
+import { Megaphone } from "lucide-react";
+import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
+import useAnnouncements from "@/data-access/hooks/useAnnouncements";
+import ReportIssue from "./ReportIssue";
+import Spinner from "./Spinner";
+import { Button } from "./ui/button";
+import { DialogTrigger } from "./ui/dialog";
+
+function Announcements() {
+  const { toast } = useToast();
+  const { data: announcements, isLoading, isError, error } = useAnnouncements();
+  const [readAnnouncements, setReadAnnouncements] = useState<string[]>(() => {
+    const storedReadAnnouncements = localStorage.getItem("readAnnouncements");
+    return storedReadAnnouncements ? JSON.parse(storedReadAnnouncements) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem(
+      "readAnnouncements",
+      JSON.stringify(readAnnouncements),
+    );
+  }, [readAnnouncements]);
+
+  useEffect(() => {
+    const unreadAnnouncements = announcements?.filter(
+      (announcement) => !readAnnouncements.includes(announcement.id),
+    );
+
+    if (unreadAnnouncements && unreadAnnouncements.length > 0) {
+      toast({
+        title: "New Announcements",
+        description: `You have ${
+          unreadAnnouncements.length
+        } unread announcement${unreadAnnouncements.length > 1 ? "s" : ""}.`,
+      });
+    }
+  }, [announcements, readAnnouncements, toast]);
+
+  const markAsRead = (id: string) => {
+    setReadAnnouncements((prev) => [...prev, id]);
+  };
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="icon">
+          <Megaphone className="h-5 w-5" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-h-[400px] overflow-y-scroll">
+        <DialogHeader>
+          <DialogTitle className="text-xl -mt-1">Announcements</DialogTitle>
+        </DialogHeader>
+        <DialogDescription asChild>
+          {isLoading ? (
+            <Spinner />
+          ) : isError ? (
+            <ReportIssue error={JSON.stringify(error)} />
+          ) : (
+            <div className="flex flex-col-reverse mx-3 mt-1 gap-3 divide-y divide-y-reverse">
+              {Array.isArray(announcements) && announcements?.length ? (
+                announcements
+                  ?.sort((a, b) => {
+                    const isUnreadA = !readAnnouncements.includes(a.id);
+                    const isUnreadB = !readAnnouncements.includes(b.id);
+
+                    if (isUnreadA !== isUnreadB) {
+                      return isUnreadA ? -1 : 1;
+                    }
+
+                    return (
+                      new Date(b.createdAt as string).getTime() -
+                      new Date(a.createdAt as string).getTime()
+                    );
+                  })
+                  .reverse()
+                  .map((announcement) => (
+                    <div
+                      key={announcement.id}
+                      className={`flex gap-1 flex-col ${
+                        readAnnouncements.includes(announcement.id)
+                          ? "opacity-50"
+                          : ""
+                      }`}
+                    >
+                      <h1 className="font-bold text-base">
+                        {announcement.title}
+                      </h1>
+                      <p className="opacity-70 text-xs">
+                        {new Date(
+                          announcement.createdAt as string,
+                        ).toLocaleString()}
+                      </p>
+                      <p className="opacity-90 mb-3">{announcement.message}</p>
+                      {!readAnnouncements.includes(announcement.id) && (
+                        <Button
+                          onClick={() => markAsRead(announcement.id)}
+                          className="mb-3"
+                          size="sm"
+                          variant="outline"
+                        >
+                          Mark as Read
+                        </Button>
+                      )}
+                    </div>
+                  ))
+              ) : (
+                <p>No announcements</p>
+              )}
+            </div>
+          )}
+        </DialogDescription>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export default Announcements;

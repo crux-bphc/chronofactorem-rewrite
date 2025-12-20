@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../tailwind.config.js";
 
 @layer base {
   :root {
@@ -70,16 +69,8 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
-  }
-}
-
-@layer utilities {
-  .grid-cols-13 {
-    grid-template-columns: repeat(13, minmax(0, 1fr));
-  }
-  .grid-rows-13 {
-    grid-template-rows: repeat(13, minmax(0, 1fr));
   }
 }

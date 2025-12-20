@@ -2,23 +2,6 @@ import { z } from "zod";
 import { addNameToString } from "./zodFieldTypes.js";
 
 // !!! IMPORTANT: THIS IS THE SOURCE OF TRUTH FOR DEGREES
-export const approvedDegreeList = [
-  "A1",
-  "A2",
-  "A3",
-  "A4",
-  "A5",
-  "A7",
-  "A8",
-  "AA",
-  "AD",
-  "B1",
-  "B2",
-  "B3",
-  "B4",
-  "B5",
-] as const;
-
 export const approvedBEDegreeList = [
   "A1",
   "A2",
@@ -28,11 +11,25 @@ export const approvedBEDegreeList = [
   "A8",
   "AA",
   "AD",
+  "AJ",
 ] as const;
 
-export const approvedMScDegreeList = ["B1", "B2", "B3", "B4", "B5"] as const;
+export const approvedMScDegreeList = [
+  "B1",
+  "B2",
+  "B3",
+  "B4",
+  "B5",
+  "B7",
+] as const;
 
 export const approvedBPharmDegreeList = ["A5"] as const;
+
+export const approvedDegreeList = [
+  ...approvedBEDegreeList,
+  ...approvedMScDegreeList,
+  ...approvedBPharmDegreeList,
+] as const;
 
 export const namedDegreeZodEnum = (name?: string) =>
   z.enum(approvedDegreeList, {
