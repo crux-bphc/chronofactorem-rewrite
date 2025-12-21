@@ -1207,9 +1207,9 @@
       "MATH F213",
       "MATH F214",
       "MATH F215",
-      "ECON/MGTS F211/F211"
+      "BITS F225"
     ],
-    "2-2": ["MATH F241", "MATH F242", "MATH F243", "MATH F244", "BITS F225"],
+    "2-2": ["MATH F241", "MATH F242", "MATH F243", "MATH F244", "ECON/MGTS F211/F211"],
     "3-1": ["MATH F311", "MATH F312", "MATH F313"],
     "3-2": ["MATH F341", "MATH F342", "MATH F343"]
   },
@@ -1220,9 +1220,9 @@
       "MATH F213",
       "MATH F214",
       "MATH F215",
-      "ECON/MGTS F211/F211"
+      "BITS F225"
     ],
-    "2-2": ["MATH F241", "MATH F242", "MATH F243", "MATH F244", "BITS F225"],
+    "2-2": ["MATH F241", "MATH F242", "MATH F243", "MATH F244", "ECON/MGTS F211/F211"],
     "3-1": [
       "MATH F311",
       "MATH F312",
@@ -1251,9 +1251,9 @@
       "MATH F213",
       "MATH F214",
       "MATH F215",
-      "ECON/MGTS F211/F211"
+      "BITS F225"
     ],
-    "2-2": ["MATH F241", "MATH F242", "MATH F243", "MATH F244", "BITS F225"],
+    "2-2": ["MATH F241", "MATH F242", "MATH F243", "MATH F244", "ECON/MGTS F211/F211"],
     "3-1": [
       "MATH F311",
       "MATH F312",
@@ -1282,9 +1282,9 @@
       "MATH F213",
       "MATH F214",
       "MATH F215",
-      "ECON/MGTS F211/F211"
+      "BITS F225"
     ],
-    "2-2": ["MATH F241", "MATH F242", "MATH F243", "MATH F244", "BITS F225"],
+    "2-2": ["MATH F241", "MATH F242", "MATH F243", "MATH F244", "ECON/MGTS F211/F211"],
     "3-1": [
       "MATH F311",
       "MATH F312",
@@ -1313,9 +1313,9 @@
       "MATH F213",
       "MATH F214",
       "MATH F215",
-      "ECON/MGTS F211/F211"
+      "BITS F225"
     ],
-    "2-2": ["MATH F241", "MATH F242", "MATH F243", "MATH F244", "BITS F225"],
+    "2-2": ["MATH F241", "MATH F242", "MATH F243", "MATH F244", "ECON/MGTS F211/F211"],
     "3-1": [
       "MATH F311",
       "MATH F312",
@@ -1344,9 +1344,9 @@
       "MATH F213",
       "MATH F214",
       "MATH F215",
-      "ECON/MGTS F211/F211"
+      "BITS F225"
     ],
-    "2-2": ["MATH F241", "MATH F242", "MATH F243", "MATH F244", "BITS F225"],
+    "2-2": ["MATH F241", "MATH F242", "MATH F243", "MATH F244", "ECON/MGTS F211/F211"],
     "3-1": [
       "MATH F311",
       "MATH F312",
@@ -1373,9 +1373,9 @@
       "MATH F213",
       "MATH F214",
       "MATH F215",
-      "ECON/MGTS F211/F211"
+      "BITS F225"
     ],
-    "2-2": ["MATH F241", "MATH F242", "MATH F243", "MATH F244", "BITS F225"],
+    "2-2": ["MATH F241", "MATH F242", "MATH F243", "MATH F244", "ECON/MGTS F211/F211"],
     "3-1": [
       "MATH F311",
       "MATH F312",
@@ -1404,9 +1404,9 @@
       "MATH F213",
       "MATH F214",
       "MATH F215",
-      "ECON/MGTS F211/F211"
+      "BITS F225"
     ],
-    "2-2": ["MATH F241", "MATH F242", "MATH F243", "MATH F244", "BITS F225"],
+    "2-2": ["MATH F241", "MATH F242", "MATH F243", "MATH F244", "ECON/MGTS F211/F211"],
     "3-1": [
       "MATH F311",
       "MATH F312",
@@ -1435,9 +1435,9 @@
       "MATH F213",
       "MATH F214",
       "MATH F215",
-      "ECON/MGTS F211/F211"
+      "BITS F225"
     ],
-    "2-2": ["MATH F241", "MATH F242", "MATH F243", "MATH F244", "BITS F225"],
+    "2-2": ["MATH F241", "MATH F242", "MATH F243", "MATH F244", "ECON/MGTS F211/F211"],
     "3-1": ["MATH F311", "MATH F312", "MATH F313", "MAC F211", "MAC F212"],
     "3-2": [
       "MATH F341",
