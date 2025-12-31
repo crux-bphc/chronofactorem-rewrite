@@ -11,7 +11,7 @@ jobs:
         run: |
             cd /home/ubuntu/clones
             cd chronofactorem-rewrite-draft
-            git pull
+            GIT_SSH_COMMAND="ssh -i /home/ubuntu/.ssh/gh-actions -o IdentitiesOnly=yes" git pull
             docker compose --profile ingestion down
             docker compose --profile prod down
             docker compose --profile prod up --build -d
