@@ -1,10 +1,10 @@
-FROM node:22.17.0-bookworm-slim
+FROM node:24.14.1-bookworm-slim
 ENV NODE_ENV development
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
-RUN corepack enable pnpm && corepack install -g pnpm@latest-10
+RUN corepack enable pnpm && corepack install -g pnpm@latest-11
 
 WORKDIR /usr/local/app/frontend
 COPY ./frontend/package.json ./

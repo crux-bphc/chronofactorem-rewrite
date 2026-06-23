@@ -1,7 +1,7 @@
-FROM node:22.17.0-bookworm-slim AS build-stage
+FROM node:24.14.1-bookworm-slim AS build-stage
 ENV NODE_ENV production
 
-RUN corepack enable pnpm && corepack install -g pnpm@latest-10
+RUN corepack enable pnpm && corepack install -g pnpm@latest-11
 
 WORKDIR /usr/src/app/frontend
 COPY --chown=node:node frontend/tsconfig.json ./
@@ -35,7 +35,7 @@ WORKDIR /usr/src/app/frontend
 COPY --chown=node:node frontend/src ./src
 RUN pnpm run build
 
-FROM nginx:1.25.3-alpine-slim
+FROM nginx:1.31.2-alpine-slim
 WORKDIR /usr/share/nginx/html
 
 RUN mkdir /usr/log

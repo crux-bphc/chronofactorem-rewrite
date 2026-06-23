@@ -2,3 +2,6 @@ packages:
   - "lib"
   - "frontend"
   - "backend"
+allowBuilds:
+  '@swc/core': true
+  esbuild: true

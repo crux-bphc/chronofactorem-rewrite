@@ -1,7 +1,7 @@
-FROM node:22.17.0-bookworm-slim AS build-stage
+FROM node:24.14.1-bookworm-slim AS build-stage
 ENV NODE_ENV production
 
-RUN corepack enable pnpm && corepack install -g pnpm@latest-10
+RUN corepack enable pnpm && corepack install -g pnpm@latest-11
 
 WORKDIR /usr/src/app
 COPY --chown=node:node ./package.json ./
@@ -30,11 +30,11 @@ RUN pnpm tsc --build
 USER node
 CMD ["dumb-init", "node", "--enable-source-maps", "build/index.js"]
 
-FROM node:22.17.0-bookworm-slim
+FROM node:24.14.1-bookworm-slim
 ENV NODE_ENV production
 WORKDIR /usr/src/app
 
-RUN corepack enable pnpm && corepack install -g pnpm@latest-10
+RUN corepack enable pnpm && corepack install -g pnpm@latest-11
 
 RUN apt-get update && apt-get install -y --no-install-recommends dumb-init && apt-get clean && rm -rf /var/lib/apt/lists/*
 

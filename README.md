@@ -4,8 +4,8 @@
 
 ## Steps for setup:
 
-1. Install [nvm](https://github.com/nvm-sh/nvm) and install Node v22.17.0 LTS using `nvm install v22.17.0`. If you're using a different Node version manager, do the equivalent.
-2. Activate Node v22.17.0 using `nvm use v22.17.0`.
+1. Install [nvm](https://github.com/nvm-sh/nvm) and install Node v22.17.0 LTS using `nvm install v24.14.1`. If you're using a different Node version manager, do the equivalent.
+2. Activate Node v24.14.1 using `nvm use v24.14.1`.
 3. Install pnpm, using `npm i -g pnpm`.
 4. Install the packages in this repo by running `pnpm i -r` in the root of this repository.
 
