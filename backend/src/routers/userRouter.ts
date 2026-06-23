@@ -4,11 +4,11 @@ import {
   createAnnouncement,
 } from "../controllers/user/createAnnouncement.js";
 import { editUser, editUserValidator } from "../controllers/user/editUser.js";
+import { getAllAnnouncements } from "../controllers/user/getAnnouncements.js";
 import {
   getUserDetails,
   getUserDetailsValidator,
 } from "../controllers/user/getUserDetails.js";
-import { getAllAnnouncements } from "../controllers/user/retrieveAnnouncements.js";
 import { authenticate } from "../middleware/auth.js";
 
 const userRouter = express.Router();
