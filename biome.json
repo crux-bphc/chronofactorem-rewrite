@@ -6,10 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": [
-      "**",
-      "!backend/data"
-    ]
+    "includes": ["**", "!backend/data"]
   },
   "formatter": {
     "indentStyle": "space"
