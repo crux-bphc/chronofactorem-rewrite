@@ -6,8 +6,10 @@ export const approvedSectionTypeList = ["L", "P", "T"] as const;
 
 export const namedSectionTypeZodEnum = (name?: string) =>
   z.enum(approvedSectionTypeList, {
-    required_error: addNameToString("section type is required", name),
-    invalid_type_error: addNameToString("section type is not valid", name),
+    error: (issue) =>
+      issue.input === undefined
+        ? addNameToString("section type is required", name)
+        : addNameToString("section type is not valid", name),
   });
 export const sectionTypeZodEnum = namedSectionTypeZodEnum();
 

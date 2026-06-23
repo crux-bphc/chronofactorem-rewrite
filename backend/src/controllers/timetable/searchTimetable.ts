@@ -19,10 +19,10 @@ const searchTimetableSchema = z.object({
     // note that this implies a limit of 500 on the number of search results
     page: namedIntegerType("search results page")
       .gte(0, {
-        message: "invalid search results page",
+        error: "invalid search results page",
       })
       .lte(50, {
-        message: "invalid search results page",
+        error: "invalid search results page",
       })
       .optional(),
     year: namedCollegeYearType("search filter").optional(),
@@ -32,10 +32,10 @@ const searchTimetableSchema = z.object({
     semester: namedSemesterType("search filter").optional(),
     degrees: namedDegreeZodList("search filter")
       .min(1, {
-        message: "degrees must be a non-empty array of valid degree strings",
+        error: "degrees must be a non-empty array of valid degree strings",
       })
       .max(2, {
-        message: "degrees may not contain more than two elements",
+        error: "degrees may not contain more than two elements",
       })
       .optional(),
     courseQuery: namedNonEmptyStringType("search filter course query")
@@ -67,7 +67,7 @@ export const searchTimetable = async (req: Request, res: Response) => {
 
     const usefulQueryParams = {
       query,
-      from: Number.parseInt((page as string | undefined) ?? "0") * 12,
+      from: Number.parseInt((page as string | undefined) ?? "0", 10) * 12,
       year,
       name,
       authorId,

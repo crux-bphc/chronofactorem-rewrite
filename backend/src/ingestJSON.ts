@@ -339,7 +339,7 @@ export const ingestJSON = async (
             courses[courseValues[i].code as string].sections[courseSectionCode]
               .instructor,
           type: courseSectionCode.slice(0, 1) as sectionTypeEnum,
-          number: Number.parseInt(courseSectionCode.slice(1)),
+          number: Number.parseInt(courseSectionCode.slice(1), 10),
           roomTime: roomTimes,
         });
       }

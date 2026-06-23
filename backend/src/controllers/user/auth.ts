@@ -172,7 +172,7 @@ export async function authCallback(req: Request, res: Response) {
 
         res.redirect(
           `${env.FRONTEND_URL}/getDegrees?year=${
-            timetableJSON.metadata.acadYear - Number.parseInt(batch) + 1
+            timetableJSON.metadata.acadYear - Number.parseInt(batch, 10) + 1
           }`,
         );
       }
@@ -284,7 +284,7 @@ export async function getDegrees(req: Request, res: Response) {
       .insert()
       .into(User)
       .values({
-        batch: Number.parseInt(batch),
+        batch: Number.parseInt(batch, 10),
         name: name,
         degrees: userData.degrees,
         email: userData.email,
@@ -369,7 +369,7 @@ export async function checkAuthStatus(req: Request, res: Response) {
       return res.json({
         message: "user needs to get degrees",
         redirect: `/getDegrees?year=${
-          timetableJSON.metadata.acadYear - Number.parseInt(batch) + 1
+          timetableJSON.metadata.acadYear - Number.parseInt(batch, 10) + 1
         }`,
       });
     }

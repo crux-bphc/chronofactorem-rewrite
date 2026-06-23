@@ -25,12 +25,12 @@ function About() {
           This version of ChronoFactorem is the first real release of
           ChronoFactorem. We really wanted to iron out as many bugs as we can
           before we push it out to you to ensure a smooth experience, so it got
-          a little delayed. If you do still find bugs, please report them{" "}
+          a little delayed. If you do still find bugs, please{" "}
           <a
             href="https://github.com/crux-bphc/chronofactorem-rewrite/issues"
             className="text-blue-400 inline pl-1 items-center"
           >
-            here
+            report them
             <ArrowUpRightFromCircle className="inline w-5 h-5 ml-1 mr-1" />
           </a>
         </p>
@@ -48,12 +48,12 @@ function About() {
         </p>
         <p className="pt-4">
           The backend code is some of the most solid code we've written over the
-          years, you can go look at it and star it{" "}
+          years, you can go{" "}
           <a
             href="https://github.com/crux-bphc/chronofactorem-rewrite/"
             className="text-blue-400 inline pl-1 items-center"
           >
-            here
+            look at it and star it
             <ArrowUpRightFromCircle className="inline w-5 h-5 ml-1 mr-1" />
           </a>
           . We thank Arunachala AM, Jason Goveas, Anurav Garg, Dharanikanth

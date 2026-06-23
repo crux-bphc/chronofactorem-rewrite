@@ -204,13 +204,13 @@ const TimetableHeader = ({
                       courses.
                     </span>
                     <span className="flex">
-                      Please report this issue
+                      Please
                       <a
                         href="https://github.com/crux-bphc/chronofactorem-rewrite/issues"
                         className="text-blue-700 dark:text-blue-400 flex pl-1"
                       >
                         <span className="text-blue-700 dark:text-blue-400">
-                          here
+                          report this issue
                         </span>
                         <ArrowUpRightFromCircle className="w-4 h-4 ml-1" />
                       </a>

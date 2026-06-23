@@ -134,7 +134,7 @@ export function TimetableGrid({
         const [code, room, day, hour] =
           timetableDetailsSections[i].roomTime[j].split(":");
         const remainder = daysOfWeek.indexOf(day);
-        const quotient = Number.parseInt(hour) - 1;
+        const quotient = Number.parseInt(hour, 10) - 1;
         grid[
           isVertical ? remainder + quotient * 6 : quotient + remainder * 13
         ] = {
@@ -304,7 +304,6 @@ export function TimetableGrid({
                   className={`bg-background border border-muted dark:border-muted/70 ${
                     isVertical ? "min-h-28 sm:min-h-16" : "min-h-20"
                   }`}
-                  // biome-ignore lint/suspicious/noArrayIndexKey: there's literally no other property this grid thing has
                   key={2 * i}
                 />
               ),

@@ -19,11 +19,11 @@ const dataSchema = z.object({
     sem: namedSemesterType("search").optional(),
     branch: namedDegreeZodList("search branch")
       .min(1, {
-        message:
+        error:
           "search branch must be a non-empty array of valid degree strings",
       })
       .max(2, {
-        message: "search branch may not contain more than two elements",
+        error: "search branch may not contain more than two elements",
       })
       .optional(),
     // This type definition for archived is not ideal, but boolean() doesn't work directly as the param is read as a string, and coercing it to boolean makes all values pass the check, rendering this check useless. Thus, this is the current solution
@@ -54,8 +54,8 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
     }
 
     const branch: degreeList = req.query.branch as degreeList;
-    const year: number = Number.parseInt(req.query.year as string);
-    const sem: number = Number.parseInt(req.query.sem as string);
+    const year: number = Number.parseInt(req.query.year as string, 10);
+    const sem: number = Number.parseInt(req.query.sem as string, 10);
     // note that if archived is not passed as a param, (req.query.archived as string) evaluates to the string "undefined"
     const archived: boolean = (req.query.archived as string) === "true";
     const isPrivate = false;

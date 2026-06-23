@@ -33,29 +33,37 @@ export const approvedDegreeList = [
 
 export const namedDegreeZodEnum = (name?: string) =>
   z.enum(approvedDegreeList, {
-    required_error: addNameToString("degree is required", name),
-    invalid_type_error: addNameToString("degree is not valid", name),
+    error: (issue) =>
+      issue.input === undefined
+        ? addNameToString("degree is required", name)
+        : addNameToString("degree is not valid", name),
   });
 export const degreeZodEnum = namedDegreeZodEnum();
 
 export const namedBEDegreeZodEnum = (name?: string) =>
   z.enum(approvedBEDegreeList, {
-    required_error: addNameToString("BE degree is required", name),
-    invalid_type_error: addNameToString("BE degree is not valid", name),
+    error: (issue) =>
+      issue.input === undefined
+        ? addNameToString("BE degree is required", name)
+        : addNameToString("BE degree is not valid", name),
   });
 export const beDegreeZodEnum = namedBEDegreeZodEnum();
 
 export const namedMScDegreeZodEnum = (name?: string) =>
   z.enum(approvedMScDegreeList, {
-    required_error: addNameToString("MSc degree is required", name),
-    invalid_type_error: addNameToString("MSc degree is not valid", name),
+    error: (issue) =>
+      issue.input === undefined
+        ? addNameToString("MSc degree is required", name)
+        : addNameToString("MSc degree is not valid", name),
   });
 export const mscDegreeZodEnum = namedMScDegreeZodEnum();
 
 export const namedBPharmDegreeZodEnum = (name?: string) =>
   z.enum(approvedBPharmDegreeList, {
-    required_error: addNameToString("BPharm degree is required", name),
-    invalid_type_error: addNameToString("BPharm degree is not valid", name),
+    error: (issue) =>
+      issue.input === undefined
+        ? addNameToString("BPharm degree is required", name)
+        : addNameToString("BPharm degree is not valid", name),
   });
 export const bpharmDegreeZodEnum = namedBPharmDegreeZodEnum();
 

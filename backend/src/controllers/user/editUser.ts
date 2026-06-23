@@ -12,11 +12,10 @@ const dataSchema = z.object({
   body: z.object({
     degrees: namedDegreeZodList("user")
       .min(1, {
-        message:
-          "user degrees must be a non-empty array of valid degree strings",
+        error: "user degrees must be a non-empty array of valid degree strings",
       })
       .max(2, {
-        message: "user degrees may not contain more than two elements",
+        error: "user degrees may not contain more than two elements",
       }),
   }),
 });
