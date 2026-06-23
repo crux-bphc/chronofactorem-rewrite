@@ -17,10 +17,12 @@ type DepsType = {
 };
 export const searchQueryOptions = (deps: DepsType) => {
   const filteredDeps = Object.keys(deps)
-    .filter((key) => typeof deps[key] === "number")
-    .map((key) => {
-      return [key, deps[key] as string];
-    });
+    .filter(
+      (key) =>
+        typeof deps[key] === "number" ||
+        (typeof deps[key] === "string" && deps[key] !== ""),
+    )
+    .map((key) => [key, String(deps[key])]);
   const query = new URLSearchParams(filteredDeps).toString();
   return queryOptions({
     queryKey: ["search_timetables", query],
