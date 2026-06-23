@@ -115,8 +115,8 @@ export const searchTimetable = async (req: Request, res: Response) => {
       !Array.isArray(searchResults)
     ) {
       logger.error(
-        "Error while searching timetable: ",
         (searchResults as SearchError).error,
+        "Error while searching timetable: ",
       );
       return res.status(500).json({ message: "Internal Server Error" });
     }

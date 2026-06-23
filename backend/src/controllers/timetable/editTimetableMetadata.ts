@@ -54,7 +54,7 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
       .json({ message: "draft timetable can not be public" });
   }
 
-  const dbID = sqids.decode(req.params.id);
+  const dbID = sqids.decode(req.params.id as string);
   if (!validSqid(dbID)) {
     return res.status(404).json({ message: "Timetable does not exist" });
   }

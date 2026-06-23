@@ -6,7 +6,6 @@
     "module": "ES2022",
     "skipLibCheck": true,
     // shadcn/ui setup
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },

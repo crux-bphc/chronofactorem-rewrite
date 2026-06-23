@@ -4,10 +4,10 @@
       "ES2022"
     ],
     "target": "ES2022",
-    "downlevelIteration": true,
     // Has to be NodeNext to allow for required "with { type: 'json' }" syntax: https://stackoverflow.com/a/70106896
     "module": "NodeNext",
     "moduleResolution": "Node16",
+    "rootDir": "..",
     "outDir": "build",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,

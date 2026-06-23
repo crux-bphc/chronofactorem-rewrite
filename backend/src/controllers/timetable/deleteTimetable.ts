@@ -36,7 +36,7 @@ export const deleteTimetable = async (req: Request, res: Response) => {
     return res.status(401).json({ message: "unregistered user" });
   }
 
-  const dbID = sqids.decode(req.params.id);
+  const dbID = sqids.decode(req.params.id as string);
   if (!validSqid(dbID)) {
     return res.status(404).json({ message: "Timetable does not exist" });
   }

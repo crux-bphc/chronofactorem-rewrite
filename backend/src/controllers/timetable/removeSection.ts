@@ -32,7 +32,7 @@ export const removeSectionValidator = validate(dataSchema);
 
 export const removeSection = async (req: Request, res: Response) => {
   const logger = req.log;
-  const dbID = sqids.decode(req.params.id);
+  const dbID = sqids.decode(req.params.id as string);
   if (!validSqid(dbID)) {
     return res.status(404).json({ message: "Timetable does not exist" });
   }
