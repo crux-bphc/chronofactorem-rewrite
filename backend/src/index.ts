@@ -1,9 +1,9 @@
 // import "dotenv/config";
 import app from "./app.js";
 import { env } from "./config/server.js";
-import { AppDataSource } from "./db.js";
+import { initializeDataSource } from "./db.js";
 
-AppDataSource.initialize()
+initializeDataSource()
   .then(async () => {
     // start express server
     app.listen(env.BACKEND_PORT);

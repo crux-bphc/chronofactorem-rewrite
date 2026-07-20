@@ -31,7 +31,6 @@ export const serverSchema = z.object({
   CHRONO_SECRET: z.string().min(1),
   DB_LONG_RUNNING_QUERY_MS: z.coerce.number().prefault(2000),
   LOG_MODE: z.enum(["development", "production"]).optional(),
-  SEARCH_SERVICE_URL: z.string().url().min(1),
   // from pino.Level
   LOG_LEVEL: z
     .enum(["silent", "fatal", "error", "warn", "info", "debug", "trace"])

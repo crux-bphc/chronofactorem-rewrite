@@ -28,10 +28,6 @@ import {
   removeSection,
   removeSectionValidator,
 } from "../controllers/timetable/removeSection.js";
-import {
-  searchTimetable,
-  searchTimetableValidator,
-} from "../controllers/timetable/searchTimetable.js";
 import { authenticate } from "../middleware/auth.js";
 
 const timetableRouter = express.Router();
@@ -42,12 +38,6 @@ timetableRouter.get(
   authenticate,
   getPublicTimetablesValidator,
   getPublicTimetables,
-);
-timetableRouter.get(
-  "/search",
-  authenticate,
-  searchTimetableValidator,
-  searchTimetable,
 );
 timetableRouter.get("/:id", getTimetableByIdValidator, getTimetableById);
 timetableRouter.post(

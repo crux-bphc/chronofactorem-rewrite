@@ -1,9 +1,9 @@
 import "dotenv/config";
-import { AppDataSource } from "./db.js";
+import { AppDataSource, initializeDataSource } from "./db.js";
 import { ingestJSON } from "./ingestJSON.js";
 import timetableJSON from "./timetable.json" with { type: "json" };
 
-AppDataSource.initialize()
+initializeDataSource()
   .then(async () => {
     // create a query runner to make it easier to create transactions across typeorm function calls
     console.log("connecting to db...");

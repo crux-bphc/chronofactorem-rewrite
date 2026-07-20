@@ -4,7 +4,6 @@ import { env } from "./config/server.js";
 import {
   Announcement,
   Course,
-  SearchHistory,
   Section,
   Timetable,
   User,
@@ -16,9 +15,14 @@ export const AppDataSource = new DataSource({
   url: `postgres://${env.POSTGRES_USER}:${env.POSTGRES_PASSWORD}@${env.DB_HOST}:${env.PGPORT}?db=${env.POSTGRES_DB}`,
   synchronize: true,
   logging: false,
-  entities: [User, Timetable, Course, Section, SearchHistory, Announcement],
+  entities: [User, Timetable, Course, Section, Announcement],
   migrations: [],
   subscribers: [],
   maxQueryExecutionTime: env.DB_LONG_RUNNING_QUERY_MS,
   logger: new DatabaseLogger(databaseLogger),
 });
+
+export const initializeDataSource = async () => {
+  await AppDataSource.initialize();
+  return AppDataSource;
+};

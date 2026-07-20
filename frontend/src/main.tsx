@@ -17,7 +17,6 @@ import finalizeTimetableRoute from "./pages/FinalizeTimetable";
 import getDegreesRoute from "./pages/GetDegrees";
 import homeRoute from "./pages/Home";
 import loginRoute from "./pages/Login";
-import searchRoute from "./pages/SearchResults";
 import viewTimetableRoute from "./pages/ViewTimetable";
 import RootComponent from "./RootComponent";
 import "./index.css";
@@ -46,7 +45,6 @@ const routeTree = rootRoute.addChildren([
     editTimetableRoute,
     finalizeTimetableRoute,
     viewTimetableRoute,
-    searchRoute,
   ]),
 ]);
 

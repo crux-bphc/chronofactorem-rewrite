@@ -1,5 +1,5 @@
 import { Link, useRouter } from "@tanstack/react-router";
-import { Info, LogOut, Pencil, Plus, Search } from "lucide-react";
+import { Info, LogOut, Pencil, Plus } from "lucide-react";
 import { useCookies } from "react-cookie";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,8 +15,6 @@ import { router } from "../main";
 import Announcements from "./Announcements";
 import { ModeToggle } from "./ModeToggle";
 import ReportIssue from "./ReportIssue";
-import SearchBar from "./SearchBar";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
 export function NavBar() {
   const stateRouter = useRouter();
@@ -79,21 +77,6 @@ export function NavBar() {
             </div>
           </Button>
         )}
-        <div className="hidden md:flex">
-          <SearchBar />
-        </div>
-        <div className="text-primary p-2 text-lg rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out">
-          <div className="flex md:hidden">
-            <Popover>
-              <PopoverTrigger asChild className="cursor-pointer">
-                <Search />
-              </PopoverTrigger>
-              <PopoverContent className="w-80 mt-4">
-                <SearchBar />
-              </PopoverContent>
-            </Popover>
-          </div>
-        </div>
         <Link
           to="/about"
           className="text-primary text-lg p-2 rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out"

@@ -1,12 +1,6 @@
 import type { QueryRunner } from "typeorm";
 import type { sectionTypeEnum } from "../../lib/src/index.js";
 import { Course, Section, Timetable } from "./entity/entities.js";
-import {
-  addCourse,
-  addTimetable,
-  removeCourse,
-  removeTimetable,
-} from "./utils/search.js";
 
 interface ExamJSON {
   midsem: string | null;
@@ -353,54 +347,6 @@ export const ingestJSON = async (
       .values(sectionValues)
       .execute();
     console.log("sections inserted!");
-
-    console.log("removing old courses from search service...");
-    const [oldCourseIds, oldCourseCount] = await queryRunner.manager
-      .createQueryBuilder()
-      .select("course.id")
-      .from(Course, "course")
-      .where("course.archived = :archived", { archived: true })
-      .getManyAndCount();
-    console.log(`${oldCourseCount} old courses found`);
-    for (const { id } of oldCourseIds) {
-      await removeCourse(id, console);
-    }
-    console.log("removed old courses from search service!");
-
-    console.log("adding updated courses into search service...");
-    const [updatedCourses, updatedCourseCount] = await queryRunner.manager
-      .createQueryBuilder()
-      .select("course")
-      .from(Course, "course")
-      .leftJoinAndSelect("course.sections", "section")
-      .getManyAndCount();
-    console.log(`${updatedCourseCount} courses found`);
-    for (const course of updatedCourses) {
-      await addCourse(course, console);
-    }
-    console.log("added updated courses to search service!");
-
-    console.log(
-      "waiting for 10 seconds to avoid potential race conditions in search service...",
-    );
-    await new Promise((resolve) => {
-      setTimeout(resolve, 10000);
-    });
-
-    console.log("updating timetables in search service...");
-    const [timetableIds, timetableCount] = await queryRunner.manager
-      .createQueryBuilder()
-      .select("timetable")
-      .from(Timetable, "timetable")
-      .leftJoinAndSelect("timetable.sections", "section")
-      .where("timetable.archived = :archived", { archived: true })
-      .getManyAndCount();
-    console.log(`${timetableCount} timetables are to be updated`);
-    for (const timetable of timetableIds) {
-      await removeTimetable(timetable.id, console);
-      await addTimetable(timetable, null, console);
-    }
-    console.log("updated timetables in search service!");
 
     await queryRunner.commitTransaction();
     // show summary of the transaction

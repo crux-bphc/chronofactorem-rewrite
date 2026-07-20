@@ -10,7 +10,6 @@ import type { Timetable, User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { userRepository } from "../../repositories/userRepository.js";
-import { addTimetable, removeTimetable } from "../../utils/search.js";
 import sqids, { validSqid } from "../../utils/sqids.js";
 
 const dataSchema = z.object({
@@ -104,9 +103,9 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
       message: "cannot publish timetable with warnings",
     });
   }
-  let updatedTimetable: Timetable;
+
   try {
-    updatedTimetable = await timetableRepository.save({
+    await timetableRepository.save({
       ...timetable,
       name: name,
       private: isPrivate,
@@ -114,17 +113,6 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
     });
   } catch (err: any) {
     logger.error("Error while editing timetable: ", err.message);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-
-  // update search service
-  try {
-    if (isDraft === false && isPrivate === false) {
-      await addTimetable(updatedTimetable, req.session?.email ?? "", logger);
-    } else {
-      await removeTimetable(timetable.id, logger);
-    }
-  } catch (_err: any) {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 

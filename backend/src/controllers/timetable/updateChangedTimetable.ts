@@ -9,18 +9,11 @@ import { env } from "../../config/server.js";
 import { AppDataSource } from "../../db.js";
 import { Course, Section, Timetable } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
-import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { checkForExamTimingsChange } from "../../utils/checkForChange.js";
 import {
   checkForClassHoursClash,
   checkForExamHoursClash,
 } from "../../utils/checkForClashes.js";
-import {
-  addCourse,
-  addTimetable,
-  removeCourse,
-  removeTimetable,
-} from "../../utils/search.js";
 import { addExamTimings, removeSection } from "../../utils/updateSection.js";
 import { updateSectionWarnings } from "../../utils/updateWarnings.js";
 
@@ -237,34 +230,6 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
     await queryRunner.commitTransaction();
     queryRunner.release();
 
-    // update course in search service
-    try {
-      await removeCourse(course.id, logger);
-      await addCourse(course, logger);
-    } catch (_err: any) {
-      return res.status(500).json({ message: "Internal Server Error" });
-    }
-
-    // update timetables in search service
-    for (const timetable of timetables) {
-      try {
-        await removeTimetable(timetable.id, logger);
-      } catch (_err: any) {
-        return res.status(500).json({ message: "Internal Server Error" });
-      }
-      if (!timetable.draft && !timetable.private) {
-        const timetableWithSections = await timetableRepository
-          .createQueryBuilder("timetable")
-          .leftJoinAndSelect("timetable.sections", "section")
-          .where("timetable.id = :id", { id: timetable.id })
-          .getOneOrFail();
-        try {
-          await addTimetable(timetableWithSections, null, logger);
-        } catch (_err: any) {
-          return res.status(500).json({ message: "Internal Server Error" });
-        }
-      }
-    }
     return res.json({ message: "Timetable successfully updated" });
   } catch (err: any) {
     logger.error(err);
