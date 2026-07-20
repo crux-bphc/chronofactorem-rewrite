@@ -10,3 +10,4 @@ postgres
 logs
 nginx.prod.conf
 backend/data
+mise.toml
