@@ -4,7 +4,7 @@
 
 ## Steps for setup:
 
-1. Install [nvm](https://github.com/nvm-sh/nvm) and install Node v22.17.0 LTS using `nvm install v24.14.1`. If you're using a different Node version manager, do the equivalent.
+1. Install [nvm](https://github.com/nvm-sh/nvm) and install Node v24.14.0 LTS using `nvm install v24.14.1`. If you're using a different Node version manager, do the equivalent.
 2. Activate Node v24.14.1 using `nvm use v24.14.1`.
 3. Install pnpm, using `npm i -g pnpm`.
 4. Install the packages in this repo by running `pnpm i -r` in the root of this repository.
@@ -183,11 +183,3 @@ If something goes wrong, and you need to overwrite the course data for a semeste
 **NOTE:** This same `db` container is used in `dev` and `prod`
 
 **NOTE:** This same `ingestion` container is the container that runs the ingestion script.
-
-## Search service
-
-For course & timetable search, we'll be using https://github.com/crux-bphc/search-service/. Both the Docker Compose configurations are set to run on the same network (named `chrono_net`).
-
-Make sure to set the `CHRONO_PORT` environment variable in the search service to an unused port (such as 4713). Then, set the `SEARCH_SERVICE_URL` environment variable here to `http://chrono:XXXX`, replacing `XXXX` with the previously set port.
-
-Before adding any timetables to the search service, you'll need to add the relevant courses to the search service indexes. A sample way to do this is using https://github.com/crux-bphc/search-service/blob/master/chrono/utils.py.
