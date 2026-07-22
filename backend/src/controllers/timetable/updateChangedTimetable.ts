@@ -103,10 +103,14 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
         // This is needed because the course exam dates are not from DB,
         // but are from the JSON body of the request.
         // A similar procedure is used during ingestion as well.
-        course.compreStartTime = new Date(course.compreStartTime);
-        course.compreEndTime = new Date(course.compreEndTime);
-        course.midsemStartTime = new Date(course.midsemStartTime);
-        course.midsemEndTime = new Date(course.midsemEndTime);
+        if (course.compreStartTime !== null && course.compreEndTime !== null) {
+          course.compreStartTime = new Date(course.compreStartTime);
+          course.compreEndTime = new Date(course.compreEndTime);
+        }
+        if (course.midsemStartTime !== null && course.midsemEndTime !== null) {
+          course.midsemStartTime = new Date(course.midsemStartTime);
+          course.midsemEndTime = new Date(course.midsemEndTime);
+        }
 
         // Check if the new timings clash with any other timings of other courses
         if (checkForExamHoursClash(timetable, course).clash) {
