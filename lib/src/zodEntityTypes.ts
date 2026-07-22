@@ -20,18 +20,20 @@ export const namedCourseType = (name?: string) =>
     id: namedUUIDType(addNameToString("course", name)),
     code: namedNonEmptyStringType(addNameToString("course code", name)),
     name: namedNonEmptyStringType(addNameToString("course name", name)),
+    // exam timings are nullable in the database (courses without exams,
+    // e.g. labs/projects, have NULLs), so they must be nullable here too
     midsemStartTime: namedISOTimestampType(
       addNameToString("course midsemStartTime", name),
-    ),
+    ).nullable(),
     midsemEndTime: namedISOTimestampType(
       addNameToString("course midsemEndTime", name),
-    ),
+    ).nullable(),
     compreStartTime: namedISOTimestampType(
       addNameToString("course compreStartTime", name),
-    ),
+    ).nullable(),
     compreEndTime: namedISOTimestampType(
       addNameToString("course compreEndTime", name),
-    ),
+    ).nullable(),
     archived: namedBooleanType(addNameToString("course archived", name)),
     acadYear: namedYearType(addNameToString("course acadYear", name)),
     semester: namedSemesterType(addNameToString("course", name)),
