@@ -1,9 +1,10 @@
+import { useQuery } from "@tanstack/react-query";
 import { notFound, useParams } from "@tanstack/react-router";
 import type React from "react";
 import { createContext, useContext, useEffect, useReducer } from "react";
-import Spinner from "@/components/Spinner";
+import CenteredSpinner from "@/components/CenteredSpinner";
 import useCourse from "@/data-access/hooks/useCourse";
-import useCourses from "@/data-access/hooks/useCourses";
+import { courseQueryOptions } from "@/data-access/hooks/useCourses";
 import useTimetable from "@/data-access/hooks/useTimetable";
 import useUser from "@/data-access/hooks/useUser";
 import reducer from "./reducer";
@@ -53,9 +54,19 @@ export const TimetableProvider = ({
   if (timetableId === undefined) throw notFound();
   const [state, dispatch] = useReducer(reducer, initialTimetableState);
   const { data: user, isLoading: isUserLoading } = useUser();
-  const { data: courses, isLoading: isCoursesLoading } = useCourses();
   const { data: timetable, isLoading: isTimetableLoading } =
     useTimetable(timetableId);
+  // The course list must match the semester of the timetable being viewed
+  // (archived timetables reference archived courses), so the query is gated
+  // on the timetable being loaded.
+  const { data: courses, isLoading: isCoursesLoading } = useQuery({
+    ...courseQueryOptions(
+      timetable === undefined
+        ? undefined
+        : { acadYear: timetable.acadYear, semester: timetable.semester },
+    ),
+    enabled: timetable !== undefined,
+  });
   const { data: course } = useCourse(state.currentCourseID);
 
   useEffect(() => {
@@ -93,7 +104,7 @@ export const TimetableProvider = ({
   }, []);
 
   if (isUserLoading || isCoursesLoading || isTimetableLoading) {
-    return <Spinner />;
+    return <CenteredSpinner />;
   }
 
   return (
