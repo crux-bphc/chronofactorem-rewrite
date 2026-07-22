@@ -19,6 +19,7 @@ import { courseQueryOptions } from "@/data-access/hooks/useCourses";
 import { timetableQueryOptions } from "@/data-access/hooks/useTimetable";
 import { userQueryOptions } from "@/data-access/hooks/useUser";
 import authenticatedRoute from "../AuthenticatedRoute";
+import CenteredSpinner from "../components/CenteredSpinner";
 import NotFound from "../components/NotFound";
 import { SideMenu } from "../components/SideMenu";
 import Spinner from "../components/Spinner";
@@ -35,11 +36,23 @@ import { toast, useToast } from "../components/ui/use-toast";
 const viewTimetableRoute = new Route({
   getParentRoute: () => authenticatedRoute,
   path: "view/$timetableId",
-  loader: ({ context: { queryClient }, params: { timetableId } }) => {
+  loader: async ({ context: { queryClient }, params: { timetableId } }) => {
     queryClient.ensureQueryData(userQueryOptions);
-    queryClient.ensureQueryData(courseQueryOptions);
-    queryClient.ensureQueryData(timetableQueryOptions(timetableId));
+    // Courses are fetched for the semester of the timetable being viewed, so
+    // the timetable has to be loaded first. Awaiting both keeps this data in
+    // the loader, so preloading warms it before navigation (see
+    // https://tanstack.com/router/v1/docs/guide/data-loading)
+    const timetable = await queryClient.ensureQueryData(
+      timetableQueryOptions(timetableId),
+    );
+    await queryClient.ensureQueryData(
+      courseQueryOptions({
+        acadYear: timetable.acadYear,
+        semester: timetable.semester,
+      }),
+    );
   },
+  pendingComponent: CenteredSpinner,
   component: () => (
     <TimetableProvider>
       <ViewTimetable />
