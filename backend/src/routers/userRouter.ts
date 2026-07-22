@@ -21,11 +21,6 @@ userRouter.post(
   createAnnouncement,
 );
 userRouter.get("/announcements", authenticate, getAllAnnouncements);
-userRouter.get(
-  "/{.:id}",
-  authenticate,
-  getUserDetailsValidator,
-  getUserDetails,
-);
+userRouter.get("/{:id}", authenticate, getUserDetailsValidator, getUserDetails);
 
 export default userRouter;
