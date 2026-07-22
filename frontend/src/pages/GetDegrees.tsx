@@ -56,7 +56,7 @@ function GetDegrees() {
 
   const handleSubmit = async () => {
     if (firstDegree) {
-      if (firstDegree?.includes("B") && year >= 2 && secondDegree === null) {
+      if (firstDegree?.includes("B") && year >= 3 && secondDegree === null) {
         toast({
           title: "Select your second degree!",
           variant: "destructive",
@@ -64,7 +64,7 @@ function GetDegrees() {
         return;
       }
       const degrees =
-        firstDegree?.includes("B") && year >= 2 && secondDegree !== "A0"
+        firstDegree?.includes("B") && year >= 3 && secondDegree !== "A0"
           ? [firstDegree, secondDegree]
           : [firstDegree];
       createUser(
