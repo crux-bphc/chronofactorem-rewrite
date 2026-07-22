@@ -45,11 +45,9 @@ export const useSwapTimetableSections = (timetableId: string | undefined) => {
       newSectionId: string;
     }) => {
       if (timetableId === undefined) return;
-      await chronoAPI.post(`/api/timetable/${timetableId}/remove`, {
+      await chronoAPI.post(`/api/timetable/${timetableId}/swap`, {
         sectionId,
-      });
-      await chronoAPI.post(`/api/timetable/${timetableId}/add`, {
-        sectionId: newSectionId,
+        newSectionId,
       });
     },
     onSuccess: () => {
