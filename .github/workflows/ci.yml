@@ -1,0 +1,65 @@
+name: Build and lint code
+
+on:
+  pull_request:
+    types: [ labeled, synchronize ]
+  push:
+    branches: [ master ]
+  merge_group:
+
+# cancel stale runs when a newer run for the same PR/branch is queued,
+# so pushes don't pile up
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-lint:
+    if: ${{ github.event.label.name == 'ready' || contains(github.event.pull_request.labels.*.name, 'ready') || github.event_name == 'push' || github.event_name == 'merge_group' }}
+    # GitHub-hosted: free for this public repo, and every job gets its own
+    # VM, which eliminates the serial queue on the single self-hosted runner
+    # (deploys stay self-hosted in pipeline.yml/release.yml)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # pnpm must be installed before setup-node for cache: pnpm to work
+      - uses: pnpm/action-setup@v6
+        name: Install pnpm
+        with:
+          version: 11.8.0
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.14.1
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install -r --frozen-lockfile
+
+      - name: Build lib
+        run: pnpm tsc --build
+        working-directory: "./lib"
+
+      - name: Build backend
+        run: pnpm tsc --build
+        working-directory: "./backend"
+
+      - name: Build frontend
+        run: pnpm run build
+        working-directory: "./frontend"
+
+      - name: Run biomejs linter and formatter on lib
+        run: pnpm biome ci .
+        working-directory: "./lib"
+
+      - name: Run biomejs linter and formatter on backend
+        run: pnpm biome ci .
+        working-directory: "./backend"
+
+      - name: Run biomejs linter and formatter on frontend
+        run: pnpm biome ci .
+        working-directory: "./frontend"
