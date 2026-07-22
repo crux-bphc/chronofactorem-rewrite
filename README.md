@@ -9,6 +9,9 @@
 3. Install pnpm, using `npm i -g pnpm`.
 4. Install the packages in this repo by running `pnpm i -r` in the root of this repository.
 
+> [!tip]
+> Typescript 7 is now out, and we find the Typescript 7 dev experience to be quite a bit faster than the default in VSCode. We recommend installing the plugins in `.vscode` and setting them up to enable TS7 support.
+
 Check [.env.example](./.env.example) for an example env file. It can be arbitrary, though we recommend using:
 
 ```
