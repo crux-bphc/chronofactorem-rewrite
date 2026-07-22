@@ -58,6 +58,14 @@ export const authenticate = async (
     req.session = parsedSession.data;
     return next();
   } catch (error) {
+    // jwt.verify throws JsonWebTokenError (and its TokenExpiredError
+    // subclass) for expired or otherwise invalid sessions
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(401).json({
+        message: "unauthorized",
+        error: "invalid user session",
+      });
+    }
     return res.status(500).json(JSON.stringify(error));
   }
 };
