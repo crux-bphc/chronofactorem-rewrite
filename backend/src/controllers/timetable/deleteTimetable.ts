@@ -70,7 +70,7 @@ export const deleteTimetable = async (req: Request, res: Response) => {
   } catch (err: any) {
     logger.error("Error while deleting timetable: ", err.message);
 
-    res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
   return res.json({ message: "timetable deleted" });
 };
