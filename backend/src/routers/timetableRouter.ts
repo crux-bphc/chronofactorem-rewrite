@@ -24,6 +24,10 @@ import {
   removeSection,
   removeSectionValidator,
 } from "../controllers/timetable/removeSection.js";
+import {
+  swapSections,
+  swapSectionsValidator,
+} from "../controllers/timetable/swapSections.js";
 import { authenticate } from "../middleware/auth.js";
 
 const timetableRouter = express.Router();
@@ -42,6 +46,12 @@ timetableRouter.post(
   authenticate,
   removeSectionValidator,
   removeSection,
+);
+timetableRouter.post(
+  "/:id/swap",
+  authenticate,
+  swapSectionsValidator,
+  swapSections,
 );
 timetableRouter.post(
   "/:id/edit",

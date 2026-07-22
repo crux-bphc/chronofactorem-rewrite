@@ -65,6 +65,7 @@ export const addSection = async (req: Request, res: Response) => {
   try {
     timetable = await timetableRepository
       .createQueryBuilder("timetable")
+      .leftJoinAndSelect("timetable.sections", "section")
       .where("timetable.id = :id", { id: dbID[0] })
       .getOne();
   } catch (err: any) {
@@ -161,24 +162,16 @@ export const addSection = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 
-  let sameCourseSectionsCount = 0;
-
-  try {
-    sameCourseSectionsCount = await sectionRepository
-      .createQueryBuilder("section")
-      .innerJoin("section.timetables", "timetable")
-      .where("timetable.id = :id", { id: timetable.id })
-      .andWhere("section.courseId = :courseId", { courseId })
-      .andWhere("section.type = :type", { type: section.type })
-      .getCount();
-  } catch (err: any) {
-    logger.error(
-      "Error while querying for other sections of same course: ",
-      err.message,
-    );
-
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
+  // the timetable's sections were already loaded with it above, so this
+  // check happens in memory, same as in removeSection and swapSections
+  const sameCourseSectionsCount = timetable.sections.filter(
+    (currentSection) => {
+      return (
+        currentSection.courseId === courseId &&
+        currentSection.type === section?.type
+      );
+    },
+  ).length;
 
   if (sameCourseSectionsCount > 0) {
     return res.status(400).json({
