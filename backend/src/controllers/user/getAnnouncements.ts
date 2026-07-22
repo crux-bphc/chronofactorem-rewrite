@@ -6,6 +6,7 @@ export const getAllAnnouncements = async (req: Request, res: Response) => {
   try {
     const announcements = await announcementRepository
       .createQueryBuilder("announcement")
+      .orderBy("announcement.createdAt", "DESC")
       .getMany();
 
     return res.status(200).json(announcements);
