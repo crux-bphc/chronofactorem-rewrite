@@ -44,6 +44,8 @@ export const swapSections = async (req: Request, res: Response) => {
   const sectionId = req.body.sectionId;
   const newSectionId = req.body.newSectionId;
 
+  // Common checks
+
   let author: User | null = null;
 
   try {
@@ -91,6 +93,8 @@ export const swapSections = async (req: Request, res: Response) => {
     return res.status(418).json({ message: "timetable is archived" });
   }
 
+  // Checks that removeSection makes
+
   let section: Section | null = null;
 
   try {
@@ -108,15 +112,22 @@ export const swapSections = async (req: Request, res: Response) => {
     return res.status(404).json({ message: "Section not found" });
   }
 
-  const timetableHasSection = timetable.sections.some(
-    (timetableSection) => timetableSection.id === section?.id,
-  );
+  let timetableHasSection = false;
+
+  for (const timetableSection of timetable.sections) {
+    if (timetableSection.id === section.id) {
+      timetableHasSection = true;
+      break;
+    }
+  }
 
   if (!timetableHasSection) {
     return res.status(404).json({
       message: "Section not part of given timetable",
     });
   }
+
+  // Checks that addSection makes
 
   let newSection: Section | null = null;
 
@@ -189,10 +200,7 @@ export const swapSections = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 
-  // Everything below first computes the post-swap state in memory, and only
-  // then writes it in a single transaction, so a failed swap changes nothing.
-
-  // ---- removal side (mirrors removeSection) ----
+  // Here we update the state of the timetable in-memory and see if it violates any of our clash rules
 
   const sameCourseSections: Section[] = timetable.sections.filter(
     (currentSection) => {
@@ -237,8 +245,6 @@ export const swapSections = async (req: Request, res: Response) => {
         "Timetable and warnings state inconsistent, please contact us if you see this",
     });
   }
-
-  // ---- addition side (mirrors addSection, against the post-removal state) ----
 
   const classHourClashes = checkForClassHoursClash(timetable, newSection);
   if (classHourClashes.clash) {
@@ -297,6 +303,7 @@ export const swapSections = async (req: Request, res: Response) => {
     );
   }
 
+  // Finally once we have decided that the swap is valid we write to db in a safe transaction
   try {
     await timetableRepository.manager.transaction(
       async (transactionalEntityManager) => {
