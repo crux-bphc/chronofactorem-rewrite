@@ -20,8 +20,10 @@ import {
 } from "../../types/auth.js";
 import {
   clearAuthCookies,
+  clearPkceCookies,
   hashFingerprint,
   setAuthCookies,
+  setPkceCookies,
   signJWT,
   verifyJWT,
 } from "../../utils/authUtils.js";
@@ -33,35 +35,26 @@ import {
 
 // on the frontend, for accessing routes, send requests with credentials:true
 
-// openid code_verifier
-const code_verifier = client.randomPKCECodeVerifier();
-let pkceState: string;
-
-// redirects to the redirect URL for signing in
+// redirects to the logto sign in page
 export async function manageAuthRedirect(req: Request, res: Response) {
   const logger = req.log;
   try {
     const config = await getConfig();
+    // pkce verifier and state are generated per request, and stashed in
+    // short-lived cookies so the callback can verify the token exchange
+    const code_verifier = client.randomPKCECodeVerifier();
     const code_challenge =
       await client.calculatePKCECodeChallenge(code_verifier);
+    const state = client.randomState();
 
     const parameters: Record<string, string> = {
       redirect_uri: `${env.BACKEND_URL}/auth/callback`,
       scope: "openid email profile",
       code_challenge,
       code_challenge_method: "S256",
+      state,
     };
 
-    if (!config.serverMetadata().supportsPKCE()) {
-      /**
-       * We cannot be sure the server supports PKCE so we're going to use state too.
-       * Use of PKCE is backwards compatible even if the AS doesn't support it which
-       * is why we're using it regardless. Like PKCE, random state must be generated
-       * for every redirect to the authorization_endpoint.
-       */
-      pkceState = client.randomState();
-      parameters.state = pkceState;
-    }
     const authRedirect = client.buildAuthorizationUrl(config, parameters);
 
     if (req.cookies.session && req.cookies.fingerprint) {
@@ -75,11 +68,13 @@ export async function manageAuthRedirect(req: Request, res: Response) {
         sessionData.fingerprintHash !== hashFingerprint(fingerprintCookie)
       ) {
         clearAuthCookies(res);
+        setPkceCookies(res, code_verifier, state);
         return res.redirect(authRedirect.href);
       }
 
       return res.redirect(`${env.BACKEND_URL}/auth/callback`);
     }
+    setPkceCookies(res, code_verifier, state);
     return res.redirect(authRedirect.href);
   } catch (err: any) {
     logger.error("Authentication failure: ", err);
@@ -97,16 +92,23 @@ export async function authCallback(req: Request, res: Response) {
     } else {
       // sets session cookie
 
+      const pkceVerifier = req.cookies.pkce_verifier;
+      const pkceState = req.cookies.pkce_state;
+      if (pkceVerifier === undefined || pkceState === undefined) {
+        return res.status(401).redirect(`${env.BACKEND_URL}/auth/login`);
+      }
+
       const config = await getConfig();
       const tokenSet = await client.authorizationCodeGrant(
         config,
         new URL(`${env.BACKEND_URL}${req.originalUrl}`),
         {
-          pkceCodeVerifier: code_verifier,
+          pkceCodeVerifier: pkceVerifier,
           idTokenExpected: true,
           expectedState: pkceState,
         },
       );
+      clearPkceCookies(res);
 
       // obtaining the access_token from tokenSet
       const access_token = tokenSet.access_token;
@@ -124,7 +126,20 @@ export async function authCallback(req: Request, res: Response) {
       // defines maxAge according to env vars
       const maxAge = env.SESSION_MAX_AGE_MS; // converts into milliseconds
 
-      if (userInfo.name === undefined || userInfo.email === undefined) {
+      // fall back to the id token's claims if userinfo doesn't return them
+      const idTokenClaims = tokenSet.claims();
+      const name =
+        userInfo.name ??
+        (typeof idTokenClaims?.name === "string"
+          ? idTokenClaims.name
+          : undefined);
+      const email =
+        userInfo.email ??
+        (typeof idTokenClaims?.email === "string"
+          ? idTokenClaims.email
+          : undefined);
+
+      if (name === undefined || email === undefined) {
         return res.status(500).json({
           message: "error while authenticating",
           error: "incomplete information returned by OAuth provider",
@@ -133,8 +148,8 @@ export async function authCallback(req: Request, res: Response) {
       const fingerprint = Math.random().toString(36).substring(2);
 
       const userData: UnfinishedUserSession = {
-        name: userInfo.name,
-        email: userInfo.email,
+        name: name,
+        email: email,
         maxAge: maxAge,
         fingerprintHash: hashFingerprint(fingerprint),
       };
@@ -316,6 +331,19 @@ export async function getDegrees(req: Request, res: Response) {
       error: JSON.stringify(error),
     });
   }
+}
+
+// clears the auth cookies and redirects to logto's end session endpoint,
+// which ends the sso session and sends the user back to the login page
+export async function logout(_req: Request, res: Response) {
+  clearAuthCookies(res);
+  const endSessionUrl = new URL(`${env.LOGTO_ENDPOINT}/oidc/session/end`);
+  endSessionUrl.searchParams.set("client_id", env.LOGTO_APP_ID);
+  endSessionUrl.searchParams.set(
+    "post_logout_redirect_uri",
+    `${env.FRONTEND_URL}/login`,
+  );
+  return res.redirect(endSessionUrl.href);
 }
 
 // checks whether user is not logged in, logged in but hasn't finished selecting degrees, or properly logged in
