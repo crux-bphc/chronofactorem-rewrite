@@ -3,9 +3,7 @@ import { z } from "zod";
 import {
   type degreeList,
   isAValidDegreeCombination,
-  namedCollegeYearType,
   namedDegreeZodList,
-  namedSemesterType,
 } from "../../../../lib/src/index.js";
 import type { Timetable, User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
@@ -15,16 +13,22 @@ import sqids from "../../utils/sqids.js";
 
 const dataSchema = z.object({
   query: z.object({
-    year: namedCollegeYearType("search").optional(),
-    sem: namedSemesterType("search").optional(),
-    branch: namedDegreeZodList("search branch")
-      .min(1, {
-        error:
-          "search branch must be a non-empty array of valid degree strings",
-      })
-      .max(2, {
-        error: "search branch may not contain more than two elements",
-      })
+    // query params arrive as strings, so they have to be coerced
+    year: z.coerce.number().int().gte(1).lte(6).optional(),
+    sem: z.coerce.number().int().gte(1).lte(2).optional(),
+    branch: z
+      .preprocess(
+        // ?branch=A7 parses as a bare string, not a one-element array
+        (value) => (Array.isArray(value) ? value : [value]),
+        namedDegreeZodList("search branch")
+          .min(1, {
+            error:
+              "search branch must be a non-empty array of valid degree strings",
+          })
+          .max(2, {
+            error: "search branch may not contain more than two elements",
+          }),
+      )
       .optional(),
     // This type definition for archived is not ideal, but boolean() doesn't work directly as the param is read as a string, and coercing it to boolean makes all values pass the check, rendering this check useless. Thus, this is the current solution
     archived: z.union([z.literal("true"), z.literal("false")]).optional(),
@@ -53,7 +57,14 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const branch: degreeList = req.query.branch as degreeList;
+    // the validator doesn't write parsed values back, so normalize here too:
+    // a single ?branch=A7 arrives as a bare string instead of an array
+    const branch: degreeList | undefined =
+      req.query.branch === undefined
+        ? undefined
+        : ((Array.isArray(req.query.branch)
+            ? req.query.branch
+            : [req.query.branch]) as degreeList);
     const year: number = Number.parseInt(req.query.year as string, 10);
     const sem: number = Number.parseInt(req.query.sem as string, 10);
     // note that if archived is not passed as a param, (req.query.archived as string) evaluates to the string "undefined"
@@ -84,9 +95,12 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
             "Branch may only have one valid BE degree and one valid MSc degee",
         });
       }
-      queryBuilder = queryBuilder.andWhere("timetable.degrees = :branch", {
-        branch,
-      });
+      // match the degrees array in either order (stored order depends on how
+      // the user picked their degrees)
+      queryBuilder = queryBuilder.andWhere(
+        "timetable.degrees @> :branch AND timetable.degrees <@ :branch",
+        { branch },
+      );
     }
 
     if (year) {
@@ -119,6 +133,7 @@ export const getPublicTimetables = async (req: Request, res: Response) => {
       return res.status(500).json({ message: "Internal Server Error" });
     }
   } catch (err: any) {
-    return err;
+    logger.error(err);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
