@@ -22,12 +22,15 @@ export const getUserDetails = async (req: Request, res: Response) => {
   try {
     user = await userRepository
       .createQueryBuilder("user")
+      // the join's parameter must not be named :id — query builder params
+      // are global, and the where clause below would overwrite this binding
+      // and silently disable the private/draft filter
       .leftJoin(
         "user.timetables",
         "timetable",
-        "(user.id <> :id and timetable.private = :private and timetable.draft = :draft) or (user.id = :id)",
+        "(user.id <> :sessionId and timetable.private = :private and timetable.draft = :draft) or (user.id = :sessionId)",
         {
-          id: req.session?.id,
+          sessionId: req.session?.id,
           draft: false,
           private: false,
         },
@@ -50,7 +53,7 @@ export const getUserDetails = async (req: Request, res: Response) => {
       .getOne();
   } catch (err: any) {
     logger.error("Error while querying for user: ", err.message);
-    res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 
   if (!user) {
