@@ -19,8 +19,12 @@ const useEditTimetable = () => {
     mutationFn: (data: EditTimetableParams) => {
       return chronoAPI.post(`/api/timetable/${data.id}/edit`, data.body);
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
+      // the edited timetable's own cache entry is stale too (e.g. draft flag
+      // flipped by the edit button), otherwise the edit page bounces back
+      // with a spurious "non-draft timetables cannot be edited" error
+      queryClient.invalidateQueries({ queryKey: ["timetable", variables.id] });
     },
     onError: (e) => toastHandler(e, toast),
   });
