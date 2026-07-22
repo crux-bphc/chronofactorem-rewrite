@@ -64,7 +64,7 @@ export function SideMenu({
         const clashes = timetable.examTimes.filter((x) => {
           if (x.split("|")[0] === e.code) return false;
           return x.includes(
-            `${withClash.midsemStartTime}|${withClash.midsemStartTime}`,
+            `${withClash.midsemStartTime}|${withClash.midsemEndTime}`,
           );
         });
         withClash.clashing = clashes.length === 0 ? null : clashes;
