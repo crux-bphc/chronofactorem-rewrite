@@ -17,10 +17,6 @@ import {
   editTimetableMetadataValidator,
 } from "../controllers/timetable/editTimetableMetadata.js";
 import {
-  getPublicTimetables,
-  getPublicTimetablesValidator,
-} from "../controllers/timetable/getPublicTimetables.js";
-import {
   getTimetableById,
   getTimetableByIdValidator,
 } from "../controllers/timetable/getTimetableById.js";
@@ -33,12 +29,6 @@ import { authenticate } from "../middleware/auth.js";
 const timetableRouter = express.Router();
 
 timetableRouter.post("/create", authenticate, createTimetable);
-timetableRouter.get(
-  "/getPublic",
-  authenticate,
-  getPublicTimetablesValidator,
-  getPublicTimetables,
-);
 timetableRouter.get("/:id", getTimetableByIdValidator, getTimetableById);
 timetableRouter.post(
   "/:id/delete",
