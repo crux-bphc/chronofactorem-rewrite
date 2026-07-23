@@ -67,10 +67,10 @@ export const TimetablePageShell = ({
   children: React.ReactNode;
 }) => {
   const {
-    state: { isLoading, screenIsLarge },
+    state: { isCopyingTimetable, screenIsLarge },
   } = useTimetableState();
 
-  if (isLoading) {
+  if (isCopyingTimetable) {
     return (
       <div className="flex flex-col text-muted-foreground gap-8 xl:text-xl lg:text-lg md:text-md text-sm bg-background h-[calc(100dvh-5rem)] justify-center w-full items-center">
         <Spinner />

@@ -153,8 +153,8 @@ const TimetableHeader = ({
               className="rounded-full p-3"
               onClick={() => {
                 dispatch({
-                  type: TimetableActionType.SetLoading,
-                  loading: true,
+                  type: TimetableActionType.SetIsCopyingTimetable,
+                  isCopyingTimetable: true,
                 });
                 setTimeout(() => {
                   copyTimetable(timetable.id, {
@@ -166,8 +166,8 @@ const TimetableHeader = ({
                   });
                   setTimeout(() => {
                     dispatch({
-                      type: TimetableActionType.SetLoading,
-                      loading: false,
+                      type: TimetableActionType.SetIsCopyingTimetable,
+                      isCopyingTimetable: false,
                     });
                   }, 1000);
                 }, 1000);

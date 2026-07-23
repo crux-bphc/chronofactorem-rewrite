@@ -17,8 +17,8 @@ const reducer: Reducer<TimetableStateType, Action> = (
   switch (action.type) {
     case TimetableActionType.ToggleVertical:
       return { ...state, isVertical: !state.isVertical };
-    case TimetableActionType.SetLoading:
-      return { ...state, isLoading: action.loading };
+    case TimetableActionType.SetIsCopyingTimetable:
+      return { ...state, isCopyingTimetable: action.isCopyingTimetable };
     case TimetableActionType.SetSelectedCourseAndSection:
       return {
         ...state,

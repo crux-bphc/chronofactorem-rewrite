@@ -27,7 +27,7 @@ type TabType = "CDCs" | "search" | "currentCourses" | "exams";
 
 export type TimetableStateType = {
   isVertical: boolean;
-  isLoading: boolean;
+  isCopyingTimetable: boolean;
   user: z.infer<typeof userWithTimetablesType> | undefined;
   courses: z.infer<typeof courseType>[] | undefined;
   timetable: z.infer<typeof timetableWithSectionsType> | undefined;
@@ -44,7 +44,7 @@ export type TimetableStateType = {
 
 export enum TimetableActionType {
   ToggleVertical = 0,
-  SetLoading = 1,
+  SetIsCopyingTimetable = 1,
   SetSelectedCourseAndSection = 2,
   SetSelectedSectionType = 3,
   SetMenuTab = 4,
@@ -59,8 +59,8 @@ export type Action =
       type: TimetableActionType.ToggleVertical;
     }
   | {
-      type: TimetableActionType.SetLoading;
-      loading: boolean;
+      type: TimetableActionType.SetIsCopyingTimetable;
+      isCopyingTimetable: boolean;
     }
   | {
       type: TimetableActionType.SetSelectedCourseAndSection;
