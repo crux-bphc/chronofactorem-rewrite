@@ -1,24 +1,15 @@
 import { Outlet, Route, redirect } from "@tanstack/react-router";
 import { AxiosError } from "axios";
-import { z } from "zod";
 import { NavBar } from "./components/Navbar";
-import chronoAPI from "./data-access/axios";
+import { authStatusQueryOptions } from "./data-access/hooks/useAuthStatus";
 import { rootRoute } from "./router";
-
-const userAuthStatusType = z.object({
-  message: z.string(),
-  redirect: z.string().optional(),
-  error: z.string().optional(),
-});
 
 const authenticatedRoute = new Route({
   id: "authenticated",
   getParentRoute: () => rootRoute,
-  beforeLoad: async () => {
+  beforeLoad: async ({ context: { queryClient } }) => {
     try {
-      await chronoAPI.get<z.infer<typeof userAuthStatusType>>(
-        "/api/auth/check",
-      );
+      await queryClient.ensureQueryData(authStatusQueryOptions);
     } catch (e) {
       if (e instanceof AxiosError && e.response) {
         if (
