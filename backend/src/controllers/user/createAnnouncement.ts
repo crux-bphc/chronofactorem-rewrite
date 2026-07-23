@@ -1,9 +1,6 @@
 import type { Request, Response } from "express";
+import { announcementType, namedNonEmptyStringType } from "lib";
 import { z } from "zod";
-import {
-  announcementType,
-  namedNonEmptyStringType,
-} from "../../../../lib/src/index.js";
 import { env } from "../../config/server.js";
 import { Announcement } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";

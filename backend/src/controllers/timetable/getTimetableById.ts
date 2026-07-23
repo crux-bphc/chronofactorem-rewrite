@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
+import { timetableIDType } from "lib";
 import { z } from "zod";
-import { timetableIDType } from "../../../../lib/src/index.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
 import sqids, { validSqid } from "../../utils/sqids.js";

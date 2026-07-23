@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import type { degreeEnum } from "../../../../lib/src/index.js";
+import type { degreeEnum } from "lib";
 import { type Section, Timetable, type User } from "../../entity/entities.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";
 import { userRepository } from "../../repositories/userRepository.js";

@@ -1,11 +1,11 @@
 import type { Request, Response } from "express";
-import * as client from "openid-client";
 import {
   type degreeList,
   getBatchFromEmail,
   isAValidDegreeCombination,
   namedDegreeZodList,
-} from "../../../../lib/src/index.js";
+} from "lib";
+import * as client from "openid-client";
 import { getConfig } from "../../config/authClient.js";
 import { env } from "../../config/server.js";
 import { User } from "../../entity/entities.js";

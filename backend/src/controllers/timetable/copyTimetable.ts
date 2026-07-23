@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
+import { type degreeEnum, timetableIDType } from "lib";
 import { z } from "zod";
-import { type degreeEnum, timetableIDType } from "../../../../lib/src/index.js";
 import { type Section, Timetable, type User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { timetableRepository } from "../../repositories/timetableRepository.js";

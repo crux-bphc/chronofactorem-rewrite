@@ -1,10 +1,6 @@
 import type { Request, Response } from "express";
+import { namedUUIDType, type sectionTypeList, timetableIDType } from "lib";
 import { z } from "zod";
-import {
-  namedUUIDType,
-  type sectionTypeList,
-  timetableIDType,
-} from "../../../../lib/src/index.js";
 import type {
   Course,
   Section,

@@ -1,10 +1,10 @@
 import type { Request, Response } from "express";
-import { z } from "zod";
 import {
   type degreeList,
   isAValidDegreeCombination,
   namedDegreeZodList,
-} from "../../../../lib/src/index.js";
+} from "lib";
+import { z } from "zod";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { userRepository } from "../../repositories/userRepository.js";
 
