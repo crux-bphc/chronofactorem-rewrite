@@ -14,5 +14,10 @@ initializeDataSource()
     await ingestJSON(timetableJSON, queryRunner);
 
     await queryRunner.release();
+    await AppDataSource.destroy();
   })
-  .catch((error) => console.log(error));
+  .catch(async (error) => {
+    console.log(error);
+    process.exitCode = 1;
+    if (AppDataSource.isInitialized) await AppDataSource.destroy();
+  });
