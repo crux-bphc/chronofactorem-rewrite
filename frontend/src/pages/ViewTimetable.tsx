@@ -170,8 +170,6 @@ function ViewTimetable() {
               )}
               <TimetableGrid
                 isVertical={screenIsLarge ? isVertical : true}
-                handleUnitClick={(e) => console.log(e)}
-                handleUnitDelete={(e) => console.log("DELETING", e)}
                 isOnEditPage={false}
               />
             </div>

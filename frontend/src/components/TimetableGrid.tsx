@@ -14,7 +14,7 @@ export function TimetableGrid({
   isOnEditPage,
 }: {
   isVertical: boolean;
-  handleUnitClick: (
+  handleUnitClick?: (
     e: {
       id: string;
       name: string;
@@ -27,7 +27,7 @@ export function TimetableGrid({
     } | null,
     event: React.MouseEvent,
   ) => void;
-  handleUnitDelete: (
+  handleUnitDelete?: (
     e: {
       id: string;
       name: string;
@@ -258,7 +258,7 @@ export function TimetableGrid({
                       className={`bg-background border border-muted dark:border-muted/70 cursor-pointer transition duration-200 ease-in-out text-foreground/65 p-1.5 ${
                         isVertical ? "min-h-28 sm:min-h-16" : "min-h-20"
                       }`}
-                      onClick={(event) => handleUnitClick(e, event)}
+                      onClick={(event) => handleUnitClick?.(e, event)}
                     >
                       <div className="relative flex h-full text-xs sm:text-sm flex-col justify-end bg-muted-foreground/30 p-1.5 rounded gap-0.5">
                         <X
@@ -266,7 +266,7 @@ export function TimetableGrid({
                           className={`absolute top-1 right-1 sm:visible invisible hover:stroke-destructive dark:hover:stroke-red-400 transition duration-100 ease-in-out ${
                             isOnEditPage ? "" : "hidden"
                           }`}
-                          onClick={() => handleUnitDelete(e)}
+                          onClick={() => handleUnitDelete?.(e)}
                         />
                         <span className="font-bold text-ellipsis overflow-hidden text-wrap tracking-tight">
                           {e.courseId}
@@ -308,7 +308,6 @@ export function TimetableGrid({
                 />
               ),
             )}
-          {/* {JSON.stringify(timetableDetails)} */}
         </div>
       </div>
     </div>

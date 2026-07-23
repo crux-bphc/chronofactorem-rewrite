@@ -132,10 +132,7 @@ function EditTimetable() {
       ) : (
         <div className="grow h-[calc(100vh-12rem)]">
           <TooltipProvider>
-            <TimetableHeader
-              isOnEditPage={true}
-              generateScreenshot={() => null}
-            />
+            <TimetableHeader isOnEditPage={true} />
             <div className="flex flex-row gap-4 h-full relative">
               {screenIsLarge ? (
                 SideBar
