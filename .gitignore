@@ -11,3 +11,7 @@ logs
 nginx.prod.conf
 backend/data
 mise.toml
+.DS_Store
+.claude/
+.remember/
+docs/superpowers/
