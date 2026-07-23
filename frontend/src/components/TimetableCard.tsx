@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import useEditTimetable from "@/data-access/hooks/useEditTimetable";
-import { router } from "../main";
+import { router } from "../router";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import {

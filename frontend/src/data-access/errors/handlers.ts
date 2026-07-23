@@ -1,6 +1,6 @@
 import { notFound } from "@tanstack/react-router";
 import { AxiosError } from "axios";
-import { router } from "@/main";
+import { router } from "@/router";
 
 export const handleNotFound = (error: unknown) => {
   if (

@@ -10,7 +10,7 @@ import useEditUser from "@/data-access/hooks/useEditUser";
 import useUser, { userQueryOptions } from "@/data-access/hooks/useUser";
 import authenticatedRoute from "../AuthenticatedRoute";
 import { useToast } from "../components/ui/use-toast";
-import { router } from "../main";
+import { router } from "../router";
 
 const editUserProfileRoute = new Route({
   getParentRoute: () => authenticatedRoute,
