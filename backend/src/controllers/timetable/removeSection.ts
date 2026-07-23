@@ -1,21 +1,22 @@
 import type { Request, Response } from "express";
-import { namedUUIDType, type sectionTypeList, timetableIDType } from "lib";
+import { namedUUIDType, timetableIDType } from "lib";
 import { z } from "zod";
-import type {
-  Course,
-  Section,
-  Timetable,
-  User,
-} from "../../entity/entities.js";
+import type { Section } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import {
   courseRepository,
   sectionRepository,
   timetableRepository,
-  userRepository,
 } from "../../repositories/index.js";
-import sqids, { validSqid } from "../../utils/sqids.js";
+import { removeSection as removeSectionFromTimetable } from "../../utils/updateSection.js";
 import { updateSectionWarnings } from "../../utils/updateWarnings.js";
+import {
+  decodeTimetableSqidOr404,
+  fetchAuthorOrError,
+  fetchTimetableOrError,
+  getCourseSectionTypes,
+  queryOr500,
+} from "./helpers.js";
 
 const dataSchema = z.object({
   body: z.object({
@@ -30,70 +31,44 @@ export const removeSectionValidator = validate(dataSchema);
 
 export const removeSection = async (req: Request, res: Response) => {
   const logger = req.log;
-  const dbID = sqids.decode(req.params.id as string);
-  if (!validSqid(dbID)) {
-    return res.status(404).json({ message: "Timetable does not exist" });
+  const dbID = decodeTimetableSqidOr404(req, res);
+  if (dbID === null) {
+    return;
   }
   const sectionId = req.body.sectionId;
 
-  let author: User | null = null;
-
-  try {
-    author = await userRepository
-      .createQueryBuilder("user")
-      .where("user.id = :id", { id: req.session?.id })
-      .getOne();
-  } catch (err: any) {
-    logger.error("Error while querying user: ", err.message);
-
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-
+  const author = await fetchAuthorOrError(
+    req,
+    res,
+    logger,
+    "Error while querying user: ",
+  );
   if (!author) {
-    return res.status(401).json({ message: "unregistered user" });
+    return;
   }
 
-  let timetable: Timetable | null = null;
-
-  try {
-    timetable = await timetableRepository
-      .createQueryBuilder("timetable")
-      .leftJoinAndSelect("timetable.sections", "section")
-      .where("timetable.id = :id", { id: dbID[0] })
-      .getOne();
-  } catch (err: any) {
-    logger.error("Error while querying timetable: ", err.message);
-
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-
+  const timetable = await fetchTimetableOrError(res, logger, dbID, {
+    authorId: author.id,
+    joinSections: true,
+    mustBeDraft: true,
+    queryErrorLogMessage: "Error while querying timetable: ",
+  });
   if (!timetable) {
-    return res.status(404).json({ message: "timetable not found" });
+    return;
   }
 
-  if (timetable.authorId !== author.id) {
-    return res.status(403).json({ message: "user does not own timetable" });
-  }
-
-  if (!timetable.draft) {
-    return res.status(418).json({ message: "timetable is not a draft" });
-  }
-
-  if (timetable.archived) {
-    return res.status(418).json({ message: "timetable is archived" });
-  }
-
-  let section: Section | null = null;
-
-  try {
-    section = await sectionRepository
-      .createQueryBuilder("section")
-      .where("section.id = :sectionId", { sectionId })
-      .getOne();
-  } catch (err: any) {
-    logger.error("Error while querying for section: ", err.message);
-
-    return res.status(500).json({ message: "Internal Server Error" });
+  const section = await queryOr500(
+    res,
+    logger,
+    "Error while querying for section: ",
+    () =>
+      sectionRepository
+        .createQueryBuilder("section")
+        .where("section.id = :sectionId", { sectionId })
+        .getOne(),
+  );
+  if (section === undefined) {
+    return;
   }
 
   if (section === null) {
@@ -115,18 +90,20 @@ export const removeSection = async (req: Request, res: Response) => {
     });
   }
 
-  let course: Course | null = null;
   const courseId = section.courseId;
 
-  try {
-    course = await courseRepository
-      .createQueryBuilder("course")
-      .where("course.id = :id", { id: courseId })
-      .getOne();
-  } catch (err: any) {
-    logger.error("Error while querying for course: ", err.message);
-
-    return res.status(500).json({ message: "Internal Server Error" });
+  const course = await queryOr500(
+    res,
+    logger,
+    "Error while querying for course: ",
+    () =>
+      courseRepository
+        .createQueryBuilder("course")
+        .where("course.id = :id", { id: courseId })
+        .getOne(),
+  );
+  if (course === undefined) {
+    return;
   }
 
   if (!course) {
@@ -150,36 +127,17 @@ export const removeSection = async (req: Request, res: Response) => {
     });
   }
 
-  let sectionTypes: sectionTypeList = [];
-
-  try {
-    const sectionTypeHolders = await sectionRepository
-      .createQueryBuilder("section")
-      .select("section.type")
-      .where("section.courseId = :courseId", { courseId: courseId })
-      .distinctOn(["section.type"])
-      .getMany();
-    sectionTypes = sectionTypeHolders.map((section) => section.type);
-  } catch (err: any) {
-    logger.error(
-      "Error while querying for course's section types: ",
-      err.message,
-    );
-
-    return res.status(500).json({ message: "Internal Server Error" });
+  const sectionTypes = await queryOr500(
+    res,
+    logger,
+    "Error while querying for course's section types: ",
+    () => getCourseSectionTypes(sectionRepository.manager, courseId),
+  );
+  if (sectionTypes === undefined) {
+    return;
   }
 
-  const classTimings = section.roomTime.map((time) => {
-    return time.split(":")[2] + time.split(":")[3];
-  });
-
-  timetable.timings = timetable.timings.filter((time) => {
-    return !classTimings.includes(time.split(":")[1]);
-  });
-
-  timetable.sections = timetable.sections.filter((currentSection) => {
-    return currentSection.id !== section?.id;
-  });
+  removeSectionFromTimetable(timetable, section);
 
   try {
     timetable.warnings = updateSectionWarnings(
@@ -200,12 +158,14 @@ export const removeSection = async (req: Request, res: Response) => {
     });
   }
 
-  try {
-    await timetableRepository.save(timetable);
-  } catch (err: any) {
-    logger.error("Error while removing section from timetable: ", err.message);
-
-    return res.status(500).json({ message: "Internal Server Error" });
+  const saved = await queryOr500(
+    res,
+    logger,
+    "Error while removing section from timetable: ",
+    () => timetableRepository.save(timetable),
+  );
+  if (saved === undefined) {
+    return;
   }
 
   return res.json({ message: "section removed" });
