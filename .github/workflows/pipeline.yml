@@ -10,7 +10,7 @@ jobs:
       - name: ssh into machine, and clone repo
         run: |
             cd /home/ubuntu/clones
-            cd chronofactorem-rewrite-draft
+            cd chronofactorem-rewrite-staging
             GIT_SSH_COMMAND="ssh -i /home/ubuntu/.ssh/gh-actions -o IdentitiesOnly=yes" git pull
             docker compose --profile ingestion down
             docker compose --profile prod down
