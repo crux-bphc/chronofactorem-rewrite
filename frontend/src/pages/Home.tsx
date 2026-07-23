@@ -11,7 +11,7 @@ import authenticatedRoute from "../AuthenticatedRoute";
 import TimetableCard from "../components/TimetableCard";
 import { Button } from "../components/ui/button";
 import { useToast } from "../components/ui/use-toast";
-import { router } from "../main";
+import { router } from "../router";
 
 type Timetable = z.infer<typeof timetableType>;
 const renderTimetableSection = (title: string, timetables: Timetable[]) => {

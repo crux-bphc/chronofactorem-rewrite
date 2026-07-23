@@ -20,7 +20,7 @@ import useCopyTimetable from "@/data-access/hooks/useCopyTimetable";
 import useEditTimetable from "@/data-access/hooks/useEditTimetable";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
-import { router } from "../main";
+import { router } from "../router";
 
 const TimetableHeader = ({
   isOnEditPage,

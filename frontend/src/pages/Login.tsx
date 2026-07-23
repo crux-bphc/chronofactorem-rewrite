@@ -6,7 +6,7 @@ import { authStatusQueryOptions } from "@/data-access/hooks/useAuthStatus";
 import { ModeToggle } from "../components/ModeToggle";
 import { Button } from "../components/ui/button";
 import { useToast } from "../components/ui/use-toast";
-import { rootRoute, router } from "../main";
+import { rootRoute, router } from "../router";
 
 const loginRoute = new Route({
   getParentRoute: () => rootRoute,

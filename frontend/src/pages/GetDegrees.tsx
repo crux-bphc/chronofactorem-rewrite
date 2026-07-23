@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import toastHandler from "@/data-access/errors/toastHandler";
 import useCreateUser from "@/data-access/hooks/useCreateUser";
 import { userQueryOptions } from "@/data-access/hooks/useUser";
-import { rootRoute, router } from "../main";
+import { rootRoute, router } from "../router";
 
 /*
 Although users are always redirected to /getDegrees after login, we don't want to show them the page if they've already filled it out.

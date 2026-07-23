@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import useCreateTimetable from "@/data-access/hooks/useCreateTimetable";
 import useUser from "@/data-access/hooks/useUser";
-import { router } from "../main";
+import { router } from "../router";
 import Announcements from "./Announcements";
 import { ModeToggle } from "./ModeToggle";
 import ReportIssue from "./ReportIssue";

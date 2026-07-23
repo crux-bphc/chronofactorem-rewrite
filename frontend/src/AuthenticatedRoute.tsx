@@ -3,7 +3,7 @@ import { AxiosError } from "axios";
 import { z } from "zod";
 import { NavBar } from "./components/Navbar";
 import chronoAPI from "./data-access/axios";
-import { rootRoute } from "./main";
+import { rootRoute } from "./router";
 
 const userAuthStatusType = z.object({
   message: z.string(),

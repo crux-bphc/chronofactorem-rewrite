@@ -32,7 +32,7 @@ import {
   PopoverTrigger,
 } from "../components/ui/popover";
 import { toast, useToast } from "../components/ui/use-toast";
-import { router } from "../main";
+import { router } from "../router";
 
 const editTimetableRoute = new Route({
   getParentRoute: () => authenticatedRoute,
