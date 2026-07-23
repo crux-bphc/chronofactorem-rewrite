@@ -1,5 +1,5 @@
 import type { AxiosResponse } from "axios";
-import ReportIssue from "@/components/ReportIssueToastAction";
+import ReportIssueToastAction from "@/components/ReportIssueToastAction";
 
 const errorTitleMap = {
   400: "Error",
@@ -19,7 +19,7 @@ export const HTTPError = <T extends object, K>(
         ? response.data.message
         : `API returned ${response.status}`,
     variant: "destructive" as const,
-    action: <ReportIssue />,
+    action: <ReportIssueToastAction />,
   };
 };
 
@@ -28,6 +28,6 @@ export const UnknownError = () => {
     title: "Unknown Error",
     description: "An unknown error occurred.",
     variant: "destructive" as const,
-    action: <ReportIssue />,
+    action: <ReportIssueToastAction />,
   };
 };

@@ -40,7 +40,7 @@ const TimetableHeader = ({
   generateScreenshot,
 }: {
   isOnEditPage: boolean;
-  generateScreenshot: () => void;
+  generateScreenshot?: () => void;
 }) => {
   const {
     state: {
