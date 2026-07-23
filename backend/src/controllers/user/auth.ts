@@ -9,7 +9,7 @@ import * as client from "openid-client";
 import { getConfig } from "../../config/authClient.js";
 import { env } from "../../config/server.js";
 import { User } from "../../entity/entities.js";
-import { userRepository } from "../../repositories/userRepository.js";
+import { userRepository } from "../../repositories/index.js";
 import timetableJSON from "../../timetable.json" with { type: "json" };
 import {
   type FinishedUserSession,

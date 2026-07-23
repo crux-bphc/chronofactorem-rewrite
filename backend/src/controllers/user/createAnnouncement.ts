@@ -4,7 +4,7 @@ import { z } from "zod";
 import { env } from "../../config/server.js";
 import { Announcement } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
-import { announcementRepository } from "../../repositories/announcementRepository.js";
+import { announcementRepository } from "../../repositories/index.js";
 
 const announcementSchema = z.object({
   body: announcementType.extend({

@@ -8,8 +8,10 @@ import {
 import { z } from "zod";
 import type { Timetable, User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
-import { timetableRepository } from "../../repositories/timetableRepository.js";
-import { userRepository } from "../../repositories/userRepository.js";
+import {
+  timetableRepository,
+  userRepository,
+} from "../../repositories/index.js";
 import sqids, { validSqid } from "../../utils/sqids.js";
 
 const dataSchema = z.object({

@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { timetableIDType } from "lib";
 import { z } from "zod";
 import { validate } from "../../middleware/zodValidateRequest.js";
-import { timetableRepository } from "../../repositories/timetableRepository.js";
+import { timetableRepository } from "../../repositories/index.js";
 import sqids, { validSqid } from "../../utils/sqids.js";
 
 const dataSchema = z.object({

@@ -6,7 +6,7 @@ import {
 } from "lib";
 import { z } from "zod";
 import { validate } from "../../middleware/zodValidateRequest.js";
-import { userRepository } from "../../repositories/userRepository.js";
+import { userRepository } from "../../repositories/index.js";
 
 const dataSchema = z.object({
   body: z.object({
