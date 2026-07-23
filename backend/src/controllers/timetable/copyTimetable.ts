@@ -1,14 +1,17 @@
 import type { Request, Response } from "express";
 import { type degreeEnum, timetableIDType } from "lib";
 import { z } from "zod";
-import { type Section, Timetable, type User } from "../../entity/entities.js";
+import { type Section, Timetable } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
-import {
-  timetableRepository,
-  userRepository,
-} from "../../repositories/index.js";
+import { timetableRepository } from "../../repositories/index.js";
 import timetableJSON from "../../timetable.json" with { type: "json" };
-import sqids, { validSqid } from "../../utils/sqids.js";
+import sqids from "../../utils/sqids.js";
+import {
+  decodeTimetableSqidOr404,
+  fetchAuthorOrError,
+  fetchTimetableOrError,
+  queryOr500,
+} from "./helpers.js";
 
 const dataSchema = z.object({
   params: z.object({
@@ -20,25 +23,19 @@ export const copyTimetableValidator = validate(dataSchema);
 
 export const copyTimetable = async (req: Request, res: Response) => {
   const logger = req.log;
-  let author: User | null = null;
-  const dbID = sqids.decode(req.params.id as string);
-  if (!validSqid(dbID)) {
-    return res.status(404).json({ message: "Timetable does not exist" });
+  const dbID = decodeTimetableSqidOr404(req, res);
+  if (dbID === null) {
+    return;
   }
 
-  try {
-    author = await userRepository
-      .createQueryBuilder("user")
-      .where("user.id = :id", { id: req.session?.id })
-      .getOne();
-  } catch (err: any) {
-    logger.error("Error while querying for user: ", err.message);
-
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-
+  const author = await fetchAuthorOrError(
+    req,
+    res,
+    logger,
+    "Error while querying for user: ",
+  );
   if (!author) {
-    return res.status(401).json({ message: "unregistered user" });
+    return;
   }
 
   // new timetable default properties
@@ -58,23 +55,13 @@ export const copyTimetable = async (req: Request, res: Response) => {
   const lastUpdated: Date = new Date();
   const authorId: string = author.id;
 
-  let copiedTimetable: Timetable | null = null;
-  try {
-    copiedTimetable = await timetableRepository
-      .createQueryBuilder("timetable")
-      .leftJoinAndSelect("timetable.sections", "section")
-      .where("timetable.id = :id", { id: dbID[0] })
-      .getOne();
-  } catch (err: any) {
-    logger.error("Error while querying for timetable: ", err.message);
-
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-
+  const copiedTimetable = await fetchTimetableOrError(res, logger, dbID, {
+    joinSections: true,
+    notFoundMessage: "timetable to be copied not found",
+    queryErrorLogMessage: "Error while querying for timetable: ",
+  });
   if (!copiedTimetable) {
-    return res
-      .status(404)
-      .json({ message: "timetable to be copied not found" });
+    return;
   }
 
   if (copiedTimetable.archived) {
@@ -87,56 +74,62 @@ export const copyTimetable = async (req: Request, res: Response) => {
   examTimes = copiedTimetable.examTimes;
   warnings = copiedTimetable.warnings;
 
-  try {
-    const timetable = await timetableRepository
-      .createQueryBuilder()
-      .insert()
-      .into(Timetable)
-      .values({
-        authorId,
-        name,
-        degrees,
-        private: isPrivate,
-        draft: isDraft,
-        archived: isArchived,
-        acadYear,
-        semester,
-        year,
-        sections,
-        timings,
-        examTimes,
-        warnings,
-        createdAt,
-        lastUpdated,
-      })
-      .execute();
-    try {
-      let section: Section | null = null;
-      for (let i = 0; i < copiedTimetable.sections.length; i++) {
-        section = copiedTimetable.sections[i];
-        await timetableRepository
-          .createQueryBuilder()
-          .relation(Timetable, "sections")
-          .of(timetable.identifiers[0].id)
-          .add(section);
-      }
-    } catch (err: any) {
-      logger.error(
+  const timetableID = await queryOr500(
+    res,
+    logger,
+    "Error while copying timetable: ",
+    async () => {
+      const timetable = await timetableRepository
+        .createQueryBuilder()
+        .insert()
+        .into(Timetable)
+        .values({
+          authorId,
+          name,
+          degrees,
+          private: isPrivate,
+          draft: isDraft,
+          archived: isArchived,
+          acadYear,
+          semester,
+          year,
+          sections,
+          timings,
+          examTimes,
+          warnings,
+          createdAt,
+          lastUpdated,
+        })
+        .execute();
+
+      const sectionsCopied = await queryOr500(
+        res,
+        logger,
         "Error while copying sections into new timetable: ",
-        err.message,
+        async () => {
+          for (let i = 0; i < copiedTimetable.sections.length; i++) {
+            const section = copiedTimetable.sections[i];
+            await timetableRepository
+              .createQueryBuilder()
+              .relation(Timetable, "sections")
+              .of(timetable.identifiers[0].id)
+              .add(section);
+          }
+          return true;
+        },
       );
+      if (sectionsCopied === undefined) {
+        return undefined;
+      }
 
-      return res.status(500).json({ message: "Internal Server Error" });
-    }
-
-    const timetableID = sqids.encode([timetable.identifiers[0].id]);
-    return res.status(201).json({
-      message: "Timetable copied successfully",
-      id: timetableID,
-    });
-  } catch (err: any) {
-    logger.error("Error while copying timetable: ", err.message);
-
-    return res.status(500).json({ message: "Internal Server Error" });
+      return sqids.encode([timetable.identifiers[0].id]);
+    },
+  );
+  if (timetableID === undefined) {
+    return;
   }
+  return res.status(201).json({
+    message: "Timetable copied successfully",
+    id: timetableID,
+  });
 };

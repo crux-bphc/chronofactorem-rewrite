@@ -16,6 +16,7 @@ import {
 } from "../../utils/checkForClashes.js";
 import { addExamTimings, removeSection } from "../../utils/updateSection.js";
 import { updateSectionWarnings } from "../../utils/updateWarnings.js";
+import { getCourseSectionTypes } from "./helpers.js";
 
 const dataSchema = z.object({
   body: z.object({
@@ -52,14 +53,9 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
       .execute();
 
     // Fetch the total types of sections of that course (required later to update warnings)
-    const sectionTypeHolders = await queryRunner.manager
-      .createQueryBuilder(Section, "section")
-      .select("section.type")
-      .where("section.courseId = :courseId", { courseId: course.id })
-      .distinctOn(["section.type"])
-      .getMany();
-    const requiredSectionTypes: sectionTypeList = sectionTypeHolders.map(
-      (section) => section.type,
+    const requiredSectionTypes: sectionTypeList = await getCourseSectionTypes(
+      queryRunner.manager,
+      course.id,
     );
 
     // Fetch the timetables that are affected, archived timetables cannot be affected

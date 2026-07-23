@@ -1,30 +1,21 @@
 import type { Request, Response } from "express";
 import type { degreeEnum } from "lib";
-import { type Section, Timetable, type User } from "../../entity/entities.js";
-import {
-  timetableRepository,
-  userRepository,
-} from "../../repositories/index.js";
+import { type Section, Timetable } from "../../entity/entities.js";
+import { timetableRepository } from "../../repositories/index.js";
 import timetableJSON from "../../timetable.json" with { type: "json" };
 import sqids from "../../utils/sqids.js";
+import { fetchAuthorOrError, queryOr500 } from "./helpers.js";
 
 export const createTimetable = async (req: Request, res: Response) => {
   const logger = req.log;
-  let author: User | null = null;
-
-  try {
-    author = await userRepository
-      .createQueryBuilder("user")
-      .where("user.id = :id", { id: req.session?.id })
-      .getOne();
-  } catch (err: any) {
-    logger.error("Error while querying for user: ", err.message);
-
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-
+  const author = await fetchAuthorOrError(
+    req,
+    res,
+    logger,
+    "Error while querying for user: ",
+  );
   if (!author) {
-    return res.status(401).json({ message: "unregistered user" });
+    return;
   }
 
   // new timetable default properties
@@ -44,38 +35,42 @@ export const createTimetable = async (req: Request, res: Response) => {
   const lastUpdated: Date = new Date();
   const authorId: string = author.id;
 
-  try {
-    const createdTimetable = await timetableRepository
-      .createQueryBuilder()
-      .insert()
-      .into(Timetable)
-      .values({
-        authorId,
-        name,
-        degrees,
-        private: isPrivate,
-        draft: isDraft,
-        archived: isArchived,
-        acadYear,
-        semester,
-        year,
-        sections,
-        timings,
-        examTimes,
-        warnings,
-        createdAt,
-        lastUpdated,
-      })
-      .execute();
+  const timetableID = await queryOr500(
+    res,
+    logger,
+    "Error while creating timetable: ",
+    async () => {
+      const createdTimetable = await timetableRepository
+        .createQueryBuilder()
+        .insert()
+        .into(Timetable)
+        .values({
+          authorId,
+          name,
+          degrees,
+          private: isPrivate,
+          draft: isDraft,
+          archived: isArchived,
+          acadYear,
+          semester,
+          year,
+          sections,
+          timings,
+          examTimes,
+          warnings,
+          createdAt,
+          lastUpdated,
+        })
+        .execute();
 
-    const timetableID = sqids.encode([createdTimetable.identifiers[0].id]);
-    return res.status(201).json({
-      message: "Timetable created successfully",
-      id: timetableID,
-    });
-  } catch (err: any) {
-    logger.error("Error while creating timetable: ", err.message);
-
-    return res.status(500).json({ message: "Internal Server Error" });
+      return sqids.encode([createdTimetable.identifiers[0].id]);
+    },
+  );
+  if (timetableID === undefined) {
+    return;
   }
+  return res.status(201).json({
+    message: "Timetable created successfully",
+    id: timetableID,
+  });
 };

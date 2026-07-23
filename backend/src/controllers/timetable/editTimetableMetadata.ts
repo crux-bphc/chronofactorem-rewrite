@@ -5,13 +5,14 @@ import {
   timetableIDType,
 } from "lib";
 import { z } from "zod";
-import type { Timetable, User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
+import { timetableRepository } from "../../repositories/index.js";
 import {
-  timetableRepository,
-  userRepository,
-} from "../../repositories/index.js";
-import sqids, { validSqid } from "../../utils/sqids.js";
+  decodeTimetableSqidOr404,
+  fetchAuthorOrError,
+  fetchTimetableOrError,
+  queryOr500,
+} from "./helpers.js";
 
 const dataSchema = z.object({
   body: z.object({
@@ -28,24 +29,18 @@ export const editTimetableMetadataValidator = validate(dataSchema);
 
 export const editTimetableMetadata = async (req: Request, res: Response) => {
   const logger = req.log;
-  let author: User | null = null;
-
   const name: string = req.body.name;
   const isPrivate: boolean = req.body.isPrivate;
   const isDraft: boolean = req.body.isDraft;
 
-  try {
-    author = await userRepository
-      .createQueryBuilder("user")
-      .where("user.id = :id", { id: req.session?.id })
-      .getOne();
-  } catch (err: any) {
-    logger.error("Error while querying user: ", err.message);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-
+  const author = await fetchAuthorOrError(
+    req,
+    res,
+    logger,
+    "Error while querying user: ",
+  );
   if (!author) {
-    return res.status(401).json({ message: "unregistered user" });
+    return;
   }
 
   if (isDraft && !isPrivate) {
@@ -54,30 +49,18 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
       .json({ message: "draft timetable can not be public" });
   }
 
-  const dbID = sqids.decode(req.params.id as string);
-  if (!validSqid(dbID)) {
-    return res.status(404).json({ message: "Timetable does not exist" });
+  const dbID = decodeTimetableSqidOr404(req, res);
+  if (dbID === null) {
+    return;
   }
 
-  let timetable: Timetable | null = null;
-
-  try {
-    timetable = await timetableRepository
-      .createQueryBuilder("timetable")
-      .leftJoinAndSelect("timetable.sections", "section")
-      .where("timetable.id = :id", { id: dbID[0] })
-      .getOne();
-  } catch (err: any) {
-    logger.error("Error while querying timetable: ", err.message);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-
+  const timetable = await fetchTimetableOrError(res, logger, dbID, {
+    authorId: author.id,
+    joinSections: true,
+    queryErrorLogMessage: "Error while querying timetable: ",
+  });
   if (!timetable) {
-    return res.status(404).json({ message: "timetable not found" });
-  }
-
-  if (timetable.authorId !== author.id) {
-    return res.status(403).json({ message: "user does not own timetable" });
+    return;
   }
 
   if (timetable.archived && isDraft) {
@@ -105,16 +88,20 @@ export const editTimetableMetadata = async (req: Request, res: Response) => {
     });
   }
 
-  try {
-    await timetableRepository.save({
-      ...timetable,
-      name: name,
-      private: isPrivate,
-      draft: isDraft,
-    });
-  } catch (err: any) {
-    logger.error("Error while editing timetable: ", err.message);
-    return res.status(500).json({ message: "Internal Server Error" });
+  const saved = await queryOr500(
+    res,
+    logger,
+    "Error while editing timetable: ",
+    () =>
+      timetableRepository.save({
+        ...timetable,
+        name: name,
+        private: isPrivate,
+        draft: isDraft,
+      }),
+  );
+  if (saved === undefined) {
+    return;
   }
 
   return res.json({ message: "timetable edited" });
