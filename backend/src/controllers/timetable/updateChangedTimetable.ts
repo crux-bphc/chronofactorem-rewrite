@@ -28,66 +28,47 @@ export const updateChangedTimetableValidator = validate(dataSchema);
 
 export const updateChangedTimetable = async (req: Request, res: Response) => {
   const logger = req.log;
+  if (env.CHRONO_SECRET !== req.body.chronoSecret) {
+    return res.status(401).json({ message: "Chrono Secret is incorrect" });
+  }
+  // Use a transaction because we will run many dependent mutations
+  const queryRunner = AppDataSource.createQueryRunner();
+  await queryRunner.connect();
+  await queryRunner.startTransaction();
   try {
-    if (env.CHRONO_SECRET !== req.body.chronoSecret) {
-      return res.status(401).json({ message: "Chrono Secret is incorrect" });
-    }
-    // Use a transaction because we will run many dependent mutations
-    const queryRunner = AppDataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
     // Update the course's exam timings, also make sure that the course is not archived
     const course: Course = req.body.course;
-    try {
-      await queryRunner.manager
-        .createQueryBuilder()
-        .update(Course)
-        .set({
-          midsemStartTime: course?.midsemStartTime,
-          midsemEndTime: course?.midsemEndTime,
-          compreStartTime: course?.compreStartTime,
-          compreEndTime: course?.compreEndTime,
-        })
-        .where("id = :id", { id: course?.id })
-        .andWhere("archived = :archived", { archived: false })
-        .execute();
-    } catch (err: any) {
-      logger.error("Error while querying for course: ", err.message);
-      return res.status(500).json({ message: "Internal Server Error" });
-    }
+    await queryRunner.manager
+      .createQueryBuilder()
+      .update(Course)
+      .set({
+        midsemStartTime: course?.midsemStartTime,
+        midsemEndTime: course?.midsemEndTime,
+        compreStartTime: course?.compreStartTime,
+        compreEndTime: course?.compreEndTime,
+      })
+      .where("id = :id", { id: course?.id })
+      .andWhere("archived = :archived", { archived: false })
+      .execute();
 
     // Fetch the total types of sections of that course (required later to update warnings)
-    let requiredSectionTypes: sectionTypeList = [];
-    try {
-      const sectionTypeHolders = await queryRunner.manager
-        .createQueryBuilder(Section, "section")
-        .select("section.type")
-        .where("section.courseId = :courseId", { courseId: course.id })
-        .distinctOn(["section.type"])
-        .getMany();
-      requiredSectionTypes = sectionTypeHolders.map((section) => section.type);
-    } catch (err: any) {
-      logger.error(
-        "Error while querying for course's section types: ",
-        err.message,
-      );
-    }
-
-    let timetables: Timetable[] | null = null;
+    const sectionTypeHolders = await queryRunner.manager
+      .createQueryBuilder(Section, "section")
+      .select("section.type")
+      .where("section.courseId = :courseId", { courseId: course.id })
+      .distinctOn(["section.type"])
+      .getMany();
+    const requiredSectionTypes: sectionTypeList = sectionTypeHolders.map(
+      (section) => section.type,
+    );
 
     // Fetch the timetables that are affected, archived timetables cannot be affected
-    try {
-      timetables = await queryRunner.manager
-        .createQueryBuilder(Timetable, "timetable")
-        .leftJoinAndSelect("timetable.sections", "section")
-        .where("section.courseId = :id", { id: course?.id })
-        .andWhere("timetable.archived = :archived", { archived: false })
-        .getMany();
-    } catch (err: any) {
-      logger.error("Error while querying for timetable: ", err.message);
-      return res.status(500).json({ message: "Internal Server Error" });
-    }
+    const timetables: Timetable[] = await queryRunner.manager
+      .createQueryBuilder(Timetable, "timetable")
+      .leftJoinAndSelect("timetable.sections", "section")
+      .where("section.courseId = :id", { id: course?.id })
+      .andWhere("timetable.archived = :archived", { archived: false })
+      .getMany();
 
     for (const timetable of timetables) {
       // For each timetable, check if the exam times have changed
@@ -218,25 +199,24 @@ export const updateChangedTimetable = async (req: Request, res: Response) => {
 
     // Regardless of whether or not a section was present in a timetable,
     // update the section's timings
-    try {
-      for (const section of course.sections) {
-        await queryRunner.manager
-          .createQueryBuilder()
-          .update(Section, { roomTime: section.roomTime })
-          .where("section.id = :id", { id: section?.id })
-          .execute();
-      }
-    } catch (err: any) {
-      logger.error("Error while querying for course: ", err.message);
-      return res.status(500).json({ message: "Internal Server Error" });
+    for (const section of course.sections) {
+      await queryRunner.manager
+        .createQueryBuilder()
+        .update(Section, { roomTime: section.roomTime })
+        .where("section.id = :id", { id: section?.id })
+        .execute();
     }
     // After everything passes fine, commit the transaction
     await queryRunner.commitTransaction();
-    queryRunner.release();
 
     return res.json({ message: "Timetable successfully updated" });
   } catch (err: any) {
+    if (queryRunner.isTransactionActive) {
+      await queryRunner.rollbackTransaction();
+    }
     logger.error(err);
     return res.status(500).json({ message: "Internal Server Error" });
+  } finally {
+    await queryRunner.release();
   }
 };
