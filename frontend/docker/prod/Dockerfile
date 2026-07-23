@@ -9,7 +9,6 @@ COPY --chown=node:node frontend/tsconfig.node.json ./
 COPY --chown=node:node frontend/public ./
 COPY --chown=node:node frontend/tailwind.config.js ./
 COPY --chown=node:node frontend/vite.config.ts ./
-COPY --chown=node:node frontend/CDCs.json ./
 COPY --chown=node:node frontend/components.json ./
 COPY --chown=node:node frontend/index.html ./
 COPY --chown=node:node .env ./

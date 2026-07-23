@@ -1,6 +1,6 @@
 import type { courseType, timetableWithSectionsType } from "lib";
 import type z from "zod";
-import CDCList from "@/../CDCs.json";
+import CDCList from "@/data/CDCs.json";
 
 export const filterCoursesInTimetable = (
   courses: z.infer<typeof courseType>[],
@@ -44,6 +44,12 @@ export const formatCDCWarningsAndOptions = (
 
   if (timetable === undefined || courses === undefined) return [];
 
+  // CDCs.json is keyed by degree combo: the timetable's degrees sorted,
+  // reversed, and joined (for example "B1A1"). Each combo maps
+  // "year-semester" to course codes, where "ECON/MGTS F211/F211" means
+  // either course counts.
+  // This only works because B-series duals are keyed by that concatenation.
+  // Reverse duals like "A3B4" and other degree codes (RMIT, other 2+2 programs) may not match.
   const degree = (
     timetable.degrees.length === 1
       ? timetable.degrees[0]
