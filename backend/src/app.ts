@@ -51,9 +51,9 @@ app.use("/timetable", timetableRouter);
 app.disable("x-powered-by");
 
 // Error handling
-app.use((err: any, _req: Request, res: Response, _: NextFunction) => {
-  console.log(err);
-  res.status(err.status || 500).send(err.stack);
+app.use((err: any, req: Request, res: Response, _: NextFunction) => {
+  req.log.error(err);
+  res.status(err.status || 500).json({ message: "Internal Server Error" });
 });
 
 export default app;

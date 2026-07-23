@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import type { ZodType } from "zod";
+import { ZodError, type ZodType } from "zod";
 
 export const validate =
   (schema: ZodType<any>) =>
@@ -12,6 +12,9 @@ export const validate =
       });
       return next();
     } catch (error) {
-      return res.status(400).json(error);
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: error.issues[0].message });
+      }
+      return next(error);
     }
   };

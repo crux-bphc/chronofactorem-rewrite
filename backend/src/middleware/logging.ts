@@ -1,12 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
 import { default as onFinished } from "on-finished";
-import { ZodError } from "zod";
-
-function isZodError(err: unknown): err is ZodError {
-  return Boolean(
-    err && (err instanceof ZodError || (err as ZodError).name === "ZodError"),
-  );
-}
 
 export const logger = async (
   req: Request,
@@ -34,13 +27,8 @@ export const logger = async (
     if (err || rest.statusCode >= 500) {
       resLogger.error(`${rest.statusCode} ${JSON.stringify(err)}`);
     } else {
-      // since ZodErrors have a different format from our errors, we handle them separately
       resLogger.info(
-        `${rest.statusCode} ${
-          isZodError(rest.body)
-            ? JSON.stringify(rest.body)
-            : (rest.body?.message ?? rest.statusMessage)
-        }`,
+        `${rest.statusCode} ${rest.body?.message ?? rest.statusMessage}`,
       );
     }
   });
