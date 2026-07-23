@@ -48,6 +48,8 @@ export const formatCDCWarningsAndOptions = (
   // reversed, and joined (for example "B1A1"). Each combo maps
   // "year-semester" to course codes, where "ECON/MGTS F211/F211" means
   // either course counts.
+  // This only works because B-series duals are keyed by that concatenation.
+  // Reverse duals like "A3B4" and other degree codes (RMIT, other 2+2 programs) may not match.
   const degree = (
     timetable.degrees.length === 1
       ? timetable.degrees[0]
