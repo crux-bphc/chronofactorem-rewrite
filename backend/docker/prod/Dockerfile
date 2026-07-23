@@ -27,6 +27,10 @@ WORKDIR /usr/src/app/backend
 COPY --chown=node:node ./backend/src ./src
 RUN pnpm tsc --build
 
+WORKDIR /usr/src/app/lib
+RUN rm -rf src
+RUN mv dist src
+
 USER node
 CMD ["dumb-init", "node", "--enable-source-maps", "build/index.js"]
 
@@ -42,6 +46,7 @@ COPY --chown=node:node --from=build-stage /usr/src/app/node_modules /usr/src/app
 COPY --chown=node:node --from=build-stage /usr/src/app/backend/node_modules /usr/src/app/backend/node_modules
 COPY --chown=node:node --from=build-stage /usr/src/app/backend/package.json /usr/src/app/backend/package.json
 COPY --chown=node:node --from=build-stage /usr/src/app/backend/build /usr/src/app/backend/build
+COPY --chown=node:node --from=build-stage /usr/src/app/lib /usr/src/app/lib
 
 USER node
 WORKDIR /usr/src/app/backend/build
