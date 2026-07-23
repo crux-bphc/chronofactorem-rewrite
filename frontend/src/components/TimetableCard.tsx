@@ -1,19 +1,9 @@
-import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { Link } from "@tanstack/react-router";
 import type { timetableType } from "lib";
 import { Edit2, Eye, EyeOff, Trash } from "lucide-react";
 import { useState } from "react";
 import type { z } from "zod";
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import DeleteTimetableDialog from "@/components/DeleteTimetableDialog";
 import {
   Dialog,
   DialogClose,
@@ -25,13 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import useDeleteTimetable from "@/data-access/hooks/useDeleteTimetable";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import useEditTimetable from "@/data-access/hooks/useEditTimetable";
 import { router } from "../main";
 import { Badge } from "./ui/badge";
@@ -56,7 +40,6 @@ function TimetableCard({ timetable, showFooter }: Props) {
     null | boolean
   >(null);
 
-  const { mutate: deleteTimetable } = useDeleteTimetable();
   const { mutate: editTimetable } = useEditTimetable();
 
   return (
@@ -196,45 +179,9 @@ function TimetableCard({ timetable, showFooter }: Props) {
               </Button>
             )}
 
-            <AlertDialog>
-              <Tooltip>
-                <AlertDialogTrigger asChild>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
-                    >
-                      <Trash />
-                    </Button>
-                  </TooltipTrigger>
-                </AlertDialogTrigger>
-                <TooltipContent>
-                  <p>Delete Timetable</p>
-                </TooltipContent>
-              </Tooltip>
-              <AlertDialogContent className="p-8">
-                <AlertDialogHeader>
-                  <AlertDialogTitle className="text-2xl">
-                    Are you sure?
-                  </AlertDialogTitle>
-                  <AlertDialogDescription className="text-destructive text-lg font-bold">
-                    All your progress on this timetable will be lost, and
-                    unrecoverable.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogPrimitive.Action asChild>
-                    <Button
-                      variant="destructive"
-                      onClick={() => deleteTimetable(timetable.id)}
-                    >
-                      Delete
-                    </Button>
-                  </AlertDialogPrimitive.Action>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <DeleteTimetableDialog timetableId={timetable.id}>
+              <Trash />
+            </DeleteTimetableDialog>
           </CardFooter>
         )}
       </Card>
