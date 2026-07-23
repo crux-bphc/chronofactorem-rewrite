@@ -7,7 +7,6 @@ import { z } from "zod";
  */
 export const serverSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]),
-  PGUSER: z.string().min(1),
   POSTGRES_USER: z.string().min(1),
   POSTGRES_PASSWORD: z.string().min(1),
   POSTGRES_DB: z.string().min(1),
@@ -20,14 +19,10 @@ export const serverSchema = z.object({
     .string()
     .regex(/^\d+-[a-z0-9]+\.apps\.googleusercontent\.com$/),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
-  FRONTEND_DEV_PORT: z.coerce.number().prefault(5173),
   JWT_PRIVATE_KEY: z.string().min(1),
   JWT_PUBLIC_KEY: z.string().min(1),
-  NGINX_PORT: z.coerce.number().prefault(80),
   SQIDS_ALPHABET: z.string().min(62),
   SESSION_MAX_AGE_MS: z.coerce.number().prefault(86400000),
-  VITE_FRONTEND_URL: z.url().min(1),
-  VITE_CMS_EXTENSION_ID: z.string().min(1),
   CHRONO_SECRET: z.string().min(1),
   DB_LONG_RUNNING_QUERY_MS: z.coerce.number().prefault(2000),
   LOG_MODE: z.enum(["development", "production"]).optional(),
