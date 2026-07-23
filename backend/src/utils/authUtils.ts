@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import type { Response } from "express";
+import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { env } from "../config/server.js";
 
@@ -63,6 +63,31 @@ export const verifyJWT = (token: string) => {
 
 export const hashFingerprint = (fingerprintCookie: string) =>
   createHash("sha256").update(fingerprintCookie).digest("base64url");
+
+// verifies the session + fingerprint cookie pair and returns the decoded
+// session payload. returns null when the cookies are missing, the jwt is
+// expired or invalid, or the fingerprint doesn't match
+export const getSessionFromCookies = (req: Request): jwt.JwtPayload | null => {
+  const sessionCookie = req.cookies.session;
+  const fingerprintCookie = req.cookies.fingerprint;
+  if (sessionCookie === undefined || fingerprintCookie === undefined) {
+    return null;
+  }
+
+  try {
+    const sessionData = verifyJWT(sessionCookie);
+    if (
+      typeof sessionData === "string" ||
+      sessionData.fingerprintHash !== hashFingerprint(fingerprintCookie)
+    ) {
+      return null;
+    }
+    return sessionData;
+  } catch {
+    // verifyJWT throws on expired or otherwise invalid tokens
+    return null;
+  }
+};
 
 const PKCE_COOKIE_MAX_AGE_MS = 10 * 60 * 1000; // 10 minutes
 
