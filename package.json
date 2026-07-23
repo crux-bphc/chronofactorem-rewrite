@@ -1,3 +1,10 @@
 {
-  "packageManager": "pnpm@11.8.0"
+  "packageManager": "pnpm@11.8.0",
+  "private": true,
+  "scripts": {
+    "dev": "docker network inspect chrono_net >/dev/null 2>&1 || docker network create chrono_net; docker compose --profile dev up --build",
+    "build": "pnpm -C lib exec tsc --build && pnpm -C backend exec tsc --build && pnpm -C frontend run build",
+    "lint": "pnpm -C lib exec biome ci . && pnpm -C backend exec biome ci . && pnpm -C frontend exec biome ci .",
+    "format": "pnpm -C lib exec biome check --write . && pnpm -C backend exec biome check --write . && pnpm -C frontend exec biome check --write ."
+  }
 }
