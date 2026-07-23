@@ -51,7 +51,8 @@ export const setAuthCookies = (
 export const signJWT = (data: object, maxAge: number) => {
   return jwt.sign(data, Buffer.from(env.JWT_PRIVATE_KEY, "base64"), {
     algorithm: "RS256",
-    expiresIn: maxAge,
+    // maxAge is in milliseconds, but jsonwebtoken reads expiresIn as seconds
+    expiresIn: Math.floor(maxAge / 1000),
   });
 };
 
