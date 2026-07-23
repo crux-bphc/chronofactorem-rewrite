@@ -1,14 +1,15 @@
 /*
 These are the types that facilitate authentication
 */
-import { z } from "zod";
+
 import {
   namedDegreeZodList,
   namedEmailType,
   namedIntegerType,
   namedNonEmptyStringType,
   namedUUIDType,
-} from "../../../lib/src/index.js";
+} from "lib";
+import { z } from "zod";
 
 // interface for userdata to be stored in the session cookie and for validating the type of session cookie
 export const ZodUnfinishedUserSession = z.object({

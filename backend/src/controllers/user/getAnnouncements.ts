@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { announcementRepository } from "../../repositories/announcementRepository.js";
+import { announcementRepository } from "../../repositories/index.js";
 
 export const getAllAnnouncements = async (req: Request, res: Response) => {
   const logger = req.log;

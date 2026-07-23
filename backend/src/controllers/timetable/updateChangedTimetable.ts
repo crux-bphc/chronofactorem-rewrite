@@ -1,10 +1,10 @@
 import type { Request, Response } from "express";
-import { z } from "zod";
 import {
   courseWithSectionsType,
   namedNonEmptyStringType,
   type sectionTypeList,
-} from "../../../../lib/src/index.js";
+} from "lib";
+import { z } from "zod";
 import { env } from "../../config/server.js";
 import { AppDataSource } from "../../db.js";
 import { Course, Section, Timetable } from "../../entity/entities.js";

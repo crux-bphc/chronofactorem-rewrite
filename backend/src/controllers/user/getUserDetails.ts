@@ -1,9 +1,9 @@
 import type { Request, Response } from "express";
+import { namedUUIDType } from "lib";
 import { z } from "zod";
-import { namedUUIDType } from "../../../../lib/src/index.js";
 import type { User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
-import { userRepository } from "../../repositories/userRepository.js";
+import { userRepository } from "../../repositories/index.js";
 import sqids from "../../utils/sqids.js";
 
 const dataSchema = z.object({

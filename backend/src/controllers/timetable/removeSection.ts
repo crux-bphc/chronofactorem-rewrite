@@ -1,10 +1,6 @@
 import type { Request, Response } from "express";
+import { namedUUIDType, type sectionTypeList, timetableIDType } from "lib";
 import { z } from "zod";
-import {
-  namedUUIDType,
-  type sectionTypeList,
-  timetableIDType,
-} from "../../../../lib/src/index.js";
 import type {
   Course,
   Section,
@@ -12,10 +8,12 @@ import type {
   User,
 } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
-import { courseRepository } from "../../repositories/courseRepository.js";
-import { sectionRepository } from "../../repositories/sectionRepository.js";
-import { timetableRepository } from "../../repositories/timetableRepository.js";
-import { userRepository } from "../../repositories/userRepository.js";
+import {
+  courseRepository,
+  sectionRepository,
+  timetableRepository,
+  userRepository,
+} from "../../repositories/index.js";
 import sqids, { validSqid } from "../../utils/sqids.js";
 import { updateSectionWarnings } from "../../utils/updateWarnings.js";
 

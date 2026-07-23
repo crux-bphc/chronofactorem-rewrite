@@ -1,5 +1,5 @@
+import type { sectionTypeEnum } from "lib";
 import type { QueryRunner } from "typeorm";
-import type { sectionTypeEnum } from "../../lib/src/index.js";
 import { Course, Section, Timetable } from "./entity/entities.js";
 
 interface ExamJSON {

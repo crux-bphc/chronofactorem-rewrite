@@ -1,4 +1,10 @@
 import {
+  approvedDegreeList,
+  approvedSectionTypeList,
+  type degreeEnum,
+  type sectionTypeEnum,
+} from "lib";
+import {
   Column,
   CreateDateColumn,
   Entity,
@@ -12,12 +18,6 @@ import {
   Unique,
   UpdateDateColumn,
 } from "typeorm";
-import {
-  approvedDegreeList,
-  approvedSectionTypeList,
-  type degreeEnum,
-  type sectionTypeEnum,
-} from "../../../lib/src/index.js";
 
 @Entity()
 export class User {

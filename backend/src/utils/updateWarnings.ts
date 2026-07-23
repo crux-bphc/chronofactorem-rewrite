@@ -1,4 +1,4 @@
-import type { sectionTypeList } from "../../../lib/src/index.js";
+import type { sectionTypeList } from "lib";
 import type { Section } from "../entity/entities.js";
 
 export const updateSectionWarnings = (
