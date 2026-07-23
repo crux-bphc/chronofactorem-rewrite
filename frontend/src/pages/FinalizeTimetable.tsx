@@ -2,17 +2,13 @@ import { Route } from "@tanstack/react-router";
 import { Clipboard, ClipboardCheck, Globe, Lock } from "lucide-react";
 import { useRef, useState } from "react";
 import ReportIssue from "@/components/ReportIssue";
+import { TimetablePageError } from "@/components/TimetablePageShell";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  handleLoginRedirect,
-  handleNotFound,
-} from "@/data-access/errors/handlers";
-import toastHandler from "@/data-access/errors/toastHandler";
 import useEditTimetable from "@/data-access/hooks/useEditTimetable";
 import useTimetable, {
   timetableQueryOptions,
@@ -21,7 +17,6 @@ import authenticatedRoute from "../AuthenticatedRoute";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { useToast } from "../components/ui/use-toast";
 import { router } from "../router";
 
 const finalizeTimetableRoute = new Route({
@@ -30,12 +25,7 @@ const finalizeTimetableRoute = new Route({
   loader: ({ context: { queryClient }, params: { timetableId } }) =>
     queryClient.ensureQueryData(timetableQueryOptions(timetableId)),
   component: FinalizeTimetable,
-  errorComponent: ({ error }) => {
-    const { toast } = useToast();
-    handleLoginRedirect(error);
-    handleNotFound(error);
-    toastHandler(error, toast);
-  },
+  errorComponent: TimetablePageError,
 });
 
 function FinalizeTimetable() {
