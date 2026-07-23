@@ -156,7 +156,6 @@ function FinalizeTimetable() {
                 onSuccess: () => {
                   router.navigate({
                     to: "/",
-                    params: { timetableId: timetableId },
                   });
                 },
               },
