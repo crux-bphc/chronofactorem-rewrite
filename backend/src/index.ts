@@ -1,4 +1,3 @@
-// import "dotenv/config";
 import app from "./app.js";
 import { env } from "./config/server.js";
 import { initializeDataSource } from "./db.js";

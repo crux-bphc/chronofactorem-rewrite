@@ -1,7 +1,6 @@
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import "dotenv/config";
 import express, {
   type NextFunction,
   type Request,

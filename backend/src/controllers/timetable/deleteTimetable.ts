@@ -1,4 +1,3 @@
-import "dotenv/config";
 import type { Request, Response } from "express";
 import { timetableIDType } from "lib";
 import { z } from "zod";

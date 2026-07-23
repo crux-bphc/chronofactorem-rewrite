@@ -1,3 +1,4 @@
+import "dotenv/config";
 import type { z } from "zod";
 // @ts-check
 import { serverSchema } from "./schema.js";
