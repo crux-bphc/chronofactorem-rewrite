@@ -8,7 +8,7 @@ const toastHandler = (error: Error, toaster: typeof toast) => {
     switch (error.response.status) {
       case 401:
         handleLoginRedirect(error);
-        break;
+        return;
       default:
         toaster(HTTPError(error.response, error.response.status));
         return;
