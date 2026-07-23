@@ -1,6 +1,5 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import { Info, LogOut, Pencil, Plus } from "lucide-react";
-import { useCookies } from "react-cookie";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -22,7 +21,6 @@ export function NavBar() {
     stateRouter.state.resolvedLocation?.pathname.includes("/edit/") ||
     stateRouter.state.resolvedLocation?.pathname.includes("/finalize/");
 
-  const [_cookies, _setCookie, removeCookie] = useCookies(["session"]);
   const {
     data: user,
     error: userError,
@@ -113,18 +111,8 @@ export function NavBar() {
               asChild
               className="focus:bg-destructive/90 focus:text-destructive-foreground cursor-pointer"
               onClick={() => {
-                const frontendIsHTTPS =
-                  import.meta.env.VITE_FRONTEND_URL.includes("https://");
-                removeCookie("session", {
-                  path: "/",
-                  domain: import.meta.env.VITE_FRONTEND_URL.replace(
-                    frontendIsHTTPS ? "https://" : "http://",
-                    "",
-                  ),
-                });
-                router.navigate({
-                  to: "/login",
-                });
+                // the backend clears the auth cookies and ends the logto sso session
+                window.location.href = "/api/auth/logout";
               }}
             >
               <div>

@@ -55,11 +55,9 @@ function Login() {
             asChild
             className="md:mt-6 mt-2 rounded-lg flex px-4 py-2 items-center"
           >
-            <a href="/api/auth/google">
+            <a href="/api/auth/logto">
               <AtSign className="mr-2 md:h-4 md:w-4 w-3 h-3" />
-              <span className="font-bold md:text-lg text-sm">
-                Login with Google
-              </span>
+              <span className="font-bold md:text-lg text-sm">Login</span>
             </a>
           </Button>
           <a
