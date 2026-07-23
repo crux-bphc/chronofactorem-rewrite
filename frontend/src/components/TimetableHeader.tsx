@@ -1,8 +1,4 @@
-import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import {
-  AlertOctagon,
-  AlertTriangle,
-  ArrowUpRightFromCircle,
   Copy,
   Download,
   Edit2,
@@ -11,7 +7,9 @@ import {
   Send,
   Trash,
 } from "lucide-react";
-import { useMemo } from "react";
+import CDCWarningsTooltip from "@/components/CDCWarningsTooltip";
+import DeleteTimetableDialog from "@/components/DeleteTimetableDialog";
+import TimetableWarningsTooltip from "@/components/TimetableWarningsTooltip";
 import {
   Tooltip,
   TooltipContent,
@@ -19,18 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 import { TimetableActionType, useTimetableState } from "@/context";
 import useCopyTimetable from "@/data-access/hooks/useCopyTimetable";
-import useDeleteTimetable from "@/data-access/hooks/useDeleteTimetable";
 import useEditTimetable from "@/data-access/hooks/useEditTimetable";
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "../components/ui/alert-dialog";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { router } from "../main";
@@ -43,97 +30,11 @@ const TimetableHeader = ({
   generateScreenshot: () => void;
 }) => {
   const {
-    state: {
-      isVertical,
-      user,
-      courses,
-      timetable,
-      coursesInTimetable,
-      cdcs,
-      screenIsLarge,
-    },
+    state: { isVertical, user, courses, timetable, screenIsLarge },
     dispatch,
   } = useTimetableState();
-  const { mutate: deleteTimetable } = useDeleteTimetable();
   const { mutate: editTimetable } = useEditTimetable();
   const { mutate: copyTimetable } = useCopyTimetable();
-
-  const cdcNotFoundWarning = useMemo(
-    () =>
-      cdcs.filter((e) => e.id === null && e.type === "warning") as {
-        id: null;
-        type: "warning";
-        warning: string;
-      }[],
-    [cdcs],
-  );
-
-  const missingCDCs = useMemo(() => {
-    const missing: {
-      id: string;
-      code: string;
-      name: string;
-    }[] = [];
-    for (let i = 0; i < cdcs.length; i++) {
-      if (cdcs[i].id === null) {
-        const option = cdcs[i] as
-          | {
-              id: null;
-              type: "warning";
-              warning: string;
-            }
-          | {
-              id: null;
-              type: "optional";
-              options: {
-                id: string;
-                code: string;
-                name: string;
-              }[];
-            };
-        if (
-          option.type === "optional" &&
-          !option.options.some((e) =>
-            coursesInTimetable
-              .map((added) => added.id)
-              .includes(e.id as string),
-          )
-        ) {
-          const splitCodes = option.options.map((e) => e.code).join(" (or) ");
-          missing.push({
-            id: "",
-            code: splitCodes,
-            name: "",
-          });
-        }
-      } else {
-        if (
-          !coursesInTimetable.map((e) => e.id).includes(cdcs[i].id as string)
-        ) {
-          missing.push(
-            cdcs[i] as {
-              id: string;
-              code: string;
-              name: string;
-            },
-          );
-        }
-      }
-    }
-    return missing;
-  }, [coursesInTimetable, cdcs]);
-
-  const handleMissingCDCClick = (courseId: string) => {
-    dispatch({
-      type: TimetableActionType.SetMenuTab,
-      tab: "CDCs",
-    });
-    dispatch({
-      type: TimetableActionType.SetSelectedCourseAndSection,
-      courseID: courseId === "" ? null : courseId,
-      sectionType: null,
-    });
-  };
 
   if (timetable === undefined || user === undefined || courses === undefined)
     return;
@@ -164,69 +65,7 @@ const TimetableHeader = ({
       </span>
       <span className="flex justify-center items-center gap-2">
         {isOnEditPage ? (
-          (missingCDCs.length > 0 || cdcNotFoundWarning.length > 0) && (
-            <Tooltip delayDuration={100}>
-              <TooltipTrigger
-                asChild
-                className="hover:bg-accent hover:text-accent-foreground transition duration-200 ease-in-out"
-              >
-                <div className="p-2 rounded-full">
-                  <AlertOctagon className="w-5 h-5 md:w-6 md:h-6 m-1" />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent className="bg-muted text-foreground border-muted-foreground/40 text-md">
-                {missingCDCs.length > 0 && (
-                  <div className="flex flex-col">
-                    <span>
-                      You haven't added all CDCs for this semester to your
-                      timetable.
-                    </span>
-                    <span className="font-bold pt-2">CDCs missing:</span>
-                    {missingCDCs.map((e) => (
-                      <div className="flex items-center" key={e.id}>
-                        <span className="ml-2">{e.code}</span>
-                        <Button
-                          onClick={() => {
-                            handleMissingCDCClick(e.id);
-                          }}
-                          className="p-2 w-fit h-fit ml-2 mb-1 bg-transparent hover:bg-slate-300 dark:hover:bg-slate-700 text-secondary-foreground rounded-full"
-                        >
-                          <ArrowUpRightFromCircle className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {cdcNotFoundWarning.length > 0 && (
-                  <div className="flex flex-col">
-                    <span className="font-bold">
-                      Chrono could not find some of your CDCs in the list of
-                      courses.
-                    </span>
-                    <span className="flex">
-                      Please
-                      <a
-                        href="https://github.com/crux-bphc/chronofactorem-rewrite/issues"
-                        className="text-blue-700 dark:text-blue-400 flex pl-1"
-                      >
-                        <span className="text-blue-700 dark:text-blue-400">
-                          report this issue
-                        </span>
-                        <ArrowUpRightFromCircle className="w-4 h-4 ml-1" />
-                      </a>
-                    </span>
-                    <span className="font-bold pt-2">Error List:</span>
-
-                    {cdcNotFoundWarning.map((e) => (
-                      <span className="ml-2" key={e.id}>
-                        {e.warning}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </TooltipContent>
-            </Tooltip>
-          )
+          <CDCWarningsTooltip />
         ) : (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -346,111 +185,15 @@ const TimetableHeader = ({
           </TooltipContent>
         </Tooltip>
         {user.id === timetable.authorId && (
-          <AlertDialog>
-            <Tooltip>
-              <AlertDialogTrigger asChild>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
-                  >
-                    <Trash className="w-5 h-5 md:w-6 md:h-6" />
-                  </Button>
-                </TooltipTrigger>
-              </AlertDialogTrigger>
-              <TooltipContent>
-                <p>Delete Timetable</p>
-              </TooltipContent>
-            </Tooltip>
-            <AlertDialogContent className="p-8">
-              <AlertDialogHeader>
-                <AlertDialogTitle className="text-2xl">
-                  Are you sure?
-                </AlertDialogTitle>
-                <AlertDialogDescription className="text-destructive text-lg font-bold">
-                  All your progress on this timetable will be lost, and
-                  unrecoverable.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogPrimitive.Action asChild>
-                  <Button
-                    variant="destructive"
-                    onClick={() =>
-                      deleteTimetable(timetable.id, {
-                        onSuccess: () => router.navigate({ to: "/" }),
-                      })
-                    }
-                  >
-                    Delete
-                  </Button>
-                </AlertDialogPrimitive.Action>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <DeleteTimetableDialog
+            timetableId={timetable.id}
+            onDeleted={() => router.navigate({ to: "/" })}
+          >
+            <Trash className="w-5 h-5 md:w-6 md:h-6" />
+          </DeleteTimetableDialog>
         )}
 
-        {timetable.warnings.length !== 0 && (
-          <Tooltip delayDuration={100}>
-            <TooltipTrigger
-              asChild
-              className="duration-200 mr-4 text-md p-2 h-fit dark:dark:hover:bg-orange-800/40 hover:bg-orange-300/40 rounded-lg px-4"
-            >
-              <div className="flex items-center">
-                <span className="text-orange-600 dark:text-orange-400 pr-4">
-                  {timetable.warnings
-                    .slice(0, 2)
-                    .map((x) => x.replace(":", " "))
-                    .map((x, i) => (
-                      <div key={x}>
-                        <span className="font-bold">{x}</span>
-                        {i >= 0 && i < timetable.warnings.length - 1 && (
-                          <span>, </span>
-                        )}
-                      </div>
-                    ))}
-                  {timetable.warnings.length > 2 &&
-                    ` and ${timetable.warnings.length - 2} other warning${
-                      timetable.warnings.length > 3 ? "s" : ""
-                    }`}
-                </span>
-                <AlertTriangle className="w-6 h-6 m-1 text-orange-600 dark:text-orange-400" />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent className="bg-muted text-foreground border-muted-foreground/40 text-md">
-              {timetable.warnings.map((warning) => (
-                <div className="pb-2" key={warning}>
-                  <span className="font-bold">{warning.split(":")[0]} is</span>
-                  <div className="flex flex-col pl-4">
-                    {warning
-                      .split(":")[1]
-                      .split("")
-                      .map((x) => (
-                        <div className="flex items-center" key={x}>
-                          <span>missing a {x} section</span>
-                          <Button
-                            onClick={() => {
-                              dispatch({
-                                type: TimetableActionType.SetSelectedCourseAndSection,
-                                courseID: courses.filter(
-                                  (x) => x.code === warning.split(":")[0],
-                                )[0].id,
-                                sectionType: x as "L" | "P" | "T",
-                              });
-                            }}
-                            className="p-2 w-fit h-fit ml-2 mb-1 bg-transparent hover:bg-slate-300 dark:hover:bg-muted-foreground/30 text-secondary-foreground rounded-full"
-                          >
-                            <ArrowUpRightFromCircle className="w-4 h-4 text-foreground" />
-                          </Button>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              ))}
-            </TooltipContent>
-          </Tooltip>
-        )}
+        <TimetableWarningsTooltip />
 
         {isOnEditPage && (
           <Tooltip delayDuration={100}>
