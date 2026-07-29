@@ -4,6 +4,43 @@ import jwt from "jsonwebtoken";
 import { env } from "../config/server.js";
 import { ZodFinishedUserSession } from "../types/auth.js";
 
+// populates req.session when valid auth cookies are present, but never
+// rejects the request; used on routes that serve both logged-in and
+// logged-out users
+export const attachSession = async (
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+) => {
+  try {
+    if (req.cookies.session && req.cookies.fingerprint) {
+      const sessionData = jwt.verify(
+        req.cookies.session,
+        Buffer.from(env.JWT_PUBLIC_KEY, "base64"),
+        {
+          algorithms: ["RS256"],
+        },
+      );
+
+      if (
+        typeof sessionData !== "string" &&
+        sessionData.fingerprintHash ===
+          createHash("sha256")
+            .update(req.cookies.fingerprint)
+            .digest("base64url")
+      ) {
+        const parsedSession = ZodFinishedUserSession.safeParse(sessionData);
+        if (parsedSession.success) {
+          req.session = parsedSession.data;
+        }
+      }
+    }
+  } catch {
+    // expired or malformed sessions are treated as logged out
+  }
+  return next();
+};
+
 export const authenticate = async (
   req: Request,
   res: Response,

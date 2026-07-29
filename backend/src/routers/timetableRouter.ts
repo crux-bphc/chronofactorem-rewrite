@@ -28,12 +28,17 @@ import {
   swapSections,
   swapSectionsValidator,
 } from "../controllers/timetable/swapSections.js";
-import { authenticate } from "../middleware/auth.js";
+import { attachSession, authenticate } from "../middleware/auth.js";
 
 const timetableRouter = express.Router();
 
 timetableRouter.post("/create", authenticate, createTimetable);
-timetableRouter.get("/:id", getTimetableByIdValidator, getTimetableById);
+timetableRouter.get(
+  "/:id",
+  attachSession,
+  getTimetableByIdValidator,
+  getTimetableById,
+);
 timetableRouter.post(
   "/:id/delete",
   authenticate,

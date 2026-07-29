@@ -32,6 +32,12 @@ export const getTimetableById = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Timetable does not exist" });
     }
 
+    // drafts only have a valid edit link, so for anyone but the author a
+    // draft behaves like it does not exist
+    if (timetable.draft && req.session?.id !== timetable.authorId) {
+      return res.status(404).json({ message: "Timetable does not exist" });
+    }
+
     return res.json({ ...timetable, id: id });
   } catch (error) {
     logger.error(error);
