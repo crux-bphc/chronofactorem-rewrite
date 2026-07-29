@@ -1,5 +1,5 @@
 import { Route } from "@tanstack/react-router";
-import { getBatchFromEmail } from "lib";
+import { getBatchFromEmail, unknownDegree } from "lib";
 import { useState } from "react";
 import DegreeDropDown from "@/components/DegreeDropDown";
 import ReportIssue from "@/components/ReportIssue";
@@ -108,21 +108,25 @@ function EditUserProfile() {
             </h5>
           </div>
         )}
-        <div className="flex sm:flex-row flex-col">
-          <DegreeDropDown
-            firstDegree={firstDegree}
-            secondDegree={secondDegree}
-            setFirstDegree={setFirstDegree}
-            setSecondDegree={setSecondDegree}
-            year={undefined}
-          />
-        </div>
-        <Button
-          className="w-fit mt-12 bg-muted font-bold hover:bg-primary-foreground transition ease-in-out text-foreground"
-          onClick={handleSubmit}
-        >
-          Update Profile
-        </Button>
+        {!user.degrees.includes(unknownDegree) && (
+          <>
+            <div className="flex sm:flex-row flex-col">
+              <DegreeDropDown
+                firstDegree={firstDegree}
+                secondDegree={secondDegree}
+                setFirstDegree={setFirstDegree}
+                setSecondDegree={setSecondDegree}
+                year={undefined}
+              />
+            </div>
+            <Button
+              className="w-fit mt-12 bg-muted font-bold hover:bg-primary-foreground transition ease-in-out text-foreground"
+              onClick={handleSubmit}
+            >
+              Update Profile
+            </Button>
+          </>
+        )}
       </div>
       <span className="fixed bottom-0 bg-muted w-full text-center py-1 text-md lg:text-lg text-muted-foreground">
         Powered by CRUx: The Programming and Computing Club of BITS Hyderabad

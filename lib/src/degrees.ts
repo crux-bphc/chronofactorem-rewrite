@@ -31,8 +31,12 @@ export const approvedDegreeList = [
   ...approvedBPharmDegreeList,
 ] as const;
 
+// sentinel degree for users whose email gives no batch (hd students and
+// other non-f addresses); they skip degree selection entirely on signup
+export const unknownDegree = "XX";
+
 export const namedDegreeZodEnum = (name?: string) =>
-  z.enum(approvedDegreeList, {
+  z.enum([...approvedDegreeList, unknownDegree], {
     error: (issue) =>
       issue.input === undefined
         ? addNameToString("degree is required", name)
@@ -94,7 +98,9 @@ export type mscDegreeList = z.infer<typeof mscDegreeZodList>;
 export type bpharmDegreeList = z.infer<typeof bpharmDegreeZodList>;
 
 export const isAValidDegree = (degree: string): degree is degreeEnum => {
-  return approvedDegreeList.includes(degree as degreeEnum);
+  return approvedDegreeList.includes(
+    degree as (typeof approvedDegreeList)[number],
+  );
 };
 export const isAValidBEDegree = (degree: string): degree is beDegreeEnum => {
   return approvedBEDegreeList.includes(degree as beDegreeEnum);

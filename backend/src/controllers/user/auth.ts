@@ -4,6 +4,7 @@ import {
   getBatchFromEmail,
   isAValidDegreeCombination,
   namedDegreeZodList,
+  unknownDegree,
 } from "lib";
 import * as client from "openid-client";
 import { getConfig } from "../../config/authClient.js";
@@ -25,6 +26,7 @@ import {
   setAuthCookies,
   setPkceCookies,
   signJWT,
+  toTitleCase,
   verifyJWT,
 } from "../../utils/authUtils.js";
 
@@ -176,19 +178,45 @@ export async function authCallback(req: Request, res: Response) {
         setAuthCookies(res, token, fingerprint, maxAge);
         res.redirect(env.FRONTEND_URL);
       } else {
+        const batch = getBatchFromEmail(userData.email);
+
+        if (batch === "0000") {
+          // hd students and other non-f addresses have no batch or degree
+          // defaults to ask for on getDegrees, so they skip it entirely and
+          // get sentinel values instead
+          const createdUser = await userRepository
+            .createQueryBuilder()
+            .insert()
+            .into(User)
+            .values({
+              batch: 0,
+              name: toTitleCase(userData.name),
+              degrees: [unknownDegree],
+              email: userData.email,
+              timetables: [],
+            })
+            .execute();
+
+          const finishedUserData: FinishedUserSession = {
+            name: userData.name,
+            email: userData.email,
+            id: createdUser.identifiers[0].id,
+            fingerprintHash: hashFingerprint(fingerprint),
+          };
+
+          const token = signJWT(finishedUserData, maxAge);
+          clearAuthCookies(res);
+          setAuthCookies(res, token, fingerprint, maxAge);
+          return res.redirect(env.FRONTEND_URL);
+        }
+
         // reset session and set ID as well
         const token = signJWT(userData, maxAge);
         clearAuthCookies(res);
         setAuthCookies(res, token, fingerprint, maxAge);
 
-        const batch = getBatchFromEmail(userData.email);
-        // batch is 0000 for emails that don't follow the f<year> format (hd
-        // students, non-student addresses); their year of study is unknown,
-        // so they pick degrees as if they were first years
         const yearOfStudy =
-          batch === "0000"
-            ? 1
-            : timetableJSON.metadata.acadYear - Number.parseInt(batch, 10) + 1;
+          timetableJSON.metadata.acadYear - Number.parseInt(batch, 10) + 1;
 
         res.redirect(`${env.FRONTEND_URL}/getDegrees?year=${yearOfStudy}`);
       }
@@ -204,18 +232,6 @@ export async function authCallback(req: Request, res: Response) {
 
 export async function getDegrees(req: Request, res: Response) {
   const logger = req.log;
-  // this function is declared outside the try catch block
-  // to make the capitalised name into title case
-
-  function toTitleCase(str: string | undefined) {
-    if (str === undefined) {
-      return "";
-    }
-    return str
-      .split(" ")
-      .map((s) => s[0].toUpperCase() + s.substring(1).toLowerCase())
-      .join(" ");
-  }
 
   try {
     // for user to enter their degrees
@@ -260,6 +276,8 @@ export async function getDegrees(req: Request, res: Response) {
 
     if (
       !namedDegreeZodList("user").min(1).safeParse(req.body.degrees).success ||
+      // the sentinel degree is assigned at signup, never picked here
+      req.body.degrees.includes(unknownDegree) ||
       (req.body.degrees.length === 2 &&
         !isAValidDegreeCombination(req.body.degrees))
     ) {

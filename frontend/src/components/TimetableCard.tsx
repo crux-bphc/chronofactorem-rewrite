@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import type { timetableType } from "lib";
+import { type timetableType, unknownDegree } from "lib";
 import { Edit2, Eye, EyeOff, Trash } from "lucide-react";
 import { useState } from "react";
 import type { z } from "zod";
@@ -67,8 +67,12 @@ function TimetableCard({ timetable, showFooter }: Props) {
                 {timetable.acadYear}-
                 {(timetable.acadYear + 1).toString().slice(2)}
               </span>
-              <span>|</span>
-              <span>{timetable.degrees.join("")}</span>
+              {!timetable.degrees.includes(unknownDegree) && (
+                <>
+                  <span>|</span>
+                  <span>{timetable.degrees.join("")}</span>
+                </>
+              )}
               {timetable.year !== 0 && (
                 <>
                   <span>|</span>
