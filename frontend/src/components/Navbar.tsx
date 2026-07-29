@@ -1,4 +1,5 @@
 import { Link, useRouter } from "@tanstack/react-router";
+import { AxiosError } from "axios";
 import { Info, LogOut, Pencil, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +30,12 @@ export function NavBar() {
   } = useUser();
   const { mutate: createTimetable } = useCreateTimetable();
 
+  // a 401 here just means the visitor is logged out, not that something broke
+  const isUnauthenticated =
+    isUserError &&
+    userError instanceof AxiosError &&
+    userError.response?.status === 401;
+
   const ChronoLogoText = (
     <>
       <div className="hidden md:flex">
@@ -52,21 +59,18 @@ export function NavBar() {
         ) : (
           ChronoLogoText
         )}
-        {!isEditPage && (
+        {userQueryResultData && !isEditPage && (
           <Button
             className="text-green-200 w-fit text-xl px-2 md:px-4 py-4 bg-green-900 hover:bg-green-800"
-            onClick={
-              userQueryResultData
-                ? () =>
-                    createTimetable(void null, {
-                      onSuccess: (_response) => {
-                        router.navigate({
-                          to: "/edit/$timetableId",
-                          params: { timetableId: _response.data.id },
-                        });
-                      },
-                    })
-                : undefined
+            onClick={() =>
+              createTimetable(void null, {
+                onSuccess: (_response) => {
+                  router.navigate({
+                    to: "/edit/$timetableId",
+                    params: { timetableId: _response.data.id },
+                  });
+                },
+              })
             }
           >
             <div className="hidden md:flex">Create a timetable</div>
@@ -87,48 +91,60 @@ export function NavBar() {
       </div>
 
       <div className="flex flex-row items-center md:gap-4 gap-2">
-        <Announcements />
-        <ModeToggle />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <div className="rounded-full text-foreground bg-accent p-1 px-3 text-xl h-fit">
-              <span>
-                {userQueryResultData ? userQueryResultData.name[0] : "?"}
-              </span>
-            </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="lg:w-56 w-fit">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuItem asChild>
-              {userQueryResultData && (
-                <Link to="/editProfile">
-                  <Pencil className="mr-2 h-4 w-4" />
-                  <span>Edit Profile</span>
-                </Link>
-              )}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              asChild
-              className="focus:bg-destructive/90 focus:text-destructive-foreground cursor-pointer"
-              onClick={() => {
-                // the backend clears the auth cookies and ends the logto sso session
-                window.location.href = "/api/auth/logout";
-              }}
-            >
-              <div>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
-              </div>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {userQueryResultData ? (
+          <>
+            <Announcements />
+            <ModeToggle />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="rounded-full text-foreground bg-accent p-1 px-3 text-xl h-fit">
+                  <span>{userQueryResultData.name[0]}</span>
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="lg:w-56 w-fit">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuItem asChild>
+                  <Link to="/editProfile">
+                    <Pencil className="mr-2 h-4 w-4" />
+                    <span>Edit Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  asChild
+                  className="focus:bg-destructive/90 focus:text-destructive-foreground cursor-pointer"
+                  onClick={() => {
+                    // the backend clears the auth cookies and ends the logto sso session
+                    window.location.href = "/api/auth/logout";
+                  }}
+                >
+                  <div>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </>
+        ) : (
+          <>
+            <ModeToggle />
+            {isUnauthenticated && (
+              <Link
+                to="/login"
+                className="text-primary text-lg p-2 rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out"
+              >
+                Login
+              </Link>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
   if (isUserFetching) {
-    return renderNavbarBasedOnQueryFetch(undefined);
+    return renderNavbarBasedOnQueryFetch(user);
   }
-  if (isUserError || user === undefined) {
+  if (isUserError && !isUnauthenticated) {
     return (
       <ReportIssue
         error={JSON.stringify(
@@ -137,5 +153,7 @@ export function NavBar() {
       />
     );
   }
+  // user is undefined here when the visitor is logged out, so the navbar
+  // renders without the parts that need authentication
   return renderNavbarBasedOnQueryFetch(user);
 }
