@@ -98,14 +98,16 @@ function EditUserProfile() {
         <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-foreground">
           {user.email}
         </h5>
-        <div className="flex">
-          <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-foregroun mt-4 mb-4 font-bold">
-            Batch:
-          </h5>
-          <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-foreground mt-4 mb-2 mx-2">
-            {batch}
-          </h5>
-        </div>
+        {batch !== "0000" && (
+          <div className="flex">
+            <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-foregroun mt-4 mb-4 font-bold">
+              Batch:
+            </h5>
+            <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-foreground mt-4 mb-2 mx-2">
+              {batch}
+            </h5>
+          </div>
+        )}
         <div className="flex sm:flex-row flex-col">
           <DegreeDropDown
             firstDegree={firstDegree}

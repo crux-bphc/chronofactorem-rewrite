@@ -182,14 +182,15 @@ export async function authCallback(req: Request, res: Response) {
         setAuthCookies(res, token, fingerprint, maxAge);
 
         const batch = getBatchFromEmail(userData.email);
-        // batch is set to 0000 if it's a non-student email, like hpc@hyderabad.bits-hyderabad.ac.in
-        // or undefined
+        // batch is 0000 for emails that don't follow the f<year> format (hd
+        // students, non-student addresses); their year of study is unknown,
+        // so they pick degrees as if they were first years
+        const yearOfStudy =
+          batch === "0000"
+            ? 1
+            : timetableJSON.metadata.acadYear - Number.parseInt(batch, 10) + 1;
 
-        res.redirect(
-          `${env.FRONTEND_URL}/getDegrees?year=${
-            timetableJSON.metadata.acadYear - Number.parseInt(batch, 10) + 1
-          }`,
-        );
+        res.redirect(`${env.FRONTEND_URL}/getDegrees?year=${yearOfStudy}`);
       }
     }
   } catch (_err: any) {
@@ -394,11 +395,15 @@ export async function checkAuthStatus(req: Request, res: Response) {
 
       const batch = getBatchFromEmail(sessionData.email);
 
+      // same 0000 sentinel handling as the auth callback redirect
+      const yearOfStudy =
+        batch === "0000"
+          ? 1
+          : timetableJSON.metadata.acadYear - Number.parseInt(batch, 10) + 1;
+
       return res.json({
         message: "user needs to get degrees",
-        redirect: `/getDegrees?year=${
-          timetableJSON.metadata.acadYear - Number.parseInt(batch, 10) + 1
-        }`,
+        redirect: `/getDegrees?year=${yearOfStudy}`,
       });
     }
 

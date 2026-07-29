@@ -51,8 +51,12 @@ const TimetableHeader = ({
               <span>{timetable.acadYear}</span>
               <span>|</span>
               <span>{timetable.degrees.join("")}</span>
-              <span>|</span>
-              <span className="flex-none">{`${timetable.year}-${timetable.semester}`}</span>
+              {timetable.year !== 0 && (
+                <>
+                  <span>|</span>
+                  <span className="flex-none">{`${timetable.year}-${timetable.semester}`}</span>
+                </>
+              )}
             </p>
           </Badge>
           <span className="lg:text-md md:text-sm text-xs text-muted-foreground">

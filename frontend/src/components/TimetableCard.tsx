@@ -69,8 +69,12 @@ function TimetableCard({ timetable, showFooter }: Props) {
               </span>
               <span>|</span>
               <span>{timetable.degrees.join("")}</span>
-              <span>|</span>
-              <span className="flex-none">{`${timetable.year}-${timetable.semester}`}</span>
+              {timetable.year !== 0 && (
+                <>
+                  <span>|</span>
+                  <span className="flex-none">{`${timetable.year}-${timetable.semester}`}</span>
+                </>
+              )}
             </p>
           </Badge>
         </CardContent>
