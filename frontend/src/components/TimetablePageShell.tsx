@@ -28,7 +28,10 @@ export const timetablePageLoader = async ({
   context: { queryClient: QueryClient };
   params: { timetableId: string };
 }) => {
-  queryClient.ensureQueryData(userQueryOptions);
+  queryClient.ensureQueryData(userQueryOptions).catch(() => {
+    // user is optional on timetable pages: viewing works logged out, so a
+    // failed prefetch here is fine
+  });
   // Courses are fetched for the semester of the timetable, so the timetable
   // has to be loaded first. Awaiting both keeps this data in the loader, so
   // preloading warms it before navigation (see
