@@ -66,12 +66,13 @@ function Login() {
           >
             About ChronoFactorem
           </a>
-          <p
-            className="w-fit md:mt-12 mt-3 text-muted-foreground md:text-lg text-sm"
-          >
+          <p className="w-fit md:mt-12 mt-3 text-muted-foreground md:text-lg text-sm">
             Draft Timetable for 2026-27 Sem 1 Out Now!!
           </p>
-          <a href="https://draft.chrono.crux-bphc.com/" className="w-fit md:mt-2 mt-1 text-foreground md:text-lg text-sm hover:underline underline-offset-4">
+          <a
+            href="https://draft.chrono.crux-bphc.com/"
+            className="w-fit md:mt-2 mt-1 text-foreground md:text-lg text-sm hover:underline underline-offset-4"
+          >
             Check it out here
           </a>
         </div>
