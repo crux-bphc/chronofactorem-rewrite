@@ -52,10 +52,10 @@ function Announcements() {
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline" size="icon">
-          <Megaphone className="h-5 w-5" />
+          <Megaphone />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[400px] overflow-y-scroll">
+      <DialogContent className="max-h-100 overflow-y-scroll">
         <DialogHeader>
           <DialogTitle className="text-xl -mt-1">Announcements</DialogTitle>
         </DialogHeader>
