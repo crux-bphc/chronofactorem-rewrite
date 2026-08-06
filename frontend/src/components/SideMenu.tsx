@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
-import { useTimetableState } from "@/context";
+import { TimetableActionType, useTimetableState } from "@/context";
 import CDCList from "./CDCList";
 import CourseSearchResults from "./CourseSearchResults";
 import EditCoursesTab from "./EditCoursesTab";
@@ -17,11 +16,11 @@ export function SideMenu({
   isOnEditPage: boolean;
   isScreenshotMode: boolean;
 }) {
-  const [searchTerm, setSearchTerm] = useState("");
   const {
-    state: { timetable, currentTab },
+    state: { timetable, currentTab, searchTerm },
+    dispatch,
   } = useTimetableState();
-  const [debouncedSearchTerm, _] = useDebounceValue<string>(searchTerm, 500);
+  const [debouncedSearchTerm] = useDebounceValue(searchTerm, 500);
 
   if (timetable === undefined) return;
 
@@ -50,7 +49,12 @@ export function SideMenu({
           <div className="px-4 pb-4">
             <Input
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) =>
+                dispatch({
+                  type: TimetableActionType.SetSearchTerm,
+                  searchTerm: e.target.value,
+                })
+              }
               placeholder="Search Courses"
               className="text-md p-2"
             />
