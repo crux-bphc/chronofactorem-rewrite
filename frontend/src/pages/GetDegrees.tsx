@@ -87,16 +87,16 @@ function GetDegrees() {
     <>
       <div className="flex bg-background h-screen w-full justify-center">
         <div className="flex flex-col items-center pt-48">
-          <p className="text-center">
+          <div className="text-center">
             <h1 className="scroll-m-20 leading-relaxed text-3xl md:text-6xl font-bold">
               Register
             </h1>
-            <span className="text-muted-foreground mx-4 not-md:text-xs text-center font-semibold">
+            <p className="text-muted-foreground mx-4 not-md:text-xs font-semibold">
               Select your degree
               {firstDegree?.includes("B") && year >= 2 ? "s" : ""} so we can
               help build your timetable
-            </span>
-          </p>
+            </p>
+          </div>
           <div className="flex flex-col sm:flex-row gap-2">
             <DegreeDropDown
               firstDegree={firstDegree}
