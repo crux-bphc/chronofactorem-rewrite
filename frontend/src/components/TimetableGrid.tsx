@@ -115,7 +115,7 @@ export function TimetableGrid({
   const [displayCols, setDisplayCols] = useState(13);
   const [displayRows, setDisplayRows] = useState(6);
 
-  const timetableGrid = useMemo(() => {
+  const { grid, spans, skipped } = useMemo(() => {
     const grid: ({
       id: string;
       name: string;
@@ -186,7 +186,33 @@ export function TimetableGrid({
     }
     setDisplayRows(nonNullRows);
 
-    return grid;
+    // merge runs of consecutive hours belonging to the same section into one
+    // spanning cell. hours advance along columns in the horizontal layout
+    // (stride 1) and along rows in the vertical layout (stride 6).
+    const stride = isVertical ? 6 : 1;
+    const spans = new Map<number, number>();
+    const skipped = new Set<number>();
+    for (let i = 0; i < grid.length; i++) {
+      const cell = grid[i];
+      if (cell === null || skipped.has(i)) {
+        continue;
+      }
+      let span = 1;
+      while (
+        i + stride * span < grid.length &&
+        // in the horizontal layout a run must not wrap into the next day
+        (isVertical || (i % 13) + span < 13) &&
+        grid[i + stride * span]?.id === cell.id
+      ) {
+        skipped.add(i + stride * span);
+        span++;
+      }
+      if (span > 1) {
+        spans.set(i, span);
+      }
+    }
+
+    return { grid, spans, skipped };
   }, [timetableDetailsSections, isVertical]);
 
   return (
@@ -241,14 +267,28 @@ export function TimetableGrid({
               : `${gridColClasses[displayCols - 1]} ${gridRowClasses[displayRows - 1]}`
           }`}
         >
-          {timetableGrid
-            .filter((_, i) =>
-              isVertical
-                ? i < 6 * displayCols && i % 6 < displayRows
-                : i % 13 < displayCols && i < 13 * displayRows,
+          {grid
+            .map((e, i) => ({ e, i }))
+            .filter(
+              ({ i }) =>
+                !skipped.has(i) &&
+                (isVertical
+                  ? i < 6 * displayCols && i % 6 < displayRows
+                  : i % 13 < displayCols && i < 13 * displayRows),
             )
-            .map((e, i) =>
-              e !== null ? (
+            .map(({ e, i }) => {
+              if (e === null) {
+                return (
+                  <div
+                    className={`bg-background border border-muted dark:border-muted/70 ${
+                      isVertical ? "min-h-28 sm:min-h-16" : "min-h-20"
+                    }`}
+                    key={2 * i}
+                  />
+                );
+              }
+              const span = spans.get(i) ?? 1;
+              return (
                 <Tooltip delayDuration={100} key={`${e.id}-${i}`}>
                   <TooltipTrigger asChild>
                     {/* TODO: Deal with this lint error */}
@@ -258,6 +298,13 @@ export function TimetableGrid({
                       className={`bg-background border border-muted dark:border-muted/70 cursor-pointer transition duration-200 ease-in-out text-foreground/65 p-1.5 ${
                         isVertical ? "min-h-28 sm:min-h-16" : "min-h-20"
                       }`}
+                      style={
+                        span > 1
+                          ? isVertical
+                            ? { gridRow: `span ${span}` }
+                            : { gridColumn: `span ${span}` }
+                          : undefined
+                      }
                       onClick={(event) => handleUnitClick?.(e, event)}
                     >
                       <div className="relative flex h-full text-xs sm:text-sm flex-col justify-end bg-muted-foreground/30 p-1.5 rounded gap-0.5">
@@ -299,15 +346,8 @@ export function TimetableGrid({
                     )}
                   </TooltipContent>
                 </Tooltip>
-              ) : (
-                <div
-                  className={`bg-background border border-muted dark:border-muted/70 ${
-                    isVertical ? "min-h-28 sm:min-h-16" : "min-h-20"
-                  }`}
-                  key={2 * i}
-                />
-              ),
-            )}
+              );
+            })}
         </div>
       </div>
     </div>
