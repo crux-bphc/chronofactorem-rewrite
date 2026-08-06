@@ -1,3 +1,4 @@
+import { unknownDegree } from "lib";
 import {
   Copy,
   Download,
@@ -49,10 +50,18 @@ const TimetableHeader = ({
           <Badge variant="default" className="w-fit">
             <p className="flex items-center gap-1">
               <span>{timetable.acadYear}</span>
-              <span>|</span>
-              <span>{timetable.degrees.join("")}</span>
-              <span>|</span>
-              <span className="flex-none">{`${timetable.year}-${timetable.semester}`}</span>
+              {!timetable.degrees.includes(unknownDegree) && (
+                <>
+                  <span>|</span>
+                  <span>{timetable.degrees.join("")}</span>
+                </>
+              )}
+              {timetable.year !== 0 && (
+                <>
+                  <span>|</span>
+                  <span className="flex-none">{`${timetable.year}-${timetable.semester}`}</span>
+                </>
+              )}
             </p>
           </Badge>
           <span className="lg:text-md md:text-sm text-xs text-muted-foreground">

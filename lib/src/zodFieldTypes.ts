@@ -71,6 +71,21 @@ export const namedYearType = (name?: string) =>
     .gte(1900);
 export const yearType = namedYearType();
 
+// batch is a year, or 0 as a sentinel for users whose email gives no batch,
+// like hd or other non-f addresses on the hyderabad domain
+export const namedBatchType = (name?: string) =>
+  z
+    .int({
+      message: addNameToString("batch is an invalid year", name),
+    })
+    .gte(0, {
+      message: addNameToString("batch is an invalid year", name),
+    })
+    .lte(3000, {
+      message: addNameToString("batch is an invalid year", name),
+    });
+export const batchType = namedBatchType();
+
 export const namedCollegeYearType = (name?: string) =>
   z
     .int({
@@ -86,6 +101,21 @@ export const namedCollegeYearType = (name?: string) =>
       message: addNameToString("college year is an invalid year", name),
     });
 export const collegeYearType = namedCollegeYearType();
+
+// college year of a timetable, where 0 is a sentinel for timetables whose
+// author's batch is unknown (see namedBatchType)
+export const namedCollegeYearOrSentinelType = (name?: string) =>
+  z
+    .int({
+      message: addNameToString("college year is an invalid year", name),
+    })
+    .gte(0, {
+      message: addNameToString("college year is an invalid year", name),
+    })
+    .lte(6, {
+      message: addNameToString("college year is an invalid year", name),
+    });
+export const collegeYearOrSentinelType = namedCollegeYearOrSentinelType();
 
 export const namedSemesterType = (name?: string) =>
   z
