@@ -166,7 +166,7 @@ importers:
         version: 4.3.1(vite@8.1.5(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1))
       axios:
         specifier: ^1.18.1
-        version: 1.18.1(debug@4.4.3(supports-color@5.5.0))(supports-color@5.5.0)
+        version: 1.18.1(supports-color@5.5.0)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -3858,9 +3858,9 @@ snapshots:
 
   atomic-sleep@1.0.0: {}
 
-  axios@1.18.1(debug@4.4.3(supports-color@5.5.0))(supports-color@5.5.0):
+  axios@1.18.1(supports-color@5.5.0):
     dependencies:
-      follow-redirects: 1.16.0(debug@4.4.3(supports-color@5.5.0))
+      follow-redirects: 1.16.0
       form-data: 4.0.6
       https-proxy-agent: 5.0.1(supports-color@5.5.0)
       proxy-from-env: 2.1.0
@@ -4093,7 +4093,7 @@ snapshots:
       range-parser: 1.2.1
       router: 2.2.0(supports-color@5.5.0)
       send: 1.2.1(supports-color@5.5.0)
-      serve-static: 2.2.1(supports-color@5.5.0)
+      serve-static: 2.2.1
       statuses: 2.0.2
       type-is: 2.1.0
       vary: 1.1.2
@@ -4123,9 +4123,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  follow-redirects@1.16.0(debug@4.4.3(supports-color@5.5.0)):
-    optionalDependencies:
-      debug: 4.4.3(supports-color@5.5.0)
+  follow-redirects@1.16.0: {}
 
   form-data@4.0.6:
     dependencies:
@@ -4716,7 +4714,7 @@ snapshots:
 
   seroval@1.5.6: {}
 
-  serve-static@2.2.1(supports-color@5.5.0):
+  serve-static@2.2.1:
     dependencies:
       encodeurl: 2.0.0
       escape-html: 1.0.3
