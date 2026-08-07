@@ -1,7 +1,7 @@
 FROM node:24.14.1-bookworm-slim AS build-stage
 ENV NODE_ENV production
 
-RUN corepack enable pnpm && corepack install -g pnpm@latest-11
+RUN corepack enable pnpm && corepack install -g pnpm@11.18.0
 
 WORKDIR /usr/src/app
 COPY --chown=node:node ./package.json ./
@@ -38,7 +38,7 @@ FROM node:24.14.1-bookworm-slim
 ENV NODE_ENV production
 WORKDIR /usr/src/app
 
-RUN corepack enable pnpm && corepack install -g pnpm@latest-11
+RUN corepack enable pnpm && corepack install -g pnpm@11.18.0
 
 RUN apt-get update && apt-get install -y --no-install-recommends dumb-init && apt-get clean && rm -rf /var/lib/apt/lists/*
 
