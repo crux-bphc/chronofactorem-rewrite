@@ -29,6 +29,7 @@ const initialTimetableState: TimetableStateType = {
   currentTab: "CDCs",
   screenIsLarge: window.matchMedia("(min-width: 1024px)").matches,
   timetableDetailsSections: [],
+  searchTerm: "",
 };
 
 type TimetableProviderType = {
