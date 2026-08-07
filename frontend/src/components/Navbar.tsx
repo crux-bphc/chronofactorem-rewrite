@@ -27,34 +27,22 @@ export function NavBar() {
     isError: isUserError,
     isFetching: isUserFetching,
   } = useUser();
+
   const { mutate: createTimetable } = useCreateTimetable();
 
-  const ChronoLogoText = (
-    <>
-      <div className="hidden md:flex">
-        <h1 className="scroll-m-20 cursor-pointer text-2xl mb-1 font-extrabold tracking-tight lg:text-3xl text-foreground">
-          ChronoFactorem
-        </h1>
-      </div>
-      <div className="flex md:hidden">
-        <h1 className="scroll-m-20 cursor-pointer text-2xl mb-1 font-extrabold tracking-tight lg:text-3xl text-foreground">
-          Chrono
-        </h1>
-      </div>
-    </>
-  );
-
   const renderNavbarBasedOnQueryFetch = (userQueryResultData: typeof user) => (
-    <div className="flex flex-row w-full justify-between shadow-lg py-4 px-4">
-      <div className="flex items-center md:gap-4 gap-2">
+    <div className="flex flex-row w-full justify-between p-4">
+      <div className="flex items-center md:gap-4 gap-3">
         {userQueryResultData ? (
-          <Link to="/">{ChronoLogoText}</Link>
+          <Link to="/">
+            <ChronoLogoText />
+          </Link>
         ) : (
-          ChronoLogoText
+          <ChronoLogoText />
         )}
         {!isEditPage && (
           <Button
-            className="text-green-200 w-fit text-xl px-2 md:px-4 py-4 bg-green-900 hover:bg-green-800"
+            className="text-green-200 not-md:h-fit w-fit text-xl px-2 md:px-4 bg-green-900 hover:bg-green-800"
             onClick={
               userQueryResultData
                 ? () =>
@@ -75,15 +63,14 @@ export function NavBar() {
             </div>
           </Button>
         )}
-        <Link
-          to="/about"
-          className="text-primary text-lg p-2 rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out"
-        >
-          <div className="hidden md:flex">About</div>
-          <div className="flex md:hidden">
-            <Info className="h-6 w-6" />
-          </div>
-        </Link>
+        <Button variant="link" size="sm" className="text-lg" asChild>
+          <Link to="/about">
+            <div className="hidden md:flex">About</div>
+            <div className="flex md:hidden">
+              <Info className="size-4" />
+            </div>
+          </Link>
+        </Button>
       </div>
 
       <div className="flex flex-row items-center md:gap-4 gap-2">
@@ -138,4 +125,12 @@ export function NavBar() {
     );
   }
   return renderNavbarBasedOnQueryFetch(user);
+}
+
+function ChronoLogoText() {
+  return (
+    <h1 className="md:after:content-['Factorem'] scroll-m-20 cursor-pointer text-2xl mb-1 font-extrabold tracking-tighter md:tracking-tight lg:text-3xl text-foreground">
+      Chrono
+    </h1>
+  );
 }
