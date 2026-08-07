@@ -44,13 +44,18 @@ export const getAllCourses = async (req: Request, res: Response) => {
         .andWhere("course.semester = :semester", {
           semester: Number(semester),
         })
+        .leftJoinAndSelect("course.sections", "section")
         .getMany();
     } else if (archived) {
-      courses = await courseRepository.createQueryBuilder("course").getMany();
+      courses = await courseRepository
+        .createQueryBuilder("course")
+        .leftJoinAndSelect("course.sections", "section")
+        .getMany();
     } else {
       courses = await courseRepository
         .createQueryBuilder("course")
         .where("course.archived = :archived", { archived: archived })
+        .leftJoinAndSelect("course.sections", "section")
         .getMany();
     }
 
