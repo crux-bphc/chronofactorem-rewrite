@@ -4,7 +4,7 @@ ENV NODE_ENV development
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
-RUN corepack enable pnpm && corepack install -g pnpm@latest-11
+RUN corepack enable pnpm && corepack install -g pnpm@11.18.0
 
 WORKDIR /usr/local/app/frontend
 COPY ./frontend/package.json ./

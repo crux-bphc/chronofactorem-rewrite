@@ -1,7 +1,7 @@
 FROM node:24.14.1-bookworm-slim AS build-stage
 ENV NODE_ENV production
 
-RUN corepack enable pnpm && corepack install -g pnpm@latest-11
+RUN corepack enable pnpm && corepack install -g pnpm@11.18.0
 
 WORKDIR /usr/src/app/frontend
 COPY --chown=node:node frontend/tsconfig.json ./
