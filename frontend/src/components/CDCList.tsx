@@ -1,4 +1,4 @@
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, ExternalLink } from "lucide-react";
 import { TimetableActionType, useTimetableState } from "@/context";
 import { Button } from "./ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
@@ -127,9 +127,34 @@ export const CDCList = () => {
                             {clashing
                               .map((x) => {
                                 const [code, exam] = x.split("|");
-                                return `${code}'s ${exam.toLowerCase()}`;
+                                const clashCourse = courseOptions.options.find(
+                                  (c) => c.code === code,
+                                );
+                                return (
+                                  <button
+                                    key={x}
+                                    type="button"
+                                    className="text-blue-700 dark:text-blue-400 cursor-pointer inline-flex items-baseline gap-1"
+                                    onClick={() =>
+                                      dispatch({
+                                        type: TimetableActionType.SetSelectedCourseAndSection,
+                                        courseID: clashCourse?.id ?? "",
+                                        sectionType: null,
+                                      })
+                                    }
+                                  >
+                                    {`${code}'s ${exam.toLowerCase()}`}
+                                    <ExternalLink size={12} />
+                                  </button>
+                                );
                               })
-                              .join(", ")}
+                              .reduce((prev, curr) => (
+                                <span key={curr.props.children}>
+                                  {prev}
+                                  {", "}
+                                  {curr}
+                                </span>
+                              ))}
                           </span>
                         </div>
                       )}
