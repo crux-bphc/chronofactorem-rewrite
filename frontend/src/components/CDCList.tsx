@@ -133,10 +133,11 @@ export const CDCList = () => {
                                   (c) => c.code === code,
                                 );
                                 return (
-                                  <button
+                                  <Button
                                     key={x}
                                     type="button"
-                                    className="text-blue-700 dark:text-blue-400 cursor-pointer inline-flex items-baseline gap-1"
+                                    variant="link"
+                                    className="h-auto p-0 has-[>svg]:p-0 font-medium text-blue-700 dark:text-blue-400 [&_svg]:size-3"
                                     onClick={() =>
                                       dispatch({
                                         type: TimetableActionType.SetSelectedCourseAndSection,
@@ -146,8 +147,8 @@ export const CDCList = () => {
                                     }
                                   >
                                     {`${code}'s ${exam.toLowerCase()}`}
-                                    <ExternalLink size={12} />
-                                  </button>
+                                    <ExternalLink />
+                                  </Button>
                                 );
                               })
                               .reduce((prev, curr) => (
