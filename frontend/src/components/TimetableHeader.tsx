@@ -36,8 +36,7 @@ const TimetableHeader = ({
   const { mutate: editTimetable } = useEditTimetable();
   const { mutate: copyTimetable } = useCopyTimetable();
 
-  if (timetable === undefined || user === undefined || courses === undefined)
-    return;
+  if (timetable === undefined || courses === undefined) return;
 
   return (
     <div className="flex justify-between p-4">
@@ -102,7 +101,7 @@ const TimetableHeader = ({
             </TooltipContent>
           </Tooltip>
         )}
-        {!isOnEditPage && user.id === timetable.authorId && (
+        {!isOnEditPage && user?.id === timetable.authorId && (
           <Tooltip>
             <TooltipTrigger
               className={timetable.archived ? "cursor-not-allowed" : ""}
@@ -143,48 +142,50 @@ const TimetableHeader = ({
             </TooltipContent>
           </Tooltip>
         )}
-        <Tooltip>
-          <TooltipTrigger
-            className={timetable.archived ? "cursor-not-allowed" : ""}
-          >
-            <Button
-              disabled={timetable.archived}
-              variant="ghost"
-              className="rounded-full p-3"
-              onClick={() => {
-                dispatch({
-                  type: TimetableActionType.SetIsCopyingTimetable,
-                  isCopyingTimetable: true,
-                });
-                setTimeout(() => {
-                  copyTimetable(timetable.id, {
-                    onSuccess: (res) =>
-                      router.navigate({
-                        to: "/edit/$timetableId",
-                        params: { timetableId: res.data.id },
-                      }),
+        {user !== undefined && (
+          <Tooltip>
+            <TooltipTrigger
+              className={timetable.archived ? "cursor-not-allowed" : ""}
+            >
+              <Button
+                disabled={timetable.archived}
+                variant="ghost"
+                className="rounded-full p-3"
+                onClick={() => {
+                  dispatch({
+                    type: TimetableActionType.SetIsCopyingTimetable,
+                    isCopyingTimetable: true,
                   });
                   setTimeout(() => {
-                    dispatch({
-                      type: TimetableActionType.SetIsCopyingTimetable,
-                      isCopyingTimetable: false,
+                    copyTimetable(timetable.id, {
+                      onSuccess: (res) =>
+                        router.navigate({
+                          to: "/edit/$timetableId",
+                          params: { timetableId: res.data.id },
+                        }),
                     });
+                    setTimeout(() => {
+                      dispatch({
+                        type: TimetableActionType.SetIsCopyingTimetable,
+                        isCopyingTimetable: false,
+                      });
+                    }, 1000);
                   }, 1000);
-                }, 1000);
-              }}
-            >
-              <Copy className="w-5 h-5 md:w-6 md:h-6" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>
-              {timetable.archived
-                ? "Cannot copy archived timetable"
-                : "Copy Timetable"}
-            </p>
-          </TooltipContent>
-        </Tooltip>
-        {user.id === timetable.authorId && (
+                }}
+              >
+                <Copy className="w-5 h-5 md:w-6 md:h-6" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>
+                {timetable.archived
+                  ? "Cannot copy archived timetable"
+                  : "Copy Timetable"}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        )}
+        {user?.id === timetable.authorId && (
           <DeleteTimetableDialog
             timetableId={timetable.id}
             onDeleted={() => router.navigate({ to: "/" })}

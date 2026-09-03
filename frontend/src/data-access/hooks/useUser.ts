@@ -1,4 +1,5 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import type { timetableType, userWithTimetablesType } from "lib";
 import type z from "zod";
 import chronoAPI from "../axios";
@@ -41,6 +42,13 @@ const fetchUserDetails = async (): Promise<
 export const userQueryOptions = queryOptions({
   queryKey: ["user"],
   queryFn: () => fetchUserDetails(),
+  // a 401 just means the visitor is logged out, so retrying is pointless
+  retry: (failureCount, error) => {
+    if (error instanceof AxiosError && error.response?.status === 401) {
+      return false;
+    }
+    return failureCount < 3;
+  },
   select: (data) => {
     return { ...data, ...filterTimetables(data.timetables) };
   },
