@@ -1,5 +1,5 @@
 import { Route } from "@tanstack/react-router";
-import { getBatchFromEmail } from "lib";
+import { getBatchFromEmail, unknownDegree } from "lib";
 import { useState } from "react";
 import DegreeDropDown from "@/components/DegreeDropDown";
 import ReportIssue from "@/components/ReportIssue";
@@ -98,29 +98,35 @@ function EditUserProfile() {
         <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-foreground">
           {user.email}
         </h5>
-        <div className="flex">
-          <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-foregroun mt-4 mb-4 font-bold">
-            Batch:
-          </h5>
-          <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-foreground mt-4 mb-2 mx-2">
-            {batch}
-          </h5>
-        </div>
-        <div className="flex sm:flex-row flex-col">
-          <DegreeDropDown
-            firstDegree={firstDegree}
-            secondDegree={secondDegree}
-            setFirstDegree={setFirstDegree}
-            setSecondDegree={setSecondDegree}
-            year={undefined}
-          />
-        </div>
-        <Button
-          className="w-fit mt-12 bg-muted font-bold hover:bg-primary-foreground transition ease-in-out text-foreground"
-          onClick={handleSubmit}
-        >
-          Update Profile
-        </Button>
+        {batch !== "0000" && (
+          <div className="flex">
+            <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-foregroun mt-4 mb-4 font-bold">
+              Batch:
+            </h5>
+            <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-foreground mt-4 mb-2 mx-2">
+              {batch}
+            </h5>
+          </div>
+        )}
+        {!user.degrees.includes(unknownDegree) && (
+          <>
+            <div className="flex sm:flex-row flex-col">
+              <DegreeDropDown
+                firstDegree={firstDegree}
+                secondDegree={secondDegree}
+                setFirstDegree={setFirstDegree}
+                setSecondDegree={setSecondDegree}
+                year={undefined}
+              />
+            </div>
+            <Button
+              className="w-fit mt-12 bg-muted font-bold hover:bg-primary-foreground transition ease-in-out text-foreground"
+              onClick={handleSubmit}
+            >
+              Update Profile
+            </Button>
+          </>
+        )}
       </div>
       <span className="fixed bottom-0 bg-muted w-full text-center py-1 text-md lg:text-lg text-muted-foreground">
         Powered by CRUx: The Programming and Computing Club of BITS Hyderabad

@@ -3,6 +3,7 @@ import {
   approvedSectionTypeList,
   type degreeEnum,
   type sectionTypeEnum,
+  unknownDegree,
 } from "lib";
 import {
   Column,
@@ -37,7 +38,8 @@ export class User {
   @Column({
     type: "enum",
     array: true,
-    enum: approvedDegreeList,
+    // includes the sentinel degree given to users with no batch on signup
+    enum: [...approvedDegreeList, unknownDegree],
   })
   degrees!: degreeEnum[];
 
@@ -77,7 +79,8 @@ export class Timetable {
   @Column({
     type: "enum",
     array: true,
-    enum: approvedDegreeList,
+    // includes the sentinel degree given to users with no batch on signup
+    enum: [...approvedDegreeList, unknownDegree],
   })
   degrees!: degreeEnum[];
 

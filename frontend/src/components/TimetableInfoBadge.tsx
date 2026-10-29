@@ -1,4 +1,4 @@
-import type { timetableType } from "lib";
+import { type timetableType, unknownDegree } from "lib";
 import type { z } from "zod";
 import { cn } from "@/lib/utils";
 import { Badge } from "./ui/badge";
@@ -19,11 +19,15 @@ export default function TimetableInfoBadge({
         className,
       )}
     >
-      <span>{`${timetable.year} - ${timetable.semester}`}</span>
+      {timetable.year !== 0 && (
+        <span>{`${timetable.year} - ${timetable.semester}`}</span>
+      )}
       <span>
         {timetable.acadYear}-{(timetable.acadYear + 1).toString().slice(2)}
       </span>
-      <span>{timetable.degrees.join("")}</span>
+      {!timetable.degrees.includes(unknownDegree) && (
+        <span>{timetable.degrees.join("")}</span>
+      )}
     </Badge>
   );
 }

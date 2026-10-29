@@ -25,7 +25,9 @@ export const createTimetable = async (req: Request, res: Response) => {
   const isDraft = true;
   const isArchived = false;
   const acadYear = timetableJSON.metadata.acadYear;
-  const year: number = acadYear - author.batch + 1;
+  // batch 0 means the author's email gave no batch; year 0 is a sentinel so
+  // the frontend skips year-based labels and defaults for this timetable
+  const year: number = author.batch === 0 ? 0 : acadYear - author.batch + 1;
   const semester = timetableJSON.metadata.semester;
   const sections: Section[] = [];
   const timings: string[] = [];

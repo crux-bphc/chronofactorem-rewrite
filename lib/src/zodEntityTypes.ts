@@ -3,8 +3,9 @@ import { namedDegreeZodList } from "./degrees.js";
 import { namedSectionTypeZodEnum } from "./sectionTypes.js";
 import {
   addNameToString,
+  namedBatchType,
   namedBooleanType,
-  namedCollegeYearType,
+  namedCollegeYearOrSentinelType,
   namedEmailType,
   namedIntegerType,
   namedISOTimestampType,
@@ -80,7 +81,9 @@ export const namedTimetableType = (name?: string) =>
     private: namedBooleanType(addNameToString("timetable private", name)),
     draft: namedBooleanType(addNameToString("timetable draft", name)),
     archived: namedBooleanType(addNameToString("timetable archived", name)),
-    year: namedCollegeYearType(addNameToString("timetable college year", name)),
+    year: namedCollegeYearOrSentinelType(
+      addNameToString("timetable college year", name),
+    ),
     acadYear: namedYearType(addNameToString("timetable acadYear", name)),
     semester: namedSemesterType(addNameToString("timetable", name)),
     timings: namedNonEmptyStringType(
@@ -104,7 +107,7 @@ export const namedUserType = (name?: string) =>
   z.strictObject({
     id: namedUUIDType(addNameToString("user", name)),
     email: namedEmailType(addNameToString("user", name)),
-    batch: namedYearType(addNameToString("user batch", name)),
+    batch: namedBatchType(addNameToString("user batch", name)),
     name: namedNonEmptyStringType(addNameToString("user name", name)),
     degrees: namedDegreeZodList(addNameToString("user", name)),
     createdAt: namedISOTimestampType(addNameToString("user createdAt", name)),

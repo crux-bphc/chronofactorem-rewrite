@@ -65,6 +65,16 @@ export const verifyJWT = (token: string) => {
 export const hashFingerprint = (fingerprintCookie: string) =>
   createHash("sha256").update(fingerprintCookie).digest("base64url");
 
+export const toTitleCase = (str: string | undefined) => {
+  if (str === undefined) {
+    return "";
+  }
+  return str
+    .split(" ")
+    .map((s) => s[0].toUpperCase() + s.substring(1).toLowerCase())
+    .join(" ");
+};
+
 const PKCE_COOKIE_MAX_AGE_MS = 10 * 60 * 1000; // 10 minutes
 
 // stores the per-request pkce verifier and state so the auth callback can
