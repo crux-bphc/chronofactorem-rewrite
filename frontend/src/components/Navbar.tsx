@@ -35,20 +35,6 @@ export function NavBar() {
     userError instanceof AxiosError &&
     userError.response?.status === 401;
 
-  const ChronoLogoText = (
-    <>
-      <div className="hidden md:flex">
-        <h1 className="scroll-m-20 cursor-pointer text-2xl mb-1 font-extrabold tracking-tight lg:text-3xl text-foreground">
-          ChronoFactorem
-        </h1>
-      </div>
-      <div className="flex md:hidden">
-        <h1 className="scroll-m-20 cursor-pointer text-2xl mb-1 font-extrabold tracking-tight lg:text-3xl text-foreground">
-          Chrono
-        </h1>
-      </div>
-    </>
-  );
   const { mutate: createTimetable } = useCreateTimetable();
 
   const renderNavbarBasedOnQueryFetch = (userQueryResultData: typeof user) => (
@@ -63,7 +49,7 @@ export function NavBar() {
         )}
         {userQueryResultData && !isEditPage && (
           <Button
-            className="text-green-200 w-fit text-xl px-2 md:px-4 py-4 bg-green-900 hover:bg-green-800"
+            className="text-green-200 not-md:h-fit w-fit text-xl px-2 md:px-4 bg-green-900 hover:bg-green-800"
             onClick={
               userQueryResultData
                 ? () =>
