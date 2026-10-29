@@ -1,6 +1,5 @@
 import { Outlet, Route, redirect } from "@tanstack/react-router";
 import { AxiosError } from "axios";
-import { NavBar } from "./components/Navbar";
 import { authStatusQueryOptions } from "./data-access/hooks/useAuthStatus";
 import { rootRoute } from "./router";
 
@@ -30,14 +29,7 @@ const authenticatedRoute = new Route({
       }
     }
   },
-  component: () => {
-    return (
-      <>
-        <NavBar />
-        <Outlet />
-      </>
-    );
-  },
+  component: Outlet,
 });
 
 export default authenticatedRoute;
