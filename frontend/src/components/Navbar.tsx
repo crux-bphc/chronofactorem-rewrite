@@ -1,4 +1,4 @@
-import { Link, useRouter } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { AxiosError } from "axios";
 import { Info, LogOut, Pencil, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,10 +17,9 @@ import { ModeToggle } from "./ModeToggle";
 import ReportIssue from "./ReportIssue";
 
 export function NavBar() {
-  const stateRouter = useRouter();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isEditPage =
-    stateRouter.state.resolvedLocation?.pathname.includes("/edit/") ||
-    stateRouter.state.resolvedLocation?.pathname.includes("/finalize/");
+    pathname.includes("/edit/") || pathname.includes("/finalize/");
 
   const {
     data: user,
