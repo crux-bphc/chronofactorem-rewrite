@@ -1,7 +1,7 @@
 FROM node:24.14.1-bookworm-slim
 ENV NODE_ENV development
 
-RUN corepack enable pnpm && corepack install -g pnpm@latest-11
+RUN corepack enable pnpm && corepack install -g pnpm@11.18.0
 
 WORKDIR /usr/local/app
 COPY --chown=node:node ./package.json ./
