@@ -181,6 +181,7 @@ export async function authCallback(req: Request, res: Response) {
         const batch = getBatchFromEmail(userData.email);
 
         if (batch === "0000") {
+          const name = toTitleCase(userData.name);
           // hd students and other non-f addresses have no batch or degree
           // defaults to ask for on getDegrees, so they skip it entirely and
           // get sentinel values instead
@@ -190,7 +191,7 @@ export async function authCallback(req: Request, res: Response) {
             .into(User)
             .values({
               batch: 0,
-              name: toTitleCase(userData.name),
+              name,
               degrees: [unknownDegree],
               email: userData.email,
               timetables: [],
@@ -198,7 +199,7 @@ export async function authCallback(req: Request, res: Response) {
             .execute();
 
           const finishedUserData: FinishedUserSession = {
-            name: userData.name,
+            name,
             email: userData.email,
             id: createdUser.identifiers[0].id,
             fingerprintHash: hashFingerprint(fingerprint),

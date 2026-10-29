@@ -3,6 +3,7 @@ import {
   type degreeList,
   isAValidDegreeCombination,
   namedDegreeZodList,
+  unknownDegree,
 } from "lib";
 import { z } from "zod";
 import { validate } from "../../middleware/zodValidateRequest.js";
@@ -16,6 +17,10 @@ const dataSchema = z.object({
       })
       .max(2, {
         error: "user degrees may not contain more than two elements",
+      })
+      // the sentinel degree is assigned at signup, never picked here
+      .refine((degrees) => !degrees.includes(unknownDegree), {
+        error: "user degrees must be a non-empty array of valid degree strings",
       }),
   }),
 });
