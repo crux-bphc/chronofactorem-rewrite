@@ -14,15 +14,15 @@ import {
   TimetableProvider,
   useTimetableState,
 } from "@/context";
-import authenticatedRoute from "../AuthenticatedRoute";
 import CenteredSpinner from "../components/CenteredSpinner";
 import NotFound from "../components/NotFound";
 import { SideMenu } from "../components/SideMenu";
 import { TimetableGrid } from "../components/TimetableGrid";
 import { toast } from "../components/ui/use-toast";
+import { rootRoute } from "../router";
 
 const viewTimetableRoute = new Route({
-  getParentRoute: () => authenticatedRoute,
+  getParentRoute: () => rootRoute,
   path: "view/$timetableId",
   loader: timetablePageLoader,
   pendingComponent: CenteredSpinner,
@@ -37,7 +37,7 @@ const viewTimetableRoute = new Route({
 
 function ViewTimetable() {
   const {
-    state: { isVertical, user, courses, timetable, screenIsLarge },
+    state: { isVertical, courses, timetable, screenIsLarge },
     dispatch,
   } = useTimetableState();
 
@@ -97,7 +97,7 @@ function ViewTimetable() {
       });
   }, [screenIsLarge, dispatch, isVertical]);
 
-  if (timetable === undefined || courses === undefined || user === undefined) {
+  if (timetable === undefined || courses === undefined) {
     return <ReportIssue error={"Error fetching queries"} />;
   }
 

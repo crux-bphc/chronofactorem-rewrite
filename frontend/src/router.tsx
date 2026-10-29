@@ -30,12 +30,12 @@ const routeTree = rootRoute.addChildren([
   loginRoute,
   getDegreesRoute,
   aboutRoute,
+  viewTimetableRoute,
   authenticatedRoute.addChildren([
     homeRoute,
     editUserProfileRoute,
     editTimetableRoute,
     finalizeTimetableRoute,
-    viewTimetableRoute,
   ]),
 ]);
 
