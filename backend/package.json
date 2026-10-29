@@ -40,5 +40,5 @@
     "start": "tsx src/index.ts",
     "typeorm": "typeorm-ts-node-esm"
   },
-  "packageManager": "pnpm@11.8.0"
+  "packageManager": "pnpm@11.18.0"
 }
