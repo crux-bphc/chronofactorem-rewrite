@@ -1,12 +1,20 @@
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { Outlet } from "@tanstack/react-router";
+import { Outlet, useRouterState } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
+import { NavBar } from "./components/Navbar";
 import { Toaster } from "./components/ui/toaster";
 
 export default function RootComponent() {
+  // login and getDegrees are fullscreen onboarding flows, so they render
+  // without the navbar. useRouterState re-renders on navigation, unlike
+  // reading router.state directly
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const showNavbar = pathname !== "/login" && pathname !== "/getDegrees";
+
   return (
     <>
       <Toaster />
+      {showNavbar && <NavBar />}
       <Outlet />
       {import.meta.env.DEV && (
         <>
