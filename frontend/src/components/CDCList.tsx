@@ -116,10 +116,10 @@ export const CDCList = () => {
                           sectionType: null,
                         });
                       }}
-                      className={`relative px-4 transition duration-200 ease-in-out cursor-pointer h-14 border-slate-300 dark:border-slate-600 items-center flex justify-between ${
+                      className={`relative px-4 transition duration-200 ease-in-out h-14 border-slate-300 dark:border-slate-600 items-center flex justify-between ${
                         clashing
                           ? "text-muted-foreground"
-                          : "dark:hover:bg-slate-700 hover:bg-slate-200"
+                          : "cursor-pointer dark:hover:bg-slate-700 hover:bg-slate-200"
                       }`}
                     >
                       {clashing && (
