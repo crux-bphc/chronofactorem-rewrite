@@ -35,7 +35,7 @@ const TimetableHeader = ({
     dispatch,
   } = useTimetableState();
   const { mutate: editTimetable } = useEditTimetable();
-  const { mutate: copyTimetable } = useCopyTimetable();
+  const { mutateAsync: copyTimetable } = useCopyTimetable();
 
   if (timetable === undefined || courses === undefined) return;
 
@@ -166,13 +166,20 @@ const TimetableHeader = ({
                     isCopyingTimetable: true,
                   });
                   setTimeout(() => {
-                    copyTimetable(timetable.id, {
-                      onSuccess: (res) =>
+                    // the copying spinner unmounts this header before the
+                    // copy finishes, and react query drops per-call mutate
+                    // callbacks once their component unmounts, so navigate
+                    // from the promise instead
+                    copyTimetable(timetable.id)
+                      .then((res) =>
                         router.navigate({
                           to: "/edit/$timetableId",
                           params: { timetableId: res.data.id },
                         }),
-                    });
+                      )
+                      .catch(() => {
+                        // useCopyTimetable already toasts the error
+                      });
                     setTimeout(() => {
                       dispatch({
                         type: TimetableActionType.SetIsCopyingTimetable,
