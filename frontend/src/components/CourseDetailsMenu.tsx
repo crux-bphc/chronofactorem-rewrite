@@ -153,8 +153,8 @@ const CourseDetailsMenu = () => {
                           variant={"secondary"}
                           className={`flex flex-col w-full h-fit border-slate-300 border-2 dark:border-slate-600/60 ${
                             timetable.sections.find((e) => e.id === section.id)
-                              ? "dark:bg-slate-700 bg-slate-300 hover:dark:bg-slate-700 hover:bg-slate-300"
-                              : "bg-transparent"
+                              ? "dark:bg-slate-700 bg-slate-300 hover:dark:bg-slate-600 hover:bg-slate-400/70"
+                              : "bg-transparent hover:dark:bg-slate-800 hover:bg-slate-200"
                           }`}
                           onClick={() => handleSectionClick(section)}
                           key={section.number}

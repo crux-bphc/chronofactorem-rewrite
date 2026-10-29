@@ -86,7 +86,7 @@ export function NavBar() {
             <ModeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="rounded-full text-foreground bg-accent p-1 px-3 text-xl h-fit">
+                <div className="rounded-full text-foreground bg-accent p-1 px-3 text-xl h-fit cursor-pointer">
                   <span>{userQueryResultData.name[0]}</span>
                 </div>
               </DropdownMenuTrigger>
