@@ -24,7 +24,7 @@ const DegreeDropDown = ({
   return (
     <>
       <Select onValueChange={setFirstDegree} value={firstDegree ?? undefined}>
-        <SelectTrigger className="w-84 bg-muted border-primary-foreground focus:ring-muted focus:ring-offset-muted text-foreground mt-2">
+        <SelectTrigger className="w-84 bg-muted border-primary-foreground focus:ring-muted focus:ring-offset-muted text-foreground mt-1 md:mt-2">
           <SelectValue placeholder="Select a degree" />
         </SelectTrigger>
         <SelectContent className="bg-primary-foreground border-muted text-foreground">

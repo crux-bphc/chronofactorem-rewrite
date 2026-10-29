@@ -13,6 +13,7 @@ import ReportIssue from "./ReportIssue";
 import Spinner from "./Spinner";
 import { Button } from "./ui/button";
 import { DialogTrigger } from "./ui/dialog";
+import { ToastAction } from "./ui/toast";
 
 function Announcements() {
   const { toast } = useToast();
@@ -29,6 +30,19 @@ function Announcements() {
     );
   }, [readAnnouncements]);
 
+  const markAsRead = (id: string) => {
+    setReadAnnouncements((prev) => [...prev, id]);
+  };
+
+  const markAllAsRead = () => {
+    setReadAnnouncements((prev) => [
+      ...prev,
+      ...(announcements ?? [])
+        .map((announcement) => announcement.id)
+        .filter((id) => !prev.includes(id)),
+    ]);
+  };
+
   useEffect(() => {
     const unreadAnnouncements = announcements?.filter(
       (announcement) => !readAnnouncements.includes(announcement.id),
@@ -40,24 +54,40 @@ function Announcements() {
         description: `You have ${
           unreadAnnouncements.length
         } unread announcement${unreadAnnouncements.length > 1 ? "s" : ""}.`,
+        action: (
+          <ToastAction
+            altText="Mark all announcements as read"
+            onClick={markAllAsRead}
+          >
+            Mark all as read
+          </ToastAction>
+        ),
       });
     }
   }, [announcements, readAnnouncements, toast]);
-
-  const markAsRead = (id: string) => {
-    setReadAnnouncements((prev) => [...prev, id]);
-  };
 
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline" size="icon">
-          <Megaphone className="h-5 w-5" />
+          <Megaphone />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[400px] overflow-y-scroll">
+      <DialogContent className="max-h-100 overflow-y-scroll">
         <DialogHeader>
           <DialogTitle className="text-xl -mt-1">Announcements</DialogTitle>
+          {announcements?.some(
+            (announcement) => !readAnnouncements.includes(announcement.id),
+          ) && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={markAllAsRead}
+              className="absolute right-10 top-3"
+            >
+              Mark all as read
+            </Button>
+          )}
         </DialogHeader>
         <DialogDescription asChild>
           {isLoading ? (

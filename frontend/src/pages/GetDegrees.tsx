@@ -87,11 +87,16 @@ function GetDegrees() {
     <>
       <div className="flex bg-background h-screen w-full justify-center">
         <div className="flex flex-col items-center pt-48">
-          <h1 className="scroll-m-20 text-xl tracking-tight lg:text-2xl text-foreground text-center mx-4">
-            {`Select your degree${
-              firstDegree?.includes("B") && year >= 2 ? "s" : ""
-            } so we can help build your timetable:`}
-          </h1>
+          <div className="text-center">
+            <h1 className="scroll-m-20 leading-relaxed text-3xl md:text-6xl font-bold">
+              Register
+            </h1>
+            <p className="text-muted-foreground mx-4 not-md:text-xs font-semibold">
+              Select your degree
+              {firstDegree?.includes("B") && year >= 2 ? "s" : ""} so we can
+              help build your timetable
+            </p>
+          </div>
           <div className="flex flex-col sm:flex-row gap-2">
             <DegreeDropDown
               firstDegree={firstDegree}
@@ -101,16 +106,8 @@ function GetDegrees() {
               year={year}
             />
           </div>
-          {/* <div className="scroll-m-20 text-lg tracking-tight text-foreground text-center w-2/3 pt-4">
-            <b>Note:</b> If your branch is Mathematics & Computing, please
-            select A7 (Computer Science) as a temporary fix since both of these
-            branches will have the same courses for this semester.
-          </div> */}
-          <Button
-            className="w-fit mt-6 bg-muted font-bold hover:bg-primary-foreground transition ease-in-out text-foreground"
-            onClick={handleSubmit}
-          >
-            Submit
+          <Button className="w-fit mt-4" onClick={handleSubmit} size="lg">
+            Continue
           </Button>
         </div>
       </div>
