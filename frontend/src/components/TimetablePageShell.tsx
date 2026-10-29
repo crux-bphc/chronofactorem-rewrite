@@ -1,6 +1,8 @@
 import type { QueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { Menu } from "lucide-react";
 import type React from "react";
+import NotFound from "@/components/NotFound";
 import Spinner from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,10 +13,7 @@ import {
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useToast } from "@/components/ui/use-toast";
 import { useTimetableState } from "@/context";
-import {
-  handleLoginRedirect,
-  handleNotFound,
-} from "@/data-access/errors/handlers";
+import { handleLoginRedirect } from "@/data-access/errors/handlers";
 import toastHandler from "@/data-access/errors/toastHandler";
 import { courseQueryOptions } from "@/data-access/hooks/useCourses";
 import { timetableQueryOptions } from "@/data-access/hooks/useTimetable";
@@ -49,8 +48,13 @@ export const timetablePageLoader = async ({
 
 export const TimetablePageError = ({ error }: { error: Error }) => {
   const { toast } = useToast();
+  // throwing notFound() from an errorComponent escapes to the root error
+  // boundary instead of reaching notFoundComponent, so render it directly.
+  // drafts 404 for anyone but their author, so this is a common path
+  if (error instanceof AxiosError && error.response?.status === 404) {
+    return <NotFound />;
+  }
   handleLoginRedirect(error);
-  handleNotFound(error);
   toastHandler(error, toast);
 };
 
