@@ -186,9 +186,9 @@ export function TimetableGrid({
     }
     setDisplayRows(nonNullRows);
 
-    // merge runs of consecutive hours belonging to the same section into one
-    // spanning cell. hours advance along columns in the horizontal layout
-    // (stride 1) and along rows in the vertical layout (stride 6).
+    // merge runs of consecutive hours belonging to the same section and room
+    // into one spanning cell. hours advance along columns in the horizontal
+    // layout (stride 1) and along rows in the vertical layout (stride 6).
     const stride = isVertical ? 6 : 1;
     const spans = new Map<number, number>();
     const skipped = new Set<number>();
@@ -202,7 +202,9 @@ export function TimetableGrid({
         i + stride * span < grid.length &&
         // in the horizontal layout a run must not wrap into the next day
         (isVertical || (i % 13) + span < 13) &&
-        grid[i + stride * span]?.id === cell.id
+        grid[i + stride * span]?.id === cell.id &&
+        // a merged cell only shows one room, so a room change ends the run
+        grid[i + stride * span]?.room === cell.room
       ) {
         skipped.add(i + stride * span);
         span++;
