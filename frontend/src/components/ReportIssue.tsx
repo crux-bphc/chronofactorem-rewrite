@@ -8,8 +8,8 @@ const ReportIssue = ({ error }: { error: string }) => (
     <span className="inline-flex items-baseline gap-1 text-blue-600 dark:text-blue-500 hover:underline">
       <a href="https://github.com/crux-bphc/chronofactorem-rewrite/issues">
         report this issue
+        <ExternalLink className="inline ml-1" size={16} />
       </a>
-      <ExternalLink size={16} />
     </span>
   </span>
 );

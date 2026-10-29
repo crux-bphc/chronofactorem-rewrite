@@ -60,6 +60,8 @@ const reducer: Reducer<TimetableStateType, Action> = (
         currentSectionType: state.currentSectionType ?? uniqueSectionTypes[0],
       };
     }
+    case TimetableActionType.SetSearchTerm:
+      return { ...state, searchTerm: action.searchTerm };
     default:
       return state;
   }

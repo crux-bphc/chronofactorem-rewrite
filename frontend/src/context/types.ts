@@ -40,6 +40,7 @@ export type TimetableStateType = {
   currentTab: TabType;
   screenIsLarge: boolean;
   timetableDetailsSections: TimetableSectionType[];
+  searchTerm: string;
 };
 
 export enum TimetableActionType {
@@ -52,6 +53,7 @@ export enum TimetableActionType {
   UpdateCoursesAndTimetable = 6,
   UpdateUser = 7,
   UpdateCourse = 8,
+  SetSearchTerm = 9,
 }
 
 export type Action =
@@ -91,4 +93,8 @@ export type Action =
   | {
       type: TimetableActionType.UpdateCourse;
       course: z.infer<typeof courseWithSectionsType>;
+    }
+  | {
+      type: TimetableActionType.SetSearchTerm;
+      searchTerm: string;
     };

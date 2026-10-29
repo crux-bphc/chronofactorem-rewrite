@@ -14,13 +14,21 @@ import { useToast } from "../components/ui/use-toast";
 import { router } from "../router";
 
 type Timetable = z.infer<typeof timetableType>;
-const renderTimetableSection = (title: string, timetables: Timetable[]) => {
+const TimetableSection = ({
+  title,
+  timetables,
+}: {
+  title: string;
+  timetables: Timetable[];
+}) => {
   if (timetables.length === 0) return null;
 
   return (
-    <section className="pt-8">
-      <h2 className="text-2xl md:text-3xl font-bold">{title}</h2>
-      <div className="flex flex-col items-center justify-center sm:flex-row sm:flex-wrap gap-8 pt-4 md:justify-normal">
+    <section>
+      <h2 className="text-2xl font-medium tracking-tightest text-foreground/90">
+        {title}
+      </h2>
+      <div className="flex flex-col items-stretch justify-center sm:justify-start sm:flex-row sm:flex-wrap gap-8 pt-4 md:justify-normal">
         {timetables.map((timetable) => (
           <TimetableCard
             key={timetable.id}
@@ -72,10 +80,7 @@ function Home() {
   } = user;
 
   return (
-    <main className="text-foreground py-6 md:py-12 px-10 md:px-16">
-      <h1 className="text-3xl font-bold text-center sm:text-left md:text-4xl">
-        My Timetables
-      </h1>
+    <main className="text-foreground py-6 px-6 md:px-10">
       {draftTimetables.length === 0 &&
         privateTimetables.length === 0 &&
         publicTimetables.length === 0 &&
@@ -86,7 +91,8 @@ function Home() {
             </span>
             <h2 className="text-xl sm:text-2xl">It's empty in here.</h2>
             <Button
-              className="text-lg sm:text-2xl py-6 px-10 font-bold"
+              className="text-xl py-6"
+              size="lg"
               onClick={() =>
                 createTimetable(void null, {
                   onSuccess: (_response) => {
@@ -103,11 +109,23 @@ function Home() {
           </div>
         )}
 
-      <div>
-        {renderTimetableSection("Draft Timetables:", draftTimetables)}
-        {renderTimetableSection("Private Timetables:", privateTimetables)}
-        {renderTimetableSection("Public Timetables:", publicTimetables)}
-        {renderTimetableSection("Archived Timetables:", archivedTimetables)}
+      <div className="flex flex-col gap-8">
+        <TimetableSection
+          title="Draft Timetables"
+          timetables={draftTimetables}
+        />
+        <TimetableSection
+          title="Private Timetables"
+          timetables={privateTimetables}
+        />
+        <TimetableSection
+          title="Public Timetables"
+          timetables={publicTimetables}
+        />
+        <TimetableSection
+          title="Archived Timetables"
+          timetables={archivedTimetables}
+        />
       </div>
     </main>
   );

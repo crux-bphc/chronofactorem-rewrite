@@ -255,9 +255,9 @@ export function TimetableGrid({
                     {/* biome-ignore lint/a11y/useKeyWithClickEvents: need to check if button works styling wise */}
                     {/** biome-ignore lint/a11y/noStaticElementInteractions: need to check if button works styling wise */}
                     <div
-                      className={`bg-background border border-muted dark:border-muted/70 cursor-pointer transition duration-200 ease-in-out text-foreground/65 p-1.5 ${
-                        isVertical ? "min-h-28 sm:min-h-16" : "min-h-20"
-                      }`}
+                      className={`bg-background border border-muted dark:border-muted/70 transition duration-200 ease-in-out text-foreground/65 p-1.5 ${
+                        isOnEditPage ? "cursor-pointer" : ""
+                      } ${isVertical ? "min-h-28 sm:min-h-16" : "min-h-20"}`}
                       onClick={(event) => handleUnitClick?.(e, event)}
                     >
                       <div className="relative flex h-full text-xs sm:text-sm flex-col justify-end bg-muted-foreground/30 p-1.5 rounded gap-0.5">
