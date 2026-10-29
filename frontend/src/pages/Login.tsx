@@ -44,20 +44,21 @@ function Login() {
         <div className="fixed top-4 right-4">
           <ModeToggle />
         </div>
-        <div className="flex flex-col items-center">
-          <h2 className="scroll-m-20 md:text-lg text-md tracking-tight lg:text-xl text-muted-foreground">
+        <div className="flex flex-col items-center gap-2">
+          <h2 className="scroll-m-20 text-md md:text-lg lg:text-xl tracking-tight text-muted-foreground">
             Welcome to
           </h2>
           <h1 className="scroll-m-20 md:text-6xl text-4xl font-extrabold tracking-tight lg:text-7xl text-foreground">
             ChronoFactorem
           </h1>
           <Button
+            size="lg"
+            className="md:mt-6 mt-4 rounded-lg flex items-center"
             asChild
-            className="md:mt-6 mt-2 rounded-lg flex px-4 py-2 items-center"
           >
             <a href="/api/auth/logto">
-              <AtSign className="mr-2 md:h-4 md:w-4 w-3 h-3" />
-              <span className="font-bold md:text-lg text-sm">Login</span>
+              <AtSign className="size-4" />
+              <span className="font-bold md:text-lg text-base">Login</span>
             </a>
           </Button>
           <a
@@ -66,15 +67,16 @@ function Login() {
           >
             About ChronoFactorem
           </a>
-          <p className="w-fit md:mt-12 mt-3 text-muted-foreground md:text-lg text-sm">
+          <p className="w-fit md:mt-12 mt-3 md:text-lg text-sm border px-4 py-2 rounded text-center">
             Draft Timetable for 2026-27 Sem 1 Out Now!!
+            <br />
+            <a
+              href="https://draft.chrono.crux-bphc.com/"
+              className="w-fit md:mt-2 mt-1 text-muted-foreground md:text-lg text-sm hover:underline underline-offset-4"
+            >
+              Check it out here
+            </a>
           </p>
-          <a
-            href="https://draft.chrono.crux-bphc.com/"
-            className="w-fit md:mt-2 mt-1 text-foreground md:text-lg text-sm hover:underline underline-offset-4"
-          >
-            Check it out here
-          </a>
         </div>
       </div>
       <span className="fixed bottom-0 bg-muted w-full text-center py-1 text-xs md:px-0 px-8 tracking-tight md:text-lg text-muted-foreground">

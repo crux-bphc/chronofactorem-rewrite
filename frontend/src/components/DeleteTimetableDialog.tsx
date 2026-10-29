@@ -35,8 +35,8 @@ export const DeleteTimetableDialog = ({
         <AlertDialogTrigger asChild>
           <TooltipTrigger asChild>
             <Button
-              variant="ghost"
-              className="rounded-full p-3 hover:bg-destructive/90 hover:text-destructive-foreground"
+              variant="outline"
+              className="p-3 hover:bg-destructive/90! hover:text-destructive-foreground"
             >
               {children}
             </Button>
@@ -46,12 +46,10 @@ export const DeleteTimetableDialog = ({
           <p>Delete Timetable</p>
         </TooltipContent>
       </Tooltip>
-      <AlertDialogContent className="p-8">
+      <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-2xl">
-            Are you sure?
-          </AlertDialogTitle>
-          <AlertDialogDescription className="text-destructive text-lg font-bold">
+          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+          <AlertDialogDescription>
             All your progress on this timetable will be lost, and unrecoverable.
           </AlertDialogDescription>
         </AlertDialogHeader>
