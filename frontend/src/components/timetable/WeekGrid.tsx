@@ -24,7 +24,7 @@ type WeekGridProps = {
 const tileClass =
   "relative z-1 flex min-w-0 flex-col justify-start overflow-hidden rounded-sm bg-ev px-[7px] pt-1.5 pb-[5px] text-left leading-[1.15]";
 
-function TileBody({ cell }: { cell: TimetableCell }) {
+export function TileBody({ cell }: { cell: TimetableCell }) {
   const { dept, number } = splitCode(cell.code);
   return (
     <>

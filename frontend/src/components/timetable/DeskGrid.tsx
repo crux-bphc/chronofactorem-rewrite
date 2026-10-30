@@ -1,4 +1,5 @@
 import { Bird, X } from "lucide-react";
+import { TileBody } from "@/components/timetable/WeekGrid";
 import {
   Tooltip,
   TooltipContent,
@@ -30,7 +31,9 @@ type DeskGridProps = {
   now?: React.ReactNode;
 };
 
-const padClass = "px-2.5 py-[9px]";
+// blocks are size containers: under 72px wide they stack dept / number like
+// the phone tiles instead of truncating the code
+const padClass = "px-2.5 py-[9px] @max-[72px]:px-1 @max-[72px]:py-1.5";
 
 function BlockLines({
   cell,
@@ -41,14 +44,19 @@ function BlockLines({
 }) {
   return (
     <>
-      <span
-        className={`block truncate text-base font-semibold ${edit ? "pr-5" : ""}`}
-      >
-        {cell.code}
-      </span>
-      <span className="mt-[3px] block truncate text-sm text-ink-muted">
-        {`${cell.type}${cell.number} · ${cell.room}`}
-      </span>
+      <div className="@max-[72px]:hidden">
+        <span
+          className={`block truncate text-base font-semibold ${edit ? "pr-5" : ""}`}
+        >
+          {cell.code}
+        </span>
+        <span className="mt-[3px] block truncate text-sm text-ink-muted">
+          {`${cell.type}${cell.number} · ${cell.room}`}
+        </span>
+      </div>
+      <div className="hidden leading-[1.15] @max-[72px]:block">
+        <TileBody cell={cell} />
+      </div>
     </>
   );
 }
@@ -150,9 +158,13 @@ export function DeskGrid({
             <div
               key={key}
               style={style}
-              className={`relative z-1 min-w-0 overflow-hidden rounded-md bg-ev ${padClass}`}
+              className={
+                "@container relative z-1 min-w-0 overflow-hidden rounded-md bg-ev"
+              }
             >
-              <BlockLines cell={cell} />
+              <div className={padClass}>
+                <BlockLines cell={cell} />
+              </div>
             </div>
           );
         }
@@ -161,7 +173,7 @@ export function DeskGrid({
           <div
             key={key}
             style={style}
-            className={`group relative z-1 min-w-0 overflow-hidden rounded-md bg-ev ${
+            className={`@container group relative z-1 min-w-0 overflow-hidden rounded-md bg-ev ${
               edit
                 ? "transition-[background-color,box-shadow] duration-(--d-1) hover:bg-ev-hover hover:shadow-[inset_0_0_0_1.5px_var(--ink)]"
                 : ""
@@ -218,9 +230,13 @@ export function DeskGrid({
             data-visible={ghostVisible ? "" : undefined}
             aria-hidden="true"
             style={place(cell.day, cell.hour, cell.span)}
-            className={`tt-ghost pointer-events-none relative z-2 min-w-0 overflow-hidden rounded-md bg-surface/85 text-ink-muted outline-[1.5px] -outline-offset-[1.5px] outline-ink-faint outline-dashed ${padClass} [&_span]:text-ink-muted`}
+            className={
+              "@container tt-ghost pointer-events-none relative z-2 min-w-0 overflow-hidden rounded-md bg-surface/85 text-ink-muted outline-[1.5px] -outline-offset-[1.5px] outline-ink-faint outline-dashed [&_span]:text-ink-muted"
+            }
           >
-            <BlockLines cell={cell} />
+            <div className={padClass}>
+              <BlockLines cell={cell} />
+            </div>
           </div>
         ))}
       {now}
