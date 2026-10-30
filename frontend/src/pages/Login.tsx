@@ -1,6 +1,6 @@
-import { Route } from "@tanstack/react-router";
+import { Link, Route } from "@tanstack/react-router";
 import { AxiosError } from "axios";
-import { AtSign } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import toastHandler from "@/data-access/errors/toastHandler";
 import { authStatusQueryOptions } from "@/data-access/hooks/useAuthStatus";
 import { ThemeButton } from "../components/ThemeButton";
@@ -37,52 +37,54 @@ const loginRoute = new Route({
   },
 });
 
+const stagger = (i: number) => ({ animationDelay: `${i * 40}ms` });
+const enter =
+  "animate-in fade-in slide-in-from-bottom-2 fill-mode-both duration-(--d-2) ease-(--e-out)";
+
 function Login() {
   return (
-    <>
-      <div className="flex bg-background h-screen w-full justify-center items-center">
-        <div className="fixed top-4 right-4">
-          <ThemeButton />
-        </div>
-        <div className="flex flex-col items-center gap-2">
-          <h2 className="scroll-m-20 text-md md:text-lg lg:text-xl tracking-tight text-muted-foreground">
-            Welcome to
-          </h2>
-          <h1 className="scroll-m-20 md:text-6xl text-4xl font-extrabold tracking-tight lg:text-7xl text-foreground">
+    <div className="min-h-dvh flex flex-col bg-bg text-ink">
+      <div className="fixed top-3 right-3">
+        <ThemeButton />
+      </div>
+      <div className="flex-1 flex flex-col justify-center mx-auto w-full max-w-[400px] px-7">
+        <div className={enter} style={stagger(0)}>
+          <p className="text-lg text-ink-muted">Welcome to</p>
+          <h1 className="text-[40px] lg:text-[52px] font-bold tracking-tight leading-tight">
             ChronoFactorem
           </h1>
-          <Button
-            size="lg"
-            className="md:mt-6 mt-4 rounded-lg flex items-center"
-            asChild
-          >
-            <a href="/api/auth/logto">
-              <AtSign className="size-4" />
-              <span className="font-bold md:text-lg text-base">Login</span>
-            </a>
+        </div>
+        <div className={enter} style={stagger(1)}>
+          <Button className="w-full mt-7" asChild>
+            <a href="/api/auth/logto">Login</a>
           </Button>
+        </div>
+        <div className={enter} style={stagger(2)}>
+          <Button variant="quiet" className="w-full mt-2" asChild>
+            <Link to="/about">About ChronoFactorem</Link>
+          </Button>
+        </div>
+        <div className={enter} style={stagger(3)}>
           <a
-            href="/about"
-            className="w-fit md:mt-8 mt-2 text-muted-foreground md:text-lg text-sm hover:underline underline-offset-4"
+            href="https://draft.chrono.crux-bphc.com/"
+            className="mt-10 flex items-center gap-3 rounded-xl border border-line bg-surface px-3.5 py-3"
           >
-            About ChronoFactorem
+            <span className="flex-1">
+              <span className="block text-base font-semibold">
+                Draft Timetable for 2026-27 Sem 1 Out Now!!
+              </span>
+              <span className="block text-sm text-ink-muted">
+                Check it out here
+              </span>
+            </span>
+            <ChevronRight className="size-5 text-ink-faint" />
           </a>
-          <p className="w-fit md:mt-12 mt-3 md:text-lg text-sm border px-4 py-2 rounded text-center">
-            Draft Timetable for 2026-27 Sem 1 Out Now!!
-            <br />
-            <a
-              href="https://draft.chrono.crux-bphc.com/"
-              className="w-fit md:mt-2 mt-1 text-muted-foreground md:text-lg text-sm hover:underline underline-offset-4"
-            >
-              Check it out here
-            </a>
-          </p>
         </div>
       </div>
-      <span className="fixed bottom-0 bg-muted w-full text-center py-1 text-xs md:px-0 px-8 tracking-tight md:text-lg text-muted-foreground">
+      <p className="text-sm text-ink-muted text-center px-6 pb-[22px]">
         Powered by CRUx: The Programming and Computing Club of BITS Hyderabad
-      </span>
-    </>
+      </p>
+    </div>
   );
 }
 
