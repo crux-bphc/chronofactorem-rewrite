@@ -23,6 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import useEditTimetable from "@/data-access/hooks/useEditTimetable";
+import { TIMETABLE_GRID_VT, TIMETABLE_TITLE_VT } from "@/lib/sharedTransition";
 import { cn } from "@/lib/utils";
 import { router } from "../router";
 import { TimetablePreview } from "./TimetablePreview";
@@ -85,7 +86,7 @@ function StatusChip({ timetable }: { timetable: Timetable }) {
 
 function TimetableCard({
   timetable,
-  shared: _shared,
+  shared,
   onOpen,
   onDeleted,
   className,
@@ -119,12 +120,18 @@ function TimetableCard({
       )}
       style={style}
     >
-      <TimetablePreview timings={timetable.timings} />
+      <TimetablePreview
+        timings={timetable.timings}
+        style={shared ? { viewTransitionName: TIMETABLE_GRID_VT } : undefined}
+      />
       <div className="min-w-0">
         <Link
           to={timetable.draft ? "/edit/$timetableId" : "/view/$timetableId"}
           params={{ timetableId: timetable.id }}
           onClick={() => onOpen(timetable.id)}
+          style={
+            shared ? { viewTransitionName: TIMETABLE_TITLE_VT } : undefined
+          }
           className="text-lg font-semibold text-ink line-clamp-2 break-words outline-none after:absolute after:inset-0 after:content-['']"
         >
           {timetable.name}

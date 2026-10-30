@@ -1,7 +1,8 @@
 import { Route } from "@tanstack/react-router";
 import type { timetableType } from "lib";
 import { Plus } from "lucide-react";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import type { z } from "zod";
 import { BottomBar } from "@/components/BottomBar";
 import { ButtonLabel } from "@/components/ButtonLabel";
@@ -12,6 +13,8 @@ import { handleLoginRedirect } from "@/data-access/errors/handlers";
 import toastHandler from "@/data-access/errors/toastHandler";
 import useCreateTimetable from "@/data-access/hooks/useCreateTimetable";
 import useUser, { userQueryOptions } from "@/data-access/hooks/useUser";
+import { getSharedTimetable, setSharedTimetable } from "@/lib/sharedTransition";
+import { cn } from "@/lib/utils";
 import authenticatedRoute from "../AuthenticatedRoute";
 import TimetableCard from "../components/TimetableCard";
 import { Button } from "../components/ui/button";
@@ -29,31 +32,151 @@ const overlineClass =
 const byUpdated = (a: Timetable, b: Timetable) =>
   new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime();
 
+type SectionName = "drafts" | "published" | "archived";
+type Leaving = Map<
+  string,
+  { timetable: Timetable; section: SectionName; index: number }
+>;
+
+// First-load stagger plays once per page load, not on back navigation.
+let staggered = false;
+
+function useCollapsingCards() {
+  const [leaving, setLeaving] = useState<Leaving>(() => new Map());
+  const collapse = useCallback(
+    (timetable: Timetable, section: SectionName, index: number) =>
+      setLeaving((prev) =>
+        new Map(prev).set(timetable.id, { timetable, section, index }),
+      ),
+    [],
+  );
+  const done = useCallback(
+    (id: string) =>
+      setLeaving((prev) => {
+        if (!prev.has(id)) return prev;
+        const next = new Map(prev);
+        next.delete(id);
+        return next;
+      }),
+    [],
+  );
+  return { leaving, collapse, done };
+}
+
+const prefersReducedMotion = () =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const CollapsingCard = ({
+  id,
+  leaving,
+  done,
+  children,
+}: {
+  id: string;
+  leaving: boolean;
+  done: (id: string) => void;
+  children: React.ReactNode;
+}) => {
+  useEffect(() => {
+    if (!leaving) return;
+    if (prefersReducedMotion()) {
+      done(id);
+      return;
+    }
+    const timer = setTimeout(() => done(id), 260);
+    return () => clearTimeout(timer);
+  }, [leaving, id, done]);
+
+  return (
+    <div
+      className={cn(
+        "grid transition-[grid-template-rows,opacity,transform] duration-(--d-2) ease-(--e-in)",
+        leaving ? "grid-rows-[0fr] opacity-0 scale-[.96]" : "grid-rows-[1fr]",
+      )}
+      inert={leaving}
+      aria-hidden={leaving || undefined}
+      onTransitionEnd={(e) => {
+        if (
+          leaving &&
+          e.target === e.currentTarget &&
+          e.propertyName === "grid-template-rows"
+        )
+          done(id);
+      }}
+    >
+      <div className={cn("min-h-0", leaving && "overflow-hidden")}>
+        {children}
+      </div>
+    </div>
+  );
+};
+
 const TimetableSection = ({
   id,
   title,
-  timetables,
+  section,
+  live,
+  leaving,
+  startIndex,
+  sharedId,
+  stagger,
+  onOpen,
+  collapse,
+  done,
 }: {
   id: string;
   title: string;
-  timetables: Timetable[];
+  section: SectionName;
+  live: Timetable[];
+  leaving: Leaving;
+  startIndex: number;
+  sharedId: string | null;
+  stagger: boolean;
+  onOpen: (id: string) => void;
+  collapse: (t: Timetable, section: SectionName, index: number) => void;
+  done: (id: string) => void;
 }) => {
-  if (timetables.length === 0) return null;
+  const list = [...live];
+  for (const entry of leaving.values()) {
+    if (
+      entry.section !== section ||
+      live.some((t) => t.id === entry.timetable.id)
+    )
+      continue;
+    list.splice(Math.min(entry.index, list.length), 0, entry.timetable);
+  }
+  if (list.length === 0) return null;
 
   return (
     <section aria-labelledby={id}>
       <h2 id={id} className={overlineClass}>
-        {title} · {timetables.length}
+        {title} · {live.length}
       </h2>
       <div className={gridClass}>
-        {timetables.map((timetable) => (
-          <TimetableCard
+        {list.map((timetable, i) => (
+          <CollapsingCard
             key={timetable.id}
-            timetable={timetable}
-            shared={false}
-            onOpen={() => {}}
-            onDeleted={() => {}}
-          />
+            id={timetable.id}
+            leaving={leaving.has(timetable.id)}
+            done={done}
+          >
+            <TimetableCard
+              timetable={timetable}
+              shared={sharedId === timetable.id}
+              onOpen={onOpen}
+              onDeleted={() => collapse(timetable, section, i)}
+              className={
+                stagger
+                  ? "animate-in fade-in slide-in-from-bottom-2 fill-mode-both duration-(--d-2) ease-(--e-out)"
+                  : undefined
+              }
+              style={
+                stagger
+                  ? { animationDelay: `${Math.min(startIndex + i, 5) * 30}ms` }
+                  : undefined
+              }
+            />
+          </CollapsingCard>
         ))}
       </div>
     </section>
@@ -107,6 +230,19 @@ function Home() {
   const { mutate: createTimetable, isPending: isCreating } =
     useCreateTimetable();
 
+  const [sharedId, setSharedId] = useState(getSharedTimetable);
+  const { leaving, collapse, done } = useCollapsingCards();
+  const stagger = useRef(!staggered).current;
+  const hasData = user !== undefined;
+  useEffect(() => {
+    if (hasData) staggered = true;
+  }, [hasData]);
+
+  const onOpen = (id: string) => {
+    setSharedTimetable(id);
+    flushSync(() => setSharedId(id));
+  };
+
   const timetables = user?.timetables;
   const { drafts, published, archived } = useMemo(() => {
     const all = timetables ?? [];
@@ -154,7 +290,19 @@ function Home() {
   );
 
   const isEmpty =
-    drafts.length === 0 && published.length === 0 && archived.length === 0;
+    drafts.length === 0 &&
+    published.length === 0 &&
+    archived.length === 0 &&
+    leaving.size === 0;
+  const sectionProps = { leaving, sharedId, stagger, onOpen, collapse, done };
+  const countIn = (name: SectionName, live: Timetable[]) =>
+    live.length +
+    [...leaving.values()].filter(
+      (l) => l.section === name && !live.some((t) => t.id === l.timetable.id),
+    ).length;
+  const draftsAt = 0;
+  const publishedAt = countIn("drafts", drafts);
+  const archivedAt = publishedAt + countIn("published", published);
 
   return (
     <main className={mainClass}>
@@ -169,16 +317,29 @@ function Home() {
         </div>
       ) : (
         <>
-          <TimetableSection id="drafts" title="Drafts" timetables={drafts} />
+          <TimetableSection
+            id="drafts"
+            title="Drafts"
+            section="drafts"
+            live={drafts}
+            startIndex={draftsAt}
+            {...sectionProps}
+          />
           <TimetableSection
             id="published"
             title="Published"
-            timetables={published}
+            section="published"
+            live={published}
+            startIndex={publishedAt}
+            {...sectionProps}
           />
           <TimetableSection
             id="archived"
             title="Archived"
-            timetables={archived}
+            section="archived"
+            live={archived}
+            startIndex={archivedAt}
+            {...sectionProps}
           />
           <BottomBar className="lg:hidden">{createButton()}</BottomBar>
         </>
