@@ -132,7 +132,11 @@ export const TimetablePageShell = ({
             <DialogTrigger asChild>
               <Button
                 variant="outline"
-                className={cn("mb-4 ml-4 gap-2", popoverTriggerClassName)}
+                // phones get this button in the header, next to Publish
+                className={cn(
+                  "mb-4 ml-4 gap-2 max-sm:hidden",
+                  popoverTriggerClassName,
+                )}
               >
                 <Menu className="size-4" />
                 Courses and exams

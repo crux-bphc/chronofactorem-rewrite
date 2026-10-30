@@ -22,30 +22,37 @@ export const DeleteTimetableDialog = ({
   timetableId,
   onDeleted,
   children,
+  open,
+  onOpenChange,
 }: {
   timetableId: string;
   onDeleted?: () => void;
-  children: React.ReactNode;
+  // without children there is no trigger, so control it with open
+  children?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) => {
   const { mutate: deleteTimetable } = useDeleteTimetable();
 
   return (
-    <AlertDialog>
-      <Tooltip>
-        <AlertDialogTrigger asChild>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              className="p-3 hover:bg-destructive/90! hover:text-destructive-foreground"
-            >
-              {children}
-            </Button>
-          </TooltipTrigger>
-        </AlertDialogTrigger>
-        <TooltipContent>
-          <p>Delete Timetable</p>
-        </TooltipContent>
-      </Tooltip>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      {children !== undefined && (
+        <Tooltip>
+          <AlertDialogTrigger asChild>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                className="p-3 hover:bg-destructive/90! hover:text-destructive-foreground"
+              >
+                {children}
+              </Button>
+            </TooltipTrigger>
+          </AlertDialogTrigger>
+          <TooltipContent>
+            <p>Delete Timetable</p>
+          </TooltipContent>
+        </Tooltip>
+      )}
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
