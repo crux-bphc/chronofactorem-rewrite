@@ -16,6 +16,7 @@ services:
       - "dev"
       - "prod"
       - "ingestion"
+      - "seed"
 
   backend-dev:
     build:
@@ -67,6 +68,24 @@ services:
       - ./backend/tsconfig.json:/usr/local/app/backend/tsconfig.json
     profiles:
       - "ingestion"
+
+  # seeds db with a scenario: See backend/src/seed.ts
+  seed:
+    entrypoint: ["pnpm", "tsx", "src/seed.ts"]
+    build:
+      context: ./
+      dockerfile: ./backend/docker/dev/Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend/logs:/usr/local/app/backend/logs
+      - ./backend/src:/usr/local/app/backend/src
+      - ./backend/tsconfig.json:/usr/local/app/backend/tsconfig.json
+    profiles:
+      - "seed"
 
   frontend-dev:
     init: true
