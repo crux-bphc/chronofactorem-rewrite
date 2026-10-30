@@ -18,3 +18,12 @@
 - **Pull Requests:** pull requests should **never** be from `master` or `main`. All pull requests should be from an appropriately named branch, and should be named with a name similar to the human readable form of the branch name. e.g. A PR from a branch `fix-auth-type-error` will be named "Fix TypeError in AuthController".
   - **If the PR has an associated Issue created for it, mention it, else describe it in the PR description.** The description **must** accurately, and exhaustively describe the nature of the changes you have made, and if possible describe the Issue it aimed to fix.
   - **All pull requests must be reviewed.** All means all. Doesn't matter if you are the leader of the third reich, or if you're the only person in the club. Every single PR must be reviewed until the latest changes.
+
+## Screenshots
+
+Every app screen we care about is defined in `synthetics/synthetics.ts`, against the `starter-pack` seed scenario (`backend/src/seed/scenarios/starter-pack.json`). Their screenshots live in `synthetics/screenshots/`, on an iPhone 15, Pixel 7, iPad Mini, a 1366×768 laptop and a 1920×1080 desktop, in light and dark mode. Once a PR has the `ready` label, a bot re-takes them on every push and commits whatever changed to the PR branch, so the PR's "Files changed" tab shows exactly which screens your change touched.
+
+- Pull before pushing again, since the bot may have committed to your branch.
+- If screenshots conflict while rebasing, take either side (`git checkout --theirs synthetics/screenshots`); the bot overwrites them on your next push anyway.
+- To add a screen, add an entry to `synthetics/synthetics.ts`, and add any data it needs to the `starter-pack` scenario.
+- To take them locally, run `pnpm -C synthetics start` with a Postgres reachable through `DB_HOST`/`PGPORT`/`POSTGRES_USER`/`POSTGRES_PASSWORD`. Local screenshots won't byte-match CI's (different fonts and OS), so don't commit them.
