@@ -50,6 +50,12 @@ const routeTree = rootRoute.addChildren([
   ]),
 ]);
 
+// Only opt in to view transitions where transition types are supported;
+// otherwise TanStack would transition search-only navigations too.
+const supportsTransitionTypes =
+  typeof CSS !== "undefined" &&
+  CSS.supports("selector(:active-view-transition-type(a))");
+
 export const router = new Router({
   routeTree,
   // Since we're using React Query, we don't want loader calls to ever be stale
@@ -59,7 +65,9 @@ export const router = new Router({
     queryClient,
   },
   defaultNotFoundComponent: NotFound,
-  defaultViewTransition: { types: routeTransitionTypes },
+  defaultViewTransition: supportsTransitionTypes
+    ? { types: routeTransitionTypes }
+    : false,
 });
 
 // Register things for typesafety

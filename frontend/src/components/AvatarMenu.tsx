@@ -71,7 +71,7 @@ export function AvatarMenu({ user }: { user: { name: string } }) {
         <button
           type="button"
           aria-label="My account"
-          className="relative grid size-9 shrink-0 cursor-pointer place-items-center rounded-full bg-sunk text-base font-semibold text-ink outline-none transition-colors duration-(--d-1) after:absolute after:-inset-[4px] after:content-[''] hover:bg-line lg:size-8 lg:text-sm lg:after:hidden"
+          className="relative grid size-9 shrink-0 cursor-pointer place-items-center rounded-full bg-sunk text-base font-semibold text-ink transition-colors duration-(--d-1) after:absolute after:-inset-[4px] after:content-[''] hover:bg-line lg:size-8 lg:text-sm lg:after:hidden"
         >
           <span aria-hidden="true">{user.name[0]}</span>
         </button>

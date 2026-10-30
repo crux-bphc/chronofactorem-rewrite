@@ -3,6 +3,7 @@ import { Drawer } from "vaul"
 import { ChevronLeft, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { buttonVariants } from "@/components/ui/button"
 
 const Sheet = ({
   shouldScaleBackground = false,
@@ -68,7 +69,7 @@ const SheetHeader = ({
           type="button"
           aria-label="Back"
           onClick={onBack}
-          className="-ml-1 inline-flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-ink-muted transition-colors duration-(--d-1) hover:text-ink"
+          className={cn(buttonVariants({ variant: "quiet", size: "icon" }), "-ml-1")}
         >
           <ChevronLeft className="size-5" />
         </button>
@@ -79,7 +80,7 @@ const SheetHeader = ({
     </div>
     <Drawer.Close
       aria-label="Close"
-      className="inline-flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-ink-muted transition-colors duration-(--d-1) hover:text-ink"
+      className={buttonVariants({ variant: "quiet", size: "icon" })}
     >
       <X className="size-5" />
     </Drawer.Close>

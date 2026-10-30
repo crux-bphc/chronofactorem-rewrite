@@ -20,7 +20,7 @@ const badgeVariants = cva(
         secondary:
           "rounded-full border-transparent bg-sunk px-2.5 py-0.5 text-sm font-semibold text-ink",
         destructive:
-          "rounded-full border-transparent bg-danger px-2.5 py-0.5 text-sm font-semibold text-white",
+          "rounded-full border-transparent bg-danger px-2.5 py-0.5 text-sm font-semibold text-danger-ink",
         outline:
           "rounded-full border-line px-2.5 py-0.5 text-sm font-semibold text-ink",
       },

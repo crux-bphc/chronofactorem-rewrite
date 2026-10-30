@@ -105,7 +105,7 @@ function AppBar({ user, showCreate, isCreating, create, showLogin }: BarProps) {
       {user ? (
         <Link
           to="/"
-          className="relative flex h-11 items-center text-[20px] font-bold tracking-tight text-ink outline-none"
+          className="relative flex h-11 items-center text-[20px] font-bold tracking-tight text-ink"
         >
           Chrono
         </Link>
@@ -157,16 +157,13 @@ function DesktopNav({
 }: BarProps) {
   const linkClass = (active: boolean) =>
     cn(
-      "text-base font-medium outline-none transition-colors duration-(--d-1) hover:text-ink",
+      "text-base font-medium transition-colors duration-(--d-1) hover:text-ink",
       active ? "text-ink" : "text-ink-muted",
     );
   return (
     <header className="flex h-[60px] w-full shrink-0 items-center gap-6 border-b border-line bg-bg px-7">
       {user ? (
-        <Link
-          to="/"
-          className="text-[21px] font-bold tracking-tight text-ink outline-none"
-        >
+        <Link to="/" className="text-[21px] font-bold tracking-tight text-ink">
           ChronoFactorem
         </Link>
       ) : (
