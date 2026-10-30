@@ -5,11 +5,7 @@ import { useTimetableState } from "@/context";
 import { useTimetableNav } from "@/lib/useTimetableNav";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
-export const CourseSearchResults = ({
-  debouncedSearchTerm,
-}: {
-  debouncedSearchTerm: string;
-}) => {
+export const CourseSearchResults = ({ query }: { query: string }) => {
   const {
     state: { courses, timetable },
   } = useTimetableState();
@@ -21,13 +17,13 @@ export const CourseSearchResults = ({
       .filter((course) =>
         `${course.code}: ${course.name}`
           .toLowerCase()
-          .includes(debouncedSearchTerm.trim().toLowerCase()),
+          .includes(query.trim().toLowerCase()),
       )
       .map((course) => ({
         ...course,
         clashing: getClashingExamTimes(course, timetable.examTimes),
       }));
-  }, [courses, debouncedSearchTerm, timetable]);
+  }, [courses, query, timetable]);
 
   return (
     <div className="h-[calc(100%-3rem)] overflow-y-scroll">

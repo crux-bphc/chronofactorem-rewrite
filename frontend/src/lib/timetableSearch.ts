@@ -5,11 +5,7 @@ export const timetableSearchSchema = z.object({
     .enum(["courses", "warnings", "announcements"])
     .optional()
     .catch(undefined),
-  // Interim: narrows to "courses" | "exams" once the CDC and search tabs fold away.
-  tab: z
-    .enum(["cdcs", "search", "courses", "exams"])
-    .optional()
-    .catch(undefined),
+  tab: z.enum(["courses", "exams"]).optional().catch(undefined),
   exam: z.enum(["midsem", "compre"]).optional().catch(undefined),
   course: z.string().min(1).optional().catch(undefined),
   type: z.enum(["L", "P", "T"]).optional().catch(undefined),

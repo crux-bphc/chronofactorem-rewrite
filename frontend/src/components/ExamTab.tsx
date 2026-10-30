@@ -1,16 +1,13 @@
 import { useTimetableState } from "@/context";
-import { TabsContent } from "./ui/tabs";
 
-const ExamTab = () => {
+// `all` (export: both lists, no switch) is a pass-through until the restyle.
+const ExamTab = (_props: { all?: boolean }) => {
   const {
     state: { timetable },
   } = useTimetableState();
   if (timetable === undefined) return;
   return (
-    <TabsContent
-      value="exams"
-      className="flex min-h-0 flex-1 data-[state=inactive]:hidden flex-col overflow-y-auto"
-    >
+    <div className="flex flex-col pt-2">
       <span className="text-xl font-bold pl-4 flex mb-2">Midsems</span>
       {timetable.examTimes
         .filter((e) => e.includes("|MIDSEM|"))
@@ -93,7 +90,7 @@ const ExamTab = () => {
             </span>
           </div>
         ))}
-    </TabsContent>
+    </div>
   );
 };
 

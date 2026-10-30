@@ -7,6 +7,7 @@ import type {
   userWithTimetablesType,
 } from "lib";
 import type z from "zod";
+import type { TimetableSearch } from "@/lib/timetableSearch";
 import type { TimetableSectionType } from "@/utils/timetable";
 
 type SpecialCDCType =
@@ -21,9 +22,9 @@ type SpecialCDCType =
       warning: string;
     };
 
-type CDCType = z.infer<typeof courseType> | SpecialCDCType;
+export type CDCType = z.infer<typeof courseType> | SpecialCDCType;
 
-type TabType = "cdcs" | "search" | "courses" | "exams";
+type TabType = NonNullable<TimetableSearch["tab"]>;
 
 export type TimetableUIState = {
   isVertical: boolean;

@@ -87,8 +87,8 @@ export const CDCWarningsTooltip = () => {
 
   const handleMissingCDCClick = (courseId: string) => {
     setOpen(false);
-    if (courseId === "") showTab("cdcs");
-    else openCourse(courseId, undefined, "cdcs");
+    if (courseId === "") showTab("courses");
+    else openCourse(courseId);
   };
 
   if (missingCDCs.length === 0 && cdcNotFoundWarning.length === 0) return null;

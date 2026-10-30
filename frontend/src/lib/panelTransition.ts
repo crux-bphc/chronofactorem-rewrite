@@ -1,9 +1,11 @@
 const reducedMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const nextFrame = () =>
+// Rendering (and so requestAnimationFrame) is paused while a view
+// transition's update runs, so wait on macrotasks for React to commit.
+const settle = () =>
   new Promise<void>((resolve) =>
-    requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+    setTimeout(() => setTimeout(() => resolve(), 0), 0),
   );
 
 /**
@@ -28,13 +30,15 @@ export function runPanelTransition(
   const run = async () => {
     started = true;
     await update();
-    await nextFrame();
+    await settle();
   };
   try {
-    document.startViewTransition({
+    const vt = document.startViewTransition({
       update: run,
       types: [`panel-${direction}`],
     });
+    // A newer transition (a quick second tap) skips this one; that's fine.
+    vt.ready.catch(() => {});
   } catch {
     if (!started) update();
   }
