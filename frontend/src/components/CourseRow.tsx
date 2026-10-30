@@ -4,6 +4,7 @@ import { Fragment } from "react";
 import type z from "zod";
 import { useTimetableState } from "@/context";
 import { panelForward } from "@/lib/panelTransition";
+import { titleCase } from "@/lib/titleCase";
 import { useTimetableNav } from "@/lib/useTimetableNav";
 import { cn } from "@/lib/utils";
 import { ClashingWith, ClashPill, useExamClashPills } from "./ClashPills";
@@ -17,7 +18,9 @@ function CourseText({ course }: { course: Course }) {
   return (
     <span className="flex min-w-0 flex-col">
       <span className="text-[15px] font-semibold text-ink">{course.code}</span>
-      <span className="text-[12.5px] text-ink-muted">{course.name}</span>
+      <span className="text-[12.5px] text-ink-muted">
+        {titleCase(course.name)}
+      </span>
     </span>
   );
 }

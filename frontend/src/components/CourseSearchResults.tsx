@@ -2,6 +2,7 @@ import { getClashingExamTimes } from "lib";
 import { Bird, ChevronRight, HelpCircle } from "lucide-react";
 import { useMemo } from "react";
 import { useTimetableState } from "@/context";
+import { titleCase } from "@/lib/titleCase";
 import { useTimetableNav } from "@/lib/useTimetableNav";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
@@ -45,7 +46,7 @@ export const CourseSearchResults = ({ query }: { query: string }) => {
         >
           <div className="w-full flex justify-between items-center">
             <span className="w-fit text-sm">
-              {course.code}: {course.name}
+              {course.code}: {titleCase(course.name)}
             </span>
             <ChevronRight className="w-6 h-6" />
           </div>

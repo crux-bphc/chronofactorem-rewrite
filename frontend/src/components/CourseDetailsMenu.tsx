@@ -7,6 +7,7 @@ import {
   useAddRemoveTimetableSection,
   useSwapTimetableSections,
 } from "@/data-access/hooks/useTimetableSectionAction";
+import { titleCase } from "@/lib/titleCase";
 import { useTimetableNav } from "@/lib/useTimetableNav";
 import { Button } from "./ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
@@ -60,7 +61,7 @@ const CourseDetailsMenu = () => {
           <ArrowLeft />
         </Button>
         <span className="font-semibold text-md">
-          {course?.code}: {` ${course?.name}`}
+          {course?.code}: {` ${course?.name ? titleCase(course.name) : ""}`}
         </span>
       </div>
       <Tabs

@@ -68,7 +68,7 @@ export function SideMenu({
             placeholder="Search Courses"
             value={draftTerm}
             onChange={(e) => setDraftTerm(e.target.value)}
-            className="pl-10 text-base"
+            className="pl-10 text-base [&::-webkit-search-cancel-button]:appearance-none"
           />
         </div>
       )}
