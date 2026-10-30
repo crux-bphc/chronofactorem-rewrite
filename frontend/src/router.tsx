@@ -3,6 +3,7 @@ import { Router, rootRouteWithContext } from "@tanstack/react-router";
 import { AxiosError } from "axios";
 import authenticatedRoute from "./AuthenticatedRoute";
 import NotFound from "./components/NotFound";
+import { routeTransitionTypes } from "./lib/viewTransitions";
 import aboutRoute from "./pages/About";
 import editTimetableRoute from "./pages/EditTimetable";
 import editUserProfileRoute from "./pages/EditUserProfile";
@@ -58,6 +59,7 @@ export const router = new Router({
     queryClient,
   },
   defaultNotFoundComponent: NotFound,
+  defaultViewTransition: { types: routeTransitionTypes },
 });
 
 // Register things for typesafety

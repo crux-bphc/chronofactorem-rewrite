@@ -139,3 +139,109 @@
     -webkit-font-smoothing: antialiased;
   }
 }
+
+/* Motion system (spec section 9) */
+:root {
+  --d-1: 120ms;
+  --d-2: 200ms;
+  --d-3: 300ms;
+  --e-out: cubic-bezier(0.2, 0, 0, 1);
+  --e-in: cubic-bezier(0.3, 0, 1, 1);
+  /* One small overshoot (~6%) settling within --d-3 */
+  --e-spring: linear(
+    0,
+    0.2 6%,
+    0.55 14%,
+    0.85 22%,
+    1.02 32%,
+    1.06 40%,
+    1.04 48%,
+    1.01 60%,
+    0.995 75%,
+    1
+  );
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@keyframes vt-out-forward {
+  to {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+}
+@keyframes vt-in-forward {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+}
+@keyframes vt-out-back {
+  to {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+}
+@keyframes vt-in-back {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html:active-view-transition-type(forward) {
+    &::view-transition-old(root) {
+      animation: vt-out-forward var(--d-3) var(--e-in) both;
+    }
+    &::view-transition-new(root) {
+      animation: vt-in-forward var(--d-3) var(--e-out) both;
+    }
+  }
+  html:active-view-transition-type(back) {
+    &::view-transition-old(root) {
+      animation: vt-out-back var(--d-3) var(--e-in) both;
+    }
+    &::view-transition-new(root) {
+      animation: vt-in-back var(--d-3) var(--e-out) both;
+    }
+  }
+}
+
+/* Theme change: circular reveal is driven from JS on the new snapshot */
+html.theme-transition::view-transition-old(root),
+html.theme-transition::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html.theme-transition::view-transition-old(root) {
+  z-index: 0;
+}
+html.theme-transition::view-transition-new(root) {
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must win over component styles */
+    animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must win over component styles */
+    animation-iteration-count: 1 !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must win over component styles */
+    transition-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must win over component styles */
+    scroll-behavior: auto !important;
+  }
+  ::view-transition-group(*),
+  ::view-transition-image-pair(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must win over component styles */
+    animation: none !important;
+  }
+}
