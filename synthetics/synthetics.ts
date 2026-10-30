@@ -1,11 +1,11 @@
 import type { Page } from "playwright";
 
-// one synthetic = one screen worth looking at, against the starter-pack seed
-// scenario. `as` is a user key from that scenario, or the email of someone
+// one synthetic = one screen worth looking at. Currently written for the starter-pack
+// seed scenario. `as` is a user key from that scenario, or the email of someone
 // who hasn't signed up yet (omit it to stay logged out), and `{key}` in the
 // url becomes the id of that seeded timetable. `act` runs after the page
-// settles, for screens that need a click or two to reach. announcements start
-// out read so their toast doesn't cover every screen, unless
+// settles, for screens that need interactions to reach. announcements default
+// to read so their toast doesn't cover every screen, unless
 // `unreadAnnouncements` is set
 export type Synthetic = {
   name: string;

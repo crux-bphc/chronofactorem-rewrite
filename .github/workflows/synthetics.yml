@@ -4,21 +4,18 @@ on:
   pull_request:
     types: [ labeled, synchronize ]
 
-# a newer push supersedes any run still shooting the old one
+# new pushes should cancel older ones
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
   screenshots:
-    # same ready gate as ci.yml. the bot pushes to the pr branch, which this
-    # token can't do for forks, so those are skipped
+    # same ready gate as ci.yml
     if: ${{ (github.event.label.name == 'ready' || contains(github.event.pull_request.labels.*.name, 'ready')) && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    # pins the browser, fonts and os, so the same commit always renders the
-    # same pixels
     container: mcr.microsoft.com/playwright:v1.64.1-noble
     services:
       postgres:
@@ -39,7 +36,6 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
-      # pnpm must be installed before setup-node for cache: pnpm to work
       - uses: pnpm/action-setup@v6
         name: Install pnpm
         with:
@@ -60,6 +56,9 @@ jobs:
 
       # commits made with this token don't trigger workflows, so this can't
       # loop
+      # human comment: what the FUCK!
+      # https://github.com/orgs/community/discussions/119597
+      # how is this real holy shit
       - name: Commit changed screenshots
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"

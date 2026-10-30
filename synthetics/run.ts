@@ -1,8 +1,3 @@
-// seeds the starter-pack scenario into a throwaway database, boots chrono
-// against it, then screenshots every synthetic on every device in light and
-// dark mode into screenshots/. needs a postgres reachable through the usual
-// DB_HOST, PGPORT, POSTGRES_USER and POSTGRES_PASSWORD env vars; it recreates
-// and only ever touches its own chrono_synthetics role and database
 import { type ChildProcess, spawn } from "node:child_process";
 import { generateKeyPairSync } from "node:crypto";
 import { rmSync } from "node:fs";
@@ -135,7 +130,7 @@ const shoot = async (
   announcementIds: string[],
 ) => {
   const users = Object.fromEntries(scenario.users.map((u) => [u.key, u]));
-  // software raster in one pass, so edges anti-alias the same every run
+  // pin some args for determinism in rendering
   const browser = await chromium.launch({
     args: [
       "--disable-gpu",
@@ -173,7 +168,7 @@ const shoot = async (
           reducedMotion: "reduce",
         });
         await context.clock.setFixedTime(NOW);
-        // a seeded Math.random, for the screens that pick random copy
+        // seeded Math.random
         await context.addInitScript(() => {
           let seed = 1;
           Math.random = () => {
