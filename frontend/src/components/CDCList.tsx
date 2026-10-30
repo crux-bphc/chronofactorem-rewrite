@@ -93,9 +93,10 @@ export const CDCList = () => {
                                     type="button"
                                     variant="link"
                                     className="h-auto p-0 has-[>svg]:p-0 font-medium text-blue-700 dark:text-blue-400 [&_svg]:size-3"
-                                    onClick={() =>
-                                      openCourse(clashCourse?.id ?? "")
-                                    }
+                                    onClick={() => {
+                                      if (clashCourse)
+                                        openCourse(clashCourse.id);
+                                    }}
                                   >
                                     {`${code}'s ${exam.toLowerCase()}`}
                                     <ExternalLink />
