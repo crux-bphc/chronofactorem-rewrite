@@ -105,26 +105,39 @@ export function WeekGrid({
           gridRow: `${cell.hour + 2} / span ${cell.span}`,
         };
         const key = `${cell.id}-${cell.day}-${cell.hour}`;
+        const leaving = cell.presence === "leaving";
         return mode === "edit" ? (
           <button
             key={key}
             type="button"
-            disabled={pending}
+            disabled={pending || leaving}
+            inert={leaving}
+            data-presence={cell.presence ?? "present"}
             style={placement}
-            onClick={(event) => onOpen?.(cell, event)}
-            onKeyDown={(event) => {
-              if (event.key === "Delete" || event.key === "Backspace") {
-                event.preventDefault();
-                onRemove?.(cell);
-              }
-            }}
+            onClick={leaving ? undefined : (event) => onOpen?.(cell, event)}
+            onKeyDown={
+              leaving
+                ? undefined
+                : (event) => {
+                    if (event.key === "Delete" || event.key === "Backspace") {
+                      event.preventDefault();
+                      onRemove?.(cell);
+                    }
+                  }
+            }
             aria-label={`Edit ${cell.courseId} ${cell.type}${cell.number}, press Delete to remove`}
-            className={`${tileClass} cursor-pointer transition-colors duration-(--d-1) hover:bg-ev-hover focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60`}
+            className={`${tileClass} cursor-pointer hover:bg-ev-hover focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60`}
           >
             <TileBody cell={cell} />
           </button>
         ) : (
-          <div key={key} style={placement} className={tileClass}>
+          <div
+            key={key}
+            style={placement}
+            data-presence={cell.presence ?? "present"}
+            inert={leaving}
+            className={tileClass}
+          >
             <TileBody cell={cell} />
           </div>
         );

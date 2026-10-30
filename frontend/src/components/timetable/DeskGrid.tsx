@@ -154,6 +154,7 @@ export function DeskGrid({
             <div
               key={key}
               style={style}
+              data-presence="present"
               className={
                 "@container relative z-1 min-w-0 overflow-hidden rounded-md bg-ev"
               }
@@ -165,13 +166,16 @@ export function DeskGrid({
           );
         }
         const edit = mode === "edit";
+        const leaving = cell.presence === "leaving";
         return (
           <div
             key={key}
             style={style}
+            data-presence={cell.presence ?? "present"}
+            inert={leaving}
             className={`@container group relative z-1 min-w-0 overflow-hidden rounded-md bg-ev ${
               edit
-                ? "transition-[background-color,box-shadow] duration-(--d-1) hover:bg-ev-hover hover:shadow-[inset_0_0_0_1.5px_var(--ink)]"
+                ? "hover:bg-ev-hover hover:shadow-[inset_0_0_0_1.5px_var(--ink)]"
                 : ""
             }`}
           >
@@ -180,14 +184,23 @@ export function DeskGrid({
                 {edit ? (
                   <button
                     type="button"
-                    disabled={pending}
-                    onClick={(event) => onOpen?.(cell, event)}
-                    onKeyDown={(event) => {
-                      if (event.key === "Delete" || event.key === "Backspace") {
-                        event.preventDefault();
-                        onRemove?.(cell);
-                      }
-                    }}
+                    disabled={pending || leaving}
+                    onClick={
+                      leaving ? undefined : (event) => onOpen?.(cell, event)
+                    }
+                    onKeyDown={
+                      leaving
+                        ? undefined
+                        : (event) => {
+                            if (
+                              event.key === "Delete" ||
+                              event.key === "Backspace"
+                            ) {
+                              event.preventDefault();
+                              onRemove?.(cell);
+                            }
+                          }
+                    }
                     aria-label={`Edit ${cell.courseId} ${cell.type}${cell.number}, press Delete to remove`}
                     className={`flex size-full cursor-pointer flex-col justify-start rounded-md text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring disabled:opacity-60 ${padClass}`}
                   >
@@ -207,9 +220,9 @@ export function DeskGrid({
             {edit && (
               <button
                 type="button"
-                disabled={pending}
+                disabled={pending || leaving}
                 aria-label={`Remove ${cell.code} ${cell.type}${cell.number}`}
-                onClick={() => onRemove?.(cell)}
+                onClick={leaving ? undefined : () => onRemove?.(cell)}
                 className="absolute top-1 right-1 flex size-5 cursor-pointer items-center justify-center rounded-sm bg-ev-hover text-ink-muted opacity-0 transition-opacity duration-(--d-1) group-focus-within:opacity-100 group-hover:opacity-100 hover:text-ink focus-visible:outline-2 focus-visible:outline-ring disabled:cursor-default"
               >
                 <X size={13} />

@@ -420,3 +420,43 @@ html.theme-transition::view-transition-new(root) {
     opacity: 0;
   }
 }
+
+/* Sections animate in and out (spec §9). The surface tags each block with
+   data-presence; the export never gets "entering" or "leaving". */
+[data-presence] {
+  transition:
+    opacity var(--d-2) var(--e-out),
+    transform var(--d-2) var(--e-out),
+    background-color var(--d-1) var(--e-out),
+    box-shadow var(--d-1) var(--e-out);
+}
+[data-presence="entering"] {
+  @starting-style {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+[data-presence="leaving"] {
+  opacity: 0;
+  transform: scale(0.92);
+  transition-timing-function: var(--e-in);
+}
+
+/* Agenda rows collapse through grid-template-rows so the rows below slide */
+.tt-row {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows var(--d-2) var(--e-out);
+}
+.tt-row[data-row-presence="entering"] {
+  @starting-style {
+    grid-template-rows: 0fr;
+  }
+}
+.tt-row[data-row-presence="leaving"] {
+  grid-template-rows: 0fr;
+  transition-timing-function: var(--e-in);
+  & [data-presence] {
+    transform: scale(0.96);
+  }
+}

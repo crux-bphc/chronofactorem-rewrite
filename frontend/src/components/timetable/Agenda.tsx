@@ -98,42 +98,67 @@ export function Agenda({
           }
         >
           {item.kind === "free" ? (
-            <div className="mb-1.5 grid grid-cols-[64px_1fr] gap-3">
-              <div className="col-start-2 pt-1 pb-2.5 pl-0.5 text-sm text-ink-faint">
-                {`Free · ${formatClock(item.from)} – ${formatClock(item.to)}`}
+            <div className="tt-row">
+              <div className="min-h-0 overflow-hidden">
+                <div className="mb-1.5 grid grid-cols-[64px_1fr] gap-3">
+                  <div className="col-start-2 pt-1 pb-2.5 pl-0.5 text-sm text-ink-faint">
+                    {`Free · ${formatClock(item.from)} – ${formatClock(item.to)}`}
+                  </div>
+                </div>
               </div>
             </div>
           ) : (
-            <div className="mb-1.5 grid grid-cols-[64px_1fr] gap-3">
-              <div className="pt-2.5 text-right">
-                <div className="whitespace-nowrap text-sm font-medium">
-                  {formatClock(item.cell.hour)}
-                </div>
-                <div className="whitespace-nowrap text-sm text-ink-faint">
-                  {formatSlotEnd(item.cell.hour, item.cell.span)}
+            <div className="tt-row" data-row-presence={item.cell.presence}>
+              <div className="min-h-0 overflow-hidden">
+                <div className="mb-1.5 grid grid-cols-[64px_1fr] gap-3">
+                  <div className="pt-2.5 text-right">
+                    <div className="whitespace-nowrap text-sm font-medium">
+                      {formatClock(item.cell.hour)}
+                    </div>
+                    <div className="whitespace-nowrap text-sm text-ink-faint">
+                      {formatSlotEnd(item.cell.hour, item.cell.span)}
+                    </div>
+                  </div>
+                  {mode === "edit" ? (
+                    <button
+                      type="button"
+                      disabled={pending || item.cell.presence === "leaving"}
+                      inert={item.cell.presence === "leaving"}
+                      data-presence={item.cell.presence ?? "present"}
+                      onClick={
+                        item.cell.presence === "leaving"
+                          ? undefined
+                          : (event) => onOpen?.(item.cell, event)
+                      }
+                      onKeyDown={
+                        item.cell.presence === "leaving"
+                          ? undefined
+                          : (event) => {
+                              if (
+                                event.key === "Delete" ||
+                                event.key === "Backspace"
+                              ) {
+                                event.preventDefault();
+                                onRemove?.(item.cell);
+                              }
+                            }
+                      }
+                      aria-label={`Edit ${item.cell.courseId} ${item.cell.type}${item.cell.number}, press Delete to remove`}
+                      className={`${blockClass} ${during(item.cell)} cursor-pointer hover:bg-ev-hover focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60`}
+                    >
+                      <BlockBody cell={item.cell} />
+                    </button>
+                  ) : (
+                    <div
+                      data-presence={item.cell.presence ?? "present"}
+                      inert={item.cell.presence === "leaving"}
+                      className={`${blockClass} ${during(item.cell)}`}
+                    >
+                      <BlockBody cell={item.cell} />
+                    </div>
+                  )}
                 </div>
               </div>
-              {mode === "edit" ? (
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={(event) => onOpen?.(item.cell, event)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Delete" || event.key === "Backspace") {
-                      event.preventDefault();
-                      onRemove?.(item.cell);
-                    }
-                  }}
-                  aria-label={`Edit ${item.cell.courseId} ${item.cell.type}${item.cell.number}, press Delete to remove`}
-                  className={`${blockClass} ${during(item.cell)} cursor-pointer transition-colors duration-(--d-1) hover:bg-ev-hover focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60`}
-                >
-                  <BlockBody cell={item.cell} />
-                </button>
-              ) : (
-                <div className={`${blockClass} ${during(item.cell)}`}>
-                  <BlockBody cell={item.cell} />
-                </div>
-              )}
             </div>
           )}
           {now && i === nowIndex && (

@@ -16,6 +16,8 @@ export type TimetableCell = Omit<TimetableSectionType, "roomTime"> & {
   day: number;
   hour: number;
   span: number;
+  /** Set by the surface while a section animates in or out. */
+  presence?: "present" | "entering" | "leaving";
 };
 
 export function buildTimetableGrid(sections: TimetableSectionType[]) {
