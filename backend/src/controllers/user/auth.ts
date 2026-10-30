@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import {
   type degreeList,
+  emailType,
   getBatchFromEmail,
   isAValidDegreeCombination,
   namedDegreeZodList,
@@ -148,80 +149,7 @@ export async function authCallback(req: Request, res: Response) {
           error: "incomplete information returned by OAuth provider",
         });
       }
-      const fingerprint = Math.random().toString(36).substring(2);
-
-      const userData: UnfinishedUserSession = {
-        name: name,
-        email: email,
-        maxAge: maxAge,
-        fingerprintHash: hashFingerprint(fingerprint),
-      };
-
-      const existingUser = await userRepository
-        .createQueryBuilder()
-        .select()
-        .where("email = :email", {
-          email: userData.email,
-        })
-        .getOne();
-
-      if (existingUser) {
-        const finishedUserData: FinishedUserSession = {
-          name: existingUser.name,
-          email: existingUser.email,
-          id: existingUser.id,
-          fingerprintHash: hashFingerprint(fingerprint),
-        };
-
-        // reset session and set ID as well
-        const token = signJWT(finishedUserData, maxAge);
-        clearAuthCookies(res);
-        setAuthCookies(res, token, fingerprint, maxAge);
-        res.redirect(env.FRONTEND_URL);
-      } else {
-        const batch = getBatchFromEmail(userData.email);
-
-        if (batch === "0000") {
-          const name = toTitleCase(userData.name);
-          // hd students and other non-f addresses have no batch or degree
-          // defaults to ask for on getDegrees, so they skip it entirely and
-          // get sentinel values instead
-          const createdUser = await userRepository
-            .createQueryBuilder()
-            .insert()
-            .into(User)
-            .values({
-              batch: 0,
-              name,
-              degrees: [unknownDegree],
-              email: userData.email,
-              timetables: [],
-            })
-            .execute();
-
-          const finishedUserData: FinishedUserSession = {
-            name,
-            email: userData.email,
-            id: createdUser.identifiers[0].id,
-            fingerprintHash: hashFingerprint(fingerprint),
-          };
-
-          const token = signJWT(finishedUserData, maxAge);
-          clearAuthCookies(res);
-          setAuthCookies(res, token, fingerprint, maxAge);
-          return res.redirect(env.FRONTEND_URL);
-        }
-
-        // reset session and set ID as well
-        const token = signJWT(userData, maxAge);
-        clearAuthCookies(res);
-        setAuthCookies(res, token, fingerprint, maxAge);
-
-        const yearOfStudy =
-          timetableJSON.metadata.acadYear - Number.parseInt(batch, 10) + 1;
-
-        res.redirect(`${env.FRONTEND_URL}/getDegrees?year=${yearOfStudy}`);
-      }
+      return startSession(res, name, email, maxAge);
     }
   } catch (_err: any) {
     // If user exists on database, redirect them to frontpage, if not
@@ -230,6 +158,98 @@ export async function authCallback(req: Request, res: Response) {
 
     return res.status(401).redirect(`${env.BACKEND_URL}/auth/login`);
   }
+}
+
+async function startSession(
+  res: Response,
+  name: string,
+  email: string,
+  maxAge: number,
+) {
+  const fingerprint = Math.random().toString(36).substring(2);
+
+  const userData: UnfinishedUserSession = {
+    name: name,
+    email: email,
+    maxAge: maxAge,
+    fingerprintHash: hashFingerprint(fingerprint),
+  };
+
+  const existingUser = await userRepository
+    .createQueryBuilder()
+    .select()
+    .where("email = :email", {
+      email: userData.email,
+    })
+    .getOne();
+
+  if (existingUser) {
+    const finishedUserData: FinishedUserSession = {
+      name: existingUser.name,
+      email: existingUser.email,
+      id: existingUser.id,
+      fingerprintHash: hashFingerprint(fingerprint),
+    };
+
+    // reset session and set ID as well
+    const token = signJWT(finishedUserData, maxAge);
+    clearAuthCookies(res);
+    setAuthCookies(res, token, fingerprint, maxAge);
+    res.redirect(env.FRONTEND_URL);
+  } else {
+    const batch = getBatchFromEmail(userData.email);
+
+    if (batch === "0000") {
+      const name = toTitleCase(userData.name);
+      // hd students and other non-f addresses have no batch or degree
+      // defaults to ask for on getDegrees, so they skip it entirely and
+      // get sentinel values instead
+      const createdUser = await userRepository
+        .createQueryBuilder()
+        .insert()
+        .into(User)
+        .values({
+          batch: 0,
+          name,
+          degrees: [unknownDegree],
+          email: userData.email,
+          timetables: [],
+        })
+        .execute();
+
+      const finishedUserData: FinishedUserSession = {
+        name,
+        email: userData.email,
+        id: createdUser.identifiers[0].id,
+        fingerprintHash: hashFingerprint(fingerprint),
+      };
+
+      const token = signJWT(finishedUserData, maxAge);
+      clearAuthCookies(res);
+      setAuthCookies(res, token, fingerprint, maxAge);
+      return res.redirect(env.FRONTEND_URL);
+    }
+
+    // reset session and set ID as well
+    const token = signJWT(userData, maxAge);
+    clearAuthCookies(res);
+    setAuthCookies(res, token, fingerprint, maxAge);
+
+    const yearOfStudy =
+      timetableJSON.metadata.acadYear - Number.parseInt(batch, 10) + 1;
+
+    res.redirect(`${env.FRONTEND_URL}/getDegrees?year=${yearOfStudy}`);
+  }
+}
+
+export async function loginAs(req: Request, res: Response) {
+  const email = emailType.safeParse(req.query.email);
+  if (!email.success) {
+    return res.status(400).json({ message: "pass a valid ?email=" });
+  }
+  const name =
+    typeof req.query.name === "string" ? req.query.name : "Dev User";
+  return startSession(res, name, email.data, env.SESSION_MAX_AGE_MS);
 }
 
 export async function getDegrees(req: Request, res: Response) {
