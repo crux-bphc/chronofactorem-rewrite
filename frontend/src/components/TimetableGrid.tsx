@@ -1,6 +1,6 @@
 import { useIsMutating } from "@tanstack/react-query";
 import { X } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -11,6 +11,7 @@ import {
   buildTimetableGrid,
   type TimetableCell,
   timetableDayNames,
+  timetableDays,
 } from "@/utils/timetableGrid";
 
 export function TimetableGrid({
@@ -18,6 +19,7 @@ export function TimetableGrid({
   handleUnitClick,
   handleUnitDelete,
   isOnEditPage,
+  isExport = false,
 }: {
   isVertical: boolean;
   handleUnitClick?: (
@@ -26,9 +28,10 @@ export function TimetableGrid({
   ) => void;
   handleUnitDelete?: (cell: TimetableCell) => void;
   isOnEditPage: boolean;
+  isExport?: boolean;
 }) {
   const {
-    state: { timetableDetailsSections, timetable },
+    state: { timetableDetailsSections, screenIsLarge, timetable },
   } = useTimetableState();
   const pending =
     useIsMutating({ mutationKey: ["sections", timetable?.id] }) > 0;
@@ -36,8 +39,22 @@ export function TimetableGrid({
     () => buildTimetableGrid(timetableDetailsSections),
     [timetableDetailsSections],
   );
-  const days = Array.from({ length: dayCount }, (_, i) => i);
-  const vertical = isVertical;
+  const [selectedDay, setSelectedDay] = useState(() =>
+    Math.min(Math.max(new Date().getDay() - 1, 0), 5),
+  );
+  // phones default to one day at a time, tablets to the whole week
+  const [showWeek, setShowWeek] = useState(
+    () => !window.matchMedia("(max-width: 639px)").matches,
+  );
+  // exports always get the full grid, whatever the screen size
+  const large = screenIsLarge || isExport;
+  const dayView = !large && !showWeek;
+  const days = dayView
+    ? [Math.min(selectedDay, dayCount - 1)]
+    : Array.from({ length: dayCount }, (_, i) => i);
+  const vertical = !large || isVertical;
+  // the week on small screens scrolls sideways instead of truncating codes
+  const minColumn = large || dayView ? "0" : "4rem";
   const hours = Array.from({ length: hourCount }, (_, i) => i);
   const timeLabel = (hour: number) =>
     `${((hour + 7) % 12) + 1}${hour + 8 < 12 ? "am" : "pm"}`;
@@ -54,13 +71,50 @@ export function TimetableGrid({
 
   return (
     <section aria-label="Weekly timetable" className="min-w-0 w-full lg:h-full">
+      {!large && (
+        <fieldset
+          className="flex gap-1 mb-2 rounded-xl bg-muted p-1"
+          aria-label="Choose a layout"
+        >
+          {[false, true].map((week) => (
+            <button
+              key={week ? "week" : "day"}
+              type="button"
+              aria-pressed={showWeek === week}
+              onClick={() => setShowWeek(week)}
+              className="flex-1 rounded-lg py-2 text-sm font-medium text-muted-foreground aria-pressed:bg-background aria-pressed:text-foreground aria-pressed:shadow-sm focus-visible:outline-2 focus-visible:outline-ring cursor-pointer"
+            >
+              {week ? "Week" : "Day"}
+            </button>
+          ))}
+        </fieldset>
+      )}
+      {dayView && (
+        <fieldset
+          className="flex gap-1 mb-4 rounded-xl bg-muted p-1"
+          aria-label="Choose a day"
+        >
+          {timetableDays.slice(0, dayCount).map((day, i) => (
+            <button
+              key={day}
+              type="button"
+              aria-pressed={days[0] === i}
+              aria-label={timetableDayNames[i]}
+              onClick={() => setSelectedDay(i)}
+              className="flex-1 rounded-lg py-2 text-sm font-medium text-muted-foreground aria-pressed:bg-background aria-pressed:text-foreground aria-pressed:shadow-sm focus-visible:outline-2 focus-visible:outline-ring cursor-pointer"
+            >
+              {timetableDayNames[i].slice(0, 3)}
+            </button>
+          ))}
+        </fieldset>
+      )}
       {/* on large screens the grid fills the page and its auto rows stretch */}
       <div className="overflow-x-auto rounded-xl border bg-card p-2 sm:p-3 lg:flex lg:min-h-full lg:flex-col">
         <div
           className="grid gap-1.5 lg:flex-1"
           style={{
             gridTemplateColumns: vertical
-              ? `3rem repeat(${days.length}, minmax(0, 1fr))`
+              ? `3rem repeat(${days.length}, minmax(${minColumn}, 1fr))`
               : `3rem repeat(${hourCount}, minmax(4rem, 1fr))`,
             gridTemplateRows: vertical
               ? `2rem repeat(${hourCount}, minmax(4.5rem, auto))`
@@ -77,7 +131,9 @@ export function TimetableGrid({
                   : { gridColumn: 1, gridRow: i + 2 }
               }
             >
-              {timetableDayNames[day].slice(0, 3)}
+              {dayView
+                ? timetableDayNames[day]
+                : timetableDayNames[day].slice(0, 3)}
             </div>
           ))}
           {hours.map((hour) => (
