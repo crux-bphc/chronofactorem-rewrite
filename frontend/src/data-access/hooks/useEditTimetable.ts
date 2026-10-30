@@ -19,12 +19,13 @@ const useEditTimetable = () => {
     mutationFn: (data: EditTimetableParams) => {
       return chronoAPI.post(`/api/timetable/${data.id}/edit`, data.body);
     },
-    onSuccess: (_data, variables) => {
+    onSuccess: async (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
-      // the edited timetable's own cache entry is stale too (e.g. draft flag
-      // flipped by the edit button), otherwise the edit page bounces back
-      // with a spurious "non-draft timetables cannot be edited" error
-      queryClient.invalidateQueries({ queryKey: ["timetable", variables.id] });
+      // Make sure we actually refetch data here!
+      await queryClient.invalidateQueries(
+        { queryKey: ["timetable", variables.id], refetchType: "all" },
+        { throwOnError: true },
+      );
     },
     onError: (e) => toastHandler(e, toast),
   });
