@@ -1,11 +1,13 @@
 import { useIsMutating } from "@tanstack/react-query";
 import { X } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTimetableState } from "@/context";
 import {
   buildTimetableGrid,
+  courseColor,
   type TimetableCell,
   timetableDayNames,
+  timetableDays,
 } from "@/utils/timetableGrid";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
@@ -14,14 +16,16 @@ export function TimetableGrid({
   handleUnitClick,
   handleUnitDelete,
   isOnEditPage,
+  isExport = false,
 }: {
   isVertical: boolean;
   handleUnitClick?: (cell: TimetableCell, event: React.MouseEvent) => void;
   handleUnitDelete?: (cell: TimetableCell) => void;
   isOnEditPage: boolean;
+  isExport?: boolean;
 }) {
   const {
-    state: { timetableDetailsSections, timetable },
+    state: { timetableDetailsSections, screenIsLarge, timetable },
   } = useTimetableState();
   const pending =
     useIsMutating({ mutationKey: ["sections", timetable?.id] }) > 0;
@@ -29,8 +33,14 @@ export function TimetableGrid({
     () => buildTimetableGrid(timetableDetailsSections),
     [timetableDetailsSections],
   );
-  const days = Array.from({ length: dayCount }, (_, i) => i);
-  const vertical = isVertical;
+  const [selectedDay, setSelectedDay] = useState(() =>
+    Math.min(Math.max(new Date().getDay() - 1, 0), 5),
+  );
+  const mobile = !screenIsLarge && !isExport;
+  const days = mobile
+    ? [Math.min(selectedDay, dayCount - 1)]
+    : Array.from({ length: dayCount }, (_, i) => i);
+  const vertical = mobile || isVertical;
   const hours = Array.from({ length: hourCount }, (_, i) => i);
   const timeLabel = (hour: number) =>
     `${((hour + 7) % 12) + 1}${hour + 8 < 12 ? "am" : "pm"}`;
@@ -47,6 +57,25 @@ export function TimetableGrid({
 
   return (
     <section aria-label="Weekly timetable" className="min-w-0 w-full">
+      {mobile && (
+        <fieldset
+          className="flex gap-1 mb-4 rounded-xl bg-muted p-1"
+          aria-label="Choose a day"
+        >
+          {timetableDays.slice(0, dayCount).map((day, i) => (
+            <button
+              key={day}
+              type="button"
+              aria-pressed={days[0] === i}
+              aria-label={timetableDayNames[i]}
+              onClick={() => setSelectedDay(i)}
+              className="flex-1 rounded-lg py-2 text-sm font-medium text-muted-foreground aria-pressed:bg-background aria-pressed:text-foreground aria-pressed:shadow-sm focus-visible:outline-2 focus-visible:outline-ring cursor-pointer"
+            >
+              {timetableDayNames[i].slice(0, 3)}
+            </button>
+          ))}
+        </fieldset>
+      )}
       <div className="overflow-x-auto rounded-xl border bg-card p-2 sm:p-3">
         <div
           className="grid gap-1.5"
@@ -69,7 +98,9 @@ export function TimetableGrid({
                   : { gridColumn: 1, gridRow: i + 2 }
               }
             >
-              {timetableDayNames[day].slice(0, 3)}
+              {mobile
+                ? timetableDayNames[day]
+                : timetableDayNames[day].slice(0, 3)}
             </div>
           ))}
           {hours.map((hour) => (
@@ -101,7 +132,7 @@ export function TimetableGrid({
               <div
                 key={`${cell.id}:${cell.day}:${cell.hour}`}
                 style={position(cell.day, cell.hour, cell.span)}
-                className="relative min-w-0 rounded-lg border bg-muted/60"
+                className={`relative min-w-0 rounded-lg border ${courseColor(cell.courseId)}`}
               >
                 <Tooltip delayDuration={200}>
                   <TooltipTrigger asChild>
