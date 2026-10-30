@@ -1,0 +1,1810 @@
+{
+  "name": "Starter pack",
+  "description": "Tries to cover most of the state chrono can be in: single, dual and higher degree students, a student with no timetables, draft, private, public, archived, empty and packed timetables, missing section warnings, a pick-one CDC pair with an exam clash, and unread announcements.",
+  "seededAt": "2026-10-12T09:00:00+05:30",
+  "users": [
+    {
+      "key": "alice",
+      "email": "f20250001@hyderabad.bits-pilani.ac.in",
+      "name": "Alice Sharma",
+      "degrees": ["A7"],
+      "timetables": [
+        {
+          "key": "alice-public",
+          "name": "Sem 1 plan",
+          "private": false,
+          "draft": false,
+          "sections": {
+            "MATH F211": ["L1", "T1"],
+            "CS F214": ["L1", "T2"],
+            "CS F222": ["L1", "T1"],
+            "CS F213": ["L1", "P1"],
+            "CS F215": ["L1", "T1", "P2"],
+            "ECON F211": ["L1"]
+          }
+        },
+        {
+          "key": "alice-private",
+          "name": "Backup plan",
+          "private": true,
+          "draft": false,
+          "sections": {
+            "MATH F211": ["L2", "T2"],
+            "CS F222": ["L1", "T2"]
+          }
+        },
+        {
+          "key": "alice-warnings",
+          "name": "Still deciding",
+          "private": true,
+          "draft": true,
+          "sections": {
+            "CS F215": ["L1"],
+            "ECON F211": ["L1"]
+          }
+        },
+        {
+          "key": "alice-empty",
+          "private": true,
+          "draft": true,
+          "sections": {}
+        },
+        {
+          "key": "alice-packed",
+          "name": "Packed week",
+          "private": true,
+          "draft": true,
+          "sections": {
+            "MATH F211": ["L1", "T1"],
+            "CS F214": ["L1", "T2"],
+            "CS F222": ["L1", "T1"],
+            "CS F213": ["L1", "P1"],
+            "CS F215": ["L1", "T1", "P2"],
+            "ECON F211": ["L1"],
+            "HSS F235": ["L1"],
+            "SW E101": ["P1"],
+            "MATH F313": ["L1", "T1"]
+          }
+        },
+        {
+          "key": "alice-long-name",
+          "name": "A deliberately long timetable name that keeps going to check how cards and headers wrap on small screens",
+          "private": true,
+          "draft": true,
+          "sections": {
+            "MATH F211": ["L1", "T1"]
+          }
+        },
+        {
+          "key": "alice-archived",
+          "name": "Last semester",
+          "private": true,
+          "draft": false,
+          "archived": true,
+          "sections": {
+            "CS F214": ["L1", "T1"]
+          }
+        }
+      ]
+    },
+    {
+      "key": "bob",
+      "email": "f20240002@hyderabad.bits-pilani.ac.in",
+      "name": "Bob Kumar",
+      "degrees": ["B4", "A7"],
+      "timetables": [
+        {
+          "key": "bob-public",
+          "name": "Dual degree plan",
+          "private": false,
+          "draft": false,
+          "sections": {
+            "MATH F311": ["L1", "T1"],
+            "MATH F312": ["L1", "T1"],
+            "MATH F313": ["L1", "T1"],
+            "CS F214": ["L1", "T1"],
+            "CS F213": ["L1", "P1"],
+            "CS F215": ["L1", "T2", "P1"]
+          }
+        },
+        {
+          "key": "bob-draft",
+          "private": true,
+          "draft": true,
+          "sections": {
+            "MATH F311": ["L1", "T1"],
+            "CS F214": ["L1"]
+          }
+        }
+      ]
+    },
+    {
+      "key": "hd",
+      "email": "h20260003@hyderabad.bits-pilani.ac.in",
+      "name": "Harsh Mehta",
+      "timetables": [
+        {
+          "key": "hd-draft",
+          "name": "HD electives",
+          "private": true,
+          "draft": true,
+          "sections": {
+            "CS F407": ["L1"]
+          }
+        }
+      ]
+    },
+    {
+      "key": "esha",
+      "email": "f20250005@hyderabad.bits-pilani.ac.in",
+      "name": "Esha Rao",
+      "degrees": ["A7"],
+      "timetables": []
+    }
+  ],
+  "announcements": [
+    {
+      "title": "Timetable for Semester 1 is out",
+      "message": "Courses and sections for this semester have been loaded. Build your timetable and share it with friends."
+    },
+    {
+      "title": "Exam schedule updated",
+      "message": "Midsem and compre timings were updated for a few courses. Check the exams tab on your timetables."
+    }
+  ],
+  "courses": {
+    "MATH F211": {
+      "units": 3.0,
+      "course_name": "MATHEMATICS III",
+      "sections": {
+        "L1": {
+          "instructor": ["GUJJI MURALI MOHAN REDDY"],
+          "schedule": [
+            {
+              "room": "F104",
+              "days": ["M", "W", "F"],
+              "hours": [9]
+            }
+          ]
+        },
+        "L2": {
+          "instructor": ["Jaganmohan Jonnalagadda"],
+          "schedule": [
+            {
+              "room": "F105",
+              "days": ["M", "W", "F"],
+              "hours": [9]
+            }
+          ]
+        },
+        "L3": {
+          "instructor": ["Santanu Koley"],
+          "schedule": [
+            {
+              "room": "G208",
+              "days": ["M", "W", "F"],
+              "hours": [9]
+            }
+          ]
+        },
+        "L4": {
+          "instructor": ["Naraparaju Kishore Kumar"],
+          "schedule": [
+            {
+              "room": "F208",
+              "days": ["M", "W", "F"],
+              "hours": [9]
+            }
+          ]
+        },
+        "L5": {
+          "instructor": ["Manish Kumar"],
+          "schedule": [
+            {
+              "room": "F102",
+              "days": ["M", "W", "F"],
+              "hours": [9]
+            }
+          ]
+        },
+        "L6": {
+          "instructor": ["K Bhargav Kumar"],
+          "schedule": [
+            {
+              "room": "F106",
+              "days": ["M", "W", "F"],
+              "hours": [9]
+            }
+          ]
+        },
+        "L7": {
+          "instructor": ["Kanchan Mittal"],
+          "schedule": [
+            {
+              "room": "F103",
+              "days": ["M", "W", "F"],
+              "hours": [9]
+            }
+          ]
+        },
+        "T1": {
+          "instructor": ["Gujji Murali Mohan Reddy"],
+          "schedule": [
+            {
+              "room": "G107",
+              "days": ["T"],
+              "hours": [10]
+            }
+          ]
+        },
+        "T2": {
+          "instructor": ["Jaganmohan Jonnalagadda"],
+          "schedule": [
+            {
+              "room": "G203",
+              "days": ["T"],
+              "hours": [10]
+            }
+          ]
+        },
+        "T3": {
+          "instructor": ["Santanu Koley"],
+          "schedule": [
+            {
+              "room": "G208",
+              "days": ["T"],
+              "hours": [10]
+            }
+          ]
+        },
+        "T4": {
+          "instructor": ["Naraparaju Kishore Kumar"],
+          "schedule": [
+            {
+              "room": "G207",
+              "days": ["T"],
+              "hours": [10]
+            }
+          ]
+        },
+        "T5": {
+          "instructor": ["Manish Kumar"],
+          "schedule": [
+            {
+              "room": "F207",
+              "days": ["T"],
+              "hours": [10]
+            }
+          ]
+        },
+        "T6": {
+          "instructor": ["K Bhargav Kumar"],
+          "schedule": [
+            {
+              "room": "G104",
+              "days": ["T"],
+              "hours": [10]
+            }
+          ]
+        },
+        "T7": {
+          "instructor": ["Kanchan Mittal"],
+          "schedule": [
+            {
+              "room": "F103",
+              "days": ["T"],
+              "hours": [10]
+            }
+          ]
+        },
+        "T8": {
+          "instructor": ["Avinash Nanasaheb Gharde"],
+          "schedule": [
+            {
+              "room": "F208",
+              "days": ["T"],
+              "hours": [10]
+            }
+          ]
+        },
+        "T9": {
+          "instructor": ["Kuldeep Singh"],
+          "schedule": [
+            {
+              "room": "G206",
+              "days": ["T"],
+              "hours": [10]
+            }
+          ]
+        },
+        "T10": {
+          "instructor": ["Debasmita Mohanty"],
+          "schedule": [
+            {
+              "room": "G205",
+              "days": ["T"],
+              "hours": [10]
+            }
+          ]
+        },
+        "T11": {
+          "instructor": ["Kakali Chowdhury"],
+          "schedule": [
+            {
+              "room": "G204",
+              "days": ["T"],
+              "hours": [10]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "05/10 - 9.30 - 11.00AM",
+          "compre": "01/12 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2026-10-05T04:00:00|2026-10-05T05:30:00",
+          "compre": "2026-12-01T04:00:00|2026-12-01T07:00:00"
+        }
+      ]
+    },
+    "CS F214": {
+      "units": 3.0,
+      "course_name": "LOGIC IN COMPUTER SC",
+      "sections": {
+        "L1": {
+          "instructor": ["Tathagata Ray", "TATHAGATA RAY"],
+          "schedule": [
+            {
+              "room": "F102",
+              "days": ["M"],
+              "hours": [10]
+            },
+            {
+              "room": "F102",
+              "days": ["T", "Th"],
+              "hours": [3]
+            }
+          ]
+        },
+        "T1": {
+          "instructor": ["S Shashank", "Tathagata Ray"],
+          "schedule": [
+            {
+              "room": "G102",
+              "days": ["T"],
+              "hours": [9]
+            }
+          ]
+        },
+        "T2": {
+          "instructor": ["S Shashank", "Tathagata Ray"],
+          "schedule": [
+            {
+              "room": "G102",
+              "days": ["Th"],
+              "hours": [9]
+            }
+          ]
+        },
+        "T3": {
+          "instructor": ["Tba Cs", "Sameera Muhamed Salam"],
+          "schedule": [
+            {
+              "room": "G103",
+              "days": ["T"],
+              "hours": [9]
+            }
+          ]
+        },
+        "T4": {
+          "instructor": ["Tba Cs", "Sameera Muhamed Salam"],
+          "schedule": [
+            {
+              "room": "G103",
+              "days": ["Th"],
+              "hours": [9]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "10/10 - 9.30 - 11.00AM",
+          "compre": "15/12 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2026-10-10T04:00:00|2026-10-10T05:30:00",
+          "compre": "2026-12-15T04:00:00|2026-12-15T07:00:00"
+        }
+      ]
+    },
+    "CS F222": {
+      "units": 3.0,
+      "course_name": "DISCR STRUC FOR COMP SCI",
+      "sections": {
+        "L1": {
+          "instructor": ["RAGHUNATH REDDY MADIREDDY"],
+          "schedule": [
+            {
+              "room": "F102",
+              "days": ["M", "W", "F"],
+              "hours": [8]
+            }
+          ]
+        },
+        "T1": {
+          "instructor": ["Raghunath Reddy Madireddy", "Jaldu Krishna Maitreya"],
+          "schedule": [
+            {
+              "room": "G207",
+              "days": ["T"],
+              "hours": [2]
+            }
+          ]
+        },
+        "T2": {
+          "instructor": ["Raghunath Reddy Madireddy", "Jaldu Krishna Maitreya"],
+          "schedule": [
+            {
+              "room": "G207",
+              "days": ["Th"],
+              "hours": [2]
+            }
+          ]
+        },
+        "T3": {
+          "instructor": ["Akella Amruta", "Sreejith K P"],
+          "schedule": [
+            {
+              "room": "G208",
+              "days": ["T"],
+              "hours": [2]
+            }
+          ]
+        },
+        "T4": {
+          "instructor": ["Akella Amruta", "Sreejith K P"],
+          "schedule": [
+            {
+              "room": "G208",
+              "days": ["Th"],
+              "hours": [2]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "09/10 - 2.00 - 3.30PM",
+          "compre": "12/12 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2026-10-09T08:30:00|2026-10-09T10:00:00",
+          "compre": "2026-12-12T04:00:00|2026-12-12T07:00:00"
+        }
+      ]
+    },
+    "CS F213": {
+      "units": 4.0,
+      "course_name": "OBJECT ORIENTED PROG",
+      "sections": {
+        "L1": {
+          "instructor": ["SUBHRAKANTA PANDA"],
+          "schedule": [
+            {
+              "room": "F102",
+              "days": ["M", "W", "F"],
+              "hours": [2]
+            }
+          ]
+        },
+        "P1": {
+          "instructor": ["Subhrakanta Panda", "A Shivram"],
+          "schedule": [
+            {
+              "room": "D313",
+              "days": ["T"],
+              "hours": [6, 7]
+            }
+          ]
+        },
+        "P2": {
+          "instructor": ["Subhrakanta Panda", "A Shivram"],
+          "schedule": [
+            {
+              "room": "D313",
+              "days": ["M"],
+              "hours": [6, 7]
+            }
+          ]
+        },
+        "P3": {
+          "instructor": ["Abhishek Toluva", "Sreejith K P"],
+          "schedule": [
+            {
+              "room": "D313",
+              "days": ["Th"],
+              "hours": [6, 7]
+            }
+          ]
+        },
+        "P4": {
+          "instructor": ["Jayati Deshmukh", "Abhishek Toluva"],
+          "schedule": [
+            {
+              "room": "D313",
+              "days": ["M"],
+              "hours": [3, 4]
+            }
+          ]
+        },
+        "P5": {
+          "instructor": ["Dipika Jha", "Abhijit Das"],
+          "schedule": [
+            {
+              "room": "D313",
+              "days": ["F"],
+              "hours": [6, 7]
+            }
+          ]
+        },
+        "P6": {
+          "instructor": ["Dipika Jha", "Abhijit Das"],
+          "schedule": [
+            {
+              "room": "D313",
+              "days": ["W"],
+              "hours": [3, 4]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "07/10 - 9.30 - 11.00AM",
+          "compre": "07/12 AN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2026-10-07T04:00:00|2026-10-07T05:30:00",
+          "compre": "2026-12-07T08:30:00|2026-12-07T11:30:00"
+        }
+      ]
+    },
+    "CS F215": {
+      "units": 4.0,
+      "course_name": "DIGITAL DESIGN",
+      "sections": {
+        "L1": {
+          "instructor": ["Subhendu Kumar Sahoo", "SUBHENDU KUMAR SAHOO"],
+          "schedule": [
+            {
+              "room": "F104",
+              "days": ["T", "Th"],
+              "hours": [4]
+            },
+            {
+              "room": "F104",
+              "days": ["F"],
+              "hours": [10]
+            }
+          ]
+        },
+        "L2": {
+          "instructor": ["Anakhi Hazarika"],
+          "schedule": [
+            {
+              "room": "F105",
+              "days": ["T", "Th"],
+              "hours": [4]
+            },
+            {
+              "room": "F105",
+              "days": ["F"],
+              "hours": [10]
+            }
+          ]
+        },
+        "L3": {
+          "instructor": ["Subhradeep Pal"],
+          "schedule": [
+            {
+              "room": "F103",
+              "days": ["T", "Th"],
+              "hours": [4]
+            },
+            {
+              "room": "F103",
+              "days": ["F"],
+              "hours": [10]
+            }
+          ]
+        },
+        "T1": {
+          "instructor": ["Subhendu Kumar Sahoo"],
+          "schedule": [
+            {
+              "room": "G204",
+              "days": ["T"],
+              "hours": [9]
+            }
+          ]
+        },
+        "T2": {
+          "instructor": ["Anakhi Hazarika"],
+          "schedule": [
+            {
+              "room": "G204",
+              "days": ["Th"],
+              "hours": [9]
+            }
+          ]
+        },
+        "T3": {
+          "instructor": ["Anakhi Hazarika"],
+          "schedule": [
+            {
+              "room": "G205",
+              "days": ["T"],
+              "hours": [9]
+            }
+          ]
+        },
+        "T4": {
+          "instructor": ["Subhradeep Pal"],
+          "schedule": [
+            {
+              "room": "G205",
+              "days": ["Th"],
+              "hours": [9]
+            }
+          ]
+        },
+        "T5": {
+          "instructor": ["Subhradeep Pal"],
+          "schedule": [
+            {
+              "room": "G206",
+              "days": ["T"],
+              "hours": [9]
+            }
+          ]
+        },
+        "T6": {
+          "instructor": ["Chetan Kumar Vudadha"],
+          "schedule": [
+            {
+              "room": "G201",
+              "days": ["Th"],
+              "hours": [2]
+            }
+          ]
+        },
+        "T7": {
+          "instructor": ["Soumya J"],
+          "schedule": [
+            {
+              "room": "G207",
+              "days": ["T"],
+              "hours": [9]
+            }
+          ]
+        },
+        "T8": {
+          "instructor": ["Ravikiran Yeleswarapu"],
+          "schedule": [
+            {
+              "room": "G208",
+              "days": ["T"],
+              "hours": [9]
+            }
+          ]
+        },
+        "T9": {
+          "instructor": ["Meera Kumari"],
+          "schedule": [
+            {
+              "room": "G107",
+              "days": ["T"],
+              "hours": [9]
+            }
+          ]
+        },
+        "T10": {
+          "instructor": ["Runa Kumari"],
+          "schedule": [
+            {
+              "room": "G107",
+              "days": ["Th"],
+              "hours": [9]
+            }
+          ]
+        },
+        "T11": {
+          "instructor": ["Ravikiran Yeleswarapu"],
+          "schedule": [
+            {
+              "room": "G106",
+              "days": ["Th"],
+              "hours": [9]
+            }
+          ]
+        },
+        "T12": {
+          "instructor": ["Tba-eee"],
+          "schedule": [
+            {
+              "room": "G106",
+              "days": ["T"],
+              "hours": [9]
+            }
+          ]
+        },
+        "P1": {
+          "instructor": ["Mutyala Bavana Harshitha", "Abbidi Shivani Reddy"],
+          "schedule": [
+            {
+              "room": "I012",
+              "days": ["M"],
+              "hours": [3, 4]
+            }
+          ]
+        },
+        "P2": {
+          "instructor": ["Mutyala Bavana Harshitha", "Sagnik Kundu"],
+          "schedule": [
+            {
+              "room": "I012",
+              "days": ["W"],
+              "hours": [3, 4]
+            }
+          ]
+        },
+        "P3": {
+          "instructor": ["Soppari Nithesh", "Avaneesh Ketan Chitta"],
+          "schedule": [
+            {
+              "room": "I012",
+              "days": ["F"],
+              "hours": [3, 4]
+            }
+          ]
+        },
+        "P4": {
+          "instructor": ["Soppari Nithesh", "Surakanti Jyothi"],
+          "schedule": [
+            {
+              "room": "I012",
+              "days": ["T"],
+              "hours": [6, 7]
+            }
+          ]
+        },
+        "P5": {
+          "instructor": ["Madhavi Gopal", "Surakanti Jyothi"],
+          "schedule": [
+            {
+              "room": "I012",
+              "days": ["M"],
+              "hours": [6, 7]
+            }
+          ]
+        },
+        "P6": {
+          "instructor": ["Yuvraj Maphrio Mao", "Ramavath Kalyan Nayak"],
+          "schedule": [
+            {
+              "room": "I012",
+              "days": ["W"],
+              "hours": [6, 7]
+            }
+          ]
+        },
+        "P7": {
+          "instructor": ["Aalelai Vendhan M", "Dalia Sett"],
+          "schedule": [
+            {
+              "room": "I012",
+              "days": ["Th"],
+              "hours": [6, 7]
+            }
+          ]
+        },
+        "P8": {
+          "instructor": ["Aalelai Vendhan M", "Yuvraj Maphrio Mao"],
+          "schedule": [
+            {
+              "room": "I012",
+              "days": ["F"],
+              "hours": [6, 7]
+            }
+          ]
+        },
+        "P9": {
+          "instructor": ["Omkar Kulkarni", "Ramavath Kalyan Nayak"],
+          "schedule": [
+            {
+              "room": "I013",
+              "days": ["M"],
+              "hours": [3, 4]
+            }
+          ]
+        },
+        "P10": {
+          "instructor": ["Omkar Kulkarni", "Rohini Paul Joseph"],
+          "schedule": [
+            {
+              "room": "I013",
+              "days": ["W"],
+              "hours": [3, 4]
+            }
+          ]
+        },
+        "P11": {
+          "instructor": ["Abburi Divya Vani", "Dalia Sett"],
+          "schedule": [
+            {
+              "room": "I013",
+              "days": ["F"],
+              "hours": [3, 4]
+            }
+          ]
+        },
+        "P12": {
+          "instructor": ["Pritam Paul", "Madhavi Gopal"],
+          "schedule": [
+            {
+              "room": "I013",
+              "days": ["T"],
+              "hours": [6, 7]
+            }
+          ]
+        },
+        "P13": {
+          "instructor": ["Abburi Divya Vani", "Pritam Paul"],
+          "schedule": [
+            {
+              "room": "I013",
+              "days": ["M"],
+              "hours": [6, 7]
+            }
+          ]
+        },
+        "P14": {
+          "instructor": ["Rohini Paul Joseph", "Avaneesh Ketan Chitta"],
+          "schedule": [
+            {
+              "room": "I013",
+              "days": ["Th"],
+              "hours": [6, 7]
+            }
+          ]
+        },
+        "P15": {
+          "instructor": ["Nandhana Chishor", "Sagnik Kundu"],
+          "schedule": [
+            {
+              "room": "I013",
+              "days": ["F"],
+              "hours": [6, 7]
+            }
+          ]
+        },
+        "P16": {
+          "instructor": ["Nandhana Chishor", "Abbidi Shivani Reddy"],
+          "schedule": [
+            {
+              "room": "I013",
+              "days": ["W"],
+              "hours": [6, 7]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "06/10 - 11.30 - 1.00PM",
+          "compre": "03/12 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2026-10-06T06:00:00|2026-10-06T07:30:00",
+          "compre": "2026-12-03T04:00:00|2026-12-03T07:00:00"
+        }
+      ]
+    },
+    "ECON F211": {
+      "units": 3.0,
+      "course_name": "PRINCIPLES OF ECONOMICS",
+      "sections": {
+        "L1": {
+          "instructor": [
+            "BHEEMESHWAR REDDY A",
+            "Thota Nagaraju",
+            "Bheemeshwar Reddy A"
+          ],
+          "schedule": [
+            {
+              "room": "F108",
+              "days": ["T", "Th"],
+              "hours": [8]
+            },
+            {
+              "room": "F108",
+              "days": ["W"],
+              "hours": [10]
+            }
+          ]
+        },
+        "L2": {
+          "instructor": ["Thota Nagaraju", "Bheemeshwar Reddy A"],
+          "schedule": [
+            {
+              "room": "F103",
+              "days": ["T", "Th"],
+              "hours": [1]
+            },
+            {
+              "room": "F103",
+              "days": ["F"],
+              "hours": [5]
+            }
+          ]
+        },
+        "L3": {
+          "instructor": ["Mini Thomas P", "Rishi Kumar"],
+          "schedule": [
+            {
+              "room": "F104",
+              "days": ["T", "Th"],
+              "hours": [8]
+            },
+            {
+              "room": "F104",
+              "days": ["W"],
+              "hours": [10]
+            }
+          ]
+        },
+        "L4": {
+          "instructor": ["Mini Thomas P", "Rishi Kumar"],
+          "schedule": [
+            {
+              "room": "F208",
+              "days": ["M", "W", "F"],
+              "hours": [4]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "08/10 - 9.30 - 11.00AM",
+          "compre": "09/12 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2026-10-08T04:00:00|2026-10-08T05:30:00",
+          "compre": "2026-12-09T04:00:00|2026-12-09T07:00:00"
+        }
+      ]
+    },
+    "MGTS F211": {
+      "units": 3.0,
+      "course_name": "PRINCIPLES OF MANAGEMENT",
+      "sections": {
+        "L1": {
+          "instructor": ["Swati Alok", "SWATI ALOK"],
+          "schedule": [
+            {
+              "room": "F106",
+              "days": ["T", "Th"],
+              "hours": [8]
+            },
+            {
+              "room": "F106",
+              "days": ["W"],
+              "hours": [10]
+            }
+          ]
+        },
+        "T1": {
+          "instructor": ["Mou Jana"],
+          "schedule": [
+            {
+              "room": "F106",
+              "days": ["Th"],
+              "hours": [10]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "08/10 - 9.30 - 11.00AM",
+          "compre": "09/12 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2026-10-08T04:00:00|2026-10-08T05:30:00",
+          "compre": "2026-12-09T04:00:00|2026-12-09T07:00:00"
+        }
+      ]
+    },
+    "MATH F311": {
+      "units": 3.0,
+      "course_name": "INTRODUCTION TO TOPOLOGY",
+      "sections": {
+        "L1": {
+          "instructor": ["SHARAN GOPAL"],
+          "schedule": [
+            {
+              "room": "G106",
+              "days": ["M", "W", "F"],
+              "hours": [9]
+            }
+          ]
+        },
+        "T1": {
+          "instructor": ["Sharan Gopal"],
+          "schedule": [
+            {
+              "room": "I113",
+              "days": ["T"],
+              "hours": [10]
+            }
+          ]
+        },
+        "T2": {
+          "instructor": ["Guru Charan A"],
+          "schedule": [
+            {
+              "room": "I114",
+              "days": ["T"],
+              "hours": [10]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "05/10 - 11.30 - 1.00PM",
+          "compre": "01/12 AN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2026-10-05T06:00:00|2026-10-05T07:30:00",
+          "compre": "2026-12-01T08:30:00|2026-12-01T11:30:00"
+        }
+      ]
+    },
+    "MATH F312": {
+      "units": 3.0,
+      "course_name": "ORDINARY DIFF EQUATIONS",
+      "sections": {
+        "L1": {
+          "instructor": ["K BHARGAV KUMAR", "K Bhargav Kumar"],
+          "schedule": [
+            {
+              "room": "G108",
+              "days": ["T", "Th"],
+              "hours": [8]
+            },
+            {
+              "room": "G108",
+              "days": ["W"],
+              "hours": [10]
+            }
+          ]
+        },
+        "T1": {
+          "instructor": ["K Bhargav Kumar"],
+          "schedule": [
+            {
+              "room": "G108",
+              "days": ["F"],
+              "hours": [1]
+            }
+          ]
+        },
+        "T2": {
+          "instructor": ["Riya K. Nair"],
+          "schedule": [
+            {
+              "room": "G106",
+              "days": ["F"],
+              "hours": [1]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "08/10 - 2.00 - 3.30PM",
+          "compre": "10/12 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2026-10-08T08:30:00|2026-10-08T10:00:00",
+          "compre": "2026-12-10T04:00:00|2026-12-10T07:00:00"
+        }
+      ]
+    },
+    "MATH F313": {
+      "units": 3.0,
+      "course_name": "NUMERICAL ANALYSIS",
+      "sections": {
+        "L1": {
+          "instructor": ["NARAPARAJU KISHORE KUMAR"],
+          "schedule": [
+            {
+              "room": "G108",
+              "days": ["T", "Th", "F"],
+              "hours": [5]
+            }
+          ]
+        },
+        "T1": {
+          "instructor": ["Naraparaju Kishore Kumar"],
+          "schedule": [
+            {
+              "room": "G108",
+              "days": ["W"],
+              "hours": [1]
+            }
+          ]
+        },
+        "T2": {
+          "instructor": ["Amit Kumar Pal"],
+          "schedule": [
+            {
+              "room": "I114",
+              "days": ["W"],
+              "hours": [1]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "03/10 - 9.30 - 11.00AM",
+          "compre": "05/12 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2026-10-03T04:00:00|2026-10-03T05:30:00",
+          "compre": "2026-12-05T04:00:00|2026-12-05T07:00:00"
+        }
+      ]
+    },
+    "CS F351": {
+      "units": 3.0,
+      "course_name": "THEORY OF COMPUTATION",
+      "sections": {
+        "L1": {
+          "instructor": [
+            "Venkatakrishnan Ramaswamy",
+            "VENKATAKRISHNAN RAMASWAMY"
+          ],
+          "schedule": [
+            {
+              "room": "F102",
+              "days": ["T", "Th"],
+              "hours": [9]
+            },
+            {
+              "room": "F102",
+              "days": ["W"],
+              "hours": [7]
+            }
+          ]
+        },
+        "T1": {
+          "instructor": [
+            "Venkatakrishnan Ramaswamy",
+            "Pranjali Devidas Attarde"
+          ],
+          "schedule": [
+            {
+              "room": "I221",
+              "days": ["M"],
+              "hours": [1]
+            }
+          ]
+        },
+        "T2": {
+          "instructor": [
+            "Venkatakrishnan Ramaswamy",
+            "Pranjali Devidas Attarde"
+          ],
+          "schedule": [
+            {
+              "room": "I222",
+              "days": ["W"],
+              "hours": [1]
+            }
+          ]
+        },
+        "T3": {
+          "instructor": ["Arya Mukherjee", "Apurba Das"],
+          "schedule": [
+            {
+              "room": "I222",
+              "days": ["M"],
+              "hours": [1]
+            }
+          ]
+        },
+        "T4": {
+          "instructor": ["Arya Mukherjee", "Apurba Das"],
+          "schedule": [
+            {
+              "room": "I111",
+              "days": ["W"],
+              "hours": [1]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "09/10 - 4.00 - 5.30PM",
+          "compre": "14/12 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2026-10-09T10:30:00|2026-10-09T12:00:00",
+          "compre": "2026-12-14T04:00:00|2026-12-14T07:00:00"
+        }
+      ]
+    },
+    "CS F372": {
+      "units": 3.0,
+      "course_name": "OPERATING SYSTEMS",
+      "sections": {
+        "L1": {
+          "instructor": ["Chittaranjan Hota", "CHITTARANJAN HOTA"],
+          "schedule": [
+            {
+              "room": "F102",
+              "days": ["M", "W"],
+              "hours": [5]
+            },
+            {
+              "room": "F102",
+              "days": ["Th"],
+              "hours": [10]
+            }
+          ]
+        },
+        "T1": {
+          "instructor": ["Chittaranjan Hota", "Karumanchi Jitendra Sai Kumar"],
+          "schedule": [
+            {
+              "room": "I114",
+              "days": ["F"],
+              "hours": [9]
+            }
+          ]
+        },
+        "T2": {
+          "instructor": ["Chittaranjan Hota", "Karumanchi Jitendra Sai Kumar"],
+          "schedule": [
+            {
+              "room": "J220",
+              "days": ["T"],
+              "hours": [10]
+            }
+          ]
+        },
+        "T3": {
+          "instructor": ["G Geethakumari", "Ashish Kumar Kumawat"],
+          "schedule": [
+            {
+              "room": "J119",
+              "days": ["T"],
+              "hours": [10]
+            }
+          ]
+        },
+        "T4": {
+          "instructor": ["G Geethakumari", "Ashish Kumar Kumawat"],
+          "schedule": [
+            {
+              "room": "J120",
+              "days": ["F"],
+              "hours": [9]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "05/10 - 4.00 - 5.30PM",
+          "compre": "02/12 AN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2026-10-05T10:30:00|2026-10-05T12:00:00",
+          "compre": "2026-12-02T08:30:00|2026-12-02T11:30:00"
+        }
+      ]
+    },
+    "CS F301": {
+      "units": 2.0,
+      "course_name": "PRINCIPLES OF PROGG LANG",
+      "sections": {
+        "L1": {
+          "instructor": ["ARUNA MALAPATI"],
+          "schedule": [
+            {
+              "room": "F102",
+              "days": ["M", "W"],
+              "hours": [4]
+            }
+          ]
+        },
+        "T1": {
+          "instructor": ["Aruna Malapati", "Jagriti Sahi"],
+          "schedule": [
+            {
+              "room": "I211",
+              "days": ["T"],
+              "hours": [10]
+            }
+          ]
+        },
+        "T2": {
+          "instructor": ["Aruna Malapati", "Jagriti Sahi"],
+          "schedule": [
+            {
+              "room": "I211",
+              "days": ["F"],
+              "hours": [9]
+            }
+          ]
+        },
+        "T3": {
+          "instructor": ["Kumarjit Gupta", "J Jabez Christopher"],
+          "schedule": [
+            {
+              "room": "I212",
+              "days": ["T"],
+              "hours": [10]
+            }
+          ]
+        },
+        "T4": {
+          "instructor": ["Kumarjit Gupta", "J Jabez Christopher"],
+          "schedule": [
+            {
+              "room": "I213",
+              "days": ["F"],
+              "hours": [9]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "06/10 - 4.00 - 5.30PM",
+          "compre": "05/12 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2026-10-06T10:30:00|2026-10-06T12:00:00",
+          "compre": "2026-12-05T04:00:00|2026-12-05T07:00:00"
+        }
+      ]
+    },
+    "CS F342": {
+      "units": 4.0,
+      "course_name": "COMPUTER ARCHITECTURE",
+      "sections": {
+        "L1": {
+          "instructor": ["RAJIB RANJAN MAITI", "Rajib Ranjan Maiti"],
+          "schedule": [
+            {
+              "room": "F102",
+              "days": ["M"],
+              "hours": [7]
+            },
+            {
+              "room": "F102",
+              "days": ["T", "Th"],
+              "hours": [8]
+            }
+          ]
+        },
+        "T1": {
+          "instructor": ["Rajib Ranjan Maiti"],
+          "schedule": [
+            {
+              "room": "J119",
+              "days": ["M"],
+              "hours": [1]
+            }
+          ]
+        },
+        "T2": {
+          "instructor": ["Rajib Ranjan Maiti"],
+          "schedule": [
+            {
+              "room": "J119",
+              "days": ["W"],
+              "hours": [1]
+            }
+          ]
+        },
+        "T3": {
+          "instructor": ["Prabuddha Sinha"],
+          "schedule": [
+            {
+              "room": "J120",
+              "days": ["M"],
+              "hours": [1]
+            }
+          ]
+        },
+        "T4": {
+          "instructor": ["Prabuddha Sinha"],
+          "schedule": [
+            {
+              "room": "J120",
+              "days": ["W"],
+              "hours": [1]
+            }
+          ]
+        },
+        "P1": {
+          "instructor": ["Pranay Sharma ", "Aritra Mukherjee"],
+          "schedule": [
+            {
+              "room": "I015",
+              "days": ["T"],
+              "hours": [6, 7]
+            }
+          ]
+        },
+        "P2": {
+          "instructor": ["Nikumani Choudhury", "Pranay Sharma "],
+          "schedule": [
+            {
+              "room": "I015",
+              "days": ["W"],
+              "hours": [9, 10]
+            }
+          ]
+        },
+        "P3": {
+          "instructor": ["Prabuddha Sinha", "Ameya Rakesh Ramteke"],
+          "schedule": [
+            {
+              "room": "D312",
+              "days": ["Th"],
+              "hours": [2, 3]
+            }
+          ]
+        },
+        "P4": {
+          "instructor": ["Prabuddha Sinha", "Ameya Rakesh Ramteke"],
+          "schedule": [
+            {
+              "room": "D312",
+              "days": ["M"],
+              "hours": [9, 10]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "08/10 - 11.30 - 1.00PM",
+          "compre": "09/12 AN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2026-10-08T06:00:00|2026-10-08T07:30:00",
+          "compre": "2026-12-09T08:30:00|2026-12-09T11:30:00"
+        }
+      ]
+    },
+    "HSS F222": {
+      "units": 3.0,
+      "course_name": "LINGUISTICS",
+      "sections": {
+        "L1": {
+          "instructor": ["PRANESH BHARGAVA"],
+          "schedule": [
+            {
+              "room": "J217",
+              "days": ["M", "W", "F"],
+              "hours": [3]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "07/10 - 4.00 - 5.30PM",
+          "compre": "08/12 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2026-10-07T10:30:00|2026-10-07T12:00:00",
+          "compre": "2026-12-08T04:00:00|2026-12-08T07:00:00"
+        }
+      ]
+    },
+    "HSS F235": {
+      "units": 3.0,
+      "course_name": "INTRODUCTORY PHILOSOPHY",
+      "sections": {
+        "L1": {
+          "instructor": ["JAYESH A K"],
+          "schedule": [
+            {
+              "room": "J218",
+              "days": ["M", "W", "F"],
+              "hours": [7]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "08/10 - 4.00 - 5.30PM",
+          "compre": "10/12 AN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2026-10-08T10:30:00|2026-10-08T12:00:00",
+          "compre": "2026-12-10T08:30:00|2026-12-10T11:30:00"
+        }
+      ]
+    },
+    "BITS F232": {
+      "units": 4.0,
+      "course_name": "FOUNDATIONS OF DATA STRUCTURES AND ALGORITHMS",
+      "sections": {
+        "L1": {
+          "instructor": ["ANEESH SRIVALLABH CHIVUKULA"],
+          "schedule": [
+            {
+              "room": "F103",
+              "days": ["M", "W", "F"],
+              "hours": [2]
+            }
+          ]
+        },
+        "P1": {
+          "instructor": ["Aneesh Srivallabh Chivukula", "Kokkiri Hasrith"],
+          "schedule": [
+            {
+              "room": "D313",
+              "days": ["T"],
+              "hours": [2, 3]
+            }
+          ]
+        },
+        "P2": {
+          "instructor": ["Aneesh Srivallabh Chivukula", "Tba Cs"],
+          "schedule": [
+            {
+              "room": "D313",
+              "days": ["Th"],
+              "hours": [2, 3]
+            }
+          ]
+        },
+        "P3": {
+          "instructor": ["Kokkiri Hasrith", "Sameera Muhamed Salam"],
+          "schedule": [
+            {
+              "room": "D312",
+              "days": ["M"],
+              "hours": [6, 7]
+            }
+          ]
+        },
+        "P4": {
+          "instructor": ["Tba Cs", "Sameera Muhamed Salam"],
+          "schedule": [
+            {
+              "room": "D312",
+              "days": ["W"],
+              "hours": [6, 7]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "07/10 - 11.30 - 1.00PM",
+          "compre": "07/12 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2026-10-07T06:00:00|2026-10-07T07:30:00",
+          "compre": "2026-12-07T04:00:00|2026-12-07T07:00:00"
+        }
+      ]
+    },
+    "BITS F234": {
+      "units": 4.0,
+      "course_name": "INTRODUCTION TO ENGINEERING DESIGN",
+      "sections": {
+        "L1": {
+          "instructor": ["ARNAB GUHA"],
+          "schedule": [
+            {
+              "room": "F101",
+              "days": ["M"],
+              "hours": [4]
+            }
+          ]
+        },
+        "P1": {
+          "instructor": ["Kurra Suresh", "Arnab Guha"],
+          "schedule": [
+            {
+              "room": "D208 B",
+              "days": ["W"],
+              "hours": [4, 5]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "compre": "30/11 FN",
+          "midsem": null
+        }
+      ],
+      "exams_iso": [
+        {
+          "compre": "2026-11-30T04:00:00|2026-11-30T07:00:00",
+          "midsem": null
+        }
+      ]
+    },
+    "CS F407": {
+      "units": 3.0,
+      "course_name": "ARTIFICIAL INTELLIGENCE",
+      "sections": {
+        "L1": {
+          "instructor": ["G Shukesh Reddy", "JAYATI DESHMUKH"],
+          "schedule": [
+            {
+              "room": "F103",
+              "days": ["M", "W", "F"],
+              "hours": [8]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "09/10 - 9.30 - 11.00AM",
+          "compre": "11/12 AN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2026-10-09T04:00:00|2026-10-09T05:30:00",
+          "compre": "2026-12-11T08:30:00|2026-12-11T11:30:00"
+        }
+      ]
+    },
+    "CS F429": {
+      "units": 3.0,
+      "course_name": "NATURAL LANGUAGE PROCESSING",
+      "sections": {
+        "L1": {
+          "instructor": ["R Vinay Srivatsan", "PRAJNA DEVI UPADHYAY"],
+          "schedule": [
+            {
+              "room": "I112",
+              "days": ["M", "W", "F"],
+              "hours": [2]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "07/10 - 11.30 - 1.00PM",
+          "compre": "07/12 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2026-10-07T06:00:00|2026-10-07T07:30:00",
+          "compre": "2026-12-07T04:00:00|2026-12-07T07:00:00"
+        }
+      ]
+    },
+    "MEL G643": {
+      "units": 5.0,
+      "course_name": "Verification, Test & Testability of VLSI Circuits",
+      "sections": {
+        "L1": {
+          "instructor": ["Tba-eee"],
+          "schedule": [
+            {
+              "room": "I213",
+              "days": ["M", "W", "F"],
+              "hours": [4]
+            }
+          ]
+        },
+        "P1": {
+          "instructor": ["K Gopikrishna"],
+          "schedule": [
+            {
+              "room": "I124",
+              "days": ["T", "Th"],
+              "hours": [4, 5]
+            }
+          ]
+        }
+      },
+      "exams": [
+        {
+          "midsem": "07/10 - 4.00 - 5.30PM",
+          "compre": "08/12 FN"
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": "2026-10-07T10:30:00|2026-10-07T12:00:00",
+          "compre": "2026-12-08T04:00:00|2026-12-08T07:00:00"
+        }
+      ]
+    },
+    "SW E101": {
+      "units": 1.0,
+      "course_name": "SOCIAL CONDUCT",
+      "sections": {
+        "P1": {
+          "instructor": ["MADHAVI JHA"],
+          "schedule": []
+        }
+      },
+      "exams": [
+        {
+          "midsem": null,
+          "compre": null
+        }
+      ],
+      "exams_iso": [
+        {
+          "midsem": null,
+          "compre": null
+        }
+      ]
+    }
+  }
+}

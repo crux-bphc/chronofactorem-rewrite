@@ -59,11 +59,12 @@ pnpm biome check --apply .
 
 This project's docker build system relies on something Docker Compose calls "profiles".
 
-This project has 3 profiles as of now:
+This project has 4 profiles as of now:
 
 - `dev`
 - `prod`
 - `ingestion`
+- `seed`
 
 ## Steps to run any given profile:
 
@@ -187,3 +188,16 @@ If something goes wrong, and you need to overwrite the course data for a semeste
 **NOTE:** This same `db` container is used in `dev` and `prod`
 
 **NOTE:** This same `ingestion` container is the container that runs the ingestion script.
+
+### Seed
+
+To fill an empty dev database with test data, run `docker compose --profile seed run --rm seed SCENARIO`, where SCENARIO is the name of a file in `backend/src/seed/scenarios/` (running it without one will list all of them). A scenario describes users, their timetables, announcements, and optionally its own course catalogue, so you can log in as any of its users (with `LOGIN_AS="true"` in `.env`, visit `/api/auth/as?email=EMAIL`) and use pre-defined testing data.
+
+Seeding only works when `NODE_ENV` is `development`, and only into a database with no users or courses yet. To start over, delete the database (`backend/data`) first.
+
+To add a scenario, copy an existing one and give it a `name` and `description`. Timetables are built through the real timetable routes, so a section that clashes or a timetable that can't be published fails the seed with the backend's own error.
+
+#### Containers in the `seed` profile
+
+- db
+- seed
