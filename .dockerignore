@@ -1,0 +1,11 @@
+.git
+.env
+.env.*
+!.env.example
+.ditto
+**/node_modules
+backend/data
+**/logs
+**/build
+**/dist
+**/*.tsbuildinfo

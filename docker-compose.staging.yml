@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:15.18-bookworm
+    env_file: .env
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+  backend:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+      target: backend
+    env_file: .env
+    depends_on:
+      db: {condition: service_healthy}
+    restart: unless-stopped
+  web:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+      target: web
+    depends_on: [backend]
+    restart: unless-stopped
+volumes:
+  dbdata:

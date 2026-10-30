@@ -1,0 +1,12 @@
+version: 1
+compose: docker-compose.staging.yml
+secrets: true
+hooks:
+  setup: sh deploy/setup-ditto.sh
+expose:
+  - name: web
+    service: web
+    port: 80
+    healthcheck:
+      path: /healthz
+      timeout: 120s
