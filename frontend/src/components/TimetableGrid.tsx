@@ -53,8 +53,9 @@ export function TimetableGrid({
     ? [Math.min(selectedDay, dayCount - 1)]
     : Array.from({ length: dayCount }, (_, i) => i);
   const vertical = !large || isVertical;
-  // the week on small screens scrolls sideways instead of truncating codes
-  const minColumn = large || dayView ? "0" : "4rem";
+  // the week on small screens scrolls sideways instead of truncating codes.
+  // nothing else may scroll: an export would draw the scrollbars into the image
+  const scrollsSideways = !large && !dayView;
   const hours = Array.from({ length: hourCount }, (_, i) => i);
   const timeLabel = (hour: number) =>
     `${((hour + 7) % 12) + 1}${hour + 8 < 12 ? "am" : "pm"}`;
@@ -109,22 +110,32 @@ export function TimetableGrid({
         </fieldset>
       )}
       {/* on large screens the grid fills the page and its auto rows stretch */}
-      <div className="overflow-x-auto rounded-xl border bg-card p-2 sm:p-3 lg:flex lg:min-h-full lg:flex-col">
+      {/* sizes are in em so text, labels and cells grow together on big
+          screens. exports keep one size whatever screen they're made on */}
+      <div
+        className={`rounded-xl border bg-card p-[0.67em] sm:p-[1em] lg:flex lg:min-h-full lg:flex-col ${
+          scrollsSideways ? "overflow-x-auto" : ""
+        } ${
+          isExport
+            ? "text-xs"
+            : "text-xs min-[1920px]:text-sm min-[2560px]:text-base min-[3200px]:text-lg"
+        }`}
+      >
         <div
-          className="grid gap-1.5 lg:flex-1"
+          className="grid gap-[0.5em] lg:flex-1"
           style={{
             gridTemplateColumns: vertical
-              ? `3rem repeat(${days.length}, minmax(${minColumn}, 1fr))`
-              : `3rem repeat(${hourCount}, minmax(4rem, 1fr))`,
+              ? `4em repeat(${days.length}, minmax(${scrollsSideways ? "5.33em" : "0"}, 1fr))`
+              : `4em repeat(${hourCount}, minmax(5.33em, 1fr))`,
             gridTemplateRows: vertical
-              ? `2rem repeat(${hourCount}, minmax(4.5rem, auto))`
-              : `2rem repeat(${days.length}, minmax(6rem, auto))`,
+              ? `2.67em repeat(${hourCount}, minmax(6em, auto))`
+              : `2.67em repeat(${days.length}, minmax(8em, auto))`,
           }}
         >
           {days.map((day, i) => (
             <div
               key={day}
-              className="flex items-center justify-center text-xs font-semibold text-muted-foreground"
+              className="flex items-center justify-center font-semibold text-muted-foreground"
               style={
                 vertical
                   ? { gridColumn: i + 2, gridRow: 1 }
@@ -139,7 +150,7 @@ export function TimetableGrid({
           {hours.map((hour) => (
             <div
               key={hour}
-              className="flex items-center justify-center text-xs tabular-nums text-muted-foreground"
+              className="flex items-center justify-center tabular-nums text-muted-foreground"
               style={
                 vertical
                   ? { gridColumn: 1, gridRow: hour + 2 }
@@ -184,9 +195,11 @@ export function TimetableGrid({
                           }
                         }}
                         aria-label={`Edit ${cell.courseId} ${cell.type}${cell.number}, press Delete to remove`}
-                        className="flex h-full w-full cursor-pointer flex-col justify-center gap-1 rounded-lg p-2 text-left text-xs transition-colors hover:bg-foreground/5 focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60"
+                        className="flex h-full w-full cursor-pointer flex-col justify-center gap-[0.33em] rounded-lg p-[0.67em] text-left transition-colors hover:bg-foreground/5 focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60"
                       >
-                        <span className="font-semibold break-words">
+                        <span className="font-semibold">
+                          {/* in narrow cells whole words drop below the remove button */}
+                          <span className="float-right hidden sm:block h-[1em] w-[1.5em]" />
                           {cell.courseId}
                         </span>
                         <span>
@@ -198,7 +211,7 @@ export function TimetableGrid({
                         </span>
                       </button>
                     ) : (
-                      <div className="flex h-full flex-col justify-center gap-1 rounded-lg p-2 text-xs focus-visible:outline-2 focus-visible:outline-ring">
+                      <div className="flex h-full flex-col justify-center gap-[0.33em] rounded-lg p-[0.67em] focus-visible:outline-2 focus-visible:outline-ring">
                         <span className="font-semibold break-words">
                           {cell.courseId}
                         </span>
@@ -214,11 +227,6 @@ export function TimetableGrid({
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>{cell.name}</p>
-                    <p>{cell.instructors.join(", ")}</p>
-                    <p>
-                      {timeLabel(cell.hour)} to{" "}
-                      {timeLabel(cell.hour + cell.span)}
-                    </p>
                     {isOnEditPage && (
                       <p className="text-muted-foreground">
                         (Double tap to remove)
@@ -232,9 +240,9 @@ export function TimetableGrid({
                     disabled={pending}
                     aria-label={`Remove ${cell.courseId} ${cell.type}${cell.number}`}
                     onClick={() => handleUnitDelete?.(cell)}
-                    className="absolute right-0 bottom-0 hidden sm:flex size-8 cursor-pointer items-center justify-center rounded-lg opacity-70 hover:bg-background/50 hover:opacity-100 focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-30"
+                    className="absolute top-0 right-0 hidden sm:flex size-[2.67em] cursor-pointer items-center justify-center rounded-lg opacity-70 hover:bg-background/50 hover:opacity-100 focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-30"
                   >
-                    <X className="size-3.5" />
+                    <X className="size-[1.17em]" />
                   </button>
                 )}
               </div>
