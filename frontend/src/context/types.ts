@@ -27,6 +27,7 @@ type TabType = "CDCs" | "search" | "currentCourses" | "exams";
 
 export type TimetableStateType = {
   isVertical: boolean;
+  sidebarOpen: boolean;
   isCopyingTimetable: boolean;
   user: z.infer<typeof userWithTimetablesType> | undefined;
   courses: z.infer<typeof courseType>[] | undefined;
@@ -44,6 +45,7 @@ export type TimetableStateType = {
 };
 
 export enum TimetableActionType {
+  SetSidebarOpen = 10,
   ToggleVertical = 0,
   SetIsCopyingTimetable = 1,
   SetSelectedCourseAndSection = 2,
@@ -57,6 +59,7 @@ export enum TimetableActionType {
 }
 
 export type Action =
+  | { type: TimetableActionType.SetSidebarOpen; open: boolean }
   | {
       type: TimetableActionType.ToggleVertical;
     }

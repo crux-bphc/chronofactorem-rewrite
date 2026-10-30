@@ -15,6 +15,8 @@ const reducer: Reducer<TimetableStateType, Action> = (
   action: Action,
 ) => {
   switch (action.type) {
+    case TimetableActionType.SetSidebarOpen:
+      return { ...state, sidebarOpen: action.open };
     case TimetableActionType.ToggleVertical:
       return { ...state, isVertical: !state.isVertical };
     case TimetableActionType.SetIsCopyingTimetable:
@@ -23,6 +25,7 @@ const reducer: Reducer<TimetableStateType, Action> = (
       return {
         ...state,
         currentCourseID: action.courseID,
+        sidebarOpen: action.courseID !== null || state.sidebarOpen,
         currentSectionType: action.sectionType,
       };
     case TimetableActionType.SetSelectedSectionType:
