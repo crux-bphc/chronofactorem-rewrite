@@ -1,3 +1,4 @@
+import { useIsMutating } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { useMemo } from "react";
 import {
@@ -6,7 +7,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useTimetableState } from "@/context";
-import { buildTimetableGrid, type TimetableCell } from "@/utils/timetableGrid";
+import {
+  buildTimetableGrid,
+  type TimetableCell,
+  timetableDayNames,
+} from "@/utils/timetableGrid";
 
 export function TimetableGrid({
   isVertical,
@@ -16,237 +21,177 @@ export function TimetableGrid({
 }: {
   isVertical: boolean;
   handleUnitClick?: (
-    e: {
-      id: string;
-      name: string;
-      courseId: string;
-      room: string;
-      code: string;
-      type: string;
-      number: number;
-      instructors: string[];
-    } | null,
+    cell: TimetableCell,
     event: React.MouseEvent | React.KeyboardEvent,
   ) => void;
-  handleUnitDelete?: (
-    e: {
-      id: string;
-      name: string;
-      courseId: string;
-      room: string;
-      code: string;
-      type: string;
-      number: number;
-      instructors: string[];
-    } | null,
-  ) => void;
+  handleUnitDelete?: (cell: TimetableCell) => void;
   isOnEditPage: boolean;
 }) {
   const {
-    state: { timetableDetailsSections },
+    state: { timetableDetailsSections, timetable },
   } = useTimetableState();
-  const daysOfWeek = ["M", "T", "W", "Th", "F", "S"];
-  const timings = [
-    "8 - 9",
-    "9 - 10",
-    "10 - 11",
-    "11 - 12",
-    "12 - 1",
-    "1 - 2",
-    "2 - 3",
-    "3 - 4",
-    "4 - 5",
-    "5 - 6",
-    "6 - 7",
-    "7 - 8",
-    "8 - 9",
-  ];
-  const { grid, spans, skipped, displayRows, displayCols } = useMemo(() => {
-    const model = buildTimetableGrid(timetableDetailsSections);
-    const grid: (TimetableCell | null)[] = Array(13 * 6).fill(null);
-    const spans = new Map<number, number>();
-    const skipped = new Set<number>();
-    for (const cell of model.cells) {
-      const start = isVertical
-        ? cell.day + cell.hour * 6
-        : cell.hour + cell.day * 13;
-      spans.set(start, cell.span);
-      for (let offset = 0; offset < cell.span; offset++) {
-        const index = start + offset * (isVertical ? 6 : 1);
-        grid[index] = cell;
-        if (offset) skipped.add(index);
-      }
-    }
-    return {
-      grid,
-      spans,
-      skipped,
-      displayRows: model.dayCount,
-      displayCols: model.hourCount,
-    };
-  }, [timetableDetailsSections, isVertical]);
+  const pending =
+    useIsMutating({ mutationKey: ["sections", timetable?.id] }) > 0;
+  const { cells, dayCount, hourCount } = useMemo(
+    () => buildTimetableGrid(timetableDetailsSections),
+    [timetableDetailsSections],
+  );
+  const days = Array.from({ length: dayCount }, (_, i) => i);
+  const vertical = isVertical;
+  const hours = Array.from({ length: hourCount }, (_, i) => i);
+  const timeLabel = (hour: number) =>
+    `${((hour + 7) % 12) + 1}${hour + 8 < 12 ? "am" : "pm"}`;
+  const position = (day: number, hour: number, span = 1) =>
+    vertical
+      ? {
+          gridColumn: days.indexOf(day) + 2,
+          gridRow: `${hour + 2} / span ${span}`,
+        }
+      : {
+          gridRow: days.indexOf(day) + 2,
+          gridColumn: `${hour + 2} / span ${span}`,
+        };
 
   return (
-    <div className="flex w-full lg:h-full h-[150%]">
-      {isVertical ? (
+    <section aria-label="Weekly timetable" className="min-w-0 w-full lg:h-full">
+      {/* on large screens the grid fills the page and its auto rows stretch */}
+      <div className="overflow-x-auto rounded-xl border bg-card p-2 sm:p-3 lg:flex lg:min-h-full lg:flex-col">
         <div
-          style={{ gridTemplateRows: `repeat(${displayCols}, minmax(0, 1fr))` }}
-          className={`pt-16 gap-9 sm:gap-8 sm:mt-4 lg:pt-8 lg:gap-2 sm:h-full grid justify-between  md:text-md text-sm text-center text-foreground/80 font-bold`}
-        >
-          {timings
-            .filter((_, i) => i < displayCols)
-            .map((e) => (
-              <div className="whitespace-nowrap mr-4" key={e}>
-                <span>{e}</span>
-              </div>
-            ))}
-        </div>
-      ) : (
-        <div
-          style={{ gridTemplateRows: `repeat(${displayRows}, minmax(0, 1fr))` }}
-          className={`grid  items-center mr-4 mt-12 md:text-lg text-md text-center font-bold text-foreground/80`}
-        >
-          {daysOfWeek.slice(0, displayRows).map((e) => (
-            <span key={e}>{e}</span>
-          ))}
-        </div>
-      )}
-      <div className="flex flex-col w-full h-full">
-        {isVertical ? (
-          <div
-            style={{
-              gridTemplateColumns: `repeat(${displayRows}, minmax(0, 1fr))`,
-            }}
-            className={`grid  items-center pr-2 md:text-lg text-md text-center font-bold text-foreground/80 `}
-          >
-            {daysOfWeek.slice(0, displayRows).map((e) => (
-              <span key={e}>{e}</span>
-            ))}
-          </div>
-        ) : (
-          <div
-            style={{
-              gridTemplateColumns: `repeat(${displayCols}, minmax(0, 1fr))`,
-            }}
-            className={`grid  justify-between md:text-md text-sm text-center font-bold text-foreground/80`}
-          >
-            {timings
-              .filter((_, i) => i < displayCols)
-              .map((e) => (
-                <div className="mb-4 flex flex-col" key={e}>
-                  <span>{e}</span>
-                </div>
-              ))}
-          </div>
-        )}
-        <div
-          className="grid w-full h-full"
+          className="grid gap-1.5 lg:flex-1"
           style={{
-            gridTemplateColumns: `repeat(${isVertical ? displayRows : displayCols}, minmax(0, 1fr))`,
-            gridTemplateRows: `repeat(${isVertical ? displayCols : displayRows}, minmax(0, 1fr))`,
+            gridTemplateColumns: vertical
+              ? `3rem repeat(${days.length}, minmax(0, 1fr))`
+              : `3rem repeat(${hourCount}, minmax(4rem, 1fr))`,
+            gridTemplateRows: vertical
+              ? `2rem repeat(${hourCount}, minmax(4.5rem, auto))`
+              : `2rem repeat(${days.length}, minmax(6rem, auto))`,
           }}
         >
-          {grid
-            .map((e, i) => ({ e, i }))
-            .filter(
-              ({ i }) =>
-                !skipped.has(i) &&
-                (isVertical
-                  ? i < 6 * displayCols && i % 6 < displayRows
-                  : i % 13 < displayCols && i < 13 * displayRows),
-            )
-            .map(({ e, i }) => {
-              if (e === null) {
-                return (
-                  <div
-                    className={`bg-background border border-muted dark:border-muted/70 ${
-                      isVertical ? "min-h-28 sm:min-h-16" : "min-h-20"
-                    }`}
-                    key={2 * i}
-                  />
-                );
+          {days.map((day, i) => (
+            <div
+              key={day}
+              className="flex items-center justify-center text-xs font-semibold text-muted-foreground"
+              style={
+                vertical
+                  ? { gridColumn: i + 2, gridRow: 1 }
+                  : { gridColumn: 1, gridRow: i + 2 }
               }
-              const span = spans.get(i) ?? 1;
-              return (
-                <Tooltip delayDuration={100} key={`${e.id}-${i}`}>
+            >
+              {timetableDayNames[day].slice(0, 3)}
+            </div>
+          ))}
+          {hours.map((hour) => (
+            <div
+              key={hour}
+              className="flex items-center justify-center text-xs tabular-nums text-muted-foreground"
+              style={
+                vertical
+                  ? { gridColumn: 1, gridRow: hour + 2 }
+                  : { gridColumn: hour + 2, gridRow: 1 }
+              }
+            >
+              {timeLabel(hour)}
+            </div>
+          ))}
+          {days.flatMap((day) =>
+            hours.map((hour) => (
+              <div
+                key={`${day}:${hour}`}
+                aria-hidden="true"
+                style={position(day, hour)}
+                className="rounded-md bg-muted/40"
+              />
+            )),
+          )}
+          {cells
+            .filter((cell) => days.includes(cell.day))
+            .map((cell) => (
+              <div
+                key={`${cell.id}:${cell.day}:${cell.hour}`}
+                style={position(cell.day, cell.hour, cell.span)}
+                className="relative min-w-0 rounded-lg border bg-muted"
+              >
+                <Tooltip delayDuration={200}>
                   <TooltipTrigger asChild>
-                    <div
-                      {...(isOnEditPage && {
-                        role: "button",
-                        tabIndex: 0,
-                        "aria-label": `${e.courseId} ${e.type}${e.number}, press Delete to remove`,
-                        onClick: (event: React.MouseEvent) =>
-                          handleUnitClick?.(e, event),
-                        onKeyDown: (event: React.KeyboardEvent) => {
-                          if (event.key === "Enter" || event.key === " ") {
-                            event.preventDefault();
-                            handleUnitClick?.(e, event);
-                          } else if (
+                    {isOnEditPage ? (
+                      <button
+                        type="button"
+                        disabled={pending}
+                        onClick={(event) => handleUnitClick?.(cell, event)}
+                        onKeyDown={(event) => {
+                          if (
                             event.key === "Delete" ||
                             event.key === "Backspace"
                           ) {
                             event.preventDefault();
-                            handleUnitDelete?.(e);
+                            handleUnitDelete?.(cell);
                           }
-                        },
-                      })}
-                      className={`bg-background border border-muted dark:border-muted/70 transition duration-200 ease-in-out text-foreground/65 p-1.5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring ${
-                        isOnEditPage ? "cursor-pointer" : ""
-                      } ${isVertical ? "min-h-28 sm:min-h-16" : "min-h-20"}`}
-                      style={
-                        span > 1
-                          ? isVertical
-                            ? { gridRow: `span ${span}` }
-                            : { gridColumn: `span ${span}` }
-                          : undefined
-                      }
-                    >
-                      <div className="relative flex h-full text-xs sm:text-sm flex-col justify-end bg-muted-foreground/30 p-1.5 rounded gap-0.5">
-                        <X
-                          size={16}
-                          className={`absolute top-1 right-1 cursor-pointer sm:visible invisible hover:stroke-destructive dark:hover:stroke-red-400 transition duration-100 ease-in-out ${
-                            isOnEditPage ? "" : "hidden"
-                          }`}
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            handleUnitDelete?.(e);
-                          }}
-                        />
-                        <span className="font-bold text-ellipsis overflow-hidden text-wrap tracking-tight">
-                          {e.courseId}
+                        }}
+                        aria-label={`Edit ${cell.courseId} ${cell.type}${cell.number}, press Delete to remove`}
+                        className="flex h-full w-full cursor-pointer flex-col justify-center gap-1 rounded-lg p-2 text-left text-xs transition-colors hover:bg-foreground/5 focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60"
+                      >
+                        <span className="font-semibold break-words">
+                          {cell.courseId}
                         </span>
-                        <div
-                          className={`flex justify-between ${
-                            isVertical ? "flex-col sm:flex-row" : "flex-row"
-                          }`}
-                        >
-                          <span className="font-bold">
-                            {e.type}
-                            {e.number}
-                          </span>
-                          <span className="opacity-90 text-start">
-                            {e.room}
-                          </span>
-                        </div>
+                        <span>
+                          {cell.type}
+                          {cell.number}
+                        </span>
+                        <span className="opacity-75 break-words">
+                          {cell.room}
+                        </span>
+                      </button>
+                    ) : (
+                      <div className="flex h-full flex-col justify-center gap-1 rounded-lg p-2 text-xs focus-visible:outline-2 focus-visible:outline-ring">
+                        <span className="font-semibold break-words">
+                          {cell.courseId}
+                        </span>
+                        <span>
+                          {cell.type}
+                          {cell.number}
+                        </span>
+                        <span className="opacity-75 break-words">
+                          {cell.room}
+                        </span>
                       </div>
-                    </div>
+                    )}
                   </TooltipTrigger>
-                  <TooltipContent className="bg-primary-foreground text-center text-foreground">
-                    {e.name}
+                  <TooltipContent>
+                    <p>{cell.name}</p>
+                    <p>{cell.instructors.join(", ")}</p>
+                    <p>
+                      {timeLabel(cell.hour)} to{" "}
+                      {timeLabel(cell.hour + cell.span)}
+                    </p>
                     {isOnEditPage && (
-                      <>
-                        <br />
-                        <span className="text-muted-foreground">
-                          (Double tap to remove)
-                        </span>
-                      </>
+                      <p className="text-muted-foreground">
+                        (Double tap to remove)
+                      </p>
                     )}
                   </TooltipContent>
                 </Tooltip>
-              );
-            })}
+                {isOnEditPage && (
+                  <button
+                    type="button"
+                    disabled={pending}
+                    aria-label={`Remove ${cell.courseId} ${cell.type}${cell.number}`}
+                    onClick={() => handleUnitDelete?.(cell)}
+                    className="absolute right-0 bottom-0 hidden sm:flex size-8 cursor-pointer items-center justify-center rounded-lg opacity-70 hover:bg-background/50 hover:opacity-100 focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-30"
+                  >
+                    <X className="size-3.5" />
+                  </button>
+                )}
+              </div>
+            ))}
         </div>
       </div>
-    </div>
+      {timetableDetailsSections.length === 0 && (
+        <p className="py-4 text-center text-sm text-muted-foreground">
+          {isOnEditPage
+            ? "Choose a course to start building your week."
+            : "No classes in this timetable."}
+        </p>
+      )}
+    </section>
   );
 }
