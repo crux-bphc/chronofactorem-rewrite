@@ -121,6 +121,7 @@ function ViewTimetable() {
           day={day}
           orientation={isVertical ? "columns" : "rows"}
           mode="view"
+          showNow
         />
       </TimetablePageShell>
       {isScreenshotMode && (

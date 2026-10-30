@@ -1,17 +1,20 @@
 import { Bird } from "lucide-react";
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
 import { formatClock, formatSlotEnd } from "@/utils/timeFormat";
 import {
   buildAgenda,
   type TimetableCell,
   titleCase,
 } from "@/utils/timetableGrid";
+import { NowLine } from "./NowLine";
 
 type AgendaProps = {
   cells: TimetableCell[];
   day: number;
   mode: "edit" | "view" | "export";
   pending?: boolean;
+  /** Today's grid hour and the formatted time; set only when it is on this day. */
+  now?: { hour: number; label: string } | null;
   onOpen?: (
     cell: TimetableCell,
     event: React.MouseEvent | React.KeyboardEvent,
@@ -49,10 +52,21 @@ export function Agenda({
   day,
   mode,
   pending,
+  now,
   onOpen,
   onRemove,
 }: AgendaProps) {
   const items = useMemo(() => buildAgenda(cells, day), [cells, day]);
+  // the item the now-line follows: the free gap or the class holding this
+  // hour. before the first class or after the last, there is none.
+  const nowIndex = now
+    ? items.findIndex((item) =>
+        item.kind === "free"
+          ? item.from <= now.hour && now.hour < item.to
+          : item.cell.hour <= now.hour &&
+            now.hour < item.cell.hour + item.cell.span,
+      )
+    : -1;
 
   if (items.length === 0) {
     return (
@@ -68,55 +82,65 @@ export function Agenda({
     );
   }
 
+  const during = (cell: TimetableCell) =>
+    now && cell.hour <= now.hour && now.hour < cell.hour + cell.span
+      ? "shadow-[inset_3px_0_0_var(--now)]"
+      : "";
+
   return (
     <div className="tt-agenda px-4">
-      {items.map((item) =>
-        item.kind === "free" ? (
-          <div
-            key={`free-${item.from}`}
-            className="mb-1.5 grid grid-cols-[64px_1fr] gap-3"
-          >
-            <div className="col-start-2 pt-1 pb-2.5 pl-0.5 text-sm text-ink-faint">
-              {`Free · ${formatClock(item.from)} – ${formatClock(item.to)}`}
-            </div>
-          </div>
-        ) : (
-          <div
-            key={`${item.cell.id}-${item.cell.hour}`}
-            className="mb-1.5 grid grid-cols-[64px_1fr] gap-3"
-          >
-            <div className="pt-2.5 text-right">
-              <div className="whitespace-nowrap text-sm font-medium">
-                {formatClock(item.cell.hour)}
-              </div>
-              <div className="whitespace-nowrap text-sm text-ink-faint">
-                {formatSlotEnd(item.cell.hour, item.cell.span)}
+      {items.map((item, i) => (
+        <Fragment
+          key={
+            item.kind === "free"
+              ? `free-${item.from}`
+              : `${item.cell.id}-${item.cell.hour}`
+          }
+        >
+          {item.kind === "free" ? (
+            <div className="mb-1.5 grid grid-cols-[64px_1fr] gap-3">
+              <div className="col-start-2 pt-1 pb-2.5 pl-0.5 text-sm text-ink-faint">
+                {`Free · ${formatClock(item.from)} – ${formatClock(item.to)}`}
               </div>
             </div>
-            {mode === "edit" ? (
-              <button
-                type="button"
-                disabled={pending}
-                onClick={(event) => onOpen?.(item.cell, event)}
-                onKeyDown={(event) => {
-                  if (event.key === "Delete" || event.key === "Backspace") {
-                    event.preventDefault();
-                    onRemove?.(item.cell);
-                  }
-                }}
-                aria-label={`Edit ${item.cell.courseId} ${item.cell.type}${item.cell.number}, press Delete to remove`}
-                className={`${blockClass} cursor-pointer transition-colors duration-(--d-1) hover:bg-ev-hover focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60`}
-              >
-                <BlockBody cell={item.cell} />
-              </button>
-            ) : (
-              <div className={blockClass}>
-                <BlockBody cell={item.cell} />
+          ) : (
+            <div className="mb-1.5 grid grid-cols-[64px_1fr] gap-3">
+              <div className="pt-2.5 text-right">
+                <div className="whitespace-nowrap text-sm font-medium">
+                  {formatClock(item.cell.hour)}
+                </div>
+                <div className="whitespace-nowrap text-sm text-ink-faint">
+                  {formatSlotEnd(item.cell.hour, item.cell.span)}
+                </div>
               </div>
-            )}
-          </div>
-        ),
-      )}
+              {mode === "edit" ? (
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={(event) => onOpen?.(item.cell, event)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Delete" || event.key === "Backspace") {
+                      event.preventDefault();
+                      onRemove?.(item.cell);
+                    }
+                  }}
+                  aria-label={`Edit ${item.cell.courseId} ${item.cell.type}${item.cell.number}, press Delete to remove`}
+                  className={`${blockClass} ${during(item.cell)} cursor-pointer transition-colors duration-(--d-1) hover:bg-ev-hover focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60`}
+                >
+                  <BlockBody cell={item.cell} />
+                </button>
+              ) : (
+                <div className={`${blockClass} ${during(item.cell)}`}>
+                  <BlockBody cell={item.cell} />
+                </div>
+              )}
+            </div>
+          )}
+          {now && i === nowIndex && (
+            <NowLine.Agenda label={now.label} during={item.kind === "class"} />
+          )}
+        </Fragment>
+      ))}
     </div>
   );
 }

@@ -1,9 +1,16 @@
 import { useMemo } from "react";
 import { useFadingValue } from "@/lib/sectionPreview";
+import { useNow } from "@/lib/useNow";
+import { formatNow } from "@/utils/timeFormat";
 import type { TimetableSectionType } from "@/utils/timetable";
-import { buildTimetableGrid, type TimetableCell } from "@/utils/timetableGrid";
+import {
+  buildTimetableGrid,
+  nowPosition,
+  type TimetableCell,
+} from "@/utils/timetableGrid";
 import { Agenda } from "./Agenda";
 import { DeskGrid } from "./DeskGrid";
+import { NowLine } from "./NowLine";
 import { WeekGrid } from "./WeekGrid";
 
 export type SurfaceMode = "edit" | "view" | "export";
@@ -33,6 +40,7 @@ export function TimetableSurface({
   day,
   orientation,
   mode,
+  showNow,
   preview,
   pending,
   onOpen,
@@ -56,13 +64,20 @@ export function TimetableSurface({
     [ghost.value],
   );
 
+  // the now-line belongs to the live view page only, never the editor or export
+  const date = useNow(mode === "view" && !!showNow);
+  const pos = date ? nowPosition(date, dayCount, hourCount) : null;
+  const label = date ? formatNow(date) : "";
+
   if (layout === "phone" && view === "day") {
+    const shown = Math.min(day, dayCount - 1);
     return (
       <section aria-label="Weekly timetable">
         <Agenda
           cells={cells}
-          day={Math.min(day, dayCount - 1)}
+          day={shown}
           mode={mode}
+          now={pos && pos.day === shown ? { hour: pos.hour, label } : null}
           pending={pending}
           onOpen={onOpen}
           onRemove={onRemove}
@@ -82,6 +97,18 @@ export function TimetableSurface({
           pending={pending}
           onOpen={onOpen}
           onRemove={onRemove}
+          now={
+            pos && (
+              <NowLine.Grid
+                pos={pos}
+                axis="y"
+                label={label}
+                cell={{ gridColumn: pos.day + 2, gridRow: pos.hour + 2 }}
+                track={{ gridColumn: 1, gridRow: pos.hour + 2 }}
+                labelClass="bg-bg"
+              />
+            )
+          }
         />
       </section>
     );
@@ -100,6 +127,26 @@ export function TimetableSurface({
         onRemove={onRemove}
         ghostCells={ghostCells}
         ghostVisible={ghost.visible}
+        now={
+          pos && (
+            <NowLine.Grid
+              pos={pos}
+              axis={orientation === "rows" ? "x" : "y"}
+              label={label}
+              cell={
+                orientation === "rows"
+                  ? { gridRow: pos.day + 2, gridColumn: pos.hour + 2 }
+                  : { gridColumn: pos.day + 2, gridRow: pos.hour + 2 }
+              }
+              track={
+                orientation === "rows"
+                  ? { gridRow: 1, gridColumn: pos.hour + 2 }
+                  : { gridColumn: 1, gridRow: pos.hour + 2 }
+              }
+              labelClass="bg-surface"
+            />
+          )
+        }
       />
     </section>
   );

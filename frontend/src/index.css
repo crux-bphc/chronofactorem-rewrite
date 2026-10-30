@@ -264,6 +264,32 @@ html.theme-transition::view-transition-new(root) {
   }
 }
 
+.now-rule {
+  transition: transform var(--d-3) var(--e-out);
+}
+
+/* the dot pulses once in the first 30% of each 4s cycle; PR 1's reduced-motion
+   rule turns that into a single instant run */
+.now-dot {
+  animation: now-pulse 4s infinite;
+}
+
+@keyframes now-pulse {
+  0% {
+    scale: 1;
+    opacity: 1;
+  }
+  15% {
+    scale: 1.35;
+    opacity: 0.6;
+  }
+  30%,
+  100% {
+    scale: 1;
+    opacity: 1;
+  }
+}
+
 @keyframes skeleton-sweep {
   from {
     background-position: 200% 0;
