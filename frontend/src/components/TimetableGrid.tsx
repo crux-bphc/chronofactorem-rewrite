@@ -21,6 +21,7 @@ export function TimetableGrid({
   handleUnitDelete,
   isOnEditPage,
   isExport = false,
+  hideControls = false,
 }: {
   isVertical: boolean;
   handleUnitClick?: (
@@ -30,6 +31,7 @@ export function TimetableGrid({
   handleUnitDelete?: (cell: TimetableCell) => void;
   isOnEditPage: boolean;
   isExport?: boolean;
+  hideControls?: boolean;
 }) {
   const {
     state: { timetableDetailsSections, screenIsLarge, timetable },
@@ -76,7 +78,7 @@ export function TimetableGrid({
 
   return (
     <section aria-label="Weekly timetable" className="min-w-0 w-full lg:h-full">
-      {!large && (
+      {!large && !hideControls && (
         <fieldset
           className="flex gap-1 mb-2 rounded-xl bg-muted p-1"
           aria-label="Choose a layout"
@@ -94,7 +96,7 @@ export function TimetableGrid({
           ))}
         </fieldset>
       )}
-      {dayView && (
+      {dayView && !hideControls && (
         <fieldset
           className="flex gap-1 mb-4 rounded-xl bg-muted p-1"
           aria-label="Choose a day"
@@ -253,13 +255,6 @@ export function TimetableGrid({
             ))}
         </div>
       </div>
-      {timetableDetailsSections.length === 0 && (
-        <p className="py-4 text-center text-sm text-muted-foreground">
-          {isOnEditPage
-            ? "Choose a course to start building your week."
-            : "No classes in this timetable."}
-        </p>
-      )}
     </section>
   );
 }

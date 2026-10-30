@@ -160,6 +160,8 @@ export function useTimetableNav() {
       setView: (view: "day" | "week") =>
         go((p) => ({ ...p, view }), { push: false }),
       setDay: (day: number) => go((p) => ({ ...p, day }), { push: false }),
+      showDay: (day: number) =>
+        go((p) => ({ ...p, view: "day" as const, day }), { push: false }),
       setQuery: (q: string) =>
         go(({ q: _q, ...rest }) => (q ? { ...rest, q } : rest), {
           push: false,

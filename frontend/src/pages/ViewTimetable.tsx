@@ -1,6 +1,6 @@
 import { Route } from "@tanstack/react-router";
 import { toPng } from "html-to-image";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import ReportIssue from "@/components/ReportIssue";
 import ReportIssueToastAction from "@/components/ReportIssueToastAction";
 import TimetableHeader from "@/components/TimetableHeader";
@@ -9,9 +9,13 @@ import {
   TimetablePageShell,
   timetablePageLoader,
 } from "@/components/TimetablePageShell";
+import { InterimPhoneControls } from "@/components/timetable/InterimPhoneControls";
+import { TimetableSurface } from "@/components/timetable/TimetableSurface";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TimetableProvider, useTimetableState } from "@/context";
 import { timetableSearchSchema } from "@/lib/timetableSearch";
+import { useSurfaceNav } from "@/lib/useSurfaceNav";
+import { buildTimetableGrid } from "@/utils/timetableGrid";
 import CenteredSpinner from "../components/CenteredSpinner";
 import NotFound from "../components/NotFound";
 import { SideMenu } from "../components/SideMenu";
@@ -37,8 +41,19 @@ const viewTimetableRoute = new Route({
 
 function ViewTimetable() {
   const {
-    state: { isVertical, courses, timetable, screenIsLarge },
+    state: {
+      isVertical,
+      courses,
+      timetable,
+      screenIsLarge,
+      timetableDetailsSections,
+    },
   } = useTimetableState();
+  const { dayCount } = useMemo(
+    () => buildTimetableGrid(timetableDetailsSections),
+    [timetableDetailsSections],
+  );
+  const { view, day } = useSurfaceNav(dayCount);
 
   const screenshotContentRef = useRef<HTMLDivElement>(null);
   const [isScreenshotMode, setIsScreenshotMode] = useState(false);
@@ -99,9 +114,14 @@ function ViewTimetable() {
         contentClassName="bg-background"
         popoverTriggerClassName="top-[-1rem]"
       >
-        <TimetableGrid
-          isVertical={screenIsLarge ? isVertical : true}
-          isOnEditPage={false}
+        {!screenIsLarge && <InterimPhoneControls dayCount={dayCount} />}
+        <TimetableSurface
+          sections={timetableDetailsSections}
+          layout={screenIsLarge ? "desktop" : "phone"}
+          view={view}
+          day={day}
+          orientation={isVertical ? "columns" : "rows"}
+          mode="view"
         />
       </TimetablePageShell>
       {isScreenshotMode && (
