@@ -45,58 +45,6 @@ export function TimetableGrid({
   const {
     state: { timetableDetailsSections },
   } = useTimetableState();
-  const gridRowClasses = [
-    "grid-rows-1",
-    "grid-rows-2",
-    "grid-rows-3",
-    "grid-rows-4",
-    "grid-rows-5",
-    "grid-rows-6",
-    "grid-rows-7",
-    "grid-rows-8",
-    "grid-rows-9",
-    "grid-rows-10",
-    "grid-rows-11",
-    "grid-rows-12",
-    "grid-rows-13",
-    "grid-rows-14",
-    "grid-rows-15",
-    "grid-rows-16",
-    "grid-rows-17",
-    "grid-rows-18",
-    "grid-rows-19",
-    "grid-rows-20",
-    "grid-rows-21",
-    "grid-rows-22",
-    "grid-rows-23",
-    "grid-rows-24",
-  ];
-  const gridColClasses = [
-    "grid-cols-1",
-    "grid-cols-2",
-    "grid-cols-3",
-    "grid-cols-4",
-    "grid-cols-5",
-    "grid-cols-6",
-    "grid-cols-7",
-    "grid-cols-8",
-    "grid-cols-9",
-    "grid-cols-10",
-    "grid-cols-11",
-    "grid-cols-12",
-    "grid-cols-13",
-    "grid-cols-14",
-    "grid-cols-15",
-    "grid-cols-16",
-    "grid-cols-17",
-    "grid-cols-18",
-    "grid-cols-19",
-    "grid-cols-20",
-    "grid-cols-21",
-    "grid-cols-22",
-    "grid-cols-23",
-    "grid-cols-24",
-  ];
   const daysOfWeek = ["M", "T", "W", "Th", "F", "S"];
   const timings = [
     "8 - 9",
@@ -142,7 +90,8 @@ export function TimetableGrid({
     <div className="flex w-full lg:h-full h-[150%]">
       {isVertical ? (
         <div
-          className={`pt-16 gap-9 sm:gap-8 sm:mt-4 lg:pt-8 lg:gap-2 sm:h-full grid justify-between ${gridRowClasses[displayCols - 1]} md:text-md text-sm text-center text-foreground/80 font-bold`}
+          style={{ gridTemplateRows: `repeat(${displayCols}, minmax(0, 1fr))` }}
+          className={`pt-16 gap-9 sm:gap-8 sm:mt-4 lg:pt-8 lg:gap-2 sm:h-full grid justify-between  md:text-md text-sm text-center text-foreground/80 font-bold`}
         >
           {timings
             .filter((_, i) => i < displayCols)
@@ -154,7 +103,8 @@ export function TimetableGrid({
         </div>
       ) : (
         <div
-          className={`grid ${gridRowClasses[displayRows - 1]} items-center mr-4 mt-12 md:text-lg text-md text-center font-bold text-foreground/80`}
+          style={{ gridTemplateRows: `repeat(${displayRows}, minmax(0, 1fr))` }}
+          className={`grid  items-center mr-4 mt-12 md:text-lg text-md text-center font-bold text-foreground/80`}
         >
           {daysOfWeek.slice(0, displayRows).map((e) => (
             <span key={e}>{e}</span>
@@ -164,7 +114,10 @@ export function TimetableGrid({
       <div className="flex flex-col w-full h-full">
         {isVertical ? (
           <div
-            className={`grid ${gridColClasses[displayRows - 1]} items-center pr-2 md:text-lg text-md text-center font-bold text-foreground/80 `}
+            style={{
+              gridTemplateColumns: `repeat(${displayRows}, minmax(0, 1fr))`,
+            }}
+            className={`grid  items-center pr-2 md:text-lg text-md text-center font-bold text-foreground/80 `}
           >
             {daysOfWeek.slice(0, displayRows).map((e) => (
               <span key={e}>{e}</span>
@@ -172,7 +125,10 @@ export function TimetableGrid({
           </div>
         ) : (
           <div
-            className={`grid ${gridColClasses[displayCols - 1]} justify-between md:text-md text-sm text-center font-bold text-foreground/80`}
+            style={{
+              gridTemplateColumns: `repeat(${displayCols}, minmax(0, 1fr))`,
+            }}
+            className={`grid  justify-between md:text-md text-sm text-center font-bold text-foreground/80`}
           >
             {timings
               .filter((_, i) => i < displayCols)
@@ -184,11 +140,11 @@ export function TimetableGrid({
           </div>
         )}
         <div
-          className={`grid w-full h-full ${
-            isVertical
-              ? `${gridColClasses[displayRows - 1]} ${gridRowClasses[displayCols - 1]}`
-              : `${gridColClasses[displayCols - 1]} ${gridRowClasses[displayRows - 1]}`
-          }`}
+          className="grid w-full h-full"
+          style={{
+            gridTemplateColumns: `repeat(${isVertical ? displayRows : displayCols}, minmax(0, 1fr))`,
+            gridTemplateRows: `repeat(${isVertical ? displayCols : displayRows}, minmax(0, 1fr))`,
+          }}
         >
           {grid
             .map((e, i) => ({ e, i }))
