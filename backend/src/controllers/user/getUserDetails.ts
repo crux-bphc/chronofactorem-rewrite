@@ -4,6 +4,7 @@ import { z } from "zod";
 import type { User } from "../../entity/entities.js";
 import { validate } from "../../middleware/zodValidateRequest.js";
 import { userRepository } from "../../repositories/index.js";
+import { clearAuthCookies } from "../../utils/authUtils.js";
 import sqids from "../../utils/sqids.js";
 
 const dataSchema = z.object({
@@ -57,6 +58,14 @@ export const getUserDetails = async (req: Request, res: Response) => {
   }
 
   if (!user) {
+    // DB reset can cause user not to exist so we invalidate login
+    if (req.params.id === undefined) {
+      clearAuthCookies(res);
+      return res.status(401).json({
+        message: "unauthorized",
+        error: "user session expired",
+      });
+    }
     return res.status(404).json({ message: "User not found" });
   }
 

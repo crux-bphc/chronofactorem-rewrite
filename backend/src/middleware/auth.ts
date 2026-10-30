@@ -3,6 +3,7 @@ import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { env } from "../config/server.js";
 import { ZodFinishedUserSession } from "../types/auth.js";
+import { clearAuthCookies } from "../utils/authUtils.js";
 
 // populates req.session when valid auth cookies are present, but never
 // rejects the request; used on routes that serve both logged-in and
@@ -98,6 +99,7 @@ export const authenticate = async (
     // jwt.verify throws JsonWebTokenError (and its TokenExpiredError
     // subclass) for expired or otherwise invalid sessions
     if (error instanceof jwt.JsonWebTokenError) {
+      clearAuthCookies(res);
       return res.status(401).json({
         message: "unauthorized",
         error: "invalid user session",

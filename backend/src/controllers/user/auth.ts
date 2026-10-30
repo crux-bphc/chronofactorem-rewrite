@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import {
   type degreeList,
   getBatchFromEmail,
@@ -426,7 +427,19 @@ export async function checkAuthStatus(req: Request, res: Response) {
       });
     }
 
-    if (ZodFinishedUserSession.safeParse(sessionData).success) {
+    const finishedSession = ZodFinishedUserSession.safeParse(sessionData);
+    if (finishedSession.success) {
+      // if user doesn't exist but JWT is valid we should invalidate that token
+      const userExists = await userRepository.exists({
+        where: { id: finishedSession.data.id },
+      });
+      if (!userExists) {
+        clearAuthCookies(res);
+        return res.status(401).json({
+          message: "user not logged in",
+          error: "user session expired",
+        });
+      }
       return res.json({ message: "user is logged in", redirect: "/" });
     }
 
@@ -435,6 +448,14 @@ export async function checkAuthStatus(req: Request, res: Response) {
       error: "user session malformed",
     });
   } catch (error: any) {
+    // expired sessions, or ones signed with a different key
+    if (error instanceof jwt.JsonWebTokenError) {
+      clearAuthCookies(res);
+      return res.status(401).json({
+        message: "user not logged in",
+        error: "invalid user session",
+      });
+    }
     logger.error("Error while checking auth status: ", error);
     return res.status(500).json({
       message: "Internal Server Error",
