@@ -125,7 +125,7 @@ function TimetableCard({
           to={timetable.draft ? "/edit/$timetableId" : "/view/$timetableId"}
           params={{ timetableId: timetable.id }}
           onClick={() => onOpen(timetable.id)}
-          className="block text-lg font-semibold text-ink line-clamp-2 break-words outline-none after:absolute after:inset-0 after:content-['']"
+          className="text-lg font-semibold text-ink line-clamp-2 break-words outline-none after:absolute after:inset-0 after:content-['']"
         >
           {timetable.name}
         </Link>
