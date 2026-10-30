@@ -1,12 +1,13 @@
 import { useIsMutating } from "@tanstack/react-query";
 import { X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useTimetableState } from "@/context";
+import { useTimetableNav } from "@/lib/useTimetableNav";
 import {
   buildTimetableGrid,
   type TimetableCell,
@@ -39,13 +40,16 @@ export function TimetableGrid({
     () => buildTimetableGrid(timetableDetailsSections),
     [timetableDetailsSections],
   );
-  const [selectedDay, setSelectedDay] = useState(() =>
-    Math.min(Math.max(new Date().getDay() - 1, 0), 5),
-  );
-  // phones default to one day at a time, tablets to the whole week
-  const [showWeek, setShowWeek] = useState(
-    () => !window.matchMedia("(max-width: 639px)").matches,
-  );
+  const nav = useTimetableNav();
+  // absent params fall back to today and the screen size; exports ignore them
+  const selectedDay =
+    (isExport ? undefined : nav.search.day) ??
+    Math.min(Math.max(new Date().getDay() - 1, 0), 5);
+  const showWeek = isExport
+    ? true
+    : nav.search.view
+      ? nav.search.view === "week"
+      : !window.matchMedia("(max-width: 639px)").matches;
   // exports always get the full grid, whatever the screen size
   const large = screenIsLarge || isExport;
   const dayView = !large && !showWeek;
@@ -82,7 +86,7 @@ export function TimetableGrid({
               key={week ? "week" : "day"}
               type="button"
               aria-pressed={showWeek === week}
-              onClick={() => setShowWeek(week)}
+              onClick={() => nav.setView(week ? "week" : "day")}
               className="flex-1 rounded-lg py-2 text-sm font-medium text-muted-foreground aria-pressed:bg-background aria-pressed:text-foreground aria-pressed:shadow-sm focus-visible:outline-2 focus-visible:outline-ring cursor-pointer"
             >
               {week ? "Week" : "Day"}
@@ -101,7 +105,7 @@ export function TimetableGrid({
               type="button"
               aria-pressed={days[0] === i}
               aria-label={timetableDayNames[i]}
-              onClick={() => setSelectedDay(i)}
+              onClick={() => nav.setDay(i)}
               className="flex-1 rounded-lg py-2 text-sm font-medium text-muted-foreground aria-pressed:bg-background aria-pressed:text-foreground aria-pressed:shadow-sm focus-visible:outline-2 focus-visible:outline-ring cursor-pointer"
             >
               {timetableDayNames[i].slice(0, 3)}
