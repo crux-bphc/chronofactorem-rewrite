@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { TimetableSectionType } from "@/utils/timetable";
 
 export type Presence = "present" | "entering" | "leaving";
@@ -51,19 +51,25 @@ export function useSectionPresence(
     return () => clearTimeout(timer);
   }, [busy, entering, leaving]);
 
-  if (off) {
-    return sections.map((section) => ({ section, presence: "present" }));
-  }
-  const live = new Set(sections.map((s) => s.id));
-  return [
-    ...sections.map((section) => ({
-      section,
-      presence: entering.has(section.id)
-        ? ("entering" as const)
-        : ("present" as const),
-    })),
-    ...leaving
-      .filter((s) => !live.has(s.id))
-      .map((section) => ({ section, presence: "leaving" as const })),
-  ];
+  // a stable list, so consumers' memoized grids only rebuild on real changes
+  return useMemo(() => {
+    if (off) {
+      return sections.map((section) => ({
+        section,
+        presence: "present" as const,
+      }));
+    }
+    const live = new Set(sections.map((s) => s.id));
+    return [
+      ...sections.map((section) => ({
+        section,
+        presence: entering.has(section.id)
+          ? ("entering" as const)
+          : ("present" as const),
+      })),
+      ...leaving
+        .filter((s) => !live.has(s.id))
+        .map((section) => ({ section, presence: "leaving" as const })),
+    ];
+  }, [off, sections, entering, leaving]);
 }
