@@ -5,6 +5,7 @@ import {
   Edit2,
   GripHorizontal,
   GripVertical,
+  LoaderCircle,
   Send,
   Trash,
 } from "lucide-react";
@@ -35,7 +36,8 @@ const TimetableHeader = ({
     dispatch,
   } = useTimetableState();
   const { mutateAsync: editTimetable } = useEditTimetable();
-  const { mutateAsync: copyTimetable } = useCopyTimetable();
+  const { mutateAsync: copyTimetable, isPending: isCopying } =
+    useCopyTimetable();
 
   if (timetable === undefined || courses === undefined) return;
 
@@ -157,39 +159,27 @@ const TimetableHeader = ({
               className={timetable.archived ? "cursor-not-allowed" : ""}
             >
               <Button
-                disabled={timetable.archived}
+                disabled={timetable.archived || isCopying}
                 variant="ghost"
                 className="rounded-full p-3"
                 onClick={() => {
-                  dispatch({
-                    type: TimetableActionType.SetIsCopyingTimetable,
-                    isCopyingTimetable: true,
-                  });
-                  setTimeout(() => {
-                    // the copying spinner unmounts this header before the
-                    // copy finishes, and react query drops per-call mutate
-                    // callbacks once their component unmounts, so navigate
-                    // from the promise instead
-                    copyTimetable(timetable.id)
-                      .then((res) =>
-                        router.navigate({
-                          to: "/edit/$timetableId",
-                          params: { timetableId: res.data.id },
-                        }),
-                      )
-                      .catch(() => {
-                        // useCopyTimetable already toasts the error
-                      });
-                    setTimeout(() => {
-                      dispatch({
-                        type: TimetableActionType.SetIsCopyingTimetable,
-                        isCopyingTimetable: false,
-                      });
-                    }, 1000);
-                  }, 1000);
+                  copyTimetable(timetable.id)
+                    .then((res) =>
+                      router.navigate({
+                        to: "/edit/$timetableId",
+                        params: { timetableId: res.data.id },
+                      }),
+                    )
+                    .catch(() => {
+                      /* The mutation reports the error. */
+                    });
                 }}
               >
-                <Copy className="w-5 h-5 md:w-6 md:h-6" />
+                {isCopying ? (
+                  <LoaderCircle className="size-5 animate-spin" />
+                ) : (
+                  <Copy className="w-5 h-5 md:w-6 md:h-6" />
+                )}
               </Button>
             </TooltipTrigger>
             <TooltipContent>
