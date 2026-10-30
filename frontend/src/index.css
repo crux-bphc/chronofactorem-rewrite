@@ -247,3 +247,12 @@ html.theme-transition::view-transition-new(root) {
     animation: none !important;
   }
 }
+
+@keyframes skeleton-sweep {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
