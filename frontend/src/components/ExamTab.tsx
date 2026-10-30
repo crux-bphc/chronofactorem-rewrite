@@ -64,7 +64,8 @@ const ExamTab = () => {
           };
         })
         .sort(
-          (a, b) => Date.parse(a.compreStartTime) - Date.parse(b.compreEndTime),
+          (a, b) =>
+            Date.parse(a.compreStartTime) - Date.parse(b.compreStartTime),
         )
         .map((course) => (
           <div
