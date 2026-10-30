@@ -53,7 +53,13 @@ export function Collapse({
         }
       }}
     >
-      <div className="min-h-0 overflow-hidden">{children}</div>
+      <div
+        className="min-h-0 overflow-hidden"
+        inert={!expanded}
+        aria-hidden={!expanded || undefined}
+      >
+        {children}
+      </div>
     </div>
   );
 }

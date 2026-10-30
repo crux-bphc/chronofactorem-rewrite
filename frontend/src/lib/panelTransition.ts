@@ -18,13 +18,26 @@ export function runPanelTransition(
     update();
     return;
   }
-  document.startViewTransition({
-    update: async () => {
-      await update();
-      await nextFrame();
-    },
-    types: [`panel-${direction}`],
-  });
+  // Older engines have startViewTransition but ignore the options object, so
+  // the update callback would never run. Only use types where supported.
+  if (!CSS.supports("selector(:active-view-transition-type(a))")) {
+    update();
+    return;
+  }
+  let started = false;
+  const run = async () => {
+    started = true;
+    await update();
+    await nextFrame();
+  };
+  try {
+    document.startViewTransition({
+      update: run,
+      types: [`panel-${direction}`],
+    });
+  } catch {
+    if (!started) update();
+  }
 }
 
 export const panelForward = (fn: () => unknown) => () =>

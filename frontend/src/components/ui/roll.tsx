@@ -6,14 +6,14 @@ export function Roll({
   value,
   className,
 }: {
-  value: React.ReactNode;
+  value: string | number;
   className?: string;
 }) {
   const key = String(value);
   const [current, setCurrent] = React.useState({ key, value });
   const [leaving, setLeaving] = React.useState<{
     key: string;
-    value: React.ReactNode;
+    value: string | number;
   } | null>(null);
 
   if (current.key !== key) {

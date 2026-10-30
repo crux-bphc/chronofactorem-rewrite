@@ -1,5 +1,5 @@
 import { ArrowRight } from "lucide-react";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTimetableState } from "@/context";
 import { panelForward } from "@/lib/panelTransition";
 import { useTimetableNav } from "@/lib/useTimetableNav";
@@ -51,11 +51,11 @@ export function useExamClashPills(clashing: string[] | null) {
   return useMemo(
     () =>
       (clashing ?? []).map((entry) => {
-        const [code, exam] = entry.split("|");
+        const [code, exam = ""] = entry.split("|");
         const id = courses?.find((c) => c.code === code)?.id;
         return {
           key: entry,
-          label: `${code}'s ${exam.toLowerCase()}`,
+          label: exam ? `${code}'s ${exam.toLowerCase()}` : code,
           onSelect: id ? panelForward(() => openCourse(id)) : undefined,
         };
       }),
@@ -69,14 +69,22 @@ export function markClashLanding(courseId: string, type: "L" | "P" | "T") {
   landing = { courseId, type };
 }
 
-/** True once, for the first render matching the marked course and type. */
+/**
+ * True for the render matching the marked course and type. Render stays pure:
+ * the one-shot slot is read here and cleared in an effect after commit.
+ */
 export function useClashLanding(
   courseId: string | null,
   type: string | null,
 ): boolean {
-  if (landing && landing.courseId === courseId && landing.type === type) {
+  const matches =
+    landing !== null && landing.courseId === courseId && landing.type === type;
+  const key = `${courseId}|${type}`;
+  const [landedKey, setLandedKey] = useState<string | null>(null);
+  useEffect(() => {
+    if (!matches) return;
     landing = null;
-    return true;
-  }
-  return false;
+    setLandedKey(key);
+  }, [matches, key]);
+  return matches || landedKey === key;
 }
