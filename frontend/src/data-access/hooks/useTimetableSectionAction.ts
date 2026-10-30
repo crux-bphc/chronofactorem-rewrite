@@ -11,6 +11,8 @@ export const useAddRemoveTimetableSection = (
   const { toast } = useToast();
   const queryClient = useQueryClient();
   return useMutation({
+    mutationKey: ["sections", timetableId],
+    scope: { id: `sections:${timetableId}` },
     mutationFn: async ({
       sectionId,
       action,
@@ -18,7 +20,7 @@ export const useAddRemoveTimetableSection = (
       sectionId: string;
       action: SectionAction;
     }) => {
-      if (timetableId === undefined) return;
+      if (timetableId === undefined) throw new Error("Timetable is not loaded");
       const result = await chronoAPI.post(
         `/api/timetable/${timetableId}/${action}`,
         { sectionId },
@@ -27,7 +29,9 @@ export const useAddRemoveTimetableSection = (
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["timetable", timetableId] });
+      return queryClient.invalidateQueries({
+        queryKey: ["timetable", timetableId],
+      });
     },
     onError: (error) => toastHandler(error, toast),
   });
@@ -37,6 +41,8 @@ export const useSwapTimetableSections = (timetableId: string | undefined) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   return useMutation({
+    mutationKey: ["sections", timetableId],
+    scope: { id: `sections:${timetableId}` },
     mutationFn: async ({
       sectionId,
       newSectionId,
@@ -44,14 +50,16 @@ export const useSwapTimetableSections = (timetableId: string | undefined) => {
       sectionId: string;
       newSectionId: string;
     }) => {
-      if (timetableId === undefined) return;
+      if (timetableId === undefined) throw new Error("Timetable is not loaded");
       await chronoAPI.post(`/api/timetable/${timetableId}/swap`, {
         sectionId,
         newSectionId,
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["timetable", timetableId] });
+      return queryClient.invalidateQueries({
+        queryKey: ["timetable", timetableId],
+      });
     },
     onError: (error) => toastHandler(error, toast),
   });
