@@ -52,6 +52,9 @@ jobs:
         run: pnpm run build
         working-directory: "./frontend"
 
+      - name: Run regression tests
+        run: pnpm test
+
       - name: Run biomejs linter and formatter on lib
         run: pnpm biome ci .
         working-directory: "./lib"

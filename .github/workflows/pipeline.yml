@@ -2,16 +2,24 @@ name: Host a staging instance of ChronoFactorem
 
 on: workflow_dispatch
 
+concurrency:
+  group: staging-deployment
+  cancel-in-progress: false
+
 jobs:
   staging:
     name: Build and deploy to staging
     runs-on: self-hosted
+    env:
+      DEPLOY_SHA: ${{ github.sha }}
+      GIT_SSH_COMMAND: ssh -i /home/ubuntu/.ssh/gh-actions -o IdentitiesOnly=yes
     steps:
-      - name: ssh into machine, and clone repo
+      - name: Deploy the requested revision
+        working-directory: /home/ubuntu/clones/chronofactorem-rewrite-staging
         run: |
-            cd /home/ubuntu/clones
-            cd chronofactorem-rewrite-staging
-            GIT_SSH_COMMAND="ssh -i /home/ubuntu/.ssh/gh-actions -o IdentitiesOnly=yes" git pull
-            docker compose --profile ingestion down
-            docker compose --profile prod down
-            docker compose --profile prod up --build -d
+          set -euo pipefail
+          git diff --quiet
+          git diff --cached --quiet
+          git fetch origin "$DEPLOY_SHA"
+          git checkout --detach "$DEPLOY_SHA"
+          docker compose --profile prod up --build -d
