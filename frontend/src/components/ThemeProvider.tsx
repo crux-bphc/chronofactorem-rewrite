@@ -1,4 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { flushSync } from "react-dom";
+import { startThemeTransition } from "@/lib/viewTransitions";
 
 type Theme = "dark" | "light" | "system";
 
@@ -10,7 +12,8 @@ type ThemeProviderProps = {
 
 type ThemeProviderState = {
   theme: Theme;
-  setTheme: (theme: Theme) => void;
+  /** `origin` (viewport px) makes the change a circular-reveal transition. */
+  setTheme: (theme: Theme, origin?: { x: number; y: number }) => void;
 };
 
 const initialState: ThemeProviderState = {
@@ -50,9 +53,15 @@ export function ThemeProvider({
 
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
+    setTheme: (theme: Theme, origin?: { x: number; y: number }) => {
       localStorage.setItem(storageKey, theme);
-      setTheme(theme);
+      if (!origin) {
+        setTheme(theme);
+        return;
+      }
+      // the view transition snapshots the DOM right after this callback, so
+      // the state and the class-applying effect must flush synchronously
+      startThemeTransition(() => flushSync(() => setTheme(theme)), origin);
     },
   };
 

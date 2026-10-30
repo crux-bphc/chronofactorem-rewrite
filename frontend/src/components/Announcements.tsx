@@ -87,11 +87,27 @@ function Announcements() {
     }
   }, [announcements, readAnnouncements, toast]);
 
+  const hasUnread =
+    announcements?.some(
+      (announcement) => !readAnnouncements.includes(announcement.id),
+    ) ?? false;
+
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button aria-label="Announcements" variant="outline" size="icon">
-          <Megaphone />
+        <Button
+          aria-label={hasUnread ? "Announcements, unread" : "Announcements"}
+          variant="quiet"
+          size="icon"
+          className="relative"
+        >
+          <Megaphone className="size-5 lg:size-[18px]" />
+          {hasUnread && (
+            <span
+              aria-hidden="true"
+              className="absolute top-1 right-1 size-2 rounded-full bg-now ring-2 ring-bg"
+            />
+          )}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-100 overflow-y-scroll">
