@@ -10,11 +10,11 @@ const aboutRoute = new Route({
 
 function About() {
   return (
-    <main className="lg:pl-20 px-16 pt-8">
+    <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6">
       <h1 className="text-4xl font-bold tracking-tight">
         About ChronoFactorem
       </h1>
-      <div className="lg:w-2/3 text-2xl">
+      <div className="text-base leading-relaxed sm:text-lg">
         <p className="pt-4">
           ChronoFactorem is a project that makes the process of creating
           timetables and sharing them easy as pie. ChronoFactorem is developed

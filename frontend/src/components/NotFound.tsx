@@ -1,24 +1,21 @@
 import { Link } from "@tanstack/react-router";
+import { CalendarSearch } from "lucide-react";
+import { Button } from "./ui/button";
 
 const NotFound = () => (
-  <div className="h-[calc(100vh-68px)] w-full flex flex-col justify-center items-center">
-    <h1 className="text-9xl font-extrabold text-white tracking-widest">404</h1>
-    <div className="bg-[#FF6A3D] px-2 text-sm rounded rotate-12 absolute">
-      Page Not Found
-    </div>
-    <div className="mt-5">
-      <div className="relative inline-block text-sm font-medium text-[#FF6A3D] group active:text-orange-500 focus:outline-none focus:ring">
-        <span className="absolute inset-0 transition-transform translate-x-0.5 translate-y-0.5 bg-[#FF6A3D] group-hover:translate-y-0 group-hover:translate-x-0" />
-
-        <Link
-          className="cursor-pointer relative block px-8 py-3 bg-[#1A2238] border border-current"
-          to={"/"}
-        >
-          GO HOME
-        </Link>
-      </div>
-    </div>
-  </div>
+  <main className="flex min-h-[70dvh] flex-col items-center justify-center gap-4 px-6 text-center">
+    <CalendarSearch className="size-12 text-muted-foreground" />
+    <p className="text-sm font-medium text-muted-foreground">404</p>
+    <h1 className="text-3xl font-semibold tracking-tight">
+      We couldn't find that page
+    </h1>
+    <p className="max-w-sm text-muted-foreground">
+      Check the link and try again. Draft timetables are only visible to their
+      owner.
+    </p>
+    <Button asChild className="mt-2">
+      <Link to="/">Go to your timetables</Link>
+    </Button>
+  </main>
 );
-
 export default NotFound;

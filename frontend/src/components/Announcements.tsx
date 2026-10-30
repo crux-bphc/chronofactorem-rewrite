@@ -19,8 +19,16 @@ function Announcements() {
   const { toast } = useToast();
   const { data: announcements, isLoading, isError, error } = useAnnouncements();
   const [readAnnouncements, setReadAnnouncements] = useState<string[]>(() => {
-    const storedReadAnnouncements = localStorage.getItem("readAnnouncements");
-    return storedReadAnnouncements ? JSON.parse(storedReadAnnouncements) : [];
+    try {
+      const value = JSON.parse(
+        localStorage.getItem("readAnnouncements") ?? "[]",
+      );
+      return Array.isArray(value)
+        ? value.filter((item): item is string => typeof item === "string")
+        : [];
+    } catch {
+      return [];
+    }
   });
 
   useEffect(() => {
@@ -69,7 +77,7 @@ function Announcements() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="icon">
+        <Button aria-label="Announcements" variant="outline" size="icon">
           <Megaphone />
         </Button>
       </DialogTrigger>
@@ -97,8 +105,8 @@ function Announcements() {
           ) : (
             <div className="flex flex-col-reverse mx-3 mt-1 gap-3 divide-y divide-y-reverse">
               {Array.isArray(announcements) && announcements?.length ? (
-                announcements
-                  ?.sort((a, b) => {
+                [...announcements]
+                  .sort((a, b) => {
                     const isUnreadA = !readAnnouncements.includes(a.id);
                     const isUnreadB = !readAnnouncements.includes(b.id);
 

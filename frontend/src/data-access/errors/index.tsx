@@ -13,7 +13,8 @@ export const HTTPError = <T extends object, K>(
   status: keyof typeof errorTitleMap | number,
 ) => {
   return {
-    title: typeof status === "number" ? "Unknown Error" : errorTitleMap[status],
+    title:
+      errorTitleMap[status as keyof typeof errorTitleMap] ?? "Request failed",
     description:
       "message" in response.data && typeof response.data.message === "string"
         ? response.data.message

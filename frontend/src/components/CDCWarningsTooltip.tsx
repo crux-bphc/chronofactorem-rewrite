@@ -2,10 +2,10 @@ import { AlertOctagon, ArrowUpRightFromCircle } from "lucide-react";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { TimetableActionType, useTimetableState } from "@/context";
 
 export const CDCWarningsTooltip = () => {
@@ -94,16 +94,20 @@ export const CDCWarningsTooltip = () => {
   if (missingCDCs.length === 0 && cdcNotFoundWarning.length === 0) return null;
 
   return (
-    <Tooltip delayDuration={100}>
-      <TooltipTrigger
+    <Popover>
+      <PopoverTrigger
         asChild
         className="hover:bg-accent hover:text-accent-foreground transition duration-200 ease-in-out"
       >
-        <div className="p-2 rounded-full">
+        <button
+          type="button"
+          aria-label="Missing required courses"
+          className="p-2 rounded-full cursor-pointer"
+        >
           <AlertOctagon className="w-5 h-5 md:w-6 md:h-6 m-1" />
-        </div>
-      </TooltipTrigger>
-      <TooltipContent className="bg-muted text-foreground border-muted-foreground/40 text-md">
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="bg-muted text-foreground border-muted-foreground/40 text-md">
         {missingCDCs.length > 0 && (
           <div className="flex flex-col">
             <span>
@@ -151,8 +155,8 @@ export const CDCWarningsTooltip = () => {
             ))}
           </div>
         )}
-      </TooltipContent>
-    </Tooltip>
+      </PopoverContent>
+    </Popover>
   );
 };
 

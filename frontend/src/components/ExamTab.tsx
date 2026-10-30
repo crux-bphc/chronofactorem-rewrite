@@ -9,7 +9,7 @@ const ExamTab = () => {
   return (
     <TabsContent
       value="exams"
-      className="flex data-[state=inactive]:h-0 w-[26rem] flex-col h-full overflow-y-scroll"
+      className="flex min-h-0 flex-1 data-[state=inactive]:hidden flex-col overflow-y-auto"
     >
       <span className="text-xl font-bold pl-4 flex mb-2">Midsems</span>
       {timetable.examTimes
@@ -38,7 +38,7 @@ const ExamTab = () => {
                 hour: "numeric",
                 minute: "numeric",
                 hour12: true,
-              })} — ${new Date(course.midsemEndTime).toLocaleDateString(
+              })} to ${new Date(course.midsemEndTime).toLocaleDateString(
                 "en-US",
                 {
                   month: "short",
@@ -64,7 +64,8 @@ const ExamTab = () => {
           };
         })
         .sort(
-          (a, b) => Date.parse(a.compreStartTime) - Date.parse(b.compreEndTime),
+          (a, b) =>
+            Date.parse(a.compreStartTime) - Date.parse(b.compreStartTime),
         )
         .map((course) => (
           <div
@@ -79,7 +80,7 @@ const ExamTab = () => {
                 hour: "numeric",
                 minute: "numeric",
                 hour12: true,
-              })} — ${new Date(course.compreEndTime).toLocaleDateString(
+              })} to ${new Date(course.compreEndTime).toLocaleDateString(
                 "en-US",
                 {
                   month: "short",

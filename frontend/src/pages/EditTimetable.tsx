@@ -96,28 +96,18 @@ function EditTimetable() {
     >
       <TimetableGrid
         isVertical={screenIsLarge ? isVertical : true}
-        handleUnitClick={(e, event) => {
-          if (e?.courseId && e?.type) {
-            if (event.detail === 1) {
-              dispatch({
-                type: TimetableActionType.SetSelectedCourseAndSection,
-                courseID: courses.filter((x) => x.code === e?.courseId)[0].id,
-                sectionType: e?.type as "L" | "P" | "T",
-              });
-            } else if (event.detail >= 2) {
-              e?.id
-                ? sectionAction({ sectionId: e?.id, action: "remove" })
-                : console.log("error:", e);
-            }
-          } else {
-            console.log("error:", e);
-          }
+        handleUnitClick={(cell) => {
+          const course = courses.find((item) => item.code === cell.courseId);
+          if (course)
+            dispatch({
+              type: TimetableActionType.SetSelectedCourseAndSection,
+              courseID: course.id,
+              sectionType: cell.type as "L" | "P" | "T",
+            });
         }}
-        handleUnitDelete={(e) => {
-          e?.id
-            ? sectionAction({ sectionId: e?.id, action: "remove" })
-            : console.log("error:", e);
-        }}
+        handleUnitDelete={(cell) =>
+          sectionAction({ sectionId: cell.id, action: "remove" })
+        }
         isOnEditPage={true}
       />
     </TimetablePageShell>

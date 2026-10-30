@@ -53,7 +53,7 @@ export const formatCDCWarningsAndOptions = (
   const degree = (
     timetable.degrees.length === 1
       ? timetable.degrees[0]
-      : timetable.degrees.sort().reverse().join("")
+      : [...timetable.degrees].sort().reverse().join("")
   ) as keyof typeof CDCList;
   const cdcListKey =
     `${timetable.year}-${timetable.semester}` as keyof (typeof CDCList)[typeof degree];

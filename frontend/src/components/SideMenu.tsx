@@ -20,21 +20,27 @@ export function SideMenu({
     state: { timetable, currentTab, searchTerm },
     dispatch,
   } = useTimetableState();
-  const [debouncedSearchTerm] = useDebounceValue(searchTerm, 500);
+  const [debouncedSearchTerm] = useDebounceValue(searchTerm, 150);
 
   if (timetable === undefined) return;
 
   // user is not in course details
   return (
-    <div className="bg-secondary w-[26rem]">
+    <div className="h-full min-h-0 w-full">
       <Tabs
         value={isScreenshotMode ? "exams" : currentTab}
-        className="py-2 h-[calc(100vh-16rem)]"
+        onValueChange={(tab) =>
+          dispatch({
+            type: TimetableActionType.SetMenuTab,
+            tab: tab as typeof currentTab,
+          })
+        }
+        className="flex h-full min-h-0 flex-col p-2"
       >
-        <SideMenuTabs isOnEditPage={isOnEditPage} />
+        {!isScreenshotMode && <SideMenuTabs isOnEditPage={isOnEditPage} />}
         <TabsContent
           value="CDCs"
-          className="border-muted-foreground/80 w-[26rem] data-[state=inactive]:h-0 flex flex-col h-full overflow-y-scroll"
+          className="min-h-0 flex-1 overflow-y-auto data-[state=inactive]:hidden"
         >
           <CDCList />
         </TabsContent>
@@ -44,7 +50,7 @@ export function SideMenu({
 
         <TabsContent
           value="search"
-          className="data-[state=inactive]:h-0 w-[26rem] h-full"
+          className="min-h-0 flex-1 data-[state=inactive]:hidden"
         >
           <div className="px-4 pb-4">
             <Input

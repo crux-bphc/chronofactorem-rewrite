@@ -5,6 +5,7 @@ import {
   Edit2,
   GripHorizontal,
   GripVertical,
+  LoaderCircle,
   Send,
   Trash,
 } from "lucide-react";
@@ -26,23 +27,27 @@ import { router } from "../router";
 const TimetableHeader = ({
   isOnEditPage,
   generateScreenshot,
+  isExporting = false,
 }: {
   isOnEditPage: boolean;
   generateScreenshot?: () => void;
+  isExporting?: boolean;
 }) => {
   const {
     state: { isVertical, user, courses, timetable, screenIsLarge },
     dispatch,
   } = useTimetableState();
-  const { mutateAsync: editTimetable } = useEditTimetable();
-  const { mutateAsync: copyTimetable } = useCopyTimetable();
+  const { mutateAsync: editTimetable, isPending: isEditing } =
+    useEditTimetable();
+  const { mutateAsync: copyTimetable, isPending: isCopying } =
+    useCopyTimetable();
 
   if (timetable === undefined || courses === undefined) return;
 
   return (
-    <div className="flex justify-between p-4">
-      <span>
-        <p className="font-bold lg:text-3xl text-md sm:text-lg md:text-xl">
+    <div className="flex flex-wrap items-start justify-between gap-4 py-5">
+      <span className="min-w-0 flex-1 basis-48">
+        <p className="break-words text-xl font-semibold tracking-tight sm:text-2xl">
           {timetable.name}
         </p>
         <span className="flex lg:flex-row flex-col lg:items-center justify-normal gap-2">
@@ -71,17 +76,22 @@ const TimetableHeader = ({
           </span>
         </span>
       </span>
-      <span className="flex justify-center items-center gap-2">
+      <span className="flex flex-wrap items-center gap-1.5">
         {isOnEditPage ? (
           <CDCWarningsTooltip />
         ) : (
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
+                disabled={isExporting}
                 onClick={generateScreenshot}
                 className="flex justify-between items-center gap-2 md:text-md text-sm"
               >
-                <Download className="w-5 h-5 md:w-6 md:h-6" />
+                {isExporting ? (
+                  <LoaderCircle className="size-4 animate-spin" />
+                ) : (
+                  <Download className="size-4" />
+                )}
                 PNG
               </Button>
             </TooltipTrigger>
@@ -94,6 +104,7 @@ const TimetableHeader = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
+                aria-label={`Use ${isVertical ? "horizontal" : "vertical"} layout`}
                 variant="ghost"
                 className="rounded-full p-3"
                 onClick={() =>
@@ -112,11 +123,10 @@ const TimetableHeader = ({
         )}
         {!isOnEditPage && user?.id === timetable.authorId && (
           <Tooltip>
-            <TooltipTrigger
-              className={timetable.archived ? "cursor-not-allowed" : ""}
-            >
+            <TooltipTrigger asChild>
               <Button
-                disabled={timetable.archived}
+                disabled={timetable.archived || isEditing || isCopying}
+                aria-label="Edit timetable"
                 variant="ghost"
                 className="rounded-full p-3"
                 onClick={() =>
@@ -153,43 +163,30 @@ const TimetableHeader = ({
         )}
         {user !== undefined && (
           <Tooltip>
-            <TooltipTrigger
-              className={timetable.archived ? "cursor-not-allowed" : ""}
-            >
+            <TooltipTrigger asChild>
               <Button
-                disabled={timetable.archived}
+                disabled={timetable.archived || isEditing || isCopying}
                 variant="ghost"
                 className="rounded-full p-3"
+                aria-label="Copy timetable"
                 onClick={() => {
-                  dispatch({
-                    type: TimetableActionType.SetIsCopyingTimetable,
-                    isCopyingTimetable: true,
-                  });
-                  setTimeout(() => {
-                    // the copying spinner unmounts this header before the
-                    // copy finishes, and react query drops per-call mutate
-                    // callbacks once their component unmounts, so navigate
-                    // from the promise instead
-                    copyTimetable(timetable.id)
-                      .then((res) =>
-                        router.navigate({
-                          to: "/edit/$timetableId",
-                          params: { timetableId: res.data.id },
-                        }),
-                      )
-                      .catch(() => {
-                        // useCopyTimetable already toasts the error
-                      });
-                    setTimeout(() => {
-                      dispatch({
-                        type: TimetableActionType.SetIsCopyingTimetable,
-                        isCopyingTimetable: false,
-                      });
-                    }, 1000);
-                  }, 1000);
+                  copyTimetable(timetable.id)
+                    .then((res) =>
+                      router.navigate({
+                        to: "/edit/$timetableId",
+                        params: { timetableId: res.data.id },
+                      }),
+                    )
+                    .catch(() => {
+                      /* The mutation reports the error. */
+                    });
                 }}
               >
-                <Copy className="w-5 h-5 md:w-6 md:h-6" />
+                {isCopying ? (
+                  <LoaderCircle className="size-5 animate-spin" />
+                ) : (
+                  <Copy className="size-5" />
+                )}
               </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -217,8 +214,11 @@ const TimetableHeader = ({
             <TooltipTrigger asChild>
               <span>
                 <Button
-                  disabled={timetable.warnings.length !== 0}
-                  className="text-green-200 w-fit text-xl p-4 ml-4 bg-green-900 hover:bg-green-800"
+                  disabled={
+                    timetable.warnings.length !== 0 ||
+                    timetable.sections.length === 0
+                  }
+                  className="bg-emerald-700 text-white hover:bg-emerald-600"
                   onClick={() =>
                     router.navigate({
                       to: "/finalize/$timetableId",
@@ -226,13 +226,17 @@ const TimetableHeader = ({
                     })
                   }
                 >
-                  <div className="hidden md:flex">Publish</div>
-                  <div className="flex md:hidden">
-                    <Send className="h-6 w-6" />
-                  </div>
+                  <Send className="size-4" /> Publish
                 </Button>
               </span>
             </TooltipTrigger>
+            <TooltipContent>
+              {timetable.sections.length === 0
+                ? "Add a course before publishing"
+                : timetable.warnings.length
+                  ? "Complete the missing sections before publishing"
+                  : "Publish your timetable"}
+            </TooltipContent>
           </Tooltip>
         )}
       </span>

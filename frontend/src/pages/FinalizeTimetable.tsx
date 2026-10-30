@@ -1,22 +1,18 @@
 import { Route } from "@tanstack/react-router";
-import { Clipboard, ClipboardCheck, Globe, Lock } from "lucide-react";
-import { useRef, useState } from "react";
-import ReportIssue from "@/components/ReportIssue";
+import { ArrowLeft, Check, Copy, LoaderCircle } from "lucide-react";
+import { useState } from "react";
 import { TimetablePageError } from "@/components/TimetablePageShell";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "@/components/ui/use-toast";
 import useEditTimetable from "@/data-access/hooks/useEditTimetable";
 import useTimetable, {
   timetableQueryOptions,
 } from "@/data-access/hooks/useTimetable";
 import authenticatedRoute from "../AuthenticatedRoute";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
+import CenteredSpinner from "../components/CenteredSpinner";
 import { router } from "../router";
 
 const finalizeTimetableRoute = new Route({
@@ -25,138 +21,150 @@ const finalizeTimetableRoute = new Route({
   loader: ({ context: { queryClient }, params: { timetableId } }) =>
     queryClient.ensureQueryData(timetableQueryOptions(timetableId)),
   component: FinalizeTimetable,
+  pendingComponent: CenteredSpinner,
   errorComponent: TimetablePageError,
 });
 
 function FinalizeTimetable() {
-  const headingOptions = [
-    "Anything else?",
-    "The final touch",
-    "One last thing",
-    "Almost there!",
-  ];
-
-  const [headingText] = useState(
-    headingOptions[Math.floor(Math.random() * headingOptions.length)],
-  );
-  const [privateTimetable, setPrivate] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const nameInput = useRef<HTMLInputElement>(null);
   const { timetableId } = finalizeTimetableRoute.useParams();
-  const {
-    data: timetable,
-    isError: isTimetableError,
-    isLoading: isTimetableLoading,
-    error: timetableError,
-  } = useTimetable(timetableId);
-
-  const { mutate: editTimetable } = useEditTimetable();
-
-  if (isTimetableLoading) {
-    return <span>Loading...</span>;
-  }
-
-  if (isTimetableError || timetable === undefined) {
-    return (
-      <ReportIssue
-        error={JSON.stringify(
-          timetableError
-            ? timetableError.message
-            : "timetable query result is undefined",
-        )}
-      />
-    );
-  }
+  const { data: timetable } = useTimetable(timetableId);
+  const [name, setName] = useState<string | null>(null);
+  const [privateTimetable, setPrivate] = useState<boolean | null>(null);
+  const [copied, setCopied] = useState(false);
+  const { mutateAsync: editTimetable, isPending } = useEditTimetable();
+  if (!timetable) return <CenteredSpinner />;
+  const link = `${window.location.origin}/view/${timetableId}`;
+  const isPrivate = privateTimetable ?? timetable.private;
 
   return (
-    <div className="flex lg:pl-96 pl-12 text-foreground lg:pt-48 pt-40 w-full">
-      <div className="flex flex-col w-full">
-        <span className="text-5xl font-bold">{headingText}</span>
-        <Label htmlFor="name" className="mt-8 mb-2 text-lg">
-          Name
-        </Label>
-        <Input
-          ref={nameInput}
-          id="name"
-          defaultValue={timetable.name}
-          placeholder="Timetable Name"
-          className="text-xl lg:w-1/3 w-4/5 bg-muted ring-primary-foreground ring-offset-slate-700 border-slate-700"
-        />
-        <Label htmlFor="share" className="mt-4 mb-2 text-lg">
-          Share your timetable
-        </Label>
-        <div className="flex items-center lg:w-1/3 w-4/5" id="share">
-          <TooltipProvider>
-            <Tooltip delayDuration={100}>
-              <TooltipTrigger asChild>
-                <Button
-                  className="rounded-r-none rounded-l-lg bg-muted hover:bg-muted-foreground text-foreground px-4 mr-0"
-                  onClick={() => setPrivate(!privateTimetable)}
-                >
-                  {privateTimetable ? <Lock /> : <Globe />}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="bg-muted text-foreground border-primary-foreground">
-                {privateTimetable
-                  ? "Private (only people with the link can view)"
-                  : "Public (anyone can view)"}
-              </TooltipContent>
-            </Tooltip>
-            <Input
-              disabled
-              value={`${import.meta.env.VITE_FRONTEND_URL}/view/${timetableId}`}
-              className="text-xl ml-0 rounded-none bg-muted ring-primary-foreground ring-offset-primary-foreground border-primary-foreground"
-            />
-            <Tooltip delayDuration={100}>
-              <TooltipTrigger asChild>
-                <Button
-                  className="rounded-l-none bg-green-700 hover:bg-green-600 text-green-100 rounded-r-lg px-4 mr-0"
-                  onClick={() => {
-                    navigator.clipboard.writeText(
-                      `${
-                        import.meta.env.VITE_FRONTEND_URL
-                      }/view/${timetableId}`,
-                    );
-                    setCopied(true);
-                    setTimeout(() => setCopied(false), 2500);
-                  }}
-                >
-                  {copied ? <ClipboardCheck /> : <Clipboard />}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="bg-muted text-foreground border-primary-foreground">
-                {copied ? "Copied!" : "Copy link to timetable"}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-        <Button
-          className="bg-green-700 hover:bg-green-600 w-1/3 mt-8 text-green-100 px-4 mr-0 text-lg font-bold"
-          onClick={() =>
-            editTimetable(
-              {
-                id: timetable.id,
-                body: {
-                  name: nameInput.current?.value || timetable.name,
-                  isPrivate: privateTimetable,
-                  isDraft: false,
-                },
+    <main className="mx-auto w-full max-w-xl px-4 py-8 sm:py-16">
+      <Button
+        variant="ghost"
+        className="mb-6 -ml-3 gap-2"
+        onClick={() =>
+          router.navigate({ to: "/edit/$timetableId", params: { timetableId } })
+        }
+      >
+        <ArrowLeft className="size-4" />
+        Back to editing
+      </Button>
+      <h1 className="text-3xl font-semibold tracking-tight">
+        Ready to share your week?
+      </h1>
+      <p className="mt-2 mb-8 text-muted-foreground">
+        Give your timetable a name and choose how to share it.
+      </p>
+      <form
+        className="space-y-6"
+        onSubmit={async (event) => {
+          event.preventDefault();
+          if (isPending || !(name ?? timetable.name).trim()) return;
+          try {
+            await editTimetable({
+              id: timetable.id,
+              body: {
+                name: (name ?? timetable.name).trim(),
+                isPrivate,
+                isDraft: false,
               },
-              {
-                onSuccess: () => {
-                  router.navigate({
-                    to: "/",
-                  });
-                },
-              },
-            )
+            });
+            await router.navigate({
+              to: "/view/$timetableId",
+              params: { timetableId },
+            });
+          } catch {
+            /* The mutation reports the error. */
           }
+        }}
+      >
+        <div className="space-y-2">
+          <Label htmlFor="timetable-name">Timetable name</Label>
+          <Input
+            id="timetable-name"
+            required
+            maxLength={200}
+            value={name ?? timetable.name}
+            onChange={(event) => setName(event.target.value)}
+          />
+        </div>
+        <div className="flex items-start justify-between gap-4 rounded-xl border p-4">
+          <div>
+            <Label htmlFor="unlisted">Unlisted timetable</Label>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {isPrivate
+                ? "Only people you share the link with can find it."
+                : "Your timetable can be discovered publicly."}{" "}
+              Anyone with the link can view it after publishing.
+            </p>
+          </div>
+          <Switch
+            id="unlisted"
+            checked={isPrivate}
+            onCheckedChange={setPrivate}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="share-link">Share link</Label>
+          <div className="flex gap-2">
+            <Input
+              id="share-link"
+              value={link}
+              readOnly
+              className="min-w-0"
+              onFocus={(event) => event.target.select()}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              aria-label="Copy timetable link"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(link);
+                  setCopied(true);
+                } catch {
+                  toast({
+                    title: "Could not copy link",
+                    description: "Select the link and copy it manually.",
+                    variant: "destructive",
+                  });
+                }
+              }}
+            >
+              {copied ? (
+                <Check className="size-4" />
+              ) : (
+                <Copy className="size-4" />
+              )}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            The link becomes available to others once you publish.
+          </p>
+        </div>
+        {!timetable.sections.length && (
+          <p role="alert" className="text-sm text-destructive">
+            Add a course before publishing.
+          </p>
+        )}
+        {!!timetable.warnings.length && (
+          <p role="alert" className="text-sm text-destructive">
+            Complete the missing sections before publishing.
+          </p>
+        )}
+        <Button
+          type="submit"
+          disabled={
+            isPending ||
+            !!timetable.warnings.length ||
+            !timetable.sections.length
+          }
+          className="w-full gap-2 bg-emerald-700 text-white hover:bg-emerald-600"
         >
-          Finish
+          {isPending && <LoaderCircle className="size-4 animate-spin" />}
+          {isPending ? "Publishing..." : "Publish timetable"}
         </Button>
-      </div>
-    </div>
+      </form>
+    </main>
   );
 }
-
 export default finalizeTimetableRoute;

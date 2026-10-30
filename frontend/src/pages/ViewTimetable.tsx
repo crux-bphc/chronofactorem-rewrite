@@ -9,11 +9,8 @@ import {
   TimetablePageShell,
   timetablePageLoader,
 } from "@/components/TimetablePageShell";
-import {
-  TimetableActionType,
-  TimetableProvider,
-  useTimetableState,
-} from "@/context";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { TimetableProvider, useTimetableState } from "@/context";
 import CenteredSpinner from "../components/CenteredSpinner";
 import NotFound from "../components/NotFound";
 import { SideMenu } from "../components/SideMenu";
@@ -38,92 +35,99 @@ const viewTimetableRoute = new Route({
 function ViewTimetable() {
   const {
     state: { isVertical, courses, timetable, screenIsLarge },
-    dispatch,
   } = useTimetableState();
 
   const screenshotContentRef = useRef<HTMLDivElement>(null);
   const [isScreenshotMode, setIsScreenshotMode] = useState(false);
 
-  const generateScreenshot = useCallback(() => {
-    const screenShotContent = screenshotContentRef.current;
+  const generateScreenshot = useCallback(async () => {
+    if (isScreenshotMode) return;
     setIsScreenshotMode(true);
-    const isLarge = screenIsLarge;
-    dispatch({
-      type: TimetableActionType.UpdateScreenIsLarge,
-      screenIsLarge: true,
-    });
-
-    if (screenShotContent === null) {
-      return;
-    }
-
-    // use some standard values where it is going to render properly
-    screenShotContent.style.height = isVertical ? "640px" : "512px";
-    screenShotContent.style.width = "1920px";
-
-    toPng(screenShotContent, {
-      cacheBust: true,
-    })
-      .then((dataUrl) => {
-        const link = document.createElement("a");
-        link.download = "timetable.png";
-        link.href = dataUrl;
-        link.click();
-
-        // later remove those values let the browser figure it out the proper values
-        screenShotContent.style.height = "";
-        screenShotContent.style.width = "";
-
-        setIsScreenshotMode(false);
-        dispatch({
-          type: TimetableActionType.UpdateScreenIsLarge,
-          screenIsLarge: isLarge,
-        });
-      })
-      .catch((err: Error) => {
-        setIsScreenshotMode(false);
-        dispatch({
-          type: TimetableActionType.UpdateScreenIsLarge,
-          screenIsLarge: isLarge,
-        });
-
-        console.error("something went wrong with image generation", err);
-        toast({
-          title: "Error",
-          description: err.message,
-          variant: "destructive",
-          action: <ReportIssueToastAction />,
-        });
+    try {
+      await new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      );
+      await document.fonts.ready;
+      const content = screenshotContentRef.current;
+      if (!content)
+        throw new Error(
+          "The timetable image could not be prepared. Please try again.",
+        );
+      const dataUrl = await toPng(content, {
+        cacheBust: true,
+        pixelRatio: 2,
+        style: { position: "static" },
       });
-  }, [screenIsLarge, dispatch, isVertical]);
+      const link = document.createElement("a");
+      link.download = "timetable.png";
+      link.href = dataUrl;
+      link.click();
+    } catch (error) {
+      toast({
+        title: "Could not export timetable",
+        description:
+          error instanceof Error ? error.message : "Please try again.",
+        variant: "destructive",
+        action: <ReportIssueToastAction />,
+      });
+    } finally {
+      setIsScreenshotMode(false);
+    }
+  }, [isScreenshotMode]);
 
   if (timetable === undefined || courses === undefined) {
     return <ReportIssue error={"Error fetching queries"} />;
   }
 
-  const SideBar = (
-    <SideMenu isOnEditPage={false} isScreenshotMode={isScreenshotMode} />
-  );
+  const SideBar = <SideMenu isOnEditPage={false} isScreenshotMode={false} />;
 
   return (
-    <TimetablePageShell
-      header={
-        <TimetableHeader
+    <>
+      <TimetablePageShell
+        header={
+          <TimetableHeader
+            isOnEditPage={false}
+            generateScreenshot={generateScreenshot}
+            isExporting={isScreenshotMode}
+          />
+        }
+        sidebar={SideBar}
+        // the bg-background here is necessary so the generated image has the background in it
+        contentClassName="bg-background"
+      >
+        <TimetableGrid
+          isVertical={screenIsLarge ? isVertical : true}
           isOnEditPage={false}
-          generateScreenshot={generateScreenshot}
         />
-      }
-      sidebar={SideBar}
-      contentRef={screenshotContentRef}
-      // the bg-background here is necessary so the generated image has the background in it
-      contentClassName="bg-background"
-      popoverTriggerClassName="top-[-1rem]"
-    >
-      <TimetableGrid
-        isVertical={screenIsLarge ? isVertical : true}
-        isOnEditPage={false}
-      />
-    </TimetablePageShell>
+      </TimetablePageShell>
+      {isScreenshotMode && (
+        <TooltipProvider>
+          <div
+            aria-hidden="true"
+            className="pointer-events-none fixed left-[-10000px] top-0 w-480 bg-background p-8"
+            ref={screenshotContentRef}
+          >
+            <h2 className="mb-2 text-2xl font-semibold">{timetable.name}</h2>
+            <p className="mb-6 text-sm text-muted-foreground">
+              {timetable.acadYear}, semester {timetable.semester}
+            </p>
+            <div className="flex items-start gap-6">
+              <div className="w-80 shrink-0">
+                <SideMenu isOnEditPage={false} isScreenshotMode={true} />
+              </div>
+              <TimetableGrid
+                isVertical={isVertical}
+                isOnEditPage={false}
+                isExport
+              />
+            </div>
+            <p className="mt-6 text-xs text-muted-foreground">
+              Made with ChronoFactorem
+            </p>
+          </div>
+        </TooltipProvider>
+      )}
+    </>
   );
 }
 

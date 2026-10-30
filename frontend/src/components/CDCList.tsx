@@ -1,44 +1,8 @@
+import { getClashingExamTimes } from "lib";
 import { ChevronRight, ExternalLink } from "lucide-react";
 import { TimetableActionType, useTimetableState } from "@/context";
 import { Button } from "./ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-
-type ClashableCourse = {
-  code: string;
-  midsemStartTime: string | null;
-  midsemEndTime: string | null;
-  compreStartTime: string | null;
-  compreEndTime: string | null;
-};
-
-const getClashingExams = (
-  course: ClashableCourse,
-  examTimes: string[],
-): string[] | null => {
-  const {
-    code,
-    midsemStartTime,
-    midsemEndTime,
-    compreStartTime,
-    compreEndTime,
-  } = course;
-
-  if (midsemStartTime === null && compreStartTime === null) return null;
-
-  const clashes = examTimes.filter((x) => {
-    if (x.split("|")[0] === code) return false;
-    return (
-      (midsemStartTime !== null &&
-        midsemEndTime !== null &&
-        x.includes(`${midsemStartTime}|${midsemEndTime}`)) ||
-      (compreStartTime !== null &&
-        compreEndTime !== null &&
-        x.includes(`${compreStartTime}|${compreEndTime}`))
-    );
-  });
-
-  return clashes.length === 0 ? null : clashes;
-};
 
 export const CDCList = () => {
   const {
@@ -67,10 +31,10 @@ export const CDCList = () => {
                 })
               }
               key={course.id}
-              className="rounded-none text-left py-8 bg-secondary dark:hover:bg-slate-700 hover:bg-slate-200"
+              className="h-auto min-h-16 w-full whitespace-normal rounded-lg p-3 text-left"
             >
               <div className="flex justify-between w-full items-center">
-                <span>{`${course.code}: ${course.name}`}</span>
+                <span className="min-w-0">{`${course.code}: ${course.name}`}</span>
                 <ChevronRight />
               </div>
             </Button>
@@ -101,7 +65,7 @@ export const CDCList = () => {
               {courseOptions.options
                 .map((course) => {
                   const clashing = timetable
-                    ? getClashingExams(course, timetable.examTimes)
+                    ? getClashingExamTimes(course, timetable.examTimes)
                     : null;
                   return (
                     // biome-ignore lint/a11y/noStaticElementInteractions: need to check if button works styling wise

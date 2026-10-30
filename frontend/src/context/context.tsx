@@ -1,34 +1,38 @@
 import { useQuery } from "@tanstack/react-query";
 import { notFound, useParams } from "@tanstack/react-router";
 import type React from "react";
-import { createContext, useContext, useEffect, useReducer } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+} from "react";
 import CenteredSpinner from "@/components/CenteredSpinner";
 import useCourse from "@/data-access/hooks/useCourse";
 import { courseQueryOptions } from "@/data-access/hooks/useCourses";
 import useTimetable from "@/data-access/hooks/useTimetable";
 import useUser from "@/data-access/hooks/useUser";
+import {
+  filterCoursesInTimetable,
+  formatCDCWarningsAndOptions,
+  getFilledTimetableSections,
+} from "@/utils/timetable";
 import reducer from "./reducer";
 import {
   type Action,
   TimetableActionType,
   type TimetableStateType,
+  type TimetableUIState,
 } from "./types";
 
-const initialTimetableState: TimetableStateType = {
+const initialTimetableState: TimetableUIState = {
   isVertical: false,
-  isCopyingTimetable: false,
-  user: undefined,
-  courses: undefined,
-  timetable: undefined,
-  coursesInTimetable: [],
-  cdcs: [],
+  sidebarOpen: false,
   currentCourseID: null,
-  course: undefined,
-  uniqueSectionTypes: [],
-  currentSectionType: "L",
+  currentSectionType: null,
   currentTab: "CDCs",
-  screenIsLarge: window.matchMedia("(min-width: 1024px)").matches,
-  timetableDetailsSections: [],
+  screenIsLarge: false,
   searchTerm: "",
 };
 
@@ -37,12 +41,15 @@ type TimetableProviderType = {
   dispatch: React.Dispatch<Action>;
 };
 
-const TimetableState = createContext<TimetableProviderType>({
-  state: initialTimetableState,
-  dispatch: () => null,
-});
+const TimetableState = createContext<TimetableProviderType | undefined>(
+  undefined,
+);
 
-export const useTimetableState = () => useContext(TimetableState);
+export const useTimetableState = () => {
+  const value = useContext(TimetableState);
+  if (!value) throw new Error("Timetable state requires a TimetableProvider");
+  return value;
+};
 
 export const TimetableProvider = ({
   children,
@@ -53,7 +60,20 @@ export const TimetableProvider = ({
     strict: false,
   });
   if (timetableId === undefined) throw notFound();
-  const [state, dispatch] = useReducer(reducer, initialTimetableState);
+  return (
+    <TimetableDataProvider key={timetableId} timetableId={timetableId}>
+      {children}
+    </TimetableDataProvider>
+  );
+};
+
+const TimetableDataProvider = ({
+  children,
+  timetableId,
+}: {
+  children: React.ReactNode;
+  timetableId: string;
+}) => {
   const { data: user, isLoading: isUserLoading } = useUser();
   const { data: timetable, isLoading: isTimetableLoading } =
     useTimetable(timetableId);
@@ -68,40 +88,53 @@ export const TimetableProvider = ({
     ),
     enabled: timetable !== undefined,
   });
+  const [state, dispatch] = useReducer(reducer, {
+    ...initialTimetableState,
+    screenIsLarge: window.matchMedia("(min-width: 1024px)").matches,
+    currentTab: timetable?.draft ? "CDCs" : "currentCourses",
+  });
   const { data: course } = useCourse(state.currentCourseID);
 
-  useEffect(() => {
-    if (!courses || !timetable) return;
-    dispatch({
-      type: TimetableActionType.UpdateCoursesAndTimetable,
-      courses,
-      timetable,
-    });
-  }, [courses, timetable]);
+  const value = useMemo(() => {
+    const uniqueSectionTypes = course
+      ? [...new Set(course.sections.map((section) => section.type))].sort()
+      : [];
+    return {
+      state: {
+        ...state,
+        user,
+        timetable,
+        courses,
+        course,
+        uniqueSectionTypes,
+        currentSectionType:
+          state.currentSectionType ?? uniqueSectionTypes[0] ?? null,
+        coursesInTimetable:
+          courses && timetable
+            ? filterCoursesInTimetable(courses, timetable)
+            : [],
+        timetableDetailsSections:
+          courses && timetable
+            ? getFilledTimetableSections(courses, timetable)
+            : [],
+        cdcs:
+          courses && timetable
+            ? formatCDCWarningsAndOptions(courses, timetable)
+            : [],
+      },
+      dispatch,
+    };
+  }, [state, user, timetable, courses, course]);
 
   useEffect(() => {
-    if (!user) return;
-    dispatch({
-      type: TimetableActionType.UpdateUser,
-      user,
-    });
-  }, [user]);
-
-  useEffect(() => {
-    if (!course) return;
-    dispatch({
-      type: TimetableActionType.UpdateCourse,
-      course,
-    });
-  }, [course]);
-
-  useEffect(() => {
-    window.matchMedia("(min-width: 1024px)").addEventListener("change", (e) =>
+    const media = window.matchMedia("(min-width: 1024px)");
+    const update = () =>
       dispatch({
         type: TimetableActionType.UpdateScreenIsLarge,
-        screenIsLarge: e.matches,
-      }),
-    );
+        screenIsLarge: media.matches,
+      });
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
   }, []);
 
   if (isUserLoading || isCoursesLoading || isTimetableLoading) {
@@ -109,8 +142,6 @@ export const TimetableProvider = ({
   }
 
   return (
-    <TimetableState.Provider value={{ state, dispatch }}>
-      {children}
-    </TimetableState.Provider>
+    <TimetableState.Provider value={value}>{children}</TimetableState.Provider>
   );
 };

@@ -12,7 +12,7 @@ export default function RootComponent() {
   const showNavbar = pathname !== "/login" && pathname !== "/getDegrees";
 
   return (
-    <>
+    <div className="min-h-dvh flex flex-col">
       <Toaster />
       {showNavbar && <NavBar />}
       <Outlet />
@@ -22,6 +22,6 @@ export default function RootComponent() {
           <TanStackRouterDevtools position="bottom-left" />
         </>
       )}
-    </>
+    </div>
   );
 }
