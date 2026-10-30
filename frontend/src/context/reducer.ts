@@ -1,19 +1,11 @@
 import type { Reducer } from "react";
 import {
-  filterCoursesInTimetable,
-  formatCDCWarningsAndOptions,
-  getFilledTimetableSections,
-} from "@/utils/timetable";
-import {
   type Action,
   TimetableActionType,
-  type TimetableStateType,
+  type TimetableUIState,
 } from "./types";
 
-const reducer: Reducer<TimetableStateType, Action> = (
-  state: TimetableStateType,
-  action: Action,
-) => {
+const reducer: Reducer<TimetableUIState, Action> = (state, action) => {
   switch (action.type) {
     case TimetableActionType.SetSidebarOpen:
       return { ...state, sidebarOpen: action.open };
@@ -34,35 +26,6 @@ const reducer: Reducer<TimetableStateType, Action> = (
       return { ...state, currentTab: action.tab };
     case TimetableActionType.UpdateScreenIsLarge:
       return { ...state, screenIsLarge: action.screenIsLarge };
-    case TimetableActionType.UpdateCoursesAndTimetable: {
-      const { timetable, courses } = action;
-
-      return {
-        ...state,
-        courses,
-        timetable,
-        coursesInTimetable: filterCoursesInTimetable(courses, timetable).sort(),
-        timetableDetailsSections: getFilledTimetableSections(
-          courses,
-          timetable,
-        ),
-        cdcs: formatCDCWarningsAndOptions(courses, timetable),
-        currentTab: timetable.draft ? "CDCs" : "currentCourses",
-      };
-    }
-    case TimetableActionType.UpdateUser:
-      return { ...state, user: action.user };
-    case TimetableActionType.UpdateCourse: {
-      const uniqueSectionTypes = Array.from(
-        new Set(action.course.sections.map((section) => section.type)),
-      ).sort();
-      return {
-        ...state,
-        course: action.course,
-        uniqueSectionTypes,
-        currentSectionType: state.currentSectionType ?? uniqueSectionTypes[0],
-      };
-    }
     case TimetableActionType.SetSearchTerm:
       return { ...state, searchTerm: action.searchTerm };
     default:
