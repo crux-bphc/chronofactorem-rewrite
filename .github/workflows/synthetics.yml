@@ -1,0 +1,70 @@
+name: Update synthetics screenshots
+
+on:
+  pull_request:
+    types: [ labeled, synchronize ]
+
+# new pushes should cancel older ones
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    # same ready gate as ci.yml
+    if: ${{ (github.event.label.name == 'ready' || contains(github.event.pull_request.labels.*.name, 'ready')) && github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    container: mcr.microsoft.com/playwright:v1.64.1-noble
+    services:
+      postgres:
+        image: postgres:15.18-bookworm
+        env:
+          POSTGRES_USER: chrono
+          POSTGRES_PASSWORD: chrono
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DB_HOST: postgres
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.head_ref }}
+
+      - uses: pnpm/action-setup@v6
+        name: Install pnpm
+        with:
+          version: 11.18.0
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.14.1
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install -r --frozen-lockfile
+
+      - name: Take screenshots
+        run: pnpm -C synthetics start
+
+      # commits made with this token don't trigger workflows, so this can't
+      # loop
+      # human comment: what the FUCK!
+      # https://github.com/orgs/community/discussions/119597
+      # how is this real holy shit
+      - name: Commit changed screenshots
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git add synthetics/screenshots
+          git diff --cached --quiet && exit 0
+          git -c user.name="github-actions[bot]" \
+            -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -m "chore: update synthetics screenshots"
+          git push

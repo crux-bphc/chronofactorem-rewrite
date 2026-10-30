@@ -2,6 +2,7 @@ packages:
   - "lib"
   - "frontend"
   - "backend"
+  - "synthetics"
 allowBuilds:
   '@swc/core': true
   esbuild: true
