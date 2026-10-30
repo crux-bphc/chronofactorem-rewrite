@@ -1,11 +1,12 @@
 import { X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useTimetableState } from "@/context";
+import { buildTimetableGrid, type TimetableCell } from "@/utils/timetableGrid";
 
 export function TimetableGrid({
   isVertical,
@@ -112,109 +113,29 @@ export function TimetableGrid({
     "7 - 8",
     "8 - 9",
   ];
-  const [displayCols, setDisplayCols] = useState(13);
-  const [displayRows, setDisplayRows] = useState(6);
-
-  const { grid, spans, skipped } = useMemo(() => {
-    const grid: ({
-      id: string;
-      name: string;
-      courseId: string;
-      room: string;
-      code: string;
-      type: string;
-      number: number;
-      instructors: string[];
-    } | null)[] = Array(13 * 6);
-    for (let i = 0; i < grid.length; i++) {
-      grid[i] = null;
-    }
-    for (let i = 0; i < timetableDetailsSections.length; i++) {
-      for (let j = 0; j < timetableDetailsSections[i].roomTime.length; j++) {
-        const [code, room, day, hour] =
-          timetableDetailsSections[i].roomTime[j].split(":");
-        const remainder = daysOfWeek.indexOf(day);
-        const quotient = Number.parseInt(hour, 10) - 1;
-        grid[
-          isVertical ? remainder + quotient * 6 : quotient + remainder * 13
-        ] = {
-          id: timetableDetailsSections[i].id,
-          courseId: timetableDetailsSections[i].courseId,
-          room: room,
-          code: code,
-          type: timetableDetailsSections[i].type,
-          number: timetableDetailsSections[i].number,
-          instructors: timetableDetailsSections[i].instructors,
-          name: timetableDetailsSections[i].name,
-        };
-      }
-    }
-
-    const minDisplayCols = 9;
-    let nonNullColumns = 13;
-    for (let j = 12; j >= minDisplayCols; j--) {
-      let flag = true;
-      for (let i = 0; i < 6; i++) {
-        if ((isVertical ? grid[j * 6 + i] : grid[i * 13 + j]) !== null) {
-          flag = false;
-          break;
-        }
-      }
-      if (flag) {
-        nonNullColumns = j;
-      } else {
-        break;
-      }
-    }
-    setDisplayCols(nonNullColumns);
-
-    const minDisplayRows = 5;
-    let nonNullRows = 6;
-    for (let j = 5; j >= minDisplayRows; j--) {
-      let flag = true;
-      for (let i = 0; i < 13; i++) {
-        if ((isVertical ? grid[i * 6 + j] : grid[j * 13 + i]) !== null) {
-          flag = false;
-          break;
-        }
-      }
-      if (flag) {
-        nonNullRows = j;
-      } else {
-        break;
-      }
-    }
-    setDisplayRows(nonNullRows);
-
-    // merge runs of consecutive hours belonging to the same section and room
-    // into one spanning cell. hours advance along columns in the horizontal
-    // layout (stride 1) and along rows in the vertical layout (stride 6).
-    const stride = isVertical ? 6 : 1;
+  const { grid, spans, skipped, displayRows, displayCols } = useMemo(() => {
+    const model = buildTimetableGrid(timetableDetailsSections);
+    const grid: (TimetableCell | null)[] = Array(13 * 6).fill(null);
     const spans = new Map<number, number>();
     const skipped = new Set<number>();
-    for (let i = 0; i < grid.length; i++) {
-      const cell = grid[i];
-      if (cell === null || skipped.has(i)) {
-        continue;
-      }
-      let span = 1;
-      while (
-        i + stride * span < grid.length &&
-        // in the horizontal layout a run must not wrap into the next day
-        (isVertical || (i % 13) + span < 13) &&
-        grid[i + stride * span]?.id === cell.id &&
-        // a merged cell only shows one room, so a room change ends the run
-        grid[i + stride * span]?.room === cell.room
-      ) {
-        skipped.add(i + stride * span);
-        span++;
-      }
-      if (span > 1) {
-        spans.set(i, span);
+    for (const cell of model.cells) {
+      const start = isVertical
+        ? cell.day + cell.hour * 6
+        : cell.hour + cell.day * 13;
+      spans.set(start, cell.span);
+      for (let offset = 0; offset < cell.span; offset++) {
+        const index = start + offset * (isVertical ? 6 : 1);
+        grid[index] = cell;
+        if (offset) skipped.add(index);
       }
     }
-
-    return { grid, spans, skipped };
+    return {
+      grid,
+      spans,
+      skipped,
+      displayRows: model.dayCount,
+      displayCols: model.hourCount,
+    };
   }, [timetableDetailsSections, isVertical]);
 
   return (
