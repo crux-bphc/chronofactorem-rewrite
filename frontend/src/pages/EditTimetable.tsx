@@ -14,6 +14,7 @@ import {
   useTimetableState,
 } from "@/context";
 import { useAddRemoveTimetableSection } from "@/data-access/hooks/useTimetableSectionAction";
+import { timetableSearchSchema } from "@/lib/timetableSearch";
 import authenticatedRoute from "../AuthenticatedRoute";
 import CenteredSpinner from "../components/CenteredSpinner";
 import NotFound from "../components/NotFound";
@@ -26,6 +27,8 @@ const editTimetableRoute = new Route({
   getParentRoute: () => authenticatedRoute,
   path: "edit/$timetableId",
   loader: timetablePageLoader,
+  validateSearch: timetableSearchSchema,
+  loaderDeps: () => ({}),
   pendingComponent: CenteredSpinner,
   component: () => (
     <TimetableProvider>
