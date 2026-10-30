@@ -17,7 +17,7 @@ export const CDCWarningsTooltip = () => {
   const {
     state: { cdcs, coursesInTimetable, screenIsLarge },
   } = useTimetableState();
-  const { setTab, openCourse, closeCourse } = useTimetableNav();
+  const { showTab, openCourse } = useTimetableNav();
   const [open, setOpen] = useState(false);
 
   const cdcNotFoundWarning = useMemo(
@@ -86,10 +86,9 @@ export const CDCWarningsTooltip = () => {
   }, [coursesInTimetable, cdcs]);
 
   const handleMissingCDCClick = (courseId: string) => {
-    setTab("cdcs");
-    if (courseId === "") closeCourse();
-    else openCourse(courseId);
     setOpen(false);
+    if (courseId === "") showTab("cdcs");
+    else openCourse(courseId, undefined, "cdcs");
   };
 
   if (missingCDCs.length === 0 && cdcNotFoundWarning.length === 0) return null;

@@ -19,12 +19,12 @@ export function useTimetableNav() {
   // The route is not known statically here (edit and view share this hook),
   // so navigate relative to the current location and loosen the typing.
   const go = useCallback(
-    (
+    async (
       update: (prev: TimetableSearch) => TimetableSearch,
       opts: { push: boolean },
     ) => {
       // biome-ignore lint/suspicious/noExplicitAny: shared by two routes
-      (navigate as any)({
+      await (navigate as any)({
         search: update,
         ...(opts.push
           ? { state: { chronoNav: true } }
@@ -56,16 +56,39 @@ export function useTimetableNav() {
         go((p) => ({ ...p, tab }), { push: false }),
       setExam: (exam: "midsem" | "compre") =>
         go((p) => ({ ...p, exam }), { push: false }),
-      openCourse: (courseId: string, type?: SectionType) =>
+      showTab: (tab: NonNullable<TimetableSearch["tab"]>) =>
         go(
+          ({ course: _c, type: _t, ...rest }) => ({
+            ...rest,
+            tab,
+            ...(isPhone() ? { sheet: "courses" as const } : {}),
+          }),
+          { push: false },
+        ),
+      openCourse: async (
+        courseId: string,
+        type?: SectionType,
+        tab?: NonNullable<TimetableSearch["tab"]>,
+      ) => {
+        const phone = isPhone();
+        // Phone: the course lives inside the courses sheet. If the sheet is
+        // closed, push the list first so back returns to it before closing.
+        if (phone && !router.state.location.search.sheet) {
+          await go((p) => ({ ...p, sheet: "courses" as const }), {
+            push: true,
+          });
+        }
+        await go(
           (p) => ({
             ...p,
             course: courseId,
             type,
-            ...(isPhone() ? { sheet: "courses" as const } : {}),
+            ...(tab ? { tab } : {}),
+            ...(phone ? { sheet: "courses" as const } : {}),
           }),
           { push: true },
-        ),
+        );
+      },
       closeCourse: () => back(({ course: _c, type: _t, ...rest }) => rest),
       setType: (type: SectionType) =>
         go((p) => ({ ...p, type }), { push: false }),
@@ -74,6 +97,6 @@ export function useTimetableNav() {
       setDay: (day: number) => go((p) => ({ ...p, day }), { push: false }),
       setQuery: (q: string) => go((p) => ({ ...p, q }), { push: false }),
     }),
-    [search, go, back],
+    [search, go, back, router],
   );
 }

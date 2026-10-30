@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { notFound, useParams } from "@tanstack/react-router";
+import { notFound, useParams, useRouterState } from "@tanstack/react-router";
 import type React from "react";
 import {
   createContext,
@@ -91,6 +91,9 @@ const TimetableDataProvider = ({
     }),
   );
   const { search } = useTimetableNav();
+  const isOnEditPage = useRouterState({
+    select: (s) => s.location.pathname.startsWith("/edit"),
+  });
   const { data: course } = useCourse(search.course ?? null);
 
   const value = useMemo(() => {
@@ -106,8 +109,17 @@ const TimetableDataProvider = ({
         course,
         uniqueSectionTypes,
         currentCourseID: search.course ?? null,
-        currentSectionType: search.type ?? uniqueSectionTypes[0] ?? null,
-        currentTab: search.tab ?? (timetable?.draft ? "cdcs" : "courses"),
+        currentSectionType:
+          search.type && uniqueSectionTypes.includes(search.type)
+            ? search.type
+            : (uniqueSectionTypes[0] ?? null),
+        currentTab:
+          search.tab &&
+          (isOnEditPage || search.tab === "courses" || search.tab === "exams")
+            ? search.tab
+            : isOnEditPage && timetable?.draft
+              ? "cdcs"
+              : "courses",
         searchTerm: search.q ?? "",
         coursesInTimetable:
           courses && timetable
