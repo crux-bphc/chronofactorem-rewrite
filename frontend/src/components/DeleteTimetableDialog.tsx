@@ -27,7 +27,7 @@ export const DeleteTimetableDialog = ({
   onDeleted?: () => void;
   children: React.ReactNode;
 }) => {
-  const { mutate: deleteTimetable } = useDeleteTimetable();
+  const { mutate: deleteTimetable, isPending } = useDeleteTimetable();
 
   return (
     <AlertDialog>
@@ -35,6 +35,7 @@ export const DeleteTimetableDialog = ({
         <AlertDialogTrigger asChild>
           <TooltipTrigger asChild>
             <Button
+              aria-label="Delete timetable"
               variant="outline"
               className="p-3 hover:bg-destructive/90! hover:text-destructive-foreground"
             >
@@ -57,6 +58,7 @@ export const DeleteTimetableDialog = ({
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogPrimitive.Action asChild>
             <Button
+              disabled={isPending}
               variant="destructive"
               onClick={() =>
                 deleteTimetable(timetableId, { onSuccess: onDeleted })
