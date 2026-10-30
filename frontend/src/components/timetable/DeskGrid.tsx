@@ -32,10 +32,18 @@ type DeskGridProps = {
 
 const padClass = "px-2.5 py-[9px]";
 
-function BlockLines({ cell }: { cell: TimetableCell }) {
+function BlockLines({
+  cell,
+  edit = false,
+}: {
+  cell: TimetableCell;
+  edit?: boolean;
+}) {
   return (
     <>
-      <span className="block truncate text-base font-semibold">
+      <span
+        className={`block truncate text-base font-semibold ${edit ? "pr-5" : ""}`}
+      >
         {cell.code}
       </span>
       <span className="mt-[3px] block truncate text-sm text-ink-muted">
@@ -75,12 +83,12 @@ export function DeskGrid({
       style={
         rows
           ? {
-              gridTemplateColumns: `48px repeat(${hourCount}, minmax(64px, 1fr))`,
-              gridTemplateRows: `26px repeat(${dayCount}, minmax(88px, 1fr))`,
+              gridTemplateColumns: `48px repeat(${hourCount}, minmax(38px, 1fr))`,
+              gridTemplateRows: `26px repeat(${dayCount}, minmax(72px, 1fr))`,
             }
           : {
-              gridTemplateColumns: `48px repeat(${dayCount}, minmax(120px, 1fr))`,
-              gridTemplateRows: `26px repeat(${hourCount}, minmax(52px, 1fr))`,
+              gridTemplateColumns: `48px repeat(${dayCount}, minmax(86px, 1fr))`,
+              gridTemplateRows: `26px repeat(${hourCount}, minmax(44px, 1fr))`,
             }
       }
     >
@@ -175,7 +183,7 @@ export function DeskGrid({
                     aria-label={`Edit ${cell.courseId} ${cell.type}${cell.number}, press Delete to remove`}
                     className={`flex size-full cursor-pointer flex-col justify-start rounded-md text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring disabled:opacity-60 ${padClass}`}
                   >
-                    <BlockLines cell={cell} />
+                    <BlockLines cell={cell} edit />
                   </button>
                 ) : (
                   <div className={`size-full ${padClass}`}>
@@ -210,7 +218,7 @@ export function DeskGrid({
             data-visible={ghostVisible ? "" : undefined}
             aria-hidden="true"
             style={place(cell.day, cell.hour, cell.span)}
-            className={`tt-ghost pointer-events-none relative z-2 min-w-0 overflow-hidden rounded-md bg-transparent text-ink-muted outline-[1.5px] -outline-offset-[1.5px] outline-ink-faint outline-dashed ${padClass} [&_span]:text-ink-muted`}
+            className={`tt-ghost pointer-events-none relative z-2 min-w-0 overflow-hidden rounded-md bg-surface/85 text-ink-muted outline-[1.5px] -outline-offset-[1.5px] outline-ink-faint outline-dashed ${padClass} [&_span]:text-ink-muted`}
           >
             <BlockLines cell={cell} />
           </div>
