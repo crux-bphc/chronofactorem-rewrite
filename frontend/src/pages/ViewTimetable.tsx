@@ -124,7 +124,11 @@ function ViewTimetable() {
               {/* a stretched grid cell has a definite height, so the grid's
               h-full rows and time labels line up like on the live page */}
               <div className="min-w-0 [&>div]:h-full">
-                <TimetableGrid isVertical={isVertical} isOnEditPage={false} />
+                <TimetableGrid
+                  isVertical={isVertical}
+                  isOnEditPage={false}
+                  isExport
+                />
               </div>
             </div>
             <p className="mt-6 text-xs text-muted-foreground">
