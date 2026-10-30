@@ -1,3 +1,4 @@
+import { getClashingExamTimes } from "lib";
 import { Bird, ChevronRight, HelpCircle } from "lucide-react";
 import { useMemo } from "react";
 import { TimetableActionType, useTimetableState } from "@/context";
@@ -14,62 +15,17 @@ export const CourseSearchResults = ({
   } = useTimetableState();
 
   const courseSearchResults = useMemo(() => {
-    if (courses === undefined || timetable === undefined) return [];
-    return (
-      debouncedSearchTerm === ""
-        ? courses
-        : courses.filter((e) =>
-            `${e.code}: ${e.name}`
-              .toLowerCase()
-              .includes(debouncedSearchTerm.toLowerCase()),
-          )
-    ).map((e) => {
-      const withClash = e as unknown as {
-        id: string;
-        code: string;
-        name: string;
-        midsemStartTime: string | null;
-        midsemEndTime: string | null;
-        compreStartTime: string | null;
-        compreEndTime: string | null;
-        clashing: null | string[];
-      };
-      if (e.midsemStartTime === null && e.compreStartTime === null) {
-        withClash.clashing = null;
-        return withClash;
-      }
-      if (e.midsemStartTime === null && e.compreStartTime !== null) {
-        const clashes = timetable.examTimes.filter((x) => {
-          if (x.split("|")[0] === e.code) return false;
-          return x.includes(
-            `${withClash.compreStartTime}|${withClash.compreEndTime}`,
-          );
-        });
-        withClash.clashing = clashes.length === 0 ? null : clashes;
-        return withClash;
-      }
-      if (e.midsemStartTime !== null && e.compreStartTime === null) {
-        const clashes = timetable.examTimes.filter((x) => {
-          if (x.split("|")[0] === e.code) return false;
-          return x.includes(
-            `${withClash.midsemStartTime}|${withClash.midsemEndTime}`,
-          );
-        });
-        withClash.clashing = clashes.length === 0 ? null : clashes;
-        return withClash;
-      }
-      const clashes = timetable.examTimes.filter((x) => {
-        if (x.split("|")[0] === e.code) return false;
-        return (
-          x.includes(
-            `${withClash.midsemStartTime}|${withClash.midsemEndTime}`,
-          ) ||
-          x.includes(`${withClash.compreStartTime}|${withClash.compreEndTime}`)
-        );
-      });
-      withClash.clashing = clashes.length === 0 ? null : clashes;
-      return withClash;
-    });
+    if (!courses || !timetable) return [];
+    return courses
+      .filter((course) =>
+        `${course.code}: ${course.name}`
+          .toLowerCase()
+          .includes(debouncedSearchTerm.toLowerCase()),
+      )
+      .map((course) => ({
+        ...course,
+        clashing: getClashingExamTimes(course, timetable.examTimes),
+      }));
   }, [courses, debouncedSearchTerm, timetable]);
 
   return (
