@@ -5,6 +5,7 @@ import {
   Edit2,
   GripHorizontal,
   GripVertical,
+  LoaderCircle,
   Send,
   Trash,
 } from "lucide-react";
@@ -26,9 +27,11 @@ import { router } from "../router";
 const TimetableHeader = ({
   isOnEditPage,
   generateScreenshot,
+  isExporting = false,
 }: {
   isOnEditPage: boolean;
   generateScreenshot?: () => void;
+  isExporting?: boolean;
 }) => {
   const {
     state: { isVertical, user, courses, timetable, screenIsLarge },
@@ -78,10 +81,15 @@ const TimetableHeader = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
+                disabled={isExporting}
                 onClick={generateScreenshot}
                 className="flex justify-between items-center gap-2 md:text-md text-sm"
               >
-                <Download className="w-5 h-5 md:w-6 md:h-6" />
+                {isExporting ? (
+                  <LoaderCircle className="w-5 h-5 md:w-6 md:h-6 animate-spin" />
+                ) : (
+                  <Download className="w-5 h-5 md:w-6 md:h-6" />
+                )}
                 PNG
               </Button>
             </TooltipTrigger>
