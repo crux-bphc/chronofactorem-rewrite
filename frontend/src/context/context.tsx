@@ -27,6 +27,7 @@ import {
 
 const initialTimetableState: TimetableStateType = {
   isVertical: false,
+  sidebarOpen: false,
   isCopyingTimetable: false,
   user: undefined,
   courses: undefined,

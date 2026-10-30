@@ -9,7 +9,7 @@ const ExamTab = () => {
   return (
     <TabsContent
       value="exams"
-      className="flex data-[state=inactive]:h-0 w-[26rem] flex-col h-full overflow-y-scroll"
+      className="flex min-h-0 flex-1 data-[state=inactive]:hidden flex-col overflow-y-auto"
     >
       <span className="text-xl font-bold pl-4 flex mb-2">Midsems</span>
       {timetable.examTimes

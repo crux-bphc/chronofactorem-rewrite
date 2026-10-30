@@ -11,7 +11,7 @@ const ViewCoursesTab = () => {
   return (
     <TabsContent
       value="currentCourses"
-      className="flex h-full data-[state=inactive]:h-0 w-[26rem] overflow-y-scroll flex-col px-2 gap-2"
+      className="flex min-h-0 flex-1 data-[state=inactive]:hidden overflow-y-auto flex-col px-2 gap-2"
     >
       {coursesInTimetable.map((course) => {
         if (course === undefined) return null;

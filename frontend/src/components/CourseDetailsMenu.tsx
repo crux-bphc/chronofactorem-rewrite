@@ -78,8 +78,8 @@ const CourseDetailsMenu = () => {
   if (timetable === undefined) return;
 
   return (
-    <div className="bg-secondary w-[26rem] h-[calc(100vh-13rem)]">
-      <div className="flex items-center py-2 w-full">
+    <div className="bg-secondary flex h-full min-h-0 w-full flex-col">
+      <div className="flex shrink-0 items-center py-2 w-full">
         <Button
           variant={"ghost"}
           className="rounded-full flex ml-2 px-2 mr-2 items-center hover:bg-secondary-foreground/10"
@@ -93,15 +93,15 @@ const CourseDetailsMenu = () => {
         >
           <ArrowLeft />
         </Button>
-        <span className="font-semibold text-md h-full">
+        <span className="font-semibold text-md">
           {course?.code}: {` ${course?.name}`}
         </span>
       </div>
       <Tabs
         value={currentSectionType ?? undefined}
-        className=" h-[calc(100vh-20rem)]"
+        className="flex min-h-0 flex-1 flex-col"
       >
-        <TabsList className="w-full mb-2">
+        <TabsList className="w-full mb-2 shrink-0">
           {uniqueSectionTypes.map((sectionType) => {
             return (
               <TabsTrigger
@@ -125,10 +125,10 @@ const CourseDetailsMenu = () => {
           return (
             <TabsContent
               value={sectionType}
-              className="h-[calc(100vh-20rem)]"
+              className="min-h-0 flex-1"
               key={sectionType}
             >
-              <div className="flex flex-col gap-2 p-0 m-0 px-2 overflow-y-scroll w-[26rem] h-[calc(100vh-20rem)]">
+              <div className="flex flex-col gap-2 p-0 m-0 px-2 overflow-y-auto h-full">
                 {course?.sections
                   .filter((section) => section.type === sectionType)
                   .map((section) => {
