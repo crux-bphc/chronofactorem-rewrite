@@ -62,5 +62,6 @@ export function startThemeTransition(
       );
     })
     .catch(() => {});
-  transition.finished.finally(() => root.classList.remove("theme-transition"));
+  const cleanup = () => root.classList.remove("theme-transition");
+  transition.finished.then(cleanup, cleanup);
 }
