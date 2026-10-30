@@ -62,13 +62,22 @@ export function formatCardMeta(t: Timetable, now: Date = new Date()): string {
 
 function StatusChip({ timetable }: { timetable: Timetable }) {
   if (timetable.draft) return <Badge variant="chip">Draft</Badge>;
-  if (timetable.archived)
+  if (timetable.archived) {
+    const Visibility = timetable.private ? Lock : Globe;
     return (
       <Badge variant="chip">
         <Archive className="size-3" />
         Archived
+        <span aria-hidden="true" className="text-ink-faint">
+          ·
+        </span>
+        <Visibility className="size-3" />
+        <span className="sr-only">
+          , {timetable.private ? "private" : "public"}
+        </span>
       </Badge>
     );
+  }
   if (timetable.private)
     return (
       <Badge variant="chip">
@@ -129,6 +138,7 @@ function TimetableCard({
           to={timetable.draft ? "/edit/$timetableId" : "/view/$timetableId"}
           params={{ timetableId: timetable.id }}
           onClick={() => onOpen(timetable.id)}
+          data-card-link
           style={
             shared ? { viewTransitionName: TIMETABLE_TITLE_VT } : undefined
           }
@@ -150,7 +160,7 @@ function TimetableCard({
             variant="quiet"
             size="icon"
             ref={menuButton}
-            aria-label="More actions"
+            aria-label={`More actions for ${timetable.name}`}
             className="relative z-10"
           >
             <Ellipsis />

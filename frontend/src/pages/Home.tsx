@@ -41,13 +41,59 @@ type Leaving = Map<
 // First-load stagger plays once per page load, not on back navigation.
 let staggered = false;
 
-function useCollapsingCards() {
+// Where keyboard focus goes once a card is deleted: the next card, else the
+// previous one, else the page heading. The order is read before the collapse.
+function focusAfterDelete(id: string): () => void {
+  const ids = [...document.querySelectorAll<HTMLElement>("[data-card-id]")].map(
+    (el) => el.dataset.cardId ?? "",
+  );
+  const at = ids.indexOf(id);
+  const candidates = [...ids.slice(at + 1), ...ids.slice(0, at).reverse()];
+  return () => {
+    const link = candidates
+      .map((c) =>
+        document.querySelector<HTMLElement>(
+          `[data-card-id="${c}"] a[data-card-link]`,
+        ),
+      )
+      .find((a) => a !== null && !a.closest("[inert]"));
+    (link ?? document.getElementById("home-title"))?.focus();
+  };
+}
+
+function useCollapsingCards(timetables: Timetable[] | undefined) {
   const [leaving, setLeaving] = useState<Leaving>(() => new Map());
+  // Deleted ids stay out of the live lists until the ["user"] refetch drops
+  // them, so a slow refetch can't bring a collapsed card back.
+  const [deleted, setDeleted] = useState<ReadonlySet<string>>(() => new Set());
+  useEffect(() => {
+    setDeleted((prev) => {
+      if (prev.size === 0) return prev;
+      const next = new Set(
+        [...prev].filter((id) => timetables?.some((t) => t.id === id)),
+      );
+      return next.size === prev.size ? prev : next;
+    });
+  }, [timetables]);
   const collapse = useCallback(
-    (timetable: Timetable, section: SectionName, index: number) =>
+    (timetable: Timetable, section: SectionName, index: number) => {
+      // Wait out the dialog's close and the card's own focus return to ⋯,
+      // then move focus on unless the user has already put it elsewhere.
+      const moveFocus = focusAfterDelete(timetable.id);
+      setTimeout(() => {
+        const active = document.activeElement;
+        if (
+          active === null ||
+          active === document.body ||
+          active.closest(`[data-card-id="${timetable.id}"], [role=alertdialog]`)
+        )
+          moveFocus();
+      }, 80);
+      setDeleted((prev) => new Set(prev).add(timetable.id));
       setLeaving((prev) =>
         new Map(prev).set(timetable.id, { timetable, section, index }),
-      ),
+      );
+    },
     [],
   );
   const done = useCallback(
@@ -60,7 +106,7 @@ function useCollapsingCards() {
       }),
     [],
   );
-  return { leaving, collapse, done };
+  return { leaving, deleted, collapse, done };
 }
 
 const prefersReducedMotion = () =>
@@ -90,7 +136,7 @@ const CollapsingCard = ({
   return (
     <div
       className={cn(
-        "grid transition-[grid-template-rows,opacity,transform] duration-(--d-2) ease-(--e-in)",
+        "grid transition-[grid-template-rows,opacity,scale] duration-(--d-2) ease-(--e-in)",
         leaving ? "grid-rows-[0fr] opacity-0 scale-[.96]" : "grid-rows-[1fr]",
       )}
       inert={leaving}
@@ -104,7 +150,10 @@ const CollapsingCard = ({
           done(id);
       }}
     >
-      <div className={cn("min-h-0", leaving && "overflow-hidden")}>
+      <div
+        data-card-id={id}
+        className={cn("min-h-0", leaving && "overflow-hidden")}
+      >
         {children}
       </div>
     </div>
@@ -194,14 +243,21 @@ function HomeSkeleton() {
         {[0, 1, 2].map((i) => (
           <div
             key={i}
-            className="flex items-center gap-3 rounded-xl border border-line bg-surface p-3"
+            className="grid grid-cols-[92px_1fr_auto] items-center gap-3.5 rounded-xl border border-line bg-surface p-3.5"
           >
-            <Skeleton className="h-16 w-[92px] shrink-0 rounded-[8px]" />
-            <div className="flex min-w-0 flex-1 flex-col gap-2">
-              <Skeleton className="h-4 w-2/5" />
-              <Skeleton className="h-3 w-3/5" />
-              <Skeleton className="h-5 w-12 rounded-full" />
+            <Skeleton className="h-16 w-[92px] rounded-[8px]" />
+            {/* Rows sized by the card's own line heights; the desktop meta
+                line usually wraps in a third of 1100px. */}
+            <div className="min-w-0">
+              <div className="flex h-[1lh] items-center text-lg">
+                <Skeleton className="h-3.5 w-2/5" />
+              </div>
+              <div className="mt-[3px] flex h-[1lh] items-center text-sm lg:h-[2lh]">
+                <Skeleton className="h-3 w-3/5" />
+              </div>
+              <Skeleton className="mt-[7px] h-[calc(1lh+6px)] w-16 rounded-full text-sm" />
             </div>
+            <div className="size-9" />
           </div>
         ))}
       </div>
@@ -231,7 +287,8 @@ function Home() {
     useCreateTimetable();
 
   const [sharedId, setSharedId] = useState(getSharedTimetable);
-  const { leaving, collapse, done } = useCollapsingCards();
+  const timetables = user?.timetables;
+  const { leaving, deleted, collapse, done } = useCollapsingCards(timetables);
   const stagger = useRef(!staggered).current;
   const hasData = user !== undefined;
   useEffect(() => {
@@ -243,15 +300,14 @@ function Home() {
     flushSync(() => setSharedId(id));
   };
 
-  const timetables = user?.timetables;
   const { drafts, published, archived } = useMemo(() => {
-    const all = timetables ?? [];
+    const all = (timetables ?? []).filter((t) => !deleted.has(t.id));
     return {
       drafts: all.filter((t) => t.draft && !t.archived).sort(byUpdated),
       published: all.filter((t) => !t.draft && !t.archived).sort(byUpdated),
       archived: all.filter((t) => t.archived).sort(byUpdated),
     };
-  }, [timetables]);
+  }, [timetables, deleted]);
 
   if (isLoading) {
     return <HomeSkeleton />;
@@ -306,7 +362,11 @@ function Home() {
 
   return (
     <main className={mainClass}>
-      <h1 className="pt-2 text-2xl font-semibold lg:pt-10 lg:text-3xl">
+      <h1
+        id="home-title"
+        tabIndex={-1}
+        className="pt-2 text-2xl font-semibold outline-none lg:pt-10 lg:text-3xl"
+      >
         Timetables
       </h1>
       {isEmpty ? (
