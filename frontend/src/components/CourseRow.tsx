@@ -14,13 +14,20 @@ type Course = z.infer<typeof courseType>;
 
 const rowPad = "px-3.5 py-3";
 
-function CourseText({ course }: { course: Course }) {
+function CourseText({
+  course,
+  extra,
+}: {
+  course: Course;
+  extra?: React.ReactNode;
+}) {
   return (
     <span className="flex min-w-0 flex-col">
       <span className="text-[15px] font-semibold text-ink">{course.code}</span>
       <span className="text-[12.5px] text-ink-muted">
         {titleCase(course.name)}
       </span>
+      {extra}
     </span>
   );
 }
@@ -29,10 +36,12 @@ function ClashRow({
   course,
   clashing,
   className,
+  extra,
 }: {
   course: Course;
   clashing: string[];
   className?: string;
+  extra?: React.ReactNode;
 }) {
   const pills = useExamClashPills(clashing);
   return (
@@ -42,7 +51,7 @@ function ClashRow({
         disabled
         className="block w-full text-left opacity-50"
       >
-        <CourseText course={course} />
+        <CourseText course={course} extra={extra} />
       </button>
       <ClashingWith>
         {pills.map((p) => (
@@ -59,22 +68,29 @@ export function CourseRow({
   onOpen,
   clashing,
   className,
+  extra,
 }: {
   course: Course;
   pills?: string[];
   onOpen?: () => void;
   clashing?: string[] | null;
   className?: string;
+  extra?: React.ReactNode;
 }) {
   if (clashing && clashing.length > 0) {
     return (
-      <ClashRow course={course} clashing={clashing} className={className} />
+      <ClashRow
+        course={course}
+        clashing={clashing}
+        className={className}
+        extra={extra}
+      />
     );
   }
 
   const content = (
     <>
-      <CourseText course={course} />
+      <CourseText course={course} extra={extra} />
       {pills && pills.length > 0 ? (
         <span className="flex flex-wrap justify-end gap-1">
           {pills.map((p) => (
