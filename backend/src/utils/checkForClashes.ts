@@ -1,3 +1,4 @@
+import { getClashingExamTimes } from "lib";
 import type { Course, Section, Timetable } from "../entity/entities.js";
 
 export const checkForClassHoursClash = (
@@ -40,75 +41,27 @@ export const checkForExamHoursClash = (
   timetable: Timetable,
   newCourse: Course,
 ) => {
-  const examTimes = timetable.examTimes;
-  const courseCodes = new Set<string>();
-  // key: start time, value: { courseCode, end time }
-  const examTimesMap = new Map<Date, { courseCode: string; end: Date }>();
-  for (const examTime of examTimes) {
-    const [course, _, start, end] = examTime.split("|");
-    courseCodes.add(course);
-    examTimesMap.set(new Date(start), {
-      courseCode: course,
-      end: new Date(end),
-    });
+  if (
+    timetable.examTimes.some((time) => time.split("|")[0] === newCourse.code)
+  ) {
+    return { clash: false, exam: "", course: "", sameCourse: true };
   }
-
-  if (courseCodes.has(newCourse.code)) {
-    return {
-      clash: false,
-      exam: "",
-      course: "",
-      sameCourse: true,
+  for (const exam of ["midsem", "compre"] as const) {
+    const course = {
+      ...newCourse,
+      midsemStartTime: exam === "midsem" ? newCourse.midsemStartTime : null,
+      midsemEndTime: exam === "midsem" ? newCourse.midsemEndTime : null,
+      compreStartTime: exam === "compre" ? newCourse.compreStartTime : null,
+      compreEndTime: exam === "compre" ? newCourse.compreEndTime : null,
     };
+    const clashes = getClashingExamTimes(course, timetable.examTimes);
+    if (clashes)
+      return {
+        clash: true,
+        exam,
+        course: clashes[0].split("|")[0],
+        sameCourse: false,
+      };
   }
-
-  if (newCourse.midsemStartTime !== null && newCourse.midsemEndTime !== null) {
-    const newMidsemStartTime = new Date(newCourse.midsemStartTime);
-    const newMidsemEndTime = new Date(newCourse.midsemEndTime);
-    for (const [key, value] of examTimesMap) {
-      const { courseCode, end } = value;
-      const start = key;
-      if (
-        (newMidsemStartTime <= start && newMidsemEndTime > start) ||
-        (newMidsemStartTime < end && newMidsemEndTime >= end) ||
-        (newMidsemStartTime >= start && newMidsemEndTime <= end)
-      ) {
-        return {
-          clash: true,
-          exam: "midsem",
-          course: courseCode,
-          sameCourse: false,
-        };
-      }
-    }
-  }
-
-  if (newCourse.compreStartTime !== null && newCourse.compreEndTime !== null) {
-    const newCompreStartTime = newCourse.compreStartTime;
-    const newCompreEndTime = newCourse.compreEndTime;
-
-    for (const [key, value] of examTimesMap) {
-      const { courseCode, end } = value;
-      const start = key;
-      if (
-        (newCompreStartTime <= start && newCompreEndTime > start) ||
-        (newCompreStartTime < end && newCompreEndTime >= end) ||
-        (newCompreStartTime >= start && newCompreEndTime <= end)
-      ) {
-        return {
-          clash: true,
-          exam: "compre",
-          course: courseCode,
-          sameCourse: false,
-        };
-      }
-    }
-  }
-
-  return {
-    clash: false,
-    exam: "",
-    course: "",
-    sameCourse: false,
-  };
+  return { clash: false, exam: "", course: "", sameCourse: false };
 };
