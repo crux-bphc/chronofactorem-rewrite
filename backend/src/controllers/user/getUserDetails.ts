@@ -51,8 +51,6 @@ export const getUserDetails = async (req: Request, res: Response) => {
         "timetable.lastUpdated",
       ])
       .where("user.id = :id", { id })
-      // without an order postgres returns timetables in whatever order it
-      // likes, so cards can swap places between loads
       .orderBy("timetable.id", "ASC")
       .getOne();
   } catch (err: any) {
