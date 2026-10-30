@@ -87,7 +87,7 @@ function AnnouncementGroup({
 }
 
 function Announcements() {
-  const { toast } = useToast();
+  const { toast, dismiss } = useToast();
   const { data: announcements, isLoading, isError, error } = useAnnouncements();
   const { open, show, hide } = useAnnouncementsSheet();
   const isDesktop = useIsDesktop();
@@ -168,6 +168,12 @@ function Announcements() {
   };
 
   const notifiedAnnouncements = useRef(new Set<string>());
+  const toastId = useRef<string | undefined>(undefined);
+
+  // The open sheet already shows everything; don't leave a toast over it.
+  useEffect(() => {
+    if (open && toastId.current) dismiss(toastId.current);
+  }, [open, dismiss]);
 
   useEffect(() => {
     const unreadAnnouncements =
@@ -182,7 +188,8 @@ function Announcements() {
       for (const announcement of unreadAnnouncements) {
         notifiedAnnouncements.current.add(announcement.id);
       }
-      toast({
+      if (open) return;
+      toastId.current = toast({
         title: "New Announcements",
         description: `You have ${
           unreadAnnouncements.length
@@ -195,9 +202,9 @@ function Announcements() {
             Mark all as read
           </ToastAction>
         ),
-      });
+      }).id;
     }
-  }, [announcements, readAnnouncements, toast]);
+  }, [announcements, readAnnouncements, toast, open]);
 
   const sorted = [...(announcements ?? [])].sort((a, b) => time(b) - time(a));
   const unread = sorted.filter((a) => !readAnnouncements.includes(a.id));
@@ -220,7 +227,7 @@ function Announcements() {
         className={cn(
           "px-3.5 py-3.5",
           isLeaving &&
-            "pointer-events-none translate-x-3 opacity-0 transition-[opacity,transform] duration-(--d-2) ease-(--e-in)",
+            "pointer-events-none translate-x-3 opacity-0 transition-[opacity,translate] duration-(--d-2) ease-(--e-in)",
           !isUnread &&
             justRead.has(announcement.id) &&
             "animate-in fade-in slide-in-from-top-1 duration-(--d-2)",
@@ -309,7 +316,7 @@ function Announcements() {
         <span
           aria-hidden="true"
           className={cn(
-            "absolute top-1 right-1 size-2 rounded-full bg-now ring-2 ring-bg transition-[transform,opacity] duration-(--d-2) ease-(--e-out)",
+            "absolute top-1 right-1 size-2 rounded-full bg-now ring-2 ring-bg transition-[scale,opacity] duration-(--d-2) ease-(--e-out)",
             hasUnread ? "scale-100 opacity-100" : "scale-0 opacity-0",
           )}
         />

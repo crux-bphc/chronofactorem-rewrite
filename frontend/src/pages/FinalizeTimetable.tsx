@@ -208,14 +208,14 @@ function FinalizeTimetable() {
               <Copy
                 aria-hidden="true"
                 className={cn(
-                  "col-start-1 row-start-1 transition-[opacity,transform] duration-(--d-2)",
+                  "col-start-1 row-start-1 transition-[opacity,scale] duration-(--d-2)",
                   copied ? "scale-[.6] opacity-0" : "scale-100 opacity-100",
                 )}
               />
               <Check
                 aria-hidden="true"
                 className={cn(
-                  "col-start-1 row-start-1 transition-[opacity,transform] duration-(--d-2)",
+                  "col-start-1 row-start-1 transition-[opacity,scale] duration-(--d-2)",
                   copied ? "scale-100 opacity-100" : "scale-[.6] opacity-0",
                 )}
               />
