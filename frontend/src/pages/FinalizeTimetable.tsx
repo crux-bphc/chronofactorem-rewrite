@@ -1,5 +1,11 @@
 import { Route } from "@tanstack/react-router";
-import { Clipboard, ClipboardCheck, Globe, Lock } from "lucide-react";
+import {
+  ArrowLeft,
+  Clipboard,
+  ClipboardCheck,
+  Globe,
+  Lock,
+} from "lucide-react";
 import { useRef, useState } from "react";
 import ReportIssue from "@/components/ReportIssue";
 import { TimetablePageError } from "@/components/TimetablePageShell";
@@ -9,6 +15,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { toast } from "@/components/ui/use-toast";
 import useEditTimetable from "@/data-access/hooks/useEditTimetable";
 import useTimetable, {
   timetableQueryOptions,
@@ -69,8 +76,21 @@ function FinalizeTimetable() {
   }
 
   return (
-    <div className="flex lg:pl-96 pl-12 text-foreground lg:pt-48 pt-40 w-full">
+    <div className="flex lg:pl-96 sm:pl-12 pl-4 text-foreground lg:pt-48 sm:pt-40 pt-16 w-full">
       <div className="flex flex-col w-full">
+        <Button
+          variant="ghost"
+          className="mb-4 -ml-4 gap-2 self-start"
+          onClick={() =>
+            router.navigate({
+              to: "/edit/$timetableId",
+              params: { timetableId },
+            })
+          }
+        >
+          <ArrowLeft className="size-4" />
+          Back to editing
+        </Button>
         <span className="text-5xl font-bold">{headingText}</span>
         <Label htmlFor="name" className="mt-8 mb-2 text-lg">
           Name
@@ -111,14 +131,22 @@ function FinalizeTimetable() {
               <TooltipTrigger asChild>
                 <Button
                   className="rounded-l-none bg-green-700 hover:bg-green-600 text-green-100 rounded-r-lg px-4 mr-0"
-                  onClick={() => {
-                    navigator.clipboard.writeText(
-                      `${
-                        import.meta.env.VITE_FRONTEND_URL
-                      }/view/${timetableId}`,
-                    );
-                    setCopied(true);
-                    setTimeout(() => setCopied(false), 2500);
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(
+                        `${
+                          import.meta.env.VITE_FRONTEND_URL
+                        }/view/${timetableId}`,
+                      );
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2500);
+                    } catch {
+                      toast({
+                        title: "Could not copy link",
+                        description: "Your browser blocked clipboard access.",
+                        variant: "destructive",
+                      });
+                    }
                   }}
                 >
                   {copied ? <ClipboardCheck /> : <Clipboard />}
