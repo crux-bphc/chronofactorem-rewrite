@@ -107,7 +107,7 @@ function FinalizeTimetable() {
             to: "/",
           });
         },
-        onSettled: () => {
+        onError: () => {
           finishing.current = false;
         },
       },
@@ -200,8 +200,11 @@ function FinalizeTimetable() {
           <Button
             variant="secondary"
             size="sm"
-            className={cn("h-8", copied && "text-brand")}
-            aria-label={copied ? undefined : "Copy link to timetable"}
+            className={cn(
+              "h-8 max-lg:after:-inset-[7px]",
+              copied && "text-brand",
+            )}
+            aria-label="Copy link to timetable"
             onClick={copyLink}
           >
             <span className="inline-grid size-4 place-items-center">
@@ -226,7 +229,12 @@ function FinalizeTimetable() {
                 copied ? "grid-cols-[1fr]" : "grid-cols-[0fr]",
               )}
             >
-              <span className="overflow-hidden whitespace-nowrap">Copied!</span>
+              <span
+                aria-hidden="true"
+                className="overflow-hidden whitespace-nowrap"
+              >
+                Copied!
+              </span>
             </span>
           </Button>
           <span aria-live="polite" className="sr-only">
