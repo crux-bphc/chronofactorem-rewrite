@@ -25,36 +25,34 @@ type CDCType = z.infer<typeof courseType> | SpecialCDCType;
 
 type TabType = "CDCs" | "search" | "currentCourses" | "exams";
 
-export type TimetableStateType = {
+export type TimetableUIState = {
   isVertical: boolean;
   sidebarOpen: boolean;
-  isCopyingTimetable: boolean;
+  currentCourseID: string | null;
+  currentSectionType: sectionTypeEnum | null;
+  currentTab: TabType;
+  screenIsLarge: boolean;
+  searchTerm: string;
+};
+
+export type TimetableStateType = TimetableUIState & {
   user: z.infer<typeof userWithTimetablesType> | undefined;
   courses: z.infer<typeof courseType>[] | undefined;
   timetable: z.infer<typeof timetableWithSectionsType> | undefined;
   coursesInTimetable: z.infer<typeof courseType>[];
   cdcs: CDCType[];
-  currentCourseID: string | null;
   course: z.infer<typeof courseWithSectionsType> | undefined;
   uniqueSectionTypes: sectionTypeList;
-  currentSectionType: sectionTypeEnum | null;
-  currentTab: TabType;
-  screenIsLarge: boolean;
   timetableDetailsSections: TimetableSectionType[];
-  searchTerm: string;
 };
 
 export enum TimetableActionType {
   SetSidebarOpen = 10,
   ToggleVertical = 0,
-  SetIsCopyingTimetable = 1,
   SetSelectedCourseAndSection = 2,
   SetSelectedSectionType = 3,
   SetMenuTab = 4,
   UpdateScreenIsLarge = 5,
-  UpdateCoursesAndTimetable = 6,
-  UpdateUser = 7,
-  UpdateCourse = 8,
   SetSearchTerm = 9,
 }
 
@@ -62,10 +60,6 @@ export type Action =
   | { type: TimetableActionType.SetSidebarOpen; open: boolean }
   | {
       type: TimetableActionType.ToggleVertical;
-    }
-  | {
-      type: TimetableActionType.SetIsCopyingTimetable;
-      isCopyingTimetable: boolean;
     }
   | {
       type: TimetableActionType.SetSelectedCourseAndSection;
@@ -83,19 +77,6 @@ export type Action =
   | {
       type: TimetableActionType.UpdateScreenIsLarge;
       screenIsLarge: boolean;
-    }
-  | {
-      type: TimetableActionType.UpdateCoursesAndTimetable;
-      courses: z.infer<typeof courseType>[];
-      timetable: z.infer<typeof timetableWithSectionsType>;
-    }
-  | {
-      type: TimetableActionType.UpdateUser;
-      user: z.infer<typeof userWithTimetablesType>;
-    }
-  | {
-      type: TimetableActionType.UpdateCourse;
-      course: z.infer<typeof courseWithSectionsType>;
     }
   | {
       type: TimetableActionType.SetSearchTerm;

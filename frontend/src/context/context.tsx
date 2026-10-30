@@ -23,24 +23,16 @@ import {
   type Action,
   TimetableActionType,
   type TimetableStateType,
+  type TimetableUIState,
 } from "./types";
 
-const initialTimetableState: TimetableStateType = {
+const initialTimetableState: TimetableUIState = {
   isVertical: false,
   sidebarOpen: false,
-  isCopyingTimetable: false,
-  user: undefined,
-  courses: undefined,
-  timetable: undefined,
-  coursesInTimetable: [],
-  cdcs: [],
   currentCourseID: null,
-  course: undefined,
-  uniqueSectionTypes: [],
-  currentSectionType: "L",
+  currentSectionType: null,
   currentTab: "CDCs",
-  screenIsLarge: window.matchMedia("(min-width: 1024px)").matches,
-  timetableDetailsSections: [],
+  screenIsLarge: false,
   searchTerm: "",
 };
 
@@ -49,12 +41,15 @@ type TimetableProviderType = {
   dispatch: React.Dispatch<Action>;
 };
 
-const TimetableState = createContext<TimetableProviderType>({
-  state: initialTimetableState,
-  dispatch: () => null,
-});
+const TimetableState = createContext<TimetableProviderType | undefined>(
+  undefined,
+);
 
-export const useTimetableState = () => useContext(TimetableState);
+export const useTimetableState = () => {
+  const value = useContext(TimetableState);
+  if (!value) throw new Error("Timetable state requires a TimetableProvider");
+  return value;
+};
 
 export const TimetableProvider = ({
   children,
