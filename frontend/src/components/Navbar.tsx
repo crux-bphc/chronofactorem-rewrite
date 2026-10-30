@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { AxiosError } from "axios";
-import { Plus } from "lucide-react";
+import { Info, Plus } from "lucide-react";
 import { useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
 import useCreateTimetable from "@/data-access/hooks/useCreateTimetable";
@@ -133,6 +133,11 @@ function AppBar({ user, showCreate, isCreating, create, showLogin }: BarProps) {
           </>
         ) : (
           <>
+            <Button variant="quiet" size="icon" aria-label="About" asChild>
+              <Link to="/about">
+                <Info />
+              </Link>
+            </Button>
             <ThemeButton />
             {showLogin && loginLink}
           </>
@@ -152,7 +157,7 @@ function DesktopNav({
 }: BarProps) {
   const linkClass = (active: boolean) =>
     cn(
-      "text-lg font-medium outline-none transition-colors duration-(--d-1) hover:text-ink",
+      "text-base font-medium outline-none transition-colors duration-(--d-1) hover:text-ink",
       active ? "text-ink" : "text-ink-muted",
     );
   return (

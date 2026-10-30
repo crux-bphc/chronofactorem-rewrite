@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { LogOut, Monitor, Moon, Sun, User } from "lucide-react";
+import { Info, LogOut, Monitor, Moon, Sun, User } from "lucide-react";
 import { useRef } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import {
@@ -15,6 +15,12 @@ import { Segmented } from "@/components/ui/segmented";
 type Theme = "light" | "dark" | "system";
 
 const THEMES: Theme[] = ["light", "dark", "system"];
+
+const THEME_NAMES: Record<Theme, string> = {
+  light: "Light",
+  dark: "Dark",
+  system: "Auto",
+};
 
 const OPTIONS = [
   {
@@ -80,13 +86,27 @@ export function AvatarMenu({ user }: { user: { name: string } }) {
             <span>Edit Profile</span>
           </Link>
         </DropdownMenuItem>
+        <DropdownMenuItem asChild className="lg:hidden">
+          <Link to="/about">
+            <Info className="size-4" />
+            <span>About</span>
+          </Link>
+        </DropdownMenuItem>
         {/* An item so keyboard users can reach it: arrows move onto the row,
             left/right then change the theme. Pointer use hits the segments. */}
         <DropdownMenuItem
           className="my-1 p-0 focus:bg-transparent"
           onSelect={(e) => e.preventDefault()}
+          aria-label={`Theme: ${THEME_NAMES[theme]}`}
           onKeyDown={(e) => {
-            if (e.target !== e.currentTarget) return;
+            if (e.target !== e.currentTarget) {
+              // the Segmented handles these itself; keep Radix from also
+              // moving focus between menu items
+              if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+                e.stopPropagation();
+              }
+              return;
+            }
             const step =
               e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
             if (!step) return;
@@ -110,6 +130,9 @@ export function AvatarMenu({ user }: { user: { name: string } }) {
               change(v, el ?? document.body);
             }}
           />
+          <span role="status" className="sr-only">
+            {`Theme: ${THEME_NAMES[theme]}`}
+          </span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
