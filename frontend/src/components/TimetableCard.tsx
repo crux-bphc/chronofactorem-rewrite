@@ -153,8 +153,6 @@ function TimetableCard({ timetable, showFooter }: Props) {
                     variant="outline"
                     onClick={(e) => {
                       e.stopPropagation();
-                      // Refreshing the user moves this card into the draft
-                      // section and unmounts it. Keep navigation on the promise.
                       editTimetableAsync({
                         id: timetable.id,
                         body: {
