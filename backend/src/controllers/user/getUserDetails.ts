@@ -51,6 +51,7 @@ export const getUserDetails = async (req: Request, res: Response) => {
         "timetable.lastUpdated",
       ])
       .where("user.id = :id", { id })
+      .orderBy("timetable.id", "ASC")
       .getOne();
   } catch (err: any) {
     logger.error("Error while querying for user: ", err.message);
