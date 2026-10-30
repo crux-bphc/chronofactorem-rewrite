@@ -20,7 +20,7 @@ export const CourseSearchResults = ({
       .filter((course) =>
         `${course.code}: ${course.name}`
           .toLowerCase()
-          .includes(debouncedSearchTerm.toLowerCase()),
+          .includes(debouncedSearchTerm.trim().toLowerCase()),
       )
       .map((course) => ({
         ...course,
@@ -31,10 +31,9 @@ export const CourseSearchResults = ({
   return (
     <div className="h-[calc(100%-3rem)] overflow-y-scroll">
       {courseSearchResults.map((course) => (
-        // TODO - deal with this biome rule
-        // biome-ignore lint/a11y/useKeyWithClickEvents: bro come on really
-        // biome-ignore lint/a11y/noStaticElementInteractions: bro come on really
-        <div
+        <button
+          type="button"
+          aria-disabled={!!course.clashing}
           onClick={() => {
             if (!course.clashing) {
               dispatch({
@@ -45,14 +44,20 @@ export const CourseSearchResults = ({
             }
           }}
           key={course.id}
-          className={`relative px-4 transition flex-col pt-4 flex duration-200 ease-in-out border-t-2 border-muted-foreground/20 ${
+          className={`w-full text-left px-4 transition flex-col pt-4 flex duration-200 ease-in-out border-t-2 border-muted-foreground/20 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring ${
             course.clashing
               ? "text-muted-foreground"
               : "cursor-pointer bg-secondary dark:hover:bg-slate-700 hover:bg-slate-200"
           }`}
         >
+          <div className="w-full flex justify-between items-center">
+            <span className="w-fit text-sm">
+              {course.code}: {course.name}
+            </span>
+            <ChevronRight className="w-6 h-6" />
+          </div>
           {course.clashing && (
-            <div className="absolute left-0 top-8 py-1 dark:bg-slate-700/80 bg-slate-300/80 text-secondary-foreground text-center w-full">
+            <div className="-mx-4 mt-1 py-1 dark:bg-slate-700/80 bg-slate-300/80 text-secondary-foreground text-center">
               <span className="font-medium text-md">
                 Clashing with{" "}
                 {course.clashing
@@ -64,13 +69,6 @@ export const CourseSearchResults = ({
               </span>
             </div>
           )}
-
-          <div className="w-full flex justify-between items-center">
-            <span className="w-fit text-sm">
-              {course.code}: {course.name}
-            </span>
-            <ChevronRight className="w-6 h-6" />
-          </div>
 
           <div>
             <span className="pl-4 py-1 text-sm font-bold">Midsem</span>
@@ -158,7 +156,7 @@ export const CourseSearchResults = ({
               )}
             </span>
           </div>
-        </div>
+        </button>
       ))}
       {courseSearchResults.length === 0 && (
         <div className="flex flex-col justify-center pt-4 items-center bg-secondary h-full rounded-xl">
