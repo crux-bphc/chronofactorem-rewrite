@@ -1,11 +1,12 @@
 import { X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useTimetableState } from "@/context";
+import { buildTimetableGrid, type TimetableCell } from "@/utils/timetableGrid";
 
 export function TimetableGrid({
   isVertical,
@@ -44,58 +45,6 @@ export function TimetableGrid({
   const {
     state: { timetableDetailsSections },
   } = useTimetableState();
-  const gridRowClasses = [
-    "grid-rows-1",
-    "grid-rows-2",
-    "grid-rows-3",
-    "grid-rows-4",
-    "grid-rows-5",
-    "grid-rows-6",
-    "grid-rows-7",
-    "grid-rows-8",
-    "grid-rows-9",
-    "grid-rows-10",
-    "grid-rows-11",
-    "grid-rows-12",
-    "grid-rows-13",
-    "grid-rows-14",
-    "grid-rows-15",
-    "grid-rows-16",
-    "grid-rows-17",
-    "grid-rows-18",
-    "grid-rows-19",
-    "grid-rows-20",
-    "grid-rows-21",
-    "grid-rows-22",
-    "grid-rows-23",
-    "grid-rows-24",
-  ];
-  const gridColClasses = [
-    "grid-cols-1",
-    "grid-cols-2",
-    "grid-cols-3",
-    "grid-cols-4",
-    "grid-cols-5",
-    "grid-cols-6",
-    "grid-cols-7",
-    "grid-cols-8",
-    "grid-cols-9",
-    "grid-cols-10",
-    "grid-cols-11",
-    "grid-cols-12",
-    "grid-cols-13",
-    "grid-cols-14",
-    "grid-cols-15",
-    "grid-cols-16",
-    "grid-cols-17",
-    "grid-cols-18",
-    "grid-cols-19",
-    "grid-cols-20",
-    "grid-cols-21",
-    "grid-cols-22",
-    "grid-cols-23",
-    "grid-cols-24",
-  ];
   const daysOfWeek = ["M", "T", "W", "Th", "F", "S"];
   const timings = [
     "8 - 9",
@@ -112,116 +61,37 @@ export function TimetableGrid({
     "7 - 8",
     "8 - 9",
   ];
-  const [displayCols, setDisplayCols] = useState(13);
-  const [displayRows, setDisplayRows] = useState(6);
-
-  const { grid, spans, skipped } = useMemo(() => {
-    const grid: ({
-      id: string;
-      name: string;
-      courseId: string;
-      room: string;
-      code: string;
-      type: string;
-      number: number;
-      instructors: string[];
-    } | null)[] = Array(13 * 6);
-    for (let i = 0; i < grid.length; i++) {
-      grid[i] = null;
-    }
-    for (let i = 0; i < timetableDetailsSections.length; i++) {
-      for (let j = 0; j < timetableDetailsSections[i].roomTime.length; j++) {
-        const [code, room, day, hour] =
-          timetableDetailsSections[i].roomTime[j].split(":");
-        const remainder = daysOfWeek.indexOf(day);
-        const quotient = Number.parseInt(hour, 10) - 1;
-        grid[
-          isVertical ? remainder + quotient * 6 : quotient + remainder * 13
-        ] = {
-          id: timetableDetailsSections[i].id,
-          courseId: timetableDetailsSections[i].courseId,
-          room: room,
-          code: code,
-          type: timetableDetailsSections[i].type,
-          number: timetableDetailsSections[i].number,
-          instructors: timetableDetailsSections[i].instructors,
-          name: timetableDetailsSections[i].name,
-        };
-      }
-    }
-
-    const minDisplayCols = 9;
-    let nonNullColumns = 13;
-    for (let j = 12; j >= minDisplayCols; j--) {
-      let flag = true;
-      for (let i = 0; i < 6; i++) {
-        if ((isVertical ? grid[j * 6 + i] : grid[i * 13 + j]) !== null) {
-          flag = false;
-          break;
-        }
-      }
-      if (flag) {
-        nonNullColumns = j;
-      } else {
-        break;
-      }
-    }
-    setDisplayCols(nonNullColumns);
-
-    const minDisplayRows = 5;
-    let nonNullRows = 6;
-    for (let j = 5; j >= minDisplayRows; j--) {
-      let flag = true;
-      for (let i = 0; i < 13; i++) {
-        if ((isVertical ? grid[i * 6 + j] : grid[j * 13 + i]) !== null) {
-          flag = false;
-          break;
-        }
-      }
-      if (flag) {
-        nonNullRows = j;
-      } else {
-        break;
-      }
-    }
-    setDisplayRows(nonNullRows);
-
-    // merge runs of consecutive hours belonging to the same section and room
-    // into one spanning cell. hours advance along columns in the horizontal
-    // layout (stride 1) and along rows in the vertical layout (stride 6).
-    const stride = isVertical ? 6 : 1;
+  const { grid, spans, skipped, displayRows, displayCols } = useMemo(() => {
+    const model = buildTimetableGrid(timetableDetailsSections);
+    const grid: (TimetableCell | null)[] = Array(13 * 6).fill(null);
     const spans = new Map<number, number>();
     const skipped = new Set<number>();
-    for (let i = 0; i < grid.length; i++) {
-      const cell = grid[i];
-      if (cell === null || skipped.has(i)) {
-        continue;
-      }
-      let span = 1;
-      while (
-        i + stride * span < grid.length &&
-        // in the horizontal layout a run must not wrap into the next day
-        (isVertical || (i % 13) + span < 13) &&
-        grid[i + stride * span]?.id === cell.id &&
-        // a merged cell only shows one room, so a room change ends the run
-        grid[i + stride * span]?.room === cell.room
-      ) {
-        skipped.add(i + stride * span);
-        span++;
-      }
-      if (span > 1) {
-        spans.set(i, span);
+    for (const cell of model.cells) {
+      const start = isVertical
+        ? cell.day + cell.hour * 6
+        : cell.hour + cell.day * 13;
+      spans.set(start, cell.span);
+      for (let offset = 0; offset < cell.span; offset++) {
+        const index = start + offset * (isVertical ? 6 : 1);
+        grid[index] = cell;
+        if (offset) skipped.add(index);
       }
     }
-
-    return { grid, spans, skipped };
+    return {
+      grid,
+      spans,
+      skipped,
+      displayRows: model.dayCount,
+      displayCols: model.hourCount,
+    };
   }, [timetableDetailsSections, isVertical]);
 
   return (
     <div className="flex w-full lg:h-full h-[150%]">
       {isVertical ? (
         <div
-          className={`pt-16 gap-9 sm:gap-8 sm:mt-4 lg:pt-8 lg:gap-2 sm:h-full grid justify-between ${gridRowClasses[displayCols - 1]} md:text-md text-sm text-center text-foreground/80 font-bold`}
+          style={{ gridTemplateRows: `repeat(${displayCols}, minmax(0, 1fr))` }}
+          className={`pt-16 gap-9 sm:gap-8 sm:mt-4 lg:pt-8 lg:gap-2 sm:h-full grid justify-between  md:text-md text-sm text-center text-foreground/80 font-bold`}
         >
           {timings
             .filter((_, i) => i < displayCols)
@@ -233,7 +103,8 @@ export function TimetableGrid({
         </div>
       ) : (
         <div
-          className={`grid ${gridRowClasses[displayRows - 1]} items-center mr-4 mt-12 md:text-lg text-md text-center font-bold text-foreground/80`}
+          style={{ gridTemplateRows: `repeat(${displayRows}, minmax(0, 1fr))` }}
+          className={`grid  items-center mr-4 mt-12 md:text-lg text-md text-center font-bold text-foreground/80`}
         >
           {daysOfWeek.slice(0, displayRows).map((e) => (
             <span key={e}>{e}</span>
@@ -243,7 +114,10 @@ export function TimetableGrid({
       <div className="flex flex-col w-full h-full">
         {isVertical ? (
           <div
-            className={`grid ${gridColClasses[displayRows - 1]} items-center pr-2 md:text-lg text-md text-center font-bold text-foreground/80 `}
+            style={{
+              gridTemplateColumns: `repeat(${displayRows}, minmax(0, 1fr))`,
+            }}
+            className={`grid  items-center pr-2 md:text-lg text-md text-center font-bold text-foreground/80 `}
           >
             {daysOfWeek.slice(0, displayRows).map((e) => (
               <span key={e}>{e}</span>
@@ -251,7 +125,10 @@ export function TimetableGrid({
           </div>
         ) : (
           <div
-            className={`grid ${gridColClasses[displayCols - 1]} justify-between md:text-md text-sm text-center font-bold text-foreground/80`}
+            style={{
+              gridTemplateColumns: `repeat(${displayCols}, minmax(0, 1fr))`,
+            }}
+            className={`grid  justify-between md:text-md text-sm text-center font-bold text-foreground/80`}
           >
             {timings
               .filter((_, i) => i < displayCols)
@@ -263,11 +140,11 @@ export function TimetableGrid({
           </div>
         )}
         <div
-          className={`grid w-full h-full ${
-            isVertical
-              ? `${gridColClasses[displayRows - 1]} ${gridRowClasses[displayCols - 1]}`
-              : `${gridColClasses[displayCols - 1]} ${gridRowClasses[displayRows - 1]}`
-          }`}
+          className="grid w-full h-full"
+          style={{
+            gridTemplateColumns: `repeat(${isVertical ? displayRows : displayCols}, minmax(0, 1fr))`,
+            gridTemplateRows: `repeat(${isVertical ? displayCols : displayRows}, minmax(0, 1fr))`,
+          }}
         >
           {grid
             .map((e, i) => ({ e, i }))
