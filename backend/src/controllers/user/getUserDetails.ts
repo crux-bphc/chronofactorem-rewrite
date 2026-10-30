@@ -47,6 +47,7 @@ export const getUserDetails = async (req: Request, res: Response) => {
         "timetable.year",
         "timetable.acadYear",
         "timetable.semester",
+        "timetable.timings",
         "timetable.createdAt",
         "timetable.lastUpdated",
       ])
