@@ -35,19 +35,11 @@ type DeskGridProps = {
 // the phone tiles instead of truncating the code
 const padClass = "px-2.5 py-[9px] @max-[72px]:px-1 @max-[72px]:py-1.5";
 
-function BlockLines({
-  cell,
-  edit = false,
-}: {
-  cell: TimetableCell;
-  edit?: boolean;
-}) {
+function BlockLines({ cell }: { cell: TimetableCell }) {
   return (
     <>
       <div className="@max-[72px]:hidden">
-        <span
-          className={`block truncate text-base font-semibold ${edit ? "pr-5" : ""}`}
-        >
+        <span className="block truncate text-base font-semibold">
           {cell.code}
         </span>
         <span className="mt-[3px] block truncate text-sm text-ink-muted">
@@ -195,7 +187,7 @@ export function DeskGrid({
                     aria-label={`Edit ${cell.courseId} ${cell.type}${cell.number}, press Delete to remove`}
                     className={`flex size-full cursor-pointer flex-col justify-start rounded-md text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring disabled:opacity-60 ${padClass}`}
                   >
-                    <BlockLines cell={cell} edit />
+                    <BlockLines cell={cell} />
                   </button>
                 ) : (
                   <div className={`size-full ${padClass}`}>
@@ -214,7 +206,7 @@ export function DeskGrid({
                 disabled={pending}
                 aria-label={`Remove ${cell.code} ${cell.type}${cell.number}`}
                 onClick={() => onRemove?.(cell)}
-                className="absolute top-1.5 right-[7px] flex size-6 cursor-pointer items-center justify-center rounded-sm text-ink-muted opacity-0 transition-opacity duration-(--d-1) group-focus-within:opacity-100 group-hover:opacity-100 hover:text-ink focus-visible:outline-2 focus-visible:outline-ring disabled:cursor-default"
+                className="absolute top-1 right-1 flex size-5 cursor-pointer items-center justify-center rounded-sm bg-ev-hover text-ink-muted opacity-0 transition-opacity duration-(--d-1) group-focus-within:opacity-100 group-hover:opacity-100 hover:text-ink focus-visible:outline-2 focus-visible:outline-ring disabled:cursor-default"
               >
                 <X size={13} />
               </button>
