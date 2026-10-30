@@ -81,9 +81,6 @@ const TimetableDataProvider = ({
   const { data: user, isLoading: isUserLoading } = useUser();
   const { data: timetable, isLoading: isTimetableLoading } =
     useTimetable(timetableId);
-  // The course list must match the semester of the timetable being viewed
-  // (archived timetables reference archived courses), so the query is gated
-  // on the timetable being loaded.
   const { data: courses, isLoading: isCoursesLoading } = useQuery({
     ...courseQueryOptions(
       timetable === undefined
@@ -92,9 +89,6 @@ const TimetableDataProvider = ({
     ),
     enabled: timetable !== undefined,
   });
-  // The starting tab is only picked on mount, so later refetches don't reset
-  // it. This relies on timetablePageLoader having already loaded the
-  // timetable into the cache before this component renders.
   const [state, dispatch] = useReducer(
     reducer,
     timetable?.draft,
