@@ -1,25 +1,17 @@
 import { Route } from "@tanstack/react-router";
-import {
-  ArrowLeft,
-  Clipboard,
-  ClipboardCheck,
-  Globe,
-  Lock,
-} from "lucide-react";
-import { useRef, useState } from "react";
+import { Check, ChevronLeft, Copy, Globe, Lock } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { BottomBar } from "@/components/BottomBar";
+import { ButtonLabel } from "@/components/ButtonLabel";
 import ReportIssue from "@/components/ReportIssue";
 import { TimetablePageError } from "@/components/TimetablePageShell";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { toast } from "@/components/ui/use-toast";
 import useEditTimetable from "@/data-access/hooks/useEditTimetable";
 import useTimetable, {
   timetableQueryOptions,
 } from "@/data-access/hooks/useTimetable";
+import { setSharedTimetable, TIMETABLE_TITLE_VT } from "@/lib/sharedTransition";
+import { cn } from "@/lib/utils";
 import authenticatedRoute from "../AuthenticatedRoute";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -57,7 +49,11 @@ function FinalizeTimetable() {
     error: timetableError,
   } = useTimetable(timetableId);
 
-  const { mutate: editTimetable } = useEditTimetable();
+  const { mutate: editTimetable, isPending } = useEditTimetable();
+  // isPending lags a render behind a fast double tap, so guard synchronously.
+  const finishing = useRef(false);
+  const copyTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(copyTimer.current), []);
 
   if (isTimetableLoading) {
     return <span>Loading...</span>;
@@ -75,115 +71,175 @@ function FinalizeTimetable() {
     );
   }
 
+  const link = `${import.meta.env.VITE_FRONTEND_URL}/view/${timetableId}`;
+
+  const copyLink = async () => {
+    if (copyTimer.current) clearTimeout(copyTimer.current);
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopied(true);
+      copyTimer.current = setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+      toast({
+        title: "Could not copy link",
+        description: "Your browser blocked clipboard access.",
+      });
+    }
+  };
+
+  const finish = () => {
+    if (finishing.current) return;
+    finishing.current = true;
+    editTimetable(
+      {
+        id: timetable.id,
+        body: {
+          name: nameInput.current?.value || timetable.name,
+          isPrivate: privateTimetable,
+          isDraft: false,
+        },
+      },
+      {
+        onSuccess: () => {
+          setSharedTimetable(timetable.id);
+          router.navigate({
+            to: "/",
+          });
+        },
+        onSettled: () => {
+          finishing.current = false;
+        },
+      },
+    );
+  };
+
+  const choices = [
+    {
+      isPrivate: true,
+      Icon: Lock,
+      title: "Private",
+      subtitle: "Only people with the link can view",
+    },
+    {
+      isPrivate: false,
+      Icon: Globe,
+      title: "Public",
+      subtitle: "Anyone can view",
+    },
+  ];
+
   return (
-    <div className="flex lg:pl-96 sm:pl-12 pl-4 text-foreground lg:pt-48 sm:pt-40 pt-16 w-full">
-      <div className="flex flex-col w-full">
-        <Button
-          variant="ghost"
-          className="mb-4 -ml-4 gap-2 self-start"
-          onClick={() =>
-            router.navigate({
-              to: "/edit/$timetableId",
-              params: { timetableId },
-            })
-          }
-        >
-          <ArrowLeft className="size-4" />
-          Back to editing
-        </Button>
-        <span className="text-5xl font-bold">{headingText}</span>
-        <Label htmlFor="name" className="mt-8 mb-2 text-lg">
-          Name
-        </Label>
-        <Input
-          ref={nameInput}
-          id="name"
-          defaultValue={timetable.name}
-          placeholder="Timetable Name"
-          className="text-xl lg:w-1/3 w-4/5 bg-muted ring-primary-foreground ring-offset-slate-700 border-slate-700"
-        />
-        <Label htmlFor="share" className="mt-4 mb-2 text-lg">
+    <main className="mx-auto w-full max-w-[640px] px-4 pt-2 pb-28 lg:pt-10 lg:pb-12">
+      <Button
+        variant="quiet"
+        size="sm"
+        className="-ml-2.5"
+        onClick={() =>
+          router.navigate({
+            to: "/edit/$timetableId",
+            params: { timetableId },
+          })
+        }
+      >
+        <ChevronLeft />
+        Back to editing
+      </Button>
+      <h1
+        className="mt-4 text-3xl font-semibold"
+        style={{ viewTransitionName: TIMETABLE_TITLE_VT }}
+      >
+        {headingText}
+      </h1>
+      <Label htmlFor="name" className="mt-6 mb-2 block">
+        Name
+      </Label>
+      <Input
+        ref={nameInput}
+        id="name"
+        defaultValue={timetable.name}
+        placeholder="Timetable Name"
+      />
+      <fieldset className="mt-5 flex flex-col gap-2">
+        <legend className="mb-2 text-base font-medium text-ink">
           Share your timetable
-        </Label>
-        <div className="flex items-center lg:w-1/3 w-4/5" id="share">
-          <TooltipProvider>
-            <Tooltip delayDuration={100}>
-              <TooltipTrigger asChild>
-                <Button
-                  className="rounded-r-none rounded-l-lg bg-muted hover:bg-muted-foreground text-foreground px-4 mr-0"
-                  onClick={() => setPrivate(!privateTimetable)}
-                >
-                  {privateTimetable ? <Lock /> : <Globe />}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="bg-muted text-foreground border-primary-foreground">
-                {privateTimetable
-                  ? "Private (only people with the link can view)"
-                  : "Public (anyone can view)"}
-              </TooltipContent>
-            </Tooltip>
-            <Input
-              disabled
-              value={`${import.meta.env.VITE_FRONTEND_URL}/view/${timetableId}`}
-              className="text-xl ml-0 rounded-none bg-muted ring-primary-foreground ring-offset-primary-foreground border-primary-foreground"
+        </legend>
+        {choices.map(({ isPrivate, Icon, title, subtitle }) => (
+          <label
+            key={title}
+            className="group grid cursor-pointer grid-cols-[22px_1fr] gap-2.5 rounded-lg border border-line bg-surface px-3.5 py-3 transition-[border-color,box-shadow] duration-(--d-2) has-[:checked]:border-brand has-[:checked]:shadow-[inset_0_0_0_1px_var(--accent)] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-brand"
+          >
+            <input
+              type="radio"
+              name="visibility"
+              className="sr-only"
+              checked={privateTimetable === isPrivate}
+              onChange={() => setPrivate(isPrivate)}
             />
-            <Tooltip delayDuration={100}>
-              <TooltipTrigger asChild>
-                <Button
-                  className="rounded-l-none bg-green-700 hover:bg-green-600 text-green-100 rounded-r-lg px-4 mr-0"
-                  onClick={async () => {
-                    try {
-                      await navigator.clipboard.writeText(
-                        `${
-                          import.meta.env.VITE_FRONTEND_URL
-                        }/view/${timetableId}`,
-                      );
-                      setCopied(true);
-                      setTimeout(() => setCopied(false), 2500);
-                    } catch {
-                      toast({
-                        title: "Could not copy link",
-                        description: "Your browser blocked clipboard access.",
-                        variant: "destructive",
-                      });
-                    }
-                  }}
-                >
-                  {copied ? <ClipboardCheck /> : <Clipboard />}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="bg-muted text-foreground border-primary-foreground">
-                {copied ? "Copied!" : "Copy link to timetable"}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+            <span className="mt-0.5 grid size-5 place-items-center rounded-full border-[1.5px] border-ink-faint group-has-[:checked]:border-brand">
+              <span className="size-2.5 scale-0 rounded-full bg-brand transition-transform duration-(--d-2) ease-(--e-spring) group-has-[:checked]:scale-100" />
+            </span>
+            <span>
+              <span className="flex items-center gap-1.5 font-semibold">
+                <Icon className="size-3.5" />
+                {title}
+              </span>
+              <span className="mt-0.5 block text-sm text-ink-muted">
+                {subtitle}
+              </span>
+            </span>
+          </label>
+        ))}
+        <div className="flex h-[46px] items-center rounded-lg border border-line bg-surface pr-1.5 pl-3.5">
+          <input
+            readOnly
+            aria-label="Link to timetable"
+            value={link}
+            className="min-w-0 flex-1 bg-transparent text-lg text-ink-muted outline-none"
+          />
+          <Button
+            variant="secondary"
+            size="sm"
+            className={cn("h-8", copied && "text-brand")}
+            aria-label={copied ? undefined : "Copy link to timetable"}
+            onClick={copyLink}
+          >
+            <span className="inline-grid size-4 place-items-center">
+              <Copy
+                aria-hidden="true"
+                className={cn(
+                  "col-start-1 row-start-1 transition-[opacity,transform] duration-(--d-2)",
+                  copied ? "scale-[.6] opacity-0" : "scale-100 opacity-100",
+                )}
+              />
+              <Check
+                aria-hidden="true"
+                className={cn(
+                  "col-start-1 row-start-1 transition-[opacity,transform] duration-(--d-2)",
+                  copied ? "scale-100 opacity-100" : "scale-[.6] opacity-0",
+                )}
+              />
+            </span>
+            <span
+              className={cn(
+                "grid transition-[grid-template-columns] duration-(--d-2) ease-(--e-out)",
+                copied ? "grid-cols-[1fr]" : "grid-cols-[0fr]",
+              )}
+            >
+              <span className="overflow-hidden whitespace-nowrap">Copied!</span>
+            </span>
+          </Button>
+          <span aria-live="polite" className="sr-only">
+            {copied ? "Copied!" : ""}
+          </span>
         </div>
-        <Button
-          className="bg-green-700 hover:bg-green-600 w-1/3 mt-8 text-green-100 px-4 mr-0 text-lg font-bold"
-          onClick={() =>
-            editTimetable(
-              {
-                id: timetable.id,
-                body: {
-                  name: nameInput.current?.value || timetable.name,
-                  isPrivate: privateTimetable,
-                  isDraft: false,
-                },
-              },
-              {
-                onSuccess: () => {
-                  router.navigate({
-                    to: "/",
-                  });
-                },
-              },
-            )
-          }
-        >
-          Finish
+      </fieldset>
+      <BottomBar>
+        <Button onClick={finish} disabled={isPending} aria-busy={isPending}>
+          <ButtonLabel loading={isPending}>Finish</ButtonLabel>
         </Button>
-      </div>
-    </div>
+      </BottomBar>
+    </main>
   );
 }
 
