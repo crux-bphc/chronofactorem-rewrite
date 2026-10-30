@@ -33,7 +33,9 @@ const TimetableSection = ({
           <TimetableCard
             key={timetable.id}
             timetable={timetable}
-            showFooter={true}
+            shared={false}
+            onOpen={() => {}}
+            onDeleted={() => {}}
           />
         ))}
       </div>
