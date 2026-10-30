@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import ReportIssueToastAction from "@/components/ReportIssueToastAction";
 
-const errorTitleMap = {
+const errorTitleMap: Partial<Record<number, string>> = {
   400: "Error",
   403: "Error",
   404: "Error",
@@ -10,10 +10,10 @@ const errorTitleMap = {
 
 export const HTTPError = <T extends object, K>(
   response: AxiosResponse<T, K>,
-  status: keyof typeof errorTitleMap | number,
+  status: number,
 ) => {
   return {
-    title: typeof status === "number" ? "Unknown Error" : errorTitleMap[status],
+    title: errorTitleMap[status] ?? "Request failed",
     description:
       "message" in response.data && typeof response.data.message === "string"
         ? response.data.message
