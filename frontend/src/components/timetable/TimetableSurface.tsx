@@ -68,6 +68,7 @@ export function TimetableSurface({
   const date = useNow(mode === "view" && !!showNow);
   const pos = date ? nowPosition(date, dayCount, hourCount) : null;
   const label = date ? formatNow(date) : "";
+  const nowAt = pos ? pos.hour + pos.fraction : null;
 
   if (layout === "phone" && view === "day") {
     const shown = Math.min(day, dayCount - 1);
@@ -97,6 +98,7 @@ export function TimetableSurface({
           pending={pending}
           onOpen={onOpen}
           onRemove={onRemove}
+          nowAt={nowAt}
           now={
             pos && (
               <NowLine.Grid
@@ -127,6 +129,7 @@ export function TimetableSurface({
         onRemove={onRemove}
         ghostCells={ghostCells}
         ghostVisible={ghost.visible}
+        nowAt={nowAt}
         now={
           pos && (
             <NowLine.Grid

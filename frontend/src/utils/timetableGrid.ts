@@ -99,6 +99,12 @@ export function nowPosition(
   return { day, hour, fraction: now.getMinutes() / 60 };
 }
 
+/** Class for an axis hour label: fades out while the now label is near it. */
+export function hourLabelFade(hour: number, nowAt: number | null): string {
+  const near = nowAt !== null && Math.abs(nowAt - hour) < 0.3;
+  return `transition-opacity duration-(--d-2) ${near ? "opacity-0" : ""}`;
+}
+
 export function splitCode(code: string): { dept: string; number: string } {
   const i = code.lastIndexOf(" ");
   if (i < 0) return { dept: "", number: code };

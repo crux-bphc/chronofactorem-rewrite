@@ -1,6 +1,7 @@
 import { Bird } from "lucide-react";
 import { formatAxisHour } from "@/utils/timeFormat";
 import {
+  hourLabelFade,
   splitCode,
   type TimetableCell,
   timetableDayNames,
@@ -19,6 +20,8 @@ type WeekGridProps = {
   onRemove?: (cell: TimetableCell) => void;
   /** The now-line slot (C5). */
   now?: React.ReactNode;
+  /** Now as hours since the first axis hour; hides the hour label it nears. */
+  nowAt?: number | null;
 };
 
 const tileClass =
@@ -48,6 +51,7 @@ export function WeekGrid({
   onOpen,
   onRemove,
   now,
+  nowAt = null,
 }: WeekGridProps) {
   return (
     <div
@@ -74,7 +78,7 @@ export function WeekGrid({
             style={{ gridColumn: "2 / -1", gridRow: h + 2 }}
           />
           <div
-            className="pr-1 text-right text-xs whitespace-nowrap text-ink-faint"
+            className={`pr-1 text-right text-xs whitespace-nowrap text-ink-faint ${hourLabelFade(h, nowAt)}`}
             style={{
               gridColumn: 1,
               gridRow: h + 2,
