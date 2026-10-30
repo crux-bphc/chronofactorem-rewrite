@@ -19,7 +19,6 @@ import { buildTimetableGrid } from "@/utils/timetableGrid";
 import CenteredSpinner from "../components/CenteredSpinner";
 import NotFound from "../components/NotFound";
 import { SideMenu } from "../components/SideMenu";
-import { TimetableGrid } from "../components/TimetableGrid";
 import { toast } from "../components/ui/use-toast";
 import { rootRoute } from "../router";
 
@@ -146,11 +145,14 @@ function ViewTimetable() {
               </div>
               {/* a stretched grid cell has a definite height, so the grid's
               h-full rows and time labels line up like on the live page */}
-              <div className="min-w-0 [&>div]:h-full">
-                <TimetableGrid
-                  isVertical={isVertical}
-                  isOnEditPage={false}
-                  isExport
+              <div className="min-w-0">
+                <TimetableSurface
+                  sections={timetableDetailsSections}
+                  layout="desktop"
+                  view="week"
+                  day={0}
+                  orientation={isVertical ? "columns" : "rows"}
+                  mode="export"
                 />
               </div>
             </div>

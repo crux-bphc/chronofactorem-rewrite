@@ -1,3 +1,4 @@
+import { Bird } from "lucide-react";
 import { formatAxisHour } from "@/utils/timeFormat";
 import {
   splitCode,
@@ -84,6 +85,16 @@ export function WeekGrid({
           </div>
         </div>
       ))}
+      {cells.length === 0 && (
+        <Bird
+          role="img"
+          aria-label="No classes"
+          size={112}
+          strokeWidth={1.25}
+          className="z-1 self-center justify-self-center text-ink-faint"
+          style={{ gridColumn: "2 / -1", gridRow: "2 / -1" }}
+        />
+      )}
       {cells.map((cell) => {
         const placement = {
           gridColumn: cell.day + 2,

@@ -14,6 +14,10 @@ import { TimetableSurface } from "@/components/timetable/TimetableSurface";
 import { TimetableProvider, useTimetableState } from "@/context";
 import useCourse from "@/data-access/hooks/useCourse";
 import { useAddRemoveTimetableSection } from "@/data-access/hooks/useTimetableSectionAction";
+import {
+  SectionPreviewProvider,
+  useSectionPreview,
+} from "@/lib/sectionPreview";
 import { timetableSearchSchema } from "@/lib/timetableSearch";
 import { useSurfaceNav } from "@/lib/useSurfaceNav";
 import { useTimetableNav } from "@/lib/useTimetableNav";
@@ -34,7 +38,9 @@ const editTimetableRoute = new Route({
   pendingComponent: CenteredSpinner,
   component: () => (
     <TimetableProvider>
-      <EditTimetable />
+      <SectionPreviewProvider>
+        <EditTimetable />
+      </SectionPreviewProvider>
     </TimetableProvider>
   ),
   notFoundComponent: NotFound,
@@ -51,9 +57,11 @@ function EditTimetable() {
       currentCourseID,
       screenIsLarge,
       timetableDetailsSections,
+      course,
     },
   } = useTimetableState();
   const { openCourse } = useTimetableNav();
+  const { preview, setPreview } = useSectionPreview();
   const { dayCount } = useMemo(
     () => buildTimetableGrid(timetableDetailsSections),
     [timetableDetailsSections],
@@ -98,9 +106,42 @@ function EditTimetable() {
     return <ReportIssue error={"Error fetching queries"} />;
   }
 
+  // a section's day and hour, without the course code and room
+  const slot = (roomTime: string) => roomTime.split(":").slice(2).join(":");
+  // The picker reports mouse hovers; ghost the row on the grid unless it is
+  // already in the timetable or clashes with something that is.
+  const handleSectionHover = (sectionId: string | null) => {
+    const section = course?.sections.find((s) => s.id === sectionId);
+    if (
+      !course ||
+      !section ||
+      timetable.sections.some(
+        (item) =>
+          item.id === section.id ||
+          (!(
+            item.courseId === section.courseId && item.type === section.type
+          ) &&
+            item.roomTime.some((existing) =>
+              section.roomTime.some(
+                (incoming) => slot(existing) === slot(incoming),
+              ),
+            )),
+      )
+    ) {
+      setPreview(null);
+      return;
+    }
+    setPreview({ ...section, name: course.name, courseId: course.code });
+  };
+  // a ghost whose section just got added gives way to the real block
+  const ghost =
+    preview && !timetable.sections.some((item) => item.id === preview.id)
+      ? preview
+      : null;
+
   const SideBar =
     currentCourseID !== null && (isCourseLoading || courseData) ? (
-      <CourseDetailsMenu showHeader />
+      <CourseDetailsMenu showHeader onSectionHover={handleSectionHover} />
     ) : (
       <SideMenu isOnEditPage={true} isScreenshotMode={false} />
     );
@@ -118,6 +159,7 @@ function EditTimetable() {
         day={day}
         orientation={isVertical ? "columns" : "rows"}
         mode="edit"
+        preview={ghost}
         pending={pending}
         onOpen={(e, event) => {
           if (e?.courseId && e?.type) {

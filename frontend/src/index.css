@@ -382,3 +382,15 @@ html.theme-transition::view-transition-new(root) {
 }
 
 /* Timetable surfaces */
+
+/* The picker's ghost block fades in on mount and out before it unmounts */
+.tt-ghost {
+  opacity: 0;
+  transition: opacity var(--d-1) var(--e-out);
+}
+.tt-ghost[data-visible] {
+  opacity: 1;
+  @starting-style {
+    opacity: 0;
+  }
+}

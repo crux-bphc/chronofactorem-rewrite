@@ -1,8 +1,9 @@
 import { useMemo } from "react";
-import { TimetableGrid } from "@/components/TimetableGrid";
+import { useFadingValue } from "@/lib/sectionPreview";
 import type { TimetableSectionType } from "@/utils/timetable";
 import { buildTimetableGrid, type TimetableCell } from "@/utils/timetableGrid";
 import { Agenda } from "./Agenda";
+import { DeskGrid } from "./DeskGrid";
 import { WeekGrid } from "./WeekGrid";
 
 export type SurfaceMode = "edit" | "view" | "export";
@@ -32,13 +33,27 @@ export function TimetableSurface({
   day,
   orientation,
   mode,
+  preview,
   pending,
   onOpen,
   onRemove,
 }: SurfaceProps) {
-  const { cells, dayCount, hourCount } = useMemo(
-    () => buildTimetableGrid(sections),
-    [sections],
+  // only the desktop editor ghosts the hovered picker section; it lingers
+  // for --d-1 (120ms) after the hover ends so it can fade out
+  const ghost = useFadingValue(
+    layout === "desktop" && mode === "edit" ? (preview ?? null) : null,
+    120,
+  );
+  const grid = useMemo(() => buildTimetableGrid(sections), [sections]);
+  const { cells } = grid;
+  // a ghost on Saturday or past the last hour grows the grid to fit
+  const { dayCount, hourCount } = useMemo(
+    () => (ghost.value ? buildTimetableGrid([...sections, ghost.value]) : grid),
+    [sections, ghost.value, grid],
+  );
+  const ghostCells = useMemo(
+    () => (ghost.value ? buildTimetableGrid([ghost.value]).cells : []),
+    [ghost.value],
   );
 
   if (layout === "phone" && view === "day") {
@@ -72,14 +87,20 @@ export function TimetableSurface({
     );
   }
 
-  // Desktop still uses the old grid until C4.
   return (
-    <TimetableGrid
-      isVertical={layout === "desktop" ? orientation === "columns" : true}
-      handleUnitClick={onOpen}
-      handleUnitDelete={onRemove}
-      isOnEditPage={mode === "edit"}
-      hideControls
-    />
+    <section aria-label="Weekly timetable" className="h-full">
+      <DeskGrid
+        cells={cells}
+        dayCount={dayCount}
+        hourCount={hourCount}
+        orientation={orientation}
+        mode={mode}
+        pending={pending}
+        onOpen={onOpen}
+        onRemove={onRemove}
+        ghostCells={ghostCells}
+        ghostVisible={ghost.visible}
+      />
+    </section>
   );
 }
