@@ -35,12 +35,15 @@ function TimetableCard({ timetable, showFooter }: Props) {
     null | boolean
   >(null);
 
-  const { mutate: editTimetable, mutateAsync: editTimetableAsync } =
-    useEditTimetable();
+  const {
+    mutate: editTimetable,
+    mutateAsync: editTimetableAsync,
+    isPending,
+  } = useEditTimetable();
 
   return (
     <TooltipProvider>
-      <Card className="flex flex-col gap-6 p-4 sm:p-6 shadow-lg sm:w-md rounded-xl">
+      <Card className="flex min-w-0 flex-col gap-6 p-4 sm:p-5 shadow-sm rounded-xl transition-shadow hover:shadow-md">
         <CardHeader className="p-0">
           <CardTitle className="flex flex-row text-xl/tight items-start gap-4">
             <Link
@@ -48,7 +51,7 @@ function TimetableCard({ timetable, showFooter }: Props) {
               params={{
                 timetableId: timetable.id,
               }}
-              className="flex-1"
+              className="min-w-0 flex-1 break-words hover:underline underline-offset-4"
             >
               {timetable.name}
             </Link>
@@ -65,6 +68,7 @@ function TimetableCard({ timetable, showFooter }: Props) {
             <>
               {!timetable.draft && (
                 <Button
+                  disabled={isPending}
                   variant="outline"
                   onClick={() =>
                     editTimetable({
@@ -84,7 +88,12 @@ function TimetableCard({ timetable, showFooter }: Props) {
                 {timetable.archived ? (
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="outline" size="icon" className="p-3">
+                      <Button
+                        disabled={isPending}
+                        variant="outline"
+                        size="icon"
+                        className="p-3"
+                      >
                         <Edit2 />
                       </Button>
                     </DialogTrigger>
@@ -139,9 +148,13 @@ function TimetableCard({ timetable, showFooter }: Props) {
                   </Dialog>
                 ) : (
                   <Button
+                    aria-label="Edit timetable"
+                    disabled={isPending}
                     variant="outline"
                     onClick={(e) => {
                       e.stopPropagation();
+                      // Refreshing the user moves this card into the draft
+                      // section and unmounts it. Keep navigation on the promise.
                       editTimetableAsync({
                         id: timetable.id,
                         body: {

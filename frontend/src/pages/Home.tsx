@@ -28,7 +28,7 @@ const TimetableSection = ({
       <h2 className="text-2xl font-medium tracking-tightest text-foreground/90">
         {title}
       </h2>
-      <div className="flex flex-col items-stretch justify-center sm:justify-start sm:flex-row sm:flex-wrap gap-8 pt-4 md:justify-normal">
+      <div className="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2 xl:grid-cols-3">
         {timetables.map((timetable) => (
           <TimetableCard
             key={timetable.id}
@@ -58,7 +58,8 @@ const homeRoute = new Route({
 
 function Home() {
   const { data: user, isLoading, isError, error } = useUser();
-  const { mutate: createTimetable } = useCreateTimetable();
+  const { mutate: createTimetable, isPending: isCreating } =
+    useCreateTimetable();
 
   if (isLoading) {
     return <span>Loading...</span>;
@@ -80,7 +81,7 @@ function Home() {
   } = user;
 
   return (
-    <main className="text-foreground py-6 px-6 md:px-10">
+    <main className="mx-auto w-full max-w-7xl text-foreground py-8 px-4 sm:px-6">
       {draftTimetables.length === 0 &&
         privateTimetables.length === 0 &&
         publicTimetables.length === 0 &&
@@ -91,6 +92,7 @@ function Home() {
             </span>
             <h2 className="text-xl sm:text-2xl">It's empty in here.</h2>
             <Button
+              disabled={isCreating}
               className="text-xl py-6"
               size="lg"
               onClick={() =>

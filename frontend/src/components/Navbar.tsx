@@ -34,11 +34,12 @@ export function NavBar() {
     userError instanceof AxiosError &&
     userError.response?.status === 401;
 
-  const { mutate: createTimetable } = useCreateTimetable();
+  const { mutate: createTimetable, isPending: isCreating } =
+    useCreateTimetable();
 
   const renderNavbarBasedOnQueryFetch = (userQueryResultData: typeof user) => (
-    <div className="flex flex-row w-full justify-between p-4">
-      <div className="flex items-center md:gap-4 gap-3">
+    <div className="flex min-h-18 w-full shrink-0 items-center justify-between gap-2 border-b px-3 py-3 sm:px-6">
+      <div className="flex min-w-0 items-center gap-2 sm:gap-4">
         {userQueryResultData ? (
           <Link to="/">
             <ChronoLogoText />
@@ -48,6 +49,8 @@ export function NavBar() {
         )}
         {userQueryResultData && !isEditPage && (
           <Button
+            aria-label="Create a timetable"
+            disabled={isCreating}
             className="text-green-200 not-md:h-fit w-fit text-xl px-2 md:px-4 bg-green-900 hover:bg-green-800"
             onClick={
               userQueryResultData
@@ -70,7 +73,7 @@ export function NavBar() {
           </Button>
         )}
         <Button variant="link" size="sm" className="text-lg" asChild>
-          <Link to="/about">
+          <Link to="/about" aria-label="About ChronoFactorem">
             <div className="hidden md:flex">About</div>
             <div className="flex md:hidden">
               <Info className="size-4" />
@@ -86,9 +89,13 @@ export function NavBar() {
             <ModeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="rounded-full text-foreground bg-accent p-1 px-3 text-xl h-fit cursor-pointer">
+                <button
+                  type="button"
+                  aria-label="My account"
+                  className="size-9 shrink-0 rounded-full text-foreground bg-accent text-sm font-medium cursor-pointer focus-visible:outline-2 focus-visible:outline-ring"
+                >
                   <span>{userQueryResultData.name[0]}</span>
-                </div>
+                </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="lg:w-56 w-fit">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
