@@ -1,5 +1,6 @@
 import { QueryClient } from "@tanstack/react-query";
 import { Router, rootRouteWithContext } from "@tanstack/react-router";
+import { AxiosError } from "axios";
 import authenticatedRoute from "./AuthenticatedRoute";
 import NotFound from "./components/NotFound";
 import aboutRoute from "./pages/About";
@@ -16,6 +17,15 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
+      retry: (failureCount, error) => {
+        if (
+          error instanceof AxiosError &&
+          error.response &&
+          error.response.status < 500
+        )
+          return false;
+        return failureCount < 1;
+      },
     },
   },
 });
