@@ -98,7 +98,7 @@ function EditTimetable() {
         isVertical={screenIsLarge ? isVertical : true}
         handleUnitClick={(e, event) => {
           if (e?.courseId && e?.type) {
-            if (event.detail === 1) {
+            if (event.detail <= 1) {
               dispatch({
                 type: TimetableActionType.SetSelectedCourseAndSection,
                 courseID: courses.filter((x) => x.code === e?.courseId)[0].id,

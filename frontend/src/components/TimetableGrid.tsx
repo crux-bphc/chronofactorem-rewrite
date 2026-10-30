@@ -25,7 +25,7 @@ export function TimetableGrid({
       number: number;
       instructors: string[];
     } | null,
-    event: React.MouseEvent,
+    event: React.MouseEvent | React.KeyboardEvent,
   ) => void;
   handleUnitDelete?: (
     e: {
@@ -293,11 +293,27 @@ export function TimetableGrid({
               return (
                 <Tooltip delayDuration={100} key={`${e.id}-${i}`}>
                   <TooltipTrigger asChild>
-                    {/* TODO: Deal with this lint error */}
-                    {/* biome-ignore lint/a11y/useKeyWithClickEvents: need to check if button works styling wise */}
-                    {/** biome-ignore lint/a11y/noStaticElementInteractions: need to check if button works styling wise */}
                     <div
-                      className={`bg-background border border-muted dark:border-muted/70 transition duration-200 ease-in-out text-foreground/65 p-1.5 ${
+                      {...(isOnEditPage && {
+                        role: "button",
+                        tabIndex: 0,
+                        "aria-label": `${e.courseId} ${e.type}${e.number}, press Delete to remove`,
+                        onClick: (event: React.MouseEvent) =>
+                          handleUnitClick?.(e, event),
+                        onKeyDown: (event: React.KeyboardEvent) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            handleUnitClick?.(e, event);
+                          } else if (
+                            event.key === "Delete" ||
+                            event.key === "Backspace"
+                          ) {
+                            event.preventDefault();
+                            handleUnitDelete?.(e);
+                          }
+                        },
+                      })}
+                      className={`bg-background border border-muted dark:border-muted/70 transition duration-200 ease-in-out text-foreground/65 p-1.5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring ${
                         isOnEditPage ? "cursor-pointer" : ""
                       } ${isVertical ? "min-h-28 sm:min-h-16" : "min-h-20"}`}
                       style={
@@ -307,7 +323,6 @@ export function TimetableGrid({
                             : { gridColumn: `span ${span}` }
                           : undefined
                       }
-                      onClick={(event) => handleUnitClick?.(e, event)}
                     >
                       <div className="relative flex h-full text-xs sm:text-sm flex-col justify-end bg-muted-foreground/30 p-1.5 rounded gap-0.5">
                         <X
@@ -315,7 +330,10 @@ export function TimetableGrid({
                           className={`absolute top-1 right-1 cursor-pointer sm:visible invisible hover:stroke-destructive dark:hover:stroke-red-400 transition duration-100 ease-in-out ${
                             isOnEditPage ? "" : "hidden"
                           }`}
-                          onClick={() => handleUnitDelete?.(e)}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleUnitDelete?.(e);
+                          }}
                         />
                         <span className="font-bold text-ellipsis overflow-hidden text-wrap tracking-tight">
                           {e.courseId}
