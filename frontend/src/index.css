@@ -100,6 +100,7 @@
   --color-brand-bg: var(--accent-bg);
   --color-danger: var(--danger);
   --color-danger-bg: var(--danger-bg);
+  --color-danger-ink: var(--danger-ink);
   --color-now: var(--now);
   --color-gridline: color-mix(in srgb, var(--line) 55%, transparent);
 

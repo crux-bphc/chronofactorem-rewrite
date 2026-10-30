@@ -29,7 +29,7 @@ const toastVariants = cva(
       variant: {
         default: "bg-ink text-bg",
         destructive:
-          "destructive group bg-danger text-white",
+          "destructive group bg-danger text-danger-ink",
       },
     },
     defaultVariants: {
@@ -60,7 +60,7 @@ const ToastAction = React.forwardRef<
   <ToastPrimitives.Action
     ref={ref}
     className={cn(
-      "inline-flex h-8 shrink-0 cursor-pointer items-center justify-center whitespace-nowrap rounded-[8px] bg-bg/14 px-2.5 text-[13.5px] font-semibold transition-colors duration-(--d-1) hover:bg-bg/25 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:bg-white/15 group-[.destructive]:hover:bg-white/25",
+      "inline-flex h-8 shrink-0 cursor-pointer items-center justify-center whitespace-nowrap rounded-[8px] bg-bg/14 px-2.5 text-[13.5px] font-semibold transition-colors duration-(--d-1) hover:bg-bg/25 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:bg-danger-ink/15 group-[.destructive]:hover:bg-danger-ink/25",
       className
     )}
     {...props}
@@ -75,7 +75,7 @@ const ToastClose = React.forwardRef<
   <ToastPrimitives.Close
     ref={ref}
     className={cn(
-      "absolute right-1.5 top-1/2 inline-flex size-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md text-bg/60 transition-colors duration-(--d-1) hover:text-bg group-[.destructive]:text-white/70 group-[.destructive]:hover:text-white",
+      "absolute right-1.5 top-1/2 inline-flex size-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md text-bg/60 transition-colors duration-(--d-1) hover:text-bg group-[.destructive]:text-danger-ink group-[.destructive]:hover:opacity-80",
       className
     )}
     toast-close=""
@@ -105,7 +105,7 @@ const ToastDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Description
     ref={ref}
-    className={cn("text-[13px] opacity-70", className)}
+    className={cn("text-[13px] opacity-80 group-[.destructive]:opacity-90", className)}
     {...props}
   />
 ))
