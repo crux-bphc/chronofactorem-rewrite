@@ -14,6 +14,8 @@ interface SegmentedProps<T extends string> {
   options: SegmentedOption<T>[]
   size?: "md" | "sm"
   className?: string
+  "aria-label"?: string
+  "aria-labelledby"?: string
 }
 
 function Segmented<T extends string>({
@@ -22,6 +24,8 @@ function Segmented<T extends string>({
   options,
   size = "md",
   className,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledby,
 }: SegmentedProps<T>) {
   const refs = React.useRef<(HTMLButtonElement | null)[]>([])
   const count = options.length
@@ -60,6 +64,8 @@ function Segmented<T extends string>({
   return (
     <div
       role="radiogroup"
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledby}
       onKeyDown={onKeyDown}
       className={cn(
         "relative grid rounded-md bg-sunk p-[3px]",
@@ -89,8 +95,10 @@ function Segmented<T extends string>({
           tabIndex={i === index ? 0 : -1}
           onClick={() => onValueChange(o.value)}
           className={cn(
-            "relative z-10 flex cursor-pointer items-center justify-center gap-1.5 rounded-[8px] px-3 font-semibold transition-colors duration-(--d-1)",
-            size === "md" ? "text-base" : "text-sm",
+            "relative z-10 flex cursor-pointer after:absolute after:inset-x-0 after:content-[''] items-center justify-center gap-1.5 rounded-[8px] px-3 font-semibold transition-colors duration-(--d-1)",
+            size === "md"
+              ? "text-base max-lg:after:-inset-y-[5px]"
+              : "text-sm max-lg:after:-inset-y-[9px]",
             i === index ? "text-ink" : "text-ink-muted hover:text-ink"
           )}
         >

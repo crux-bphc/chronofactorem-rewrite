@@ -25,9 +25,9 @@ const buttonVariants = cva(
       size: {
         default:
           "h-12 rounded-xl px-4 text-lg font-semibold has-[>svg]:px-3",
-        sm: "h-[38px] rounded-md gap-1.5 px-3 text-base font-medium has-[>svg]:px-2.5",
+        sm: "relative h-[38px] max-lg:after:absolute max-lg:after:-inset-[3px] max-lg:after:content-[''] rounded-md gap-1.5 px-3 text-base font-medium has-[>svg]:px-2.5",
         lg: "h-12 rounded-xl px-4 text-lg font-semibold has-[>svg]:px-3",
-        icon: "size-9 rounded-md",
+        icon: "relative size-9 max-lg:after:absolute max-lg:after:-inset-[4px] max-lg:after:content-[''] rounded-md",
       },
     },
     defaultVariants: {
