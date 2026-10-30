@@ -1,3 +1,4 @@
+import { useIsMutating } from "@tanstack/react-query";
 import type { sectionType, sectionTypeEnum } from "lib";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { useMemo } from "react";
@@ -18,34 +19,35 @@ const CourseDetailsMenu = () => {
   const { mutate: sectionAction } = useAddRemoveTimetableSection(timetable?.id);
   const { mutate: swapSections } = useSwapTimetableSections(timetable?.id);
 
+  const pending =
+    useIsMutating({ mutationKey: ["sections", timetable?.id] }) > 0;
   const handleSectionClick = (section: z.infer<typeof sectionType>) => {
-    if (timetable === undefined || currentSectionType === null) return;
-    if (timetable.sections.find((e) => e.id === section.id)) {
+    if (!timetable || pending) return;
+    if (timetable.sections.some((item) => item.id === section.id)) {
       sectionAction({ sectionId: section.id, action: "remove" });
       return;
     }
     const other = timetable.sections.find(
-      (e) => e.type === section.type && e.courseId === section.courseId,
+      (item) =>
+        item.type === section.type && item.courseId === section.courseId,
     );
-    if (other !== undefined) {
-      swapSections({ sectionId: other.id, newSectionId: section.id });
-    } else {
-      sectionAction({ sectionId: section.id, action: "add" });
-      if (
-        uniqueSectionTypes.indexOf(currentSectionType) <
-        uniqueSectionTypes.length - 1
-      ) {
-        dispatch({
-          type: TimetableActionType.SetSelectedSectionType,
-          sectionType:
-            uniqueSectionTypes[
-              uniqueSectionTypes.indexOf(currentSectionType) + 1
-            ],
-        });
-      }
-    }
+    if (other) swapSections({ sectionId: other.id, newSectionId: section.id });
+    else
+      sectionAction(
+        { sectionId: section.id, action: "add" },
+        {
+          onSuccess: () => {
+            const next =
+              uniqueSectionTypes[uniqueSectionTypes.indexOf(section.type) + 1];
+            if (next)
+              dispatch({
+                type: TimetableActionType.SetSelectedSectionType,
+                sectionType: next,
+              });
+          },
+        },
+      );
   };
-
   interface ClashingSection {
     tm: string;
     courseId: string;
