@@ -1,18 +1,23 @@
 import { AlertOctagon, ArrowUpRightFromCircle } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import BottomSheet, {
+  BottomSheetList,
+  BottomSheetRow,
+} from "@/components/BottomSheet";
 import { Button } from "@/components/ui/button";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { TimetableActionType, useTimetableState } from "@/context";
 
 export const CDCWarningsTooltip = () => {
   const {
-    state: { cdcs, coursesInTimetable },
+    state: { cdcs, coursesInTimetable, screenIsLarge },
     dispatch,
   } = useTimetableState();
+  const [open, setOpen] = useState(false);
 
   const cdcNotFoundWarning = useMemo(
     () =>
@@ -89,21 +94,83 @@ export const CDCWarningsTooltip = () => {
       courseID: courseId === "" ? null : courseId,
       sectionType: null,
     });
+    // optional CDCs have no single course to open, so show the CDCs tab
+    if (!screenIsLarge)
+      dispatch({ type: TimetableActionType.SetSidebarOpen, open: true });
+    setOpen(false);
   };
 
   if (missingCDCs.length === 0 && cdcNotFoundWarning.length === 0) return null;
 
-  return (
-    <Tooltip delayDuration={100}>
-      <TooltipTrigger
-        asChild
-        className="hover:bg-accent hover:text-accent-foreground transition duration-200 ease-in-out"
+  const trigger = (
+    <button
+      type="button"
+      aria-label="Missing CDCs"
+      className="p-2 rounded-full hover:bg-accent hover:text-accent-foreground transition duration-200 ease-in-out max-sm:flex max-sm:h-9 max-sm:items-center max-sm:gap-1.5 max-sm:border max-sm:bg-background max-sm:px-3 max-sm:py-0 max-sm:text-sm max-sm:font-semibold"
+    >
+      <AlertOctagon className="w-5 h-5 md:w-6 md:h-6 m-1 max-sm:m-0 max-sm:size-4" />
+      <span className="sm:hidden">
+        {missingCDCs.length > 0
+          ? `${missingCDCs.length} missing CDC${missingCDCs.length > 1 ? "s" : ""}`
+          : "CDCs not found"}
+      </span>
+    </button>
+  );
+
+  const reportLink = (
+    <a
+      href="https://github.com/crux-bphc/chronofactorem-rewrite/issues"
+      className="text-blue-700 dark:text-blue-400 flex pl-1"
+    >
+      <span className="text-blue-700 dark:text-blue-400">
+        report this issue
+      </span>
+      <ArrowUpRightFromCircle className="w-4 h-4 ml-1" />
+    </a>
+  );
+
+  if (!screenIsLarge) {
+    return (
+      <BottomSheet
+        open={open}
+        onOpenChange={setOpen}
+        icon={<AlertOctagon className="size-5" />}
+        title="Missing CDCs"
+        description="CDCs for this semester that are not in your timetable."
+        className="max-h-[65dvh]"
+        trigger={trigger}
       >
-        <div className="p-2 rounded-full">
-          <AlertOctagon className="w-5 h-5 md:w-6 md:h-6 m-1" />
-        </div>
-      </TooltipTrigger>
-      <TooltipContent className="bg-muted text-foreground border-muted-foreground/40 text-md">
+        <BottomSheetList>
+          {missingCDCs.map((e) => (
+            <BottomSheetRow
+              key={e.id + e.code}
+              onClick={() => handleMissingCDCClick(e.id)}
+            >
+              {e.name ? `${e.code}: ${e.name}` : e.code}
+            </BottomSheetRow>
+          ))}
+          {cdcNotFoundWarning.length > 0 && (
+            <div className="flex flex-col gap-1 border-t-2 border-slate-300 px-4 py-3 text-sm dark:border-slate-600">
+              <span className="font-bold">
+                Chrono could not find some of your CDCs in the list of courses.
+              </span>
+              <span className="flex">Please{reportLink}</span>
+              {cdcNotFoundWarning.map((e) => (
+                <span className="text-muted-foreground" key={e.warning}>
+                  {e.warning}
+                </span>
+              ))}
+            </div>
+          )}
+        </BottomSheetList>
+      </BottomSheet>
+    );
+  }
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+      <PopoverContent className="w-auto px-3 py-1.5 bg-muted text-foreground border-muted-foreground/40 text-md">
         {missingCDCs.length > 0 && (
           <div className="flex flex-col">
             <span>
@@ -151,8 +218,8 @@ export const CDCWarningsTooltip = () => {
             ))}
           </div>
         )}
-      </TooltipContent>
-    </Tooltip>
+      </PopoverContent>
+    </Popover>
   );
 };
 

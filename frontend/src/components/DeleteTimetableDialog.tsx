@@ -41,6 +41,7 @@ export const DeleteTimetableDialog = ({
           <AlertDialogTrigger asChild>
             <TooltipTrigger asChild>
               <Button
+                aria-label="Delete timetable"
                 variant="outline"
                 className="p-3 hover:bg-destructive/90! hover:text-destructive-foreground"
               >

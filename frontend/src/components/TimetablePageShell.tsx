@@ -1,20 +1,12 @@
-import * as DialogPrimitive from "@radix-ui/react-dialog";
 import type { QueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
 import type React from "react";
 import { useEffect } from "react";
+import BottomSheet from "@/components/BottomSheet";
 import NotFound from "@/components/NotFound";
 import Spinner from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogDescription,
-  DialogPortal,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useToast } from "@/components/ui/use-toast";
 import { TimetableActionType, useTimetableState } from "@/context";
@@ -120,16 +112,17 @@ export const TimetablePageShell = ({
       <TooltipProvider>
         {header}
         {!screenIsLarge && (
-          // non-modal so the grid stays visible and usable while a section
-          // is picked; Escape and the close button still dismiss it
-          <Dialog
-            modal={false}
+          <BottomSheet
             open={sidebarOpen}
             onOpenChange={(open) =>
               dispatch({ type: TimetableActionType.SetSidebarOpen, open })
             }
-          >
-            <DialogTrigger asChild>
+            // tapping the grid shouldn't close the sheet
+            dismissOnOutsideTap={false}
+            title="Courses and exams"
+            description="Browse courses, choose sections, and review exam dates."
+            className="h-[45dvh] min-h-64"
+            trigger={
               <Button
                 variant="outline"
                 // phones get this button in the header, next to Publish
@@ -141,30 +134,10 @@ export const TimetablePageShell = ({
                 <Menu className="size-4" />
                 Courses and exams
               </Button>
-            </DialogTrigger>
-            <DialogPortal>
-              <DialogPrimitive.Content
-                // tapping the grid shouldn't close the sheet
-                onInteractOutside={(e) => e.preventDefault()}
-                className="fixed inset-x-0 bottom-0 z-50 mx-auto flex h-[45dvh] min-h-64 w-full max-w-2xl flex-col rounded-t-xl border border-b-0 bg-background shadow-lg"
-              >
-                <div className="flex shrink-0 items-center justify-between gap-2 border-b py-1 pl-4 pr-2">
-                  <DialogTitle className="text-base">
-                    Courses and exams
-                  </DialogTitle>
-                  <DialogDescription className="sr-only">
-                    Browse courses, choose sections, and review exam dates.
-                  </DialogDescription>
-                  <DialogClose asChild>
-                    <Button variant="ghost" size="icon" aria-label="Close">
-                      <X className="size-4" />
-                    </Button>
-                  </DialogClose>
-                </div>
-                <div className="min-h-0 flex-1 overflow-hidden">{sidebar}</div>
-              </DialogPrimitive.Content>
-            </DialogPortal>
-          </Dialog>
+            }
+          >
+            <div className="min-h-0 flex-1 overflow-hidden">{sidebar}</div>
+          </BottomSheet>
         )}
         <div
           className={cn(
