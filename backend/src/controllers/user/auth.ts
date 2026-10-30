@@ -247,8 +247,7 @@ export async function loginAs(req: Request, res: Response) {
   if (!email.success) {
     return res.status(400).json({ message: "pass a valid ?email=" });
   }
-  const name =
-    typeof req.query.name === "string" ? req.query.name : "Dev User";
+  const name = typeof req.query.name === "string" ? req.query.name : "Dev User";
   return startSession(res, name, email.data, env.SESSION_MAX_AGE_MS);
 }
 
