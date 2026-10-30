@@ -35,7 +35,8 @@ function TimetableCard({ timetable, showFooter }: Props) {
     null | boolean
   >(null);
 
-  const { mutate: editTimetable } = useEditTimetable();
+  const { mutate: editTimetable, mutateAsync: editTimetableAsync } =
+    useEditTimetable();
 
   return (
     <TooltipProvider>
@@ -141,24 +142,23 @@ function TimetableCard({ timetable, showFooter }: Props) {
                     variant="outline"
                     onClick={(e) => {
                       e.stopPropagation();
-                      editTimetable(
-                        {
-                          id: timetable.id,
-                          body: {
-                            name: timetable.name,
-                            isPrivate: true,
-                            isDraft: true,
-                          },
+                      editTimetableAsync({
+                        id: timetable.id,
+                        body: {
+                          name: timetable.name,
+                          isPrivate: true,
+                          isDraft: true,
                         },
-                        {
-                          onSuccess: () => {
-                            router.navigate({
-                              to: "/edit/$timetableId",
-                              params: { timetableId: timetable.id },
-                            });
-                          },
-                        },
-                      );
+                      })
+                        .then(() => {
+                          router.navigate({
+                            to: "/edit/$timetableId",
+                            params: { timetableId: timetable.id },
+                          });
+                        })
+                        .catch(() => {
+                          // useEditTimetable already toasts the error.
+                        });
                     }}
                   >
                     <Edit2 />

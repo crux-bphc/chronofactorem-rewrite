@@ -34,7 +34,7 @@ const TimetableHeader = ({
     state: { isVertical, user, courses, timetable, screenIsLarge },
     dispatch,
   } = useTimetableState();
-  const { mutate: editTimetable } = useEditTimetable();
+  const { mutateAsync: editTimetable } = useEditTimetable();
   const { mutateAsync: copyTimetable } = useCopyTimetable();
 
   if (timetable === undefined || courses === undefined) return;
@@ -120,23 +120,23 @@ const TimetableHeader = ({
                 variant="ghost"
                 className="rounded-full p-3"
                 onClick={() =>
-                  editTimetable(
-                    {
-                      id: timetable.id,
-                      body: {
-                        isDraft: true,
-                        isPrivate: true,
-                        name: timetable?.name ?? "",
-                      },
+                  editTimetable({
+                    id: timetable.id,
+                    body: {
+                      isDraft: true,
+                      isPrivate: true,
+                      name: timetable?.name ?? "",
                     },
-                    {
-                      onSuccess: () =>
-                        router.navigate({
-                          to: "/edit/$timetableId",
-                          params: { timetableId: timetable.id },
-                        }),
-                    },
-                  )
+                  })
+                    .then(() =>
+                      router.navigate({
+                        to: "/edit/$timetableId",
+                        params: { timetableId: timetable.id },
+                      }),
+                    )
+                    .catch(() => {
+                      // useEditTimetable already toasts the error.
+                    })
                 }
               >
                 <Edit2 className="w-5 h-5 md:w-6 md:h-6" />
