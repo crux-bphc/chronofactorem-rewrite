@@ -45,7 +45,9 @@ export const CourseSearchResults = ({ query }: { query: string }) => {
   return (
     <div className="h-full min-h-0 overflow-y-auto">
       <span className="sr-only" aria-live="polite">
-        {results.length === 0 ? "No results" : `${results.length} results`}
+        {results.length === 0
+          ? "No results"
+          : `${results.length} ${results.length === 1 ? "result" : "results"}`}
       </span>
       {results.length > 0 ? (
         <div
@@ -63,10 +65,7 @@ export const CourseSearchResults = ({ query }: { query: string }) => {
           ))}
         </div>
       ) : (
-        <div
-          key={query}
-          className="flex animate-[cf-fade-in_var(--d-2)_var(--e-out)] flex-col items-center gap-3 px-4 pt-12 text-center"
-        >
+        <div className="flex animate-[cf-fade-in_var(--d-2)_var(--e-out)] flex-col items-center gap-3 px-4 pt-12 text-center">
           <Bird
             size={112}
             strokeWidth={1.25}
