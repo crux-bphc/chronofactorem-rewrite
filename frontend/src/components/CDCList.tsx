@@ -31,10 +31,10 @@ export const CDCList = () => {
                 })
               }
               key={course.id}
-              className="rounded-none text-left py-8 bg-secondary dark:hover:bg-slate-700 hover:bg-slate-200"
+              className="h-auto min-h-16 w-full whitespace-normal rounded-lg p-3 text-left"
             >
               <div className="flex justify-between w-full items-center">
-                <span>{`${course.code}: ${course.name}`}</span>
+                <span className="min-w-0">{`${course.code}: ${course.name}`}</span>
                 <ChevronRight />
               </div>
             </Button>

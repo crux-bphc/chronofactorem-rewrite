@@ -11,7 +11,7 @@ const EditCoursesTab = () => {
   return (
     <TabsContent
       value="currentCourses"
-      className="flex h-full data-[state=inactive]:h-0 w-[26rem] overflow-y-scroll flex-col px-2 gap-2"
+      className="flex min-h-0 flex-1 data-[state=inactive]:hidden overflow-y-auto flex-col gap-2"
     >
       {coursesInTimetable.map((course) => {
         return (
@@ -25,7 +25,7 @@ const EditCoursesTab = () => {
               });
             }}
             key={course.id}
-            className="rounded-none text-left py-8 bg-secondary dark:hover:bg-slate-700 hover:bg-slate-200"
+            className="h-auto min-h-16 shrink-0 whitespace-normal rounded-lg text-left p-3"
           >
             <div className="flex justify-between w-full items-center">
               <span>{`${course.code}: ${course.name}`}</span>
