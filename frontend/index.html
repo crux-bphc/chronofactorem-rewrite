@@ -5,6 +5,21 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/logo.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <script>
+    // Set the theme class before first paint (mirrors ThemeProvider).
+    (() => {
+      try {
+        let t = localStorage.getItem("vite-ui-theme") || "system";
+        if (t === "system") {
+          t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        const r = document.documentElement;
+        r.classList.remove("light", "dark");
+        r.classList.add(t);
+      } catch {}
+    })();
+  </script>
   <link rel="preload" href="/fonts/host-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
   <title>ChronoFactorem</title>
