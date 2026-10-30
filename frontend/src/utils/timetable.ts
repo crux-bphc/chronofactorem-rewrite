@@ -1,4 +1,5 @@
 import type { courseType, timetableWithSectionsType } from "lib";
+import { unknownDegree } from "lib";
 import type z from "zod";
 import type { CDCType } from "@/context/types";
 import CDCList from "@/data/CDCs.json";
@@ -170,3 +171,16 @@ export const getMissingCdcs = (
           name: "",
         };
   });
+
+export const timetableMeta = (t: {
+  year: number;
+  semester: number;
+  acadYear: number;
+  degrees: string[];
+}): string[] => {
+  const parts: string[] = [];
+  if (t.year !== 0) parts.push(`${t.year}-${t.semester}`);
+  parts.push(`${t.acadYear}–${String(t.acadYear + 1).slice(2)}`);
+  if (!t.degrees.includes(unknownDegree)) parts.push(t.degrees.join(""));
+  return parts;
+};
