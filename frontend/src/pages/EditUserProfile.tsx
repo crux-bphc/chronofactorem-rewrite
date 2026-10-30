@@ -1,6 +1,8 @@
 import { Route } from "@tanstack/react-router";
 import { getBatchFromEmail, unknownDegree } from "lib";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { BottomBar } from "@/components/BottomBar";
+import { ButtonLabel } from "@/components/ButtonLabel";
 import DegreeDropDown from "@/components/DegreeDropDown";
 import ReportIssue from "@/components/ReportIssue";
 import { Button } from "@/components/ui/button";
@@ -32,8 +34,10 @@ const editUserProfileRoute = new Route({
 
 function EditUserProfile() {
   const { data: user, isLoading, isError, error } = useUser();
-  const { mutate: editUser } = useEditUser();
+  const { mutate: editUser, isPending } = useEditUser();
   const { toast } = useToast();
+  // isPending lags a render behind a fast double tap, so guard synchronously.
+  const submitting = useRef(false);
 
   const [firstDegree, setFirstDegree] = useState<string | null>(
     user?.degrees?.[0] ?? null,
@@ -62,7 +66,6 @@ function EditUserProfile() {
     if (firstDegree.includes("B") && secondDegree === null) {
       toast({
         title: "Select your second degree!",
-        variant: "destructive",
       });
       return;
     }
@@ -75,63 +78,62 @@ function EditUserProfile() {
         : [firstDegree]
       : [firstDegree];
 
+    if (submitting.current) return;
+    submitting.current = true;
     editUser(
       { degrees },
       {
+        onError: () => {
+          submitting.current = false;
+        },
         onSuccess: () => router.navigate({ to: "/" }),
       },
     );
   };
 
+  const canEdit = !user.degrees.includes(unknownDegree);
+
   return (
-    <>
-      <div className="flex flex-col lg:pt-28 pt-20 lg:mx-60 mx-12">
-        <h1 className="scroll-m-20 text-3xl tracking-tight lg:text-6xl text-foreground lg:mb-12 mb-4 font-bold">
-          Edit User Profile
-        </h1>
-        <div className="rounded-full text-foreground bg-accent lg:text-6xl text-4xl lg:h-28 lg:w-28 h-20 w-20 flex justify-center items-center">
-          <span>{user.name[0]}</span>
+    <main className="mx-auto w-full max-w-[640px] px-4 pt-2 pb-28 lg:pt-10 lg:pb-12">
+      <h1 className="text-2xl lg:text-3xl font-semibold">Edit User Profile</h1>
+      <div className="mt-5 flex items-center gap-3.5">
+        <div className="size-14 shrink-0 rounded-full bg-sunk grid place-items-center text-xl font-semibold">
+          {user.name[0]}
         </div>
-        <h3 className="scroll-m-20 text-xl tracking-tight lg:text-2xl text-foreground font-bold lg:mt-4 mt-2">
-          {user.name}
-        </h3>
-        <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-foreground">
-          {user.email}
-        </h5>
-        {batch !== "0000" && (
-          <div className="flex">
-            <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-foregroun mt-4 mb-4 font-bold">
-              Batch:
-            </h5>
-            <h5 className="scroll-m-20 text-l tracking-tight lg:text-xl text-foreground mt-4 mb-2 mx-2">
-              {batch}
-            </h5>
-          </div>
-        )}
-        {!user.degrees.includes(unknownDegree) && (
-          <>
-            <div className="flex sm:flex-row flex-col">
-              <DegreeDropDown
-                firstDegree={firstDegree}
-                secondDegree={secondDegree}
-                setFirstDegree={setFirstDegree}
-                setSecondDegree={setSecondDegree}
-                year={undefined}
-              />
-            </div>
-            <Button
-              className="w-fit mt-12 bg-muted font-bold hover:bg-primary-foreground transition ease-in-out text-foreground"
-              onClick={handleSubmit}
-            >
-              Update Profile
-            </Button>
-          </>
-        )}
+        <div className="min-w-0">
+          <p className="text-lg font-semibold">{user.name}</p>
+          <p className="text-sm text-ink-muted break-words">{user.email}</p>
+        </div>
       </div>
-      <span className="fixed bottom-0 bg-muted w-full text-center py-1 text-md lg:text-lg text-muted-foreground">
-        Powered by CRUx: The Programming and Computing Club of BITS Hyderabad
-      </span>
-    </>
+      {batch !== "0000" && (
+        <div className="mt-5 flex h-[46px] items-center justify-between rounded-lg border border-line bg-surface px-3.5">
+          <span className="text-ink-muted">Batch</span>
+          <span className="font-medium">{batch}</span>
+        </div>
+      )}
+      {canEdit && (
+        <>
+          <div className="mt-4">
+            <DegreeDropDown
+              firstDegree={firstDegree}
+              secondDegree={secondDegree}
+              setFirstDegree={setFirstDegree}
+              setSecondDegree={setSecondDegree}
+              year={undefined}
+            />
+          </div>
+          <BottomBar>
+            <Button
+              onClick={handleSubmit}
+              disabled={isPending}
+              aria-busy={isPending}
+            >
+              <ButtonLabel loading={isPending}>Update Profile</ButtonLabel>
+            </Button>
+          </BottomBar>
+        </>
+      )}
+    </main>
   );
 }
 
