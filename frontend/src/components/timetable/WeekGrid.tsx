@@ -1,6 +1,7 @@
 import { Bird } from "lucide-react";
 import { formatAxisHour } from "@/utils/timeFormat";
 import {
+  blockName,
   hourLabelFade,
   splitCode,
   type TimetableCell,
@@ -100,12 +101,16 @@ export function WeekGrid({
         />
       )}
       {cells.map((cell) => {
+        const key = `${cell.id}-${cell.day}-${cell.hour}`;
+        const leaving = cell.presence === "leaving";
+        // live tiles carry their morph name (C7); export and leaving don't
+        const named = mode !== "export" && !leaving;
         const placement = {
           gridColumn: cell.day + 2,
           gridRow: `${cell.hour + 2} / span ${cell.span}`,
-        };
-        const key = `${cell.id}-${cell.day}-${cell.hour}`;
-        const leaving = cell.presence === "leaving";
+          ...(named ? { "--vt": blockName(cell) } : {}),
+        } as React.CSSProperties;
+        const nameClass = named ? "tt-block" : "";
         return mode === "edit" ? (
           <button
             key={key}
@@ -126,7 +131,7 @@ export function WeekGrid({
                   }
             }
             aria-label={`Edit ${cell.courseId} ${cell.type}${cell.number}, press Delete to remove`}
-            className={`${tileClass} cursor-pointer hover:bg-ev-hover focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60`}
+            className={`${tileClass} ${nameClass} cursor-pointer hover:bg-ev-hover focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60`}
           >
             <TileBody cell={cell} />
           </button>
@@ -136,7 +141,7 @@ export function WeekGrid({
             style={placement}
             data-presence={cell.presence ?? "present"}
             inert={leaving}
-            className={tileClass}
+            className={`${tileClass} ${nameClass}`}
           >
             <TileBody cell={cell} />
           </div>

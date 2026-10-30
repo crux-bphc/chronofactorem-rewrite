@@ -1,7 +1,16 @@
 import type { ParsedLocation } from "@tanstack/react-router";
 
-const prefersReducedMotion = () =>
+export const prefersReducedMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/** Whether `document.startViewTransition({ types })` is understood. */
+export const supportsTransitionTypes = () =>
+  typeof document !== "undefined" &&
+  typeof document.startViewTransition === "function" &&
+  typeof ViewTransition !== "undefined" &&
+  "types" in ViewTransition.prototype &&
+  typeof CSS !== "undefined" &&
+  CSS.supports("selector(:active-view-transition-type(a))");
 
 const tsrIndex = (location: ParsedLocation) =>
   (location.state as { __TSR_index?: number }).__TSR_index ?? 0;
@@ -64,4 +73,43 @@ export function startThemeTransition(
     .catch(() => {});
   const cleanup = () => root.classList.remove("theme-transition");
   transition.finished.then(cleanup, cleanup);
+}
+
+/** Same-route timetable surface changes (spec §9). */
+export type SurfaceTransition =
+  | "day-next"
+  | "day-prev"
+  | "view-morph"
+  | "orient";
+
+/**
+ * Runs `update` inside a typed view transition. Without support for types, or
+ * under reduced motion, `update` simply runs. `update` must commit the DOM
+ * synchronously (wrap React state in `flushSync`).
+ */
+export function startSurfaceTransition(
+  type: SurfaceTransition,
+  update: () => void,
+): void {
+  if (prefersReducedMotion() || !supportsTransitionTypes()) {
+    update();
+    return;
+  }
+  let ran = false;
+  const run = () => {
+    if (ran) return;
+    ran = true;
+    update();
+  };
+  try {
+    const transition = document.startViewTransition({
+      update: run,
+      types: [type],
+    });
+    transition.ready.catch(() => {});
+    transition.finished.catch(() => {});
+    transition.updateCallbackDone.catch(() => {});
+  } catch {
+    run();
+  }
 }

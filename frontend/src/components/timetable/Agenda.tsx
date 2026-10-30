@@ -2,6 +2,7 @@ import { Bird } from "lucide-react";
 import { Fragment, useMemo } from "react";
 import { formatClock, formatSlotEnd } from "@/utils/timeFormat";
 import {
+  blockName,
   buildAgenda,
   type TimetableCell,
   titleCase,
@@ -82,6 +83,15 @@ export function Agenda({
     );
   }
 
+  // live blocks carry their morph name (C7); it only applies during a morph
+  const named = (cell: TimetableCell) =>
+    cell.presence === "leaving" || mode === "export"
+      ? { className: "", style: undefined }
+      : {
+          className: "tt-block",
+          style: { "--vt": blockName(cell) } as React.CSSProperties,
+        };
+
   const during = (cell: TimetableCell) =>
     now && cell.hour <= now.hour && now.hour < cell.hour + cell.span
       ? "shadow-[inset_3px_0_0_var(--now)]"
@@ -144,7 +154,8 @@ export function Agenda({
                             }
                       }
                       aria-label={`Edit ${item.cell.courseId} ${item.cell.type}${item.cell.number}, press Delete to remove`}
-                      className={`${blockClass} ${during(item.cell)} cursor-pointer hover:bg-ev-hover focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60`}
+                      style={named(item.cell).style}
+                      className={`${blockClass} ${named(item.cell).className} ${during(item.cell)} cursor-pointer hover:bg-ev-hover focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60`}
                     >
                       <BlockBody cell={item.cell} />
                     </button>
@@ -152,7 +163,8 @@ export function Agenda({
                     <div
                       data-presence={item.cell.presence ?? "present"}
                       inert={item.cell.presence === "leaving"}
-                      className={`${blockClass} ${during(item.cell)}`}
+                      style={named(item.cell).style}
+                      className={`${blockClass} ${named(item.cell).className} ${during(item.cell)}`}
                     >
                       <BlockBody cell={item.cell} />
                     </div>

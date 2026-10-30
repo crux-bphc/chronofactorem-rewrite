@@ -1,6 +1,11 @@
 import { useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 import { useCallback, useMemo } from "react";
 import type { TimetableSearch } from "./timetableSearch";
+import {
+  prefersReducedMotion,
+  type SurfaceTransition,
+  supportsTransitionTypes,
+} from "./viewTransitions";
 
 type SectionType = "L" | "P" | "T";
 
@@ -39,7 +44,7 @@ export function useTimetableNav() {
   const go = useCallback(
     async (
       update: (prev: TimetableSearch) => TimetableSearch,
-      opts: { push: boolean },
+      opts: { push: boolean; transition?: SurfaceTransition },
     ) => {
       let state: NavState | true = true;
       if (opts.push) {
@@ -65,6 +70,14 @@ export function useTimetableNav() {
         // Search-only changes keep the page where it is.
         resetScroll: false,
         state,
+        // a typed surface transition; otherwise the router default applies,
+        // which skips search-only moves
+        viewTransition:
+          opts.transition &&
+          !prefersReducedMotion() &&
+          supportsTransitionTypes()
+            ? { types: [opts.transition] }
+            : undefined,
         ...(opts.push ? {} : { replace: true }),
       });
     },
@@ -157,11 +170,15 @@ export function useTimetableNav() {
       closeCourse: () => back(({ course: _c, type: _t, ...rest }) => rest),
       setType: (type: SectionType) =>
         go((p) => ({ ...p, type }), { push: false }),
-      setView: (view: "day" | "week") =>
-        go((p) => ({ ...p, view }), { push: false }),
-      setDay: (day: number) => go((p) => ({ ...p, day }), { push: false }),
-      showDay: (day: number) =>
-        go((p) => ({ ...p, view: "day" as const, day }), { push: false }),
+      setView: (view: "day" | "week", transition?: SurfaceTransition) =>
+        go((p) => ({ ...p, view }), { push: false, transition }),
+      setDay: (day: number, transition?: SurfaceTransition) =>
+        go((p) => ({ ...p, day }), { push: false, transition }),
+      showDay: (day: number, transition?: SurfaceTransition) =>
+        go((p) => ({ ...p, view: "day" as const, day }), {
+          push: false,
+          transition,
+        }),
       setQuery: (q: string) =>
         go(({ q: _q, ...rest }) => (q ? { ...rest, q } : rest), {
           push: false,

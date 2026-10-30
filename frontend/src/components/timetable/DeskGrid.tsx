@@ -7,11 +7,15 @@ import {
 } from "@/components/ui/tooltip";
 import { formatAxisHour } from "@/utils/timeFormat";
 import {
+  blockName,
   hourLabelFade,
   type TimetableCell,
   timetableDayNames,
   titleCase,
 } from "@/utils/timetableGrid";
+
+const vtStyle = (cell: TimetableCell) =>
+  ({ "--vt": blockName(cell) }) as React.CSSProperties;
 
 type DeskGridProps = {
   cells: TimetableCell[];
@@ -170,10 +174,13 @@ export function DeskGrid({
         return (
           <div
             key={key}
-            style={style}
+            // live blocks carry their morph name (C7); export and leaving don't
+            style={leaving ? style : { ...style, ...vtStyle(cell) }}
             data-presence={cell.presence ?? "present"}
             inert={leaving}
             className={`@container group relative z-1 min-w-0 overflow-hidden rounded-md bg-ev ${
+              leaving ? "" : "tt-block"
+            } ${
               edit
                 ? "hover:bg-ev-hover hover:shadow-[inset_0_0_0_1.5px_var(--ink)]"
                 : ""

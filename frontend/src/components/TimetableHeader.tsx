@@ -30,6 +30,7 @@ import {
 import { TimetableActionType, useTimetableState } from "@/context";
 import useCopyTimetable from "@/data-access/hooks/useCopyTimetable";
 import useEditTimetable from "@/data-access/hooks/useEditTimetable";
+import { useOrientation } from "@/lib/useOrientation";
 import { useTimetableNav } from "@/lib/useTimetableNav";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
@@ -49,6 +50,7 @@ const TimetableHeader = ({
     dispatch,
   } = useTimetableState();
   const { openSheet } = useTimetableNav();
+  const { toggle: toggleOrientation } = useOrientation();
   const { mutateAsync: editTimetable, isPending: isEditing } =
     useEditTimetable();
   const { mutateAsync: copyTimetable } = useCopyTimetable();
@@ -311,11 +313,7 @@ const TimetableHeader = ({
                   aria-label={`Make timetable ${isVertical ? "horizontal" : "vertical"}`}
                   variant="ghost"
                   className="rounded-full p-3"
-                  onClick={() =>
-                    dispatch({
-                      type: TimetableActionType.ToggleVertical,
-                    })
-                  }
+                  onClick={toggleOrientation}
                 >
                   {isVertical ? <GripVertical /> : <GripHorizontal />}
                 </Button>

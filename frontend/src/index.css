@@ -460,3 +460,89 @@ html.theme-transition::view-transition-new(root) {
     transform: scale(0.96);
   }
 }
+
+/* Same-route surface transitions (spec §9, C7). Names exist only while their
+   transition runs, so route transitions and the export never see them. */
+@keyframes tt-day-out-next {
+  to {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+}
+@keyframes tt-day-in-next {
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+}
+@keyframes tt-day-out-prev {
+  to {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+}
+@keyframes tt-day-in-prev {
+  from {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+}
+@keyframes tt-root-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes tt-root-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* taps during a transition reach the live page underneath */
+::view-transition {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html:active-view-transition-type(view-morph, orient) {
+    & .tt-block {
+      view-transition-name: var(--vt);
+      view-transition-class: tt-block;
+    }
+    &::view-transition-group(.tt-block) {
+      animation-duration: var(--d-3);
+      animation-timing-function: var(--e-out);
+    }
+    &::view-transition-old(root) {
+      animation: tt-root-out var(--d-2) var(--e-out) both;
+    }
+    &::view-transition-new(root) {
+      animation: tt-root-in var(--d-2) var(--e-out) both;
+    }
+  }
+  html:active-view-transition-type(day-next, day-prev) {
+    & .tt-agenda {
+      view-transition-name: tt-agenda;
+    }
+    &::view-transition-old(root),
+    &::view-transition-new(root) {
+      animation: none;
+    }
+  }
+  html:active-view-transition-type(day-next) {
+    &::view-transition-old(tt-agenda) {
+      animation: tt-day-out-next var(--d-2) var(--e-in) both;
+    }
+    &::view-transition-new(tt-agenda) {
+      animation: tt-day-in-next var(--d-2) var(--e-out) both;
+    }
+  }
+  html:active-view-transition-type(day-prev) {
+    &::view-transition-old(tt-agenda) {
+      animation: tt-day-out-prev var(--d-2) var(--e-in) both;
+    }
+    &::view-transition-new(tt-agenda) {
+      animation: tt-day-in-prev var(--d-2) var(--e-out) both;
+    }
+  }
+}
