@@ -1,7 +1,6 @@
 import { useIsMutating } from "@tanstack/react-query";
-import type { sectionType, sectionTypeEnum } from "lib";
+import type { sectionType } from "lib";
 import { ArrowLeft, ExternalLink } from "lucide-react";
-import { useMemo } from "react";
 import type z from "zod";
 import { TimetableActionType, useTimetableState } from "@/context";
 import {
@@ -48,32 +47,8 @@ const CourseDetailsMenu = () => {
         },
       );
   };
-  interface ClashingSection {
-    tm: string;
-    courseId: string;
-    sectionType: sectionTypeEnum;
-  }
-  const timings: Map<string, ClashingSection> = useMemo(() => {
-    if (timetable === undefined) return new Map();
-    const m = new Map<string, ClashingSection>();
-    for (const section of timetable.sections) {
-      for (const roomTime of section.roomTime) {
-        m.set(
-          roomTime.charAt(roomTime.lastIndexOf(":") - 1) +
-            roomTime.substring(roomTime.lastIndexOf(":") + 1),
-          {
-            tm: `${section.roomTime[0].substring(
-              0,
-              section.roomTime[0].indexOf(":"),
-            )} ${section.type}${section.number}`,
-            courseId: section.courseId,
-            sectionType: section.type,
-          },
-        );
-      }
-    }
-    return m;
-  }, [timetable]);
+  // a section's day and hour, without the course code and room
+  const slot = (roomTime: string) => roomTime.split(":").slice(2).join(":");
 
   if (timetable === undefined) return;
 
@@ -131,20 +106,22 @@ const CourseDetailsMenu = () => {
               <div className="flex flex-col gap-2 p-0 m-0 px-2 overflow-y-auto h-full">
                 {course?.sections
                   .filter((section) => section.type === sectionType)
-                  .map((section) => {
-                    const tm = section.roomTime
-                      .map(
-                        (e) =>
-                          e.charAt(e.lastIndexOf(":") - 1) +
-                          e.substring(e.lastIndexOf(":") + 1),
-                      )
-                      .find((e) => timings.has(e));
-
-                    return {
-                      ...section,
-                      clashing: timings.get(tm ?? ""),
-                    };
-                  })
+                  .map((section) => ({
+                    ...section,
+                    // picking another section of the same course and type swaps it, so those don't clash
+                    clashing: timetable.sections.filter(
+                      (item) =>
+                        !(
+                          item.courseId === section.courseId &&
+                          item.type === section.type
+                        ) &&
+                        item.roomTime.some((existing) =>
+                          section.roomTime.some(
+                            (incoming) => slot(existing) === slot(incoming),
+                          ),
+                        ),
+                    ),
+                  }))
                   .map((section, _i) => {
                     return (
                       <span
@@ -160,13 +137,7 @@ const CourseDetailsMenu = () => {
                           }`}
                           onClick={() => handleSectionClick(section)}
                           key={section.number}
-                          disabled={
-                            section.clashing &&
-                            !(
-                              section.clashing.courseId === section.courseId &&
-                              section.clashing.sectionType === section.type
-                            )
-                          }
+                          disabled={section.clashing.length > 0}
                         >
                           <div className="flex items-center h-full w-full gap-4">
                             <span className="">
@@ -185,29 +156,29 @@ const CourseDetailsMenu = () => {
                             </div>
                           </div>
                         </Button>
-                        {section.clashing &&
-                        !(
-                          section.clashing.courseId === section.courseId &&
-                          section.clashing.sectionType === section.type
-                        ) ? (
+                        {section.clashing.length > 0 ? (
                           <div className="absolute left-0 top-8 bg-slate-700/80 text-center w-full">
                             <span className="text-slate-100 font-bold text-md">
                               Clashing with{" "}
-                              <button
-                                type="button"
-                                className="text-blue-700 dark:text-blue-400 cursor-pointer inline-flex items-baseline gap-1"
-                                onClick={() =>
-                                  dispatch({
-                                    type: TimetableActionType.SetSelectedCourseAndSection,
-                                    courseID: section.clashing?.courseId ?? "",
-                                    sectionType:
-                                      section.clashing?.sectionType ?? "L",
-                                  })
-                                }
-                              >
-                                {section.clashing.tm}
-                                <ExternalLink size={16} />
-                              </button>
+                              {section.clashing.map((item, i) => (
+                                <span key={item.id}>
+                                  {i > 0 && ", "}
+                                  <button
+                                    type="button"
+                                    className="text-blue-300 dark:text-blue-400 cursor-pointer inline-flex items-baseline gap-1"
+                                    onClick={() =>
+                                      dispatch({
+                                        type: TimetableActionType.SetSelectedCourseAndSection,
+                                        courseID: item.courseId,
+                                        sectionType: item.type,
+                                      })
+                                    }
+                                  >
+                                    {`${item.roomTime[0].split(":")[0]} ${item.type}${item.number}`}
+                                    <ExternalLink size={16} />
+                                  </button>
+                                </span>
+                              ))}
                             </span>
                           </div>
                         ) : null}
