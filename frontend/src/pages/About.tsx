@@ -10,11 +10,11 @@ const aboutRoute = new Route({
 
 function About() {
   return (
-    <main className="lg:pl-20 px-16 pt-8">
+    <main className="px-4 pt-8 sm:px-16 lg:pl-20">
       <h1 className="text-4xl font-bold tracking-tight">
         About ChronoFactorem
       </h1>
-      <div className="lg:w-2/3 text-2xl">
+      <div className="text-lg sm:text-2xl lg:w-2/3">
         <p className="pt-4">
           ChronoFactorem is a project that makes the process of creating
           timetables and sharing them easy as pie. ChronoFactorem is developed
@@ -28,7 +28,7 @@ function About() {
           a little delayed. If you do still find bugs, please{" "}
           <a
             href="https://github.com/crux-bphc/chronofactorem-rewrite/issues"
-            className="text-blue-400 inline pl-1 items-center"
+            className="text-blue-700 dark:text-blue-400 inline pl-1 items-center"
           >
             report them
             <ArrowUpRightFromCircle className="inline w-5 h-5 ml-1 mr-1" />
@@ -51,7 +51,7 @@ function About() {
           years, you can go{" "}
           <a
             href="https://github.com/crux-bphc/chronofactorem-rewrite/"
-            className="text-blue-400 inline pl-1 items-center"
+            className="text-blue-700 dark:text-blue-400 inline pl-1 items-center"
           >
             look at it and star it
             <ArrowUpRightFromCircle className="inline w-5 h-5 ml-1 mr-1" />
