@@ -8,13 +8,11 @@ import {
   TimetablePageShell,
   timetablePageLoader,
 } from "@/components/TimetablePageShell";
-import {
-  TimetableActionType,
-  TimetableProvider,
-  useTimetableState,
-} from "@/context";
+import { TimetableProvider, useTimetableState } from "@/context";
+import useCourse from "@/data-access/hooks/useCourse";
 import { useAddRemoveTimetableSection } from "@/data-access/hooks/useTimetableSectionAction";
 import { timetableSearchSchema } from "@/lib/timetableSearch";
+import { useTimetableNav } from "@/lib/useTimetableNav";
 import authenticatedRoute from "../AuthenticatedRoute";
 import CenteredSpinner from "../components/CenteredSpinner";
 import NotFound from "../components/NotFound";
@@ -49,8 +47,11 @@ function EditTimetable() {
       currentCourseID,
       screenIsLarge,
     },
-    dispatch,
   } = useTimetableState();
+  const { openCourse } = useTimetableNav();
+  // an unknown course id (stale or hand-edited URL) shows the list instead
+  const { isLoading: isCourseLoading, data: courseData } =
+    useCourse(currentCourseID);
 
   useEffect(() => {
     if (!timetable) return;
@@ -86,7 +87,7 @@ function EditTimetable() {
   }
 
   const SideBar =
-    currentCourseID !== null ? (
+    currentCourseID !== null && (isCourseLoading || courseData) ? (
       <CourseDetailsMenu />
     ) : (
       <SideMenu isOnEditPage={true} isScreenshotMode={false} />
@@ -102,11 +103,10 @@ function EditTimetable() {
         handleUnitClick={(e, event) => {
           if (e?.courseId && e?.type) {
             if (event.detail <= 1) {
-              dispatch({
-                type: TimetableActionType.SetSelectedCourseAndSection,
-                courseID: courses.filter((x) => x.code === e?.courseId)[0].id,
-                sectionType: e?.type as "L" | "P" | "T",
-              });
+              openCourse(
+                courses.filter((x) => x.code === e?.courseId)[0].id,
+                e?.type as "L" | "P" | "T",
+              );
             } else if (event.detail >= 2) {
               e?.id
                 ? sectionAction({ sectionId: e?.id, action: "remove" })

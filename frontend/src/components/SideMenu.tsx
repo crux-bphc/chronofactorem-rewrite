@@ -1,5 +1,6 @@
 import { useDebounceValue } from "usehooks-ts";
-import { TimetableActionType, useTimetableState } from "@/context";
+import { useTimetableState } from "@/context";
+import { useTimetableNav } from "@/lib/useTimetableNav";
 import CDCList from "./CDCList";
 import CourseSearchResults from "./CourseSearchResults";
 import EditCoursesTab from "./EditCoursesTab";
@@ -18,8 +19,8 @@ export function SideMenu({
 }) {
   const {
     state: { timetable, currentTab, searchTerm },
-    dispatch,
   } = useTimetableState();
+  const { setTab, setQuery } = useTimetableNav();
   const [debouncedSearchTerm] = useDebounceValue(searchTerm, 500);
 
   if (timetable === undefined) return;
@@ -29,17 +30,12 @@ export function SideMenu({
     <div className="bg-secondary h-full min-h-0 w-full">
       <Tabs
         value={isScreenshotMode ? "exams" : currentTab}
-        onValueChange={(tab) =>
-          dispatch({
-            type: TimetableActionType.SetMenuTab,
-            tab: tab as typeof currentTab,
-          })
-        }
+        onValueChange={(tab) => setTab(tab as typeof currentTab)}
         className="flex h-full min-h-0 flex-col py-2"
       >
         {!isScreenshotMode && <SideMenuTabs isOnEditPage={isOnEditPage} />}
         <TabsContent
-          value="CDCs"
+          value="cdcs"
           className="min-h-0 flex-1 overflow-y-auto data-[state=inactive]:hidden"
         >
           <CDCList />
@@ -55,12 +51,7 @@ export function SideMenu({
           <div className="px-4 pb-4">
             <Input
               value={searchTerm}
-              onChange={(e) =>
-                dispatch({
-                  type: TimetableActionType.SetSearchTerm,
-                  searchTerm: e.target.value,
-                })
-              }
+              onChange={(e) => setQuery(e.target.value)}
               placeholder="Search Courses"
               className="text-md p-2"
             />

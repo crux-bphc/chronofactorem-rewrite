@@ -6,7 +6,7 @@ const SideMenuTabs = ({ isOnEditPage }: { isOnEditPage: boolean }) => (
     aria-label="Timetable details"
   >
     {isOnEditPage && (
-      <TabsTrigger className="text-lg font-bold max-lg:text-base" value="CDCs">
+      <TabsTrigger className="text-lg font-bold max-lg:text-base" value="cdcs">
         CDCs
       </TabsTrigger>
     )}
@@ -18,10 +18,7 @@ const SideMenuTabs = ({ isOnEditPage }: { isOnEditPage: boolean }) => (
         Search
       </TabsTrigger>
     )}
-    <TabsTrigger
-      className="text-lg font-bold max-lg:text-base"
-      value="currentCourses"
-    >
+    <TabsTrigger className="text-lg font-bold max-lg:text-base" value="courses">
       Courses
     </TabsTrigger>
     <TabsTrigger className="text-lg font-bold max-lg:text-base" value="exams">

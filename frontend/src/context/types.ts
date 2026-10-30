@@ -23,20 +23,19 @@ type SpecialCDCType =
 
 type CDCType = z.infer<typeof courseType> | SpecialCDCType;
 
-type TabType = "CDCs" | "search" | "currentCourses" | "exams";
+type TabType = "cdcs" | "search" | "courses" | "exams";
 
 export type TimetableUIState = {
   isVertical: boolean;
-  sidebarOpen: boolean;
   isCopyingTimetable: boolean;
-  currentCourseID: string | null;
-  currentSectionType: sectionTypeEnum | null;
-  currentTab: TabType;
   screenIsLarge: boolean;
-  searchTerm: string;
 };
 
 export type TimetableStateType = TimetableUIState & {
+  currentCourseID: string | null;
+  currentSectionType: sectionTypeEnum | null;
+  currentTab: TabType;
+  searchTerm: string;
   user: z.infer<typeof userWithTimetablesType> | undefined;
   courses: z.infer<typeof courseType>[] | undefined;
   timetable: z.infer<typeof timetableWithSectionsType> | undefined;
@@ -48,18 +47,12 @@ export type TimetableStateType = TimetableUIState & {
 };
 
 export enum TimetableActionType {
-  SetSidebarOpen = 10,
   ToggleVertical = 0,
   SetIsCopyingTimetable = 1,
-  SetSelectedCourseAndSection = 2,
-  SetSelectedSectionType = 3,
-  SetMenuTab = 4,
   UpdateScreenIsLarge = 5,
-  SetSearchTerm = 9,
 }
 
 export type Action =
-  | { type: TimetableActionType.SetSidebarOpen; open: boolean }
   | {
       type: TimetableActionType.ToggleVertical;
     }
@@ -68,23 +61,6 @@ export type Action =
       isCopyingTimetable: boolean;
     }
   | {
-      type: TimetableActionType.SetSelectedCourseAndSection;
-      courseID: string | null;
-      sectionType: sectionTypeEnum | null;
-    }
-  | {
-      type: TimetableActionType.SetSelectedSectionType;
-      sectionType: sectionTypeEnum;
-    }
-  | {
-      type: TimetableActionType.SetMenuTab;
-      tab: TabType;
-    }
-  | {
       type: TimetableActionType.UpdateScreenIsLarge;
       screenIsLarge: boolean;
-    }
-  | {
-      type: TimetableActionType.SetSearchTerm;
-      searchTerm: string;
     };

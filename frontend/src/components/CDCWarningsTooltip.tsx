@@ -10,13 +10,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { TimetableActionType, useTimetableState } from "@/context";
+import { useTimetableState } from "@/context";
+import { useTimetableNav } from "@/lib/useTimetableNav";
 
 export const CDCWarningsTooltip = () => {
   const {
     state: { cdcs, coursesInTimetable, screenIsLarge },
-    dispatch,
   } = useTimetableState();
+  const { setTab, openCourse, closeCourse } = useTimetableNav();
   const [open, setOpen] = useState(false);
 
   const cdcNotFoundWarning = useMemo(
@@ -85,18 +86,9 @@ export const CDCWarningsTooltip = () => {
   }, [coursesInTimetable, cdcs]);
 
   const handleMissingCDCClick = (courseId: string) => {
-    dispatch({
-      type: TimetableActionType.SetMenuTab,
-      tab: "CDCs",
-    });
-    dispatch({
-      type: TimetableActionType.SetSelectedCourseAndSection,
-      courseID: courseId === "" ? null : courseId,
-      sectionType: null,
-    });
-    // optional CDCs have no single course to open, so show the CDCs tab
-    if (!screenIsLarge)
-      dispatch({ type: TimetableActionType.SetSidebarOpen, open: true });
+    setTab("cdcs");
+    if (courseId === "") closeCourse();
+    else openCourse(courseId);
     setOpen(false);
   };
 

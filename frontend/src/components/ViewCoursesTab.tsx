@@ -10,7 +10,7 @@ const ViewCoursesTab = () => {
 
   return (
     <TabsContent
-      value="currentCourses"
+      value="courses"
       className="flex min-h-0 flex-1 data-[state=inactive]:hidden overflow-y-auto flex-col px-2 gap-2"
     >
       {coursesInTimetable.map((course) => {

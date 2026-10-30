@@ -1,14 +1,15 @@
 import { getClashingExamTimes } from "lib";
 import { ChevronRight, ExternalLink } from "lucide-react";
-import { TimetableActionType, useTimetableState } from "@/context";
+import { useTimetableState } from "@/context";
+import { useTimetableNav } from "@/lib/useTimetableNav";
 import { Button } from "./ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export const CDCList = () => {
   const {
     state: { cdcs, timetable },
-    dispatch,
   } = useTimetableState();
+  const { openCourse } = useTimetableNav();
 
   return (
     <>
@@ -23,13 +24,7 @@ export const CDCList = () => {
           return (
             <Button
               variant={"secondary"}
-              onClick={() =>
-                dispatch({
-                  type: TimetableActionType.SetSelectedCourseAndSection,
-                  courseID: course.id,
-                  sectionType: null,
-                })
-              }
+              onClick={() => openCourse(course.id)}
               key={course.id}
               className="h-auto min-h-16 w-full whitespace-normal py-2 rounded-none text-left bg-secondary dark:hover:bg-slate-700 hover:bg-slate-200"
             >
@@ -74,11 +69,7 @@ export const CDCList = () => {
                       key={course.id}
                       onClick={() => {
                         if (clashing) return;
-                        dispatch({
-                          type: TimetableActionType.SetSelectedCourseAndSection,
-                          courseID: course.id,
-                          sectionType: null,
-                        });
+                        openCourse(course.id);
                       }}
                       className={`relative px-4 transition duration-200 ease-in-out h-14 border-slate-300 dark:border-slate-600 items-center flex justify-between ${
                         clashing
@@ -103,11 +94,7 @@ export const CDCList = () => {
                                     variant="link"
                                     className="h-auto p-0 has-[>svg]:p-0 font-medium text-blue-700 dark:text-blue-400 [&_svg]:size-3"
                                     onClick={() =>
-                                      dispatch({
-                                        type: TimetableActionType.SetSelectedCourseAndSection,
-                                        courseID: clashCourse?.id ?? "",
-                                        sectionType: null,
-                                      })
+                                      openCourse(clashCourse?.id ?? "")
                                     }
                                   >
                                     {`${code}'s ${exam.toLowerCase()}`}
