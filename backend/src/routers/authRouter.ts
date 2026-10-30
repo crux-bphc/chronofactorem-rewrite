@@ -1,9 +1,11 @@
 import type { Request, Response } from "express";
 import * as express from "express";
+import { env } from "../config/server.js";
 import {
   authCallback,
   checkAuthStatus,
   getDegrees,
+  loginAs,
   logout,
   manageAuthRedirect,
 } from "../controllers/user/auth.js";
@@ -32,5 +34,9 @@ authRouter.get("/logout", logout);
 authRouter.post("/submit", getDegrees);
 
 authRouter.get("/check", checkAuthStatus);
+
+if (env.NODE_ENV === "development" && env.LOGIN_AS) {
+  authRouter.get("/as", loginAs);
+}
 
 export default authRouter;

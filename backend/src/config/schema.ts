@@ -26,6 +26,7 @@ export const serverSchema = z.object({
   SQIDS_ALPHABET: z.string().min(62),
   SESSION_MAX_AGE_MS: z.coerce.number().prefault(86400000),
   CHRONO_SECRET: z.string().min(1),
+  LOGIN_AS: z.stringbool().default(false),
   DB_LONG_RUNNING_QUERY_MS: z.coerce.number().prefault(2000),
   LOG_MODE: z.enum(["development", "production"]).optional(),
   // from pino.Level
