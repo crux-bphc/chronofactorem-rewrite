@@ -546,6 +546,24 @@ html.theme-transition * {
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  /* the phone dock is fixed over the page. left in the root snapshot, every
+  named snapshot (grid, blocks, agenda) would paint over it, so lift it into
+  its own group on top and show it live: no fade, no slide */
+  html:active-view-transition-type(view-morph, orient, day-next, day-prev) {
+    & .dock {
+      view-transition-name: tt-dock;
+    }
+    &::view-transition-group(tt-dock) {
+      z-index: 1;
+      animation: none;
+    }
+    &::view-transition-old(tt-dock) {
+      display: none;
+    }
+    &::view-transition-new(tt-dock) {
+      animation: none;
+    }
+  }
   html:active-view-transition-type(view-morph, orient) {
     --vt-timetable-grid: timetable-grid;
     & .tt-block {
