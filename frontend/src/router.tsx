@@ -4,6 +4,7 @@ import { AxiosError } from "axios";
 import authenticatedRoute from "./AuthenticatedRoute";
 import NotFound from "./components/NotFound";
 import { rootSearchSchema } from "./lib/rootSearch";
+import { trackSharedTimetable } from "./lib/sharedTransition";
 import { routeTransitionTypes } from "./lib/viewTransitions";
 import aboutRoute from "./pages/About";
 import editTimetableRoute from "./pages/EditTimetable";
@@ -79,6 +80,8 @@ export const router = new Router({
     ? { types: routeTransitionTypes }
     : false,
 });
+
+router.subscribe("onBeforeNavigate", trackSharedTimetable);
 
 // Register things for typesafety
 declare module "@tanstack/react-router" {
