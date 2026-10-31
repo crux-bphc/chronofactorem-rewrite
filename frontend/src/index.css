@@ -358,7 +358,8 @@ html.theme-transition::view-transition-new(root) {
   border-radius: inherit;
   border: 2px solid var(--accent);
   pointer-events: none;
-  animation: cf-ring-pulse 600ms var(--e-out) 1 both;
+  /* Starts once the push transition that landed here has played. */
+  animation: cf-ring-pulse 600ms var(--e-out) var(--d-3) 1 both;
 }
 
 @media (prefers-reduced-motion: no-preference) {

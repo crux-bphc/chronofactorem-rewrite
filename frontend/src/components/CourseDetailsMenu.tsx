@@ -1,20 +1,121 @@
 import { useIsMutating } from "@tanstack/react-query";
 import type { sectionType } from "lib";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { Check, ChevronLeft, HelpCircle } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import type z from "zod";
 import { useTimetableState } from "@/context";
 import {
   useAddRemoveTimetableSection,
   useSwapTimetableSections,
 } from "@/data-access/hooks/useTimetableSectionAction";
+import { formatExam, summarizeRoomTimes } from "@/lib/formatTime";
+import { PANEL_VT_CLASS, panelBack, panelForward } from "@/lib/panelTransition";
 import { titleCase } from "@/lib/titleCase";
 import { useTimetableNav } from "@/lib/useTimetableNav";
-import { Button } from "./ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { cn } from "@/lib/utils";
+import {
+  ClashingWith,
+  ClashPill,
+  markClashLanding,
+  useClashLanding,
+} from "./ClashPills";
+import { Badge } from "./ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Roll } from "./ui/roll";
+import { Segmented } from "./ui/segmented";
+import { Skeleton } from "./ui/skeleton";
 
-const CourseDetailsMenu = () => {
+type Section = z.infer<typeof sectionType>;
+type SectionKind = "L" | "P" | "T";
+
+const typeNames: Record<SectionKind, string> = {
+  L: "Lecture",
+  P: "Practical",
+  T: "Tutorial",
+};
+
+const group =
+  "mx-4 mt-2.5 mb-6 lg:mx-0 rounded-xl border border-line bg-surface [&>*+*]:border-t [&>*+*]:border-line [&>:first-child]:rounded-t-[calc(var(--radius-xl)-1px)] [&>:last-child]:rounded-b-[calc(var(--radius-xl)-1px)]";
+
+const rowGrid = "grid grid-cols-[40px_1fr_auto] gap-x-2.5 px-3.5 py-[13px]";
+
+const reducedMotion = () =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const examHelp = {
+  midsem:
+    "Timetable Division hasn't published the midsem dates for this course. Either there is no midsem exam, or they haven't decided it yet. We recommend checking with your professor.",
+  compre:
+    "Timetable Division hasn't published the compre dates for this course. Either there is no compre exam, or they haven't decided it yet. We recommend checking with your professor.",
+};
+
+function ExamLine({
+  label,
+  start,
+  end,
+  help,
+}: {
+  label: string;
+  start: string | null;
+  end: string | null;
+  help: string;
+}) {
+  return (
+    <span>
+      {label} · {formatExam(start, end)}
+      {start === null && (
+        <Popover>
+          <PopoverTrigger
+            aria-label="About this date"
+            className="relative -my-1 ml-1 inline-grid size-6 cursor-pointer place-items-center rounded-full align-middle text-ink-muted transition-colors duration-(--d-1) after:absolute after:-inset-2.5 after:content-[''] hover:bg-sunk hover:text-ink"
+          >
+            <HelpCircle size={14} aria-hidden="true" />
+          </PopoverTrigger>
+          <PopoverContent className="p-3 text-sm leading-normal">
+            {help}
+          </PopoverContent>
+        </Popover>
+      )}
+    </span>
+  );
+}
+
+function SectionText({ section }: { section: Section }) {
+  return (
+    <>
+      <span className="text-[15px] font-semibold text-ink">
+        {section.type}
+        {section.number}
+      </span>
+      <span className="flex min-w-0 flex-col">
+        <span className="text-[14px] font-medium text-ink">
+          {section.instructors.join(", ")}
+        </span>
+        {summarizeRoomTimes(section.roomTime).map((line) => (
+          <span key={line} className="text-[13px] text-ink-muted">
+            {line}
+          </span>
+        ))}
+      </span>
+    </>
+  );
+}
+
+const CourseDetailsMenu = ({
+  showHeader = true,
+  onSectionHover,
+}: {
+  showHeader?: boolean;
+  onSectionHover?: (sectionId: string | null) => void;
+}) => {
   const {
-    state: { timetable, course, uniqueSectionTypes, currentSectionType },
+    state: {
+      timetable,
+      course,
+      currentCourseID,
+      uniqueSectionTypes,
+      currentSectionType,
+    },
   } = useTimetableState();
   const { openCourse, closeCourse, setType } = useTimetableNav();
   const { mutate: sectionAction } = useAddRemoveTimetableSection(timetable?.id);
@@ -22,21 +123,33 @@ const CourseDetailsMenu = () => {
 
   const pending =
     useIsMutating({ mutationKey: ["sections", timetable?.id] }) > 0;
-  const handleSectionClick = (section: z.infer<typeof sectionType>) => {
-    if (!timetable || pending) return;
+  // useIsMutating lags a tap by a tick; this closes the gap for a quick
+  // second tap so only one request goes out.
+  const inFlight = useRef(false);
+  const busy = pending || inFlight.current;
+  const settle = {
+    onSettled: () => {
+      inFlight.current = false;
+    },
+  };
+  const handleSectionClick = (section: Section) => {
+    if (!timetable || pending || inFlight.current) return;
+    inFlight.current = true;
     if (timetable.sections.some((item) => item.id === section.id)) {
-      sectionAction({ sectionId: section.id, action: "remove" });
+      sectionAction({ sectionId: section.id, action: "remove" }, settle);
       return;
     }
     const other = timetable.sections.find(
       (item) =>
         item.type === section.type && item.courseId === section.courseId,
     );
-    if (other) swapSections({ sectionId: other.id, newSectionId: section.id });
+    if (other)
+      swapSections({ sectionId: other.id, newSectionId: section.id }, settle);
     else
       sectionAction(
         { sectionId: section.id, action: "add" },
         {
+          ...settle,
           onSuccess: () => {
             const next =
               uniqueSectionTypes[uniqueSectionTypes.indexOf(section.type) + 1];
@@ -48,133 +161,211 @@ const CourseDetailsMenu = () => {
   // a section's day and hour, without the course code and room
   const slot = (roomTime: string) => roomTime.split(":").slice(2).join(":");
 
+  const landed = useClashLanding(course?.id ?? null, currentSectionType);
+  const landingKey = `${course?.id}|${currentSectionType}`;
+  const [pulsedKey, setPulsedKey] = useState<string | null>(null);
+  const pulse = landed && pulsedKey !== landingKey && !reducedMotion();
+
+  // Rows already selected when a course opens don't play the tick; rows
+  // selected (or reselected) while it is open do.
+  const selectedIds = new Set(timetable?.sections.map((s) => s.id));
+  const seen = useRef<{ course: string | null; ids: Set<string> }>({
+    course: null,
+    ids: new Set(),
+  });
+  if (course && seen.current.course !== course.id)
+    seen.current = { course: course.id, ids: selectedIds };
+  for (const id of seen.current.ids)
+    if (!selectedIds.has(id)) seen.current.ids.delete(id);
+
+  // Clear a hover preview if the picker goes away under the pointer.
+  const hovered = useRef(false);
+  const hoverRef = useRef(onSectionHover);
+  hoverRef.current = onSectionHover;
+  useEffect(
+    () => () => {
+      if (hovered.current) hoverRef.current?.(null);
+    },
+    [],
+  );
+  const hover = (id: string | null) => {
+    hovered.current = id !== null;
+    onSectionHover?.(id);
+  };
+
   if (timetable === undefined) return;
 
-  return (
-    <div className="bg-secondary flex h-full min-h-0 w-full flex-col">
-      <div className="flex shrink-0 items-center py-2 w-full">
-        <Button
-          variant={"ghost"}
-          className="rounded-full flex ml-2 px-2 mr-2 items-center hover:bg-secondary-foreground/10"
-          onClick={() => closeCourse()}
-        >
-          <ArrowLeft />
-        </Button>
-        <span className="font-semibold text-md">
-          {course?.code}: {` ${course?.name ? titleCase(course.name) : ""}`}
-        </span>
-      </div>
-      <Tabs
-        value={currentSectionType ?? undefined}
-        className="flex min-h-0 flex-1 flex-col"
-      >
-        <TabsList className="w-full mb-2 shrink-0">
-          {uniqueSectionTypes.map((sectionType) => {
-            return (
-              <TabsTrigger
-                value={sectionType}
-                onClick={() => {
-                  setType(sectionType);
-                }}
-                key={sectionType}
-                className="text-xl font-bold w-full"
-              >
-                {sectionType}
-              </TabsTrigger>
-            );
-          })}
-        </TabsList>
+  const chosen = (type: string) =>
+    timetable.sections.find(
+      (item) => item.courseId === currentCourseID && item.type === type,
+    );
 
-        {uniqueSectionTypes.map((sectionType) => {
-          return (
-            <TabsContent
-              value={sectionType}
-              className="min-h-0 flex-1"
-              key={sectionType}
+  const sections = (course?.sections ?? [])
+    .filter((section) => section.type === currentSectionType)
+    .map((section) => ({
+      section,
+      // picking another section of the same course and type swaps it, so those don't clash
+      clashing: timetable.sections.filter(
+        (item) =>
+          !(item.courseId === section.courseId && item.type === section.type) &&
+          item.roomTime.some((existing) =>
+            section.roomTime.some(
+              (incoming) => slot(existing) === slot(incoming),
+            ),
+          ),
+      ),
+    }));
+
+  return (
+    <div className={cn("flex h-full min-h-0 flex-col", PANEL_VT_CLASS)}>
+      <div className="shrink-0 px-4 pt-1 lg:px-0">
+        {showHeader && (
+          <div className="flex items-center">
+            <button
+              type="button"
+              aria-label="Back"
+              onClick={panelBack(closeCourse)}
+              className="-ml-4 grid size-11 shrink-0 cursor-pointer lg:-ml-2 lg:size-9 place-items-center rounded-full text-ink transition-colors duration-(--d-1) hover:bg-sunk"
             >
-              <div className="flex flex-col gap-2 p-0 m-0 px-2 overflow-y-auto h-full">
-                {course?.sections
-                  .filter((section) => section.type === sectionType)
-                  .map((section) => ({
-                    ...section,
-                    // picking another section of the same course and type swaps it, so those don't clash
-                    clashing: timetable.sections.filter(
-                      (item) =>
-                        !(
-                          item.courseId === section.courseId &&
-                          item.type === section.type
-                        ) &&
-                        item.roomTime.some((existing) =>
-                          section.roomTime.some(
-                            (incoming) => slot(existing) === slot(incoming),
-                          ),
-                        ),
-                    ),
-                  }))
-                  .map((section, _i) => {
-                    return (
-                      <span
-                        className="w-full relative flex flex-col"
-                        key={section.id}
-                      >
-                        <Button
-                          variant={"secondary"}
-                          className={`flex flex-col w-full h-fit border-slate-300 border-2 dark:border-slate-600/60 ${
-                            timetable.sections.find((e) => e.id === section.id)
-                              ? "dark:bg-slate-700 bg-slate-300 hover:dark:bg-slate-600 hover:bg-slate-400/70"
-                              : "bg-transparent hover:dark:bg-slate-800 hover:bg-slate-200"
-                          }`}
-                          onClick={() => handleSectionClick(section)}
-                          key={section.number}
-                          disabled={section.clashing.length > 0}
-                        >
-                          <div className="flex items-center h-full w-full gap-4">
-                            <span className="">
-                              {section.type}
-                              {section.number}
-                            </span>
-                            <div className="flex flex-col h-full min-h-16 justify-between text-left py-2">
-                              <span className="font-semibold whitespace-pre-wrap text-md">
-                                {section.instructors.join(", ")}
-                              </span>
-                              <span className="font-normal whitespace-pre-wrap">
-                                {section.roomTime
-                                  .map((e) => e.split(":").splice(1).join(" "))
-                                  .join(", ")}
-                              </span>
-                            </div>
-                          </div>
-                        </Button>
-                        {section.clashing.length > 0 ? (
-                          <div className="absolute left-0 top-8 bg-slate-700/80 text-center w-full">
-                            <span className="text-slate-100 font-bold text-md">
-                              Clashing with{" "}
-                              {section.clashing.map((item, i) => (
-                                <span key={item.id}>
-                                  {i > 0 && ", "}
-                                  <button
-                                    type="button"
-                                    className="text-blue-300 dark:text-blue-400 cursor-pointer inline-flex items-baseline gap-1"
-                                    onClick={() =>
-                                      openCourse(item.courseId, item.type)
-                                    }
-                                  >
-                                    {`${item.roomTime[0].split(":")[0]} ${item.type}${item.number}`}
-                                    <ExternalLink size={16} />
-                                  </button>
-                                </span>
-                              ))}
-                            </span>
-                          </div>
-                        ) : null}
-                      </span>
-                    );
-                  })}
+              <ChevronLeft size={22} aria-hidden="true" />
+            </button>
+            {course ? (
+              <h2 className="min-w-0 truncate text-[19px] font-semibold text-ink">
+                {course.code}
+              </h2>
+            ) : (
+              <Skeleton className="h-5 w-24" />
+            )}
+          </div>
+        )}
+        {course && (
+          <div className="flex flex-col pl-7 text-[13px] leading-normal text-ink-muted">
+            <span>{titleCase(course.name)}</span>
+            <ExamLine
+              label="Midsem"
+              start={course.midsemStartTime}
+              end={course.midsemEndTime}
+              help={examHelp.midsem}
+            />
+            <ExamLine
+              label="Compre"
+              start={course.compreStartTime}
+              end={course.compreEndTime}
+              help={examHelp.compre}
+            />
+          </div>
+        )}
+        {course && currentSectionType && uniqueSectionTypes.length > 0 && (
+          <Segmented
+            className="mt-3"
+            aria-label="Section type"
+            value={currentSectionType}
+            onValueChange={(t) => setType(t)}
+            options={uniqueSectionTypes.map((type) => {
+              const pick = chosen(type);
+              return {
+                value: type,
+                label: (
+                  <>
+                    <span className="truncate">{typeNames[type]}</span>
+                    {pick ? (
+                      <Badge variant="pill">
+                        <Roll value={`${pick.type}${pick.number}`} />
+                      </Badge>
+                    ) : (
+                      <Badge variant="pill-ghost">{type}</Badge>
+                    )}
+                  </>
+                ),
+              };
+            })}
+          />
+        )}
+      </div>
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        {course === undefined ? (
+          <div className={group}>
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="h-16 p-3">
+                <Skeleton className="h-full w-full" />
               </div>
-            </TabsContent>
-          );
-        })}
-      </Tabs>
+            ))}
+          </div>
+        ) : (
+          <div className={group}>
+            {sections.map(({ section, clashing }) => {
+              if (clashing.length > 0) {
+                return (
+                  <div key={section.id} className={rowGrid}>
+                    <button
+                      type="button"
+                      disabled
+                      className="col-span-3 grid grid-cols-subgrid text-left opacity-50"
+                    >
+                      <SectionText section={section} />
+                    </button>
+                    <div className="col-span-2 col-start-2 min-w-0">
+                      <ClashingWith>
+                        {clashing.map((item) => (
+                          <ClashPill
+                            key={item.id}
+                            label={`${item.roomTime[0].split(":")[0]} ${item.type}${item.number}`}
+                            onSelect={panelForward(() => {
+                              markClashLanding(item.courseId, item.type);
+                              return openCourse(item.courseId, item.type);
+                            })}
+                          />
+                        ))}
+                      </ClashingWith>
+                    </div>
+                  </div>
+                );
+              }
+              const selected = selectedIds.has(section.id);
+              const fresh = selected && !seen.current.ids.has(section.id);
+              return (
+                <button
+                  key={section.id}
+                  type="button"
+                  aria-pressed={selected}
+                  aria-busy={busy || undefined}
+                  onClick={() => handleSectionClick(section)}
+                  onMouseEnter={() => hover(section.id)}
+                  onMouseLeave={() => hover(null)}
+                  onAnimationEnd={(e) => {
+                    if (e.animationName === "cf-ring-pulse")
+                      setPulsedKey(landingKey);
+                  }}
+                  className={cn(
+                    rowGrid,
+                    "relative w-full cursor-pointer items-start text-left transition-colors duration-(--d-2) focus-visible:outline-offset-[-2px]",
+                    selected
+                      ? "bg-brand-bg shadow-[inset_3px_0_0_var(--accent)]"
+                      : "hover:bg-sunk",
+                    selected && pulse && "cf-ring-pulse",
+                    busy && "cursor-progress",
+                  )}
+                >
+                  <SectionText section={section} />
+                  {selected ? (
+                    <span
+                      className={cn(
+                        "grid size-[22px] place-items-center self-center rounded-full bg-brand text-brand-ink",
+                        fresh &&
+                          "animate-[cf-tick-in_var(--d-3)_var(--e-spring)]",
+                      )}
+                    >
+                      <Check size={14} strokeWidth={3} aria-hidden="true" />
+                    </span>
+                  ) : (
+                    <span className="size-[22px] self-center rounded-full border-[1.5px] border-line" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

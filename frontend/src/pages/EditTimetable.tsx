@@ -88,7 +88,7 @@ function EditTimetable() {
 
   const SideBar =
     currentCourseID !== null && (isCourseLoading || courseData) ? (
-      <CourseDetailsMenu />
+      <CourseDetailsMenu showHeader />
     ) : (
       <SideMenu isOnEditPage={true} isScreenshotMode={false} />
     );
