@@ -50,7 +50,7 @@ function Login() {
       <div className="flex-1 flex flex-col justify-center mx-auto w-full max-w-[400px] px-7">
         <div className={enter} style={stagger(0)}>
           <p className="text-lg text-ink-muted">Welcome to</p>
-          <h1 className="text-[40px] lg:text-[52px] font-bold tracking-tight leading-tight">
+          <h1 className="text-[40px] lg:text-[46px] font-bold tracking-tight leading-tight">
             ChronoFactorem
           </h1>
         </div>
