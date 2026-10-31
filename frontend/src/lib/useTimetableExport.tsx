@@ -1,4 +1,4 @@
-import { toPng } from "html-to-image";
+import { toBlob } from "html-to-image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReportIssueToastAction from "@/components/ReportIssueToastAction";
 import { TimetableSurface } from "@/components/timetable/TimetableSurface";
@@ -13,6 +13,46 @@ import { useOrientation } from "./useOrientation";
 export type ExportStatus = "idle" | "rendering" | "done";
 
 const DONE_MS = 1200;
+
+let styleProperties: string[] | undefined;
+
+/**
+ * html-to-image copies every computed property (~530) onto every cloned node,
+ * which blocks the main thread for half a second. Only properties some rule or
+ * inline style declares can differ from what the clone gets by default, so
+ * copying just those draws the same image. Custom properties are already
+ * resolved into the computed values, and a still image has no animations or
+ * transitions. Read once: html-to-image caches the list it is given anyway.
+ */
+function declaredStyleProperties(node: HTMLElement): string[] {
+  if (styleProperties) return styleProperties;
+  const declared = new Set<string>();
+  const add = (style: CSSStyleDeclaration) => {
+    for (let i = 0; i < style.length; i++) declared.add(style[i]);
+  };
+  const visit = (rules: CSSRuleList) => {
+    for (const rule of rules) {
+      if ("style" in rule && rule.style instanceof CSSStyleDeclaration)
+        add(rule.style);
+      if ("cssRules" in rule && rule.cssRules instanceof CSSRuleList)
+        visit(rule.cssRules);
+    }
+  };
+  for (const sheet of document.styleSheets) {
+    try {
+      visit(sheet.cssRules);
+    } catch {
+      // a cross-origin sheet can't be read; html-to-image skips it too
+    }
+  }
+  for (const el of node.querySelectorAll<HTMLElement>("[style]")) add(el.style);
+  styleProperties = Array.from(
+    getComputedStyle(document.documentElement),
+  ).filter(
+    (name) => declared.has(name) && !/^(--|animation-|transition-)/.test(name),
+  );
+  return styleProperties;
+}
 
 function ExamList({
   title,
@@ -86,15 +126,25 @@ export function useTimetableExport(): {
         throw new Error(
           "The timetable image could not be prepared. Please try again.",
         );
-      const dataUrl = await toPng(node, {
+      // toBlob encodes the PNG off the main thread, unlike toPng's toDataURL
+      const blob = await toBlob(node, {
         pixelRatio: 2,
         cacheBust: true,
         style: { position: "static" },
+        includeStyleProperties: declaredStyleProperties(node),
       });
+      if (!blob)
+        throw new Error(
+          "The timetable image could not be prepared. Please try again.",
+        );
+      const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.download = "timetable.png";
-      link.href = dataUrl;
+      link.href = url;
       link.click();
+      // Safari and Firefox read the blob after click() returns; revoking on the
+      // next tick can cancel the download, so give it time (as FileSaver does)
+      setTimeout(() => URL.revokeObjectURL(url), 40_000);
       // the "done" window is feedback only; a new export may start in it
       busy.current = false;
       setStatus("done");
