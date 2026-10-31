@@ -60,11 +60,6 @@ const DAY = 24 * HOUR;
 /** e.g. `Oct 31, 2026, 4:36 PM`. */
 export const formatTimestamp = (d: Date): string => absoluteFormat.format(d);
 
-/**
- * How long ago `d` was: `just now`, `5m ago`, `2h ago`, `yesterday`,
- * `3d ago`. Anything a week or older is an absolute date
- * (`Oct 3`, or `Oct 3, 2025` outside the current year).
- */
 export function formatRelative(d: Date, now: Date): string {
   const elapsed = now.getTime() - d.getTime();
   if (elapsed < MINUTE) return "just now";
