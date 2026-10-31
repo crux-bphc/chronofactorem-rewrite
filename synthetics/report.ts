@@ -11,6 +11,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { crc32 } from "node:zlib";
 import sharp from "sharp";
+import { type Change, changesBetween, groupRepeats } from "./changes.js";
 import { synthetics } from "./synthetics.js";
 
 // compares a run's screenshots with the baseline (master's screenshots where
@@ -341,6 +342,7 @@ for (const [, { data, hash }] of noBaseline ? [] : [...changed, ...added]) {
   files.set(`img/${hash}.png`, data);
 }
 const blinks = new Map<string, string>();
+const changes = new Map<string, Change[]>();
 await Promise.all(
   changed.map(async ([path, { data, hash }]) => {
     const name = `blink/${baseline[path]}-${hash}.png`;
@@ -349,6 +351,7 @@ await Promise.all(
       throw new Error(`no img/${baseline[path]}.png in refs/${IMAGES_REF}`);
     files.set(name, await blinkImage(before, data));
     blinks.set(path, name);
+    changes.set(path, await changesBetween(before, data));
   }),
 );
 // a merge that changed no screenshot leaves the baseline alone
@@ -414,6 +417,7 @@ const section = <T>(
   items: T[],
   pathOf: (item: T) => string,
   imageOf: (item: T) => string,
+  noteOf?: (item: T) => string,
 ) =>
   [...byRoute(items, pathOf)].flatMap(([route, group]) => [
     `### \`${route}\``,
@@ -421,10 +425,20 @@ const section = <T>(
     ...group.flatMap((item) => [
       `#### ${name(pathOf(item))}`,
       "",
+      ...(noteOf ? [noteOf(item), ""] : []),
       image(imageOf(item)),
       "",
     ]),
   ]);
+
+// changed screenshots that repeat changes already shown, or whose changes are
+// all tiny, are folded away so a review only looks at each change once
+const grouped = groupRepeats(
+  [...byRoute(changed, ([path]) => path).values()]
+    .flat()
+    .map(([path]) => ({ item: path, changes: changes.get(path) ?? [] })),
+);
+const blinkOf = (path: string) => blinks.get(path) as string;
 
 const lines = [MARKER, "## Screenshots", ""];
 if (noBaseline) {
@@ -449,11 +463,30 @@ if (noBaseline) {
         .map(([route, group]) => `\`${route}\` ${group.length}`)
         .join(" · "),
       "",
+      ...section(grouped.shown, (path) => path, blinkOf),
+    );
+  }
+  if (grouped.repeats.length) {
+    lines.push(
+      `<details><summary>Same changes as above (${grouped.repeats.length})</summary>`,
+      "",
       ...section(
-        changed,
-        ([path]) => path,
-        ([path]) => blinks.get(path) as string,
+        grouped.repeats,
+        ({ item }) => item,
+        ({ item }) => blinkOf(item),
+        ({ of }) => `Repeats ${name(of)}`,
       ),
+      "</details>",
+      "",
+    );
+  }
+  if (grouped.tiny.length) {
+    lines.push(
+      `<details><summary>Tiny changes, possibly noise (${grouped.tiny.length})</summary>`,
+      "",
+      ...section(grouped.tiny, (path) => path, blinkOf),
+      "</details>",
+      "",
     );
   }
   if (added.length) {
