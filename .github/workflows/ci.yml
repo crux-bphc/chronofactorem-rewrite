@@ -4,7 +4,8 @@ on:
   pull_request:
     types: [ opened, reopened, ready_for_review, labeled, synchronize ]
   push:
-    branches: [ master ]
+    # playground branch, drop before merging
+    branches: [ master, ci/synthetics-speed ]
   merge_group:
 
 # cancel stale runs when a newer run for the same PR/branch is queued,

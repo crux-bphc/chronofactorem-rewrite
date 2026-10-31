@@ -15,7 +15,8 @@ on:
       - pnpm-lock.yaml
       - .github/workflows/synthetics.yml
   push:
-    branches: [ master ]
+    # playground branch, drop before merging
+    branches: [ master, ci/synthetics-speed ]
     paths: *paths
 
 # new pushes should cancel older ones
@@ -150,3 +151,5 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           BASELINE: ${{ github.event_name == 'push' }}
+          # playground, drop before merging
+          IMAGES_REF: ${{ (github.ref_name == 'ci/synthetics-speed' || github.head_ref == 'ci/synthetics-speed') && 'synthetics/images-playground' || 'synthetics/images' }}
