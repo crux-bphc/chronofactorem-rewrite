@@ -7,20 +7,12 @@ import { toast } from "@/components/ui/use-toast";
 import { useTimetableState } from "@/context";
 import { timetableMeta } from "@/utils/timetable";
 import { titleCase } from "@/utils/timetableGrid";
+import { formatExamRange } from "./timeFormat";
 import { useOrientation } from "./useOrientation";
 
 export type ExportStatus = "idle" | "rendering" | "done";
 
 const DONE_MS = 1200;
-
-const examDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    hour12: true,
-  });
 
 function ExamList({
   title,
@@ -48,7 +40,7 @@ function ExamList({
           <li key={exam.code} className="flex gap-3 text-sm">
             <span className="w-24 shrink-0 font-semibold">{exam.code}</span>
             <span className="text-ink-muted">
-              {`${examDate(exam.start)} — ${examDate(exam.end)}`}
+              {formatExamRange(new Date(exam.start), new Date(exam.end))}
             </span>
           </li>
         ))}
