@@ -99,6 +99,17 @@ function PhoneSheet({ courses }: { courses: ReactNode }) {
           opener.current = document.activeElement as HTMLElement | null;
           (e.currentTarget as HTMLElement | null)?.focus();
         }}
+        // Escape in a filled search box clears it (SideMenu) rather than
+        // closing the sheet; an empty box still closes it.
+        onEscapeKeyDown={(e) => {
+          const target = e.target;
+          if (
+            target instanceof HTMLInputElement &&
+            target.type === "search" &&
+            target.value !== ""
+          )
+            e.preventDefault();
+        }}
         // The sheet opens from the URL, not a Radix trigger, so hand focus
         // back to whatever opened it.
         onCloseAutoFocus={(e) => {
