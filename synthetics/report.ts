@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { appendFileSync, readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import sharp from "sharp";
+import { synthetics } from "./synthetics.js";
 
 // compares a run's screenshots with the baseline (master's latest), and
 // reports what changed in the step summary and, on a pull request, in one
@@ -225,7 +226,52 @@ const url = (path: string) =>
   `https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${commit}/${path}`;
 const thumb = (path: string) =>
   `<a href="${url(path)}"><img src="${url(path)}" width="260"></a>`;
-const name = (path: string) => `\`${path.replace(/\.png$/, "")}\``;
+const name = (path: string) => {
+  const [synthetic, device] = path.replace(/\.png$/, "").split("/");
+  return `\`${synthetic}\` · ${device}`;
+};
+
+// screenshots grouped by the route their synthetic visits, with ids made
+// generic so every timetable's edit page lands together. groups and rows keep
+// the order of synthetics.ts
+const routes = new Map(
+  synthetics.map((synthetic, order) => [
+    synthetic.name,
+    {
+      route: synthetic.url.replace(/\{[\w-]+\}/g, ":id").split("?")[0],
+      order,
+    },
+  ]),
+);
+const byRoute = <T>(items: T[], pathOf: (item: T) => string) => {
+  const of = (item: T) => routes.get(pathOf(item).split("/")[0]);
+  const sorted = [...items].sort(
+    (a, b) =>
+      (of(a)?.order ?? routes.size) - (of(b)?.order ?? routes.size) ||
+      pathOf(a).localeCompare(pathOf(b)),
+  );
+  const groups = new Map<string, T[]>();
+  for (const item of sorted) {
+    // a removed synthetic isn't in synthetics.ts anymore
+    const route = of(item)?.route ?? "removed synthetics";
+    groups.set(route, [...(groups.get(route) ?? []), item]);
+  }
+  return groups;
+};
+const section = <T>(
+  items: T[],
+  pathOf: (item: T) => string,
+  header: string[],
+  row: (item: T) => string[],
+) =>
+  [...byRoute(items, pathOf)].flatMap(([route, group]) => [
+    `### \`${route}\``,
+    "",
+    `| ${header.join(" | ")} |`,
+    `|${header.map(() => "---").join("|")}|`,
+    ...group.map((item) => `| ${row(item).join(" | ")} |`),
+    "",
+  ]);
 
 const lines = [MARKER, "## Screenshots", ""];
 if (noBaseline) {
@@ -245,27 +291,51 @@ if (noBaseline) {
     "",
   );
   if (changed.length) {
-    lines.push("| | before | after | diff |", "|---|---|---|---|");
-    for (const [path, { hash }] of changed) {
-      lines.push(
-        `| ${name(path)} | ${thumb(`img/${baseline[path]}.png`)} | ${thumb(`img/${hash}.png`)} | ${thumb(diffs.get(path) as string)} |`,
-      );
-    }
-    lines.push("");
+    lines.push(
+      [...byRoute(changed, ([path]) => path)]
+        .map(([route, group]) => `\`${route}\` ${group.length}`)
+        .join(" · "),
+      "",
+      ...section(
+        changed,
+        ([path]) => path,
+        ["", "before", "after", "diff"],
+        ([path, { hash }]) => [
+          name(path),
+          thumb(`img/${baseline[path]}.png`),
+          thumb(`img/${hash}.png`),
+          thumb(diffs.get(path) as string),
+        ],
+      ),
+    );
   }
   if (added.length) {
-    lines.push("<details><summary>New</summary>", "", "| | |", "|---|---|");
-    for (const [path, { hash }] of added) {
-      lines.push(`| ${name(path)} | ${thumb(`img/${hash}.png`)} |`);
-    }
-    lines.push("", "</details>", "");
+    lines.push(
+      "<details><summary>New</summary>",
+      "",
+      ...section(
+        added,
+        ([path]) => path,
+        ["", "after"],
+        ([path, { hash }]) => [name(path), thumb(`img/${hash}.png`)],
+      ),
+      "</details>",
+      "",
+    );
   }
   if (removed.length) {
-    lines.push("<details><summary>Removed</summary>", "", "| | |", "|---|---|");
-    for (const path of removed) {
-      lines.push(`| ${name(path)} | ${thumb(`img/${baseline[path]}.png`)} |`);
-    }
-    lines.push("", "</details>", "");
+    lines.push(
+      "<details><summary>Removed</summary>",
+      "",
+      ...section(
+        removed,
+        (path) => path,
+        ["", "before"],
+        (path) => [name(path), thumb(`img/${baseline[path]}.png`)],
+      ),
+      "</details>",
+      "",
+    );
   }
 }
 const report = lines.join("\n");
