@@ -240,6 +240,70 @@ const hiding = (parts: Part[] = []) =>
     )
     .join("");
 
+// chrome's fullPage capture can drop a scroll container's horizontal offset
+// (the phone side menu's tab track lands back on its first tab), so while a
+// shot is taken each offset is held as a translate of the scrolled content
+// instead. the page never sees the scroll events this causes
+type Pinned = {
+  el: HTMLElement;
+  left: number;
+  snap: string;
+  children: { child: HTMLElement; translate: string; transition: string }[];
+};
+const pinScroll = (page: Page) =>
+  page.evaluate(() => {
+    const w = window as unknown as { pinned?: Pinned[]; stopScroll?: boolean };
+    if (!w.stopScroll) {
+      w.stopScroll = true;
+      for (const type of ["scroll", "scrollend"]) {
+        window.addEventListener(type, (e) => e.stopImmediatePropagation(), {
+          capture: true,
+        });
+      }
+    }
+    w.pinned = [];
+    for (const el of document.querySelectorAll<HTMLElement>("*")) {
+      const left = el.scrollLeft;
+      if (left === 0) continue;
+      const children = [...el.children].flatMap((child) =>
+        child instanceof HTMLElement
+          ? [
+              {
+                child,
+                translate: child.style.translate,
+                transition: child.style.transition,
+              },
+            ]
+          : [],
+      );
+      w.pinned.push({ el, left, snap: el.style.scrollSnapType, children });
+      el.style.scrollSnapType = "none";
+      el.scrollLeft = 0;
+      // the reduced-motion styles give everything a tiny transition, and a
+      // translate left mid-transition stays stuck after the shot
+      for (const { child } of children) {
+        child.style.transition = "none";
+        child.style.translate = `${-left}px 0`;
+      }
+    }
+  });
+const unpinScroll = (page: Page) =>
+  page.evaluate(() => {
+    const w = window as unknown as { pinned?: Pinned[] };
+    for (const { el, left, snap, children } of w.pinned ?? []) {
+      for (const { child, translate } of children) {
+        child.style.translate = translate;
+        getComputedStyle(child).translate;
+      }
+      for (const { child, transition } of children) {
+        child.style.transition = transition;
+      }
+      el.style.scrollSnapType = snap;
+      el.scrollLeft = left;
+    }
+    w.pinned = [];
+  });
+
 const shoot = async (
   timetables: Record<string, string>,
   announcementIds: string[],
@@ -337,6 +401,7 @@ const shoot = async (
         );
         await settle();
       }
+      await pinScroll(page);
       shots.push(
         await page.screenshot({
           fullPage: true,
@@ -345,6 +410,7 @@ const shoot = async (
           style: hiding(synthetic.hide),
         }),
       );
+      await unpinScroll(page);
     }
     await context.close();
     await sideBySide(shots, resolve(outDir, synthetic.name, `${device}.png`));
