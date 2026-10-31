@@ -113,6 +113,28 @@ export const synthetics: Synthetic[] = [
     },
   },
   {
+    name: "edit-search-focus",
+    as: "alice",
+    url: "/edit/{alice-packed}",
+    hide: ["navbar", "timetable-header", "grid"],
+    act: async (page) => {
+      await openMenu(page);
+      await page.getByRole("searchbox", { name: "Search Courses" }).focus();
+    },
+  },
+  {
+    name: "edit-course-back-hover",
+    as: "alice",
+    url: "/edit/{alice-packed}",
+    hide: ["navbar", "timetable-header", "grid"],
+    act: async (page) => {
+      await search(page, "CS F407");
+      await page.getByText("CS F407").first().click();
+      await page.getByRole("heading", { name: "CS F407" }).waitFor();
+      await page.getByRole("button", { name: "Back" }).hover();
+    },
+  },
+  {
     name: "edit-exams",
     as: "alice",
     url: "/edit/{alice-packed}",
