@@ -153,10 +153,6 @@ export const TimetablePageShell = ({
             gutter - 300 - 20 gap = 648px); the spec's 360px from 1280. The
             page's px-7 is the 28px gutter for the panel and the grid card */}
         <div className="grid min-h-0 flex-1 grid-cols-[300px_minmax(0,1fr)] gap-5 px-7 pb-7 xl:grid-cols-[360px_minmax(0,1fr)]">
-          {/* overflow-hidden keeps the panel's scrolling inside it; the 8px
-              of padding, given back by the negative margin, leaves room for
-              the search box's focus ring and the Back button's hover, which
-              sit on the panel's edges */}
           <aside
             data-shot="side-menu"
             className="-mx-2 flex min-h-0 flex-col overflow-hidden px-2"
