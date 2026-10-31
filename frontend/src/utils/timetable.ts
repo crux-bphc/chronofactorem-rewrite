@@ -48,7 +48,6 @@ type CdcTimetable = Pick<
   "degrees" | "year" | "semester"
 >;
 
-/** The CDC codes listed for a timetable's degrees and semester, if any. */
 export const cdcListFor = (timetable: CdcTimetable): string[] | undefined => {
   // CDCs.json is keyed by degree combo: the timetable's degrees sorted,
   // reversed, and joined (for example "B1A1"). Each combo maps
@@ -199,10 +198,7 @@ export const timetableMeta = (t: {
   return parts;
 };
 
-/**
- * A pre-filled GitHub issue for CDCs Chrono could not find: none listed for
- * the timetable's degrees and semester, or the `notFound` warnings.
- */
+// Pre-fill data we know so that issues are more helpful and easier to file
 export const cdcIssueUrl = (
   t: CdcTimetable & { acadYear: number },
   notFound: string[],
