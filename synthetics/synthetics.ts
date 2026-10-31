@@ -62,7 +62,17 @@ export const synthetics: Synthetic[] = [
     url: "/getDegrees?year=1",
   },
 
-  { name: "home", as: "alice", url: "/", unreadAnnouncements: true },
+  {
+    name: "home",
+    as: "alice",
+    url: "/",
+    unreadAnnouncements: true,
+    // the toast closes itself after a few seconds, hovering keeps it open
+    // for each theme's shot
+    act: async (page) => {
+      await page.getByText("New Announcements", { exact: true }).hover();
+    },
+  },
   { name: "home-empty", as: "esha", url: "/", hide: ["navbar"] },
   { name: "home-higher-degree", as: "hd", url: "/", hide: ["navbar"] },
   { name: "edit-profile", as: "alice", url: "/editProfile", hide: ["navbar"] },
