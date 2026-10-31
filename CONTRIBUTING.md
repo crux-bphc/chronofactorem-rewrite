@@ -26,6 +26,6 @@ A bunch of important pages are defined in `synthetics/synthetics.ts`, against th
 - The bot never commits to your branch, so there's nothing to pull.
 - The images live under `refs/synthetics/images` in this repo, not on a branch, so they don't bloat clones. Nothing there is ever deleted, so old reports keep working.
 - To add a screen, add an entry to `synthetics/synthetics.ts`, and add any data it needs to the `starter-pack` scenario.
-- To take them locally, run `pnpm -C synthetics start` with a Postgres reachable through `DB_HOST`/`PGPORT`/`POSTGRES_USER`/`POSTGRES_PASSWORD`. They land in `synthetics/screenshots/`, which is gitignored.
+- To take them locally, run `pnpm -C synthetics start` with a Postgres reachable through `DB_HOST`/`PGPORT`/`POSTGRES_USER`/`POSTGRES_PASSWORD`. They end up in in `synthetics/screenshots/`, which is gitignored.
 
 Since this can be a bit flaky and runs in CI we want to be a bit careful with this, it should be considered unstable for now and PR reviewers should verify the screenshots properly.
