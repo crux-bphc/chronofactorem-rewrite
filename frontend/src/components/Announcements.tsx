@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import useAnnouncements from "@/data-access/hooks/useAnnouncements";
+import { useSkeletonFadeIn } from "@/lib/skeletonFade";
 import { useAnnouncementsSheet } from "@/lib/useAnnouncementsSheet";
 import { useIsDesktop } from "@/lib/useIsDesktop";
 import { cn } from "@/lib/utils";
@@ -91,6 +92,9 @@ function Announcements() {
   const { data: announcements, isLoading, isError, error } = useAnnouncements();
   const { open, show, hide } = useAnnouncementsSheet();
   const isDesktop = useIsDesktop();
+  // only a skeleton someone saw fades: the list usually loads before the
+  // sheet is opened
+  const fadeIn = useSkeletonFadeIn(isLoading && open);
   const [readAnnouncements, setReadAnnouncements] = useState<string[]>(() => {
     try {
       const value = JSON.parse(
@@ -278,9 +282,17 @@ function Announcements() {
   ) : isError ? (
     <ReportIssue error={JSON.stringify(error)} />
   ) : sorted.length === 0 ? (
-    <p className="py-8 text-center text-ink-muted">No announcements</p>
+    <p
+      className={cn("py-8 text-center text-ink-muted", fadeIn.className)}
+      onAnimationEnd={fadeIn.onAnimationEnd}
+    >
+      No announcements
+    </p>
   ) : (
-    <div className="flex flex-col gap-1">
+    <div
+      className={cn("flex flex-col gap-1", fadeIn.className)}
+      onAnimationEnd={fadeIn.onAnimationEnd}
+    >
       {hasUnread && (
         <Button
           variant="secondary"

@@ -10,6 +10,7 @@ import {
 } from "@/data-access/hooks/useTimetableSectionAction";
 import { formatExam, summarizeRoomTimes } from "@/lib/formatTime";
 import { PANEL_VT_CLASS, panelForward } from "@/lib/panelTransition";
+import { useSkeletonFadeIn } from "@/lib/skeletonFade";
 import { titleCase } from "@/lib/titleCase";
 import { useTimetableNav } from "@/lib/useTimetableNav";
 import { cn } from "@/lib/utils";
@@ -161,6 +162,8 @@ const CourseDetailsMenu = ({
   // a section's day and hour, without the course code and room
   const slot = (roomTime: string) => roomTime.split(":").slice(2).join(":");
 
+  const fadeIn = useSkeletonFadeIn(course === undefined);
+
   const landed = useClashLanding(course?.id ?? null, currentSectionType);
   const [pulsedNonce, setPulsedNonce] = useState<number | null>(null);
   const pulse = landed !== null && pulsedNonce !== landed && !reducedMotion();
@@ -229,7 +232,12 @@ const CourseDetailsMenu = ({
               <ChevronLeft size={22} aria-hidden="true" />
             </button>
             {course ? (
-              <h2 className="line-clamp-2 min-w-0 text-[19px] leading-tight font-semibold text-ink">
+              <h2
+                className={cn(
+                  "line-clamp-2 min-w-0 text-[19px] leading-tight font-semibold text-ink",
+                  fadeIn.className,
+                )}
+              >
                 {titleCase(course.name)}
               </h2>
             ) : (
@@ -243,7 +251,9 @@ const CourseDetailsMenu = ({
               "flex flex-col text-[13px] leading-normal text-ink-muted",
               // phone sheet: line up with the sheet title after its ‹ button
               showHeader ? "pl-7" : "pl-[38px]",
+              fadeIn.className,
             )}
+            onAnimationEnd={fadeIn.onAnimationEnd}
           >
             <span>{course.code}</span>
             <ExamLine
@@ -263,7 +273,10 @@ const CourseDetailsMenu = ({
         {course && currentSectionType && uniqueSectionTypes.length > 0 && (
           <Segmented
             // the 300px desktop panel (below xl) needs tighter tabs to fit full names
-            className="mt-3 h-11 lg:h-10 lg:max-xl:[&>button]:gap-1 lg:max-xl:[&>button]:px-1.5 lg:max-xl:[&>button]:text-sm"
+            className={cn(
+              "mt-3 h-11 lg:h-10 lg:max-xl:[&>button]:gap-1 lg:max-xl:[&>button]:px-1.5 lg:max-xl:[&>button]:text-sm",
+              fadeIn.className,
+            )}
             aria-label="Section type"
             value={currentSectionType}
             onValueChange={(t) => setType(t)}
@@ -301,7 +314,7 @@ const CourseDetailsMenu = ({
             ))}
           </div>
         ) : (
-          <div className={group}>
+          <div className={cn(group, fadeIn.className)}>
             {sections.map(({ section, clashing }) => {
               if (clashing.length > 0) {
                 return (

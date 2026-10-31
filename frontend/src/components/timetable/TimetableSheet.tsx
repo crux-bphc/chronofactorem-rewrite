@@ -7,6 +7,7 @@ import WarningsList from "@/components/WarningsList";
 import { useTimetableState } from "@/context";
 import useCourse from "@/data-access/hooks/useCourse";
 import { PANEL_VT_CLASS } from "@/lib/panelTransition";
+import { useSkeletonFadeIn } from "@/lib/skeletonFade";
 import { titleCase } from "@/lib/titleCase";
 import { useIsDesktop } from "@/lib/useIsDesktop";
 import { useTimetableNav } from "@/lib/useTimetableNav";
@@ -38,6 +39,7 @@ function PhoneSheet({ courses }: { courses: ReactNode }) {
   });
   // matches EditTimetable: an unknown course id shows the list instead
   const { isLoading: isCourseLoading } = useCourse(currentCourseID);
+  const titleFadeIn = useSkeletonFadeIn(currentCourseID !== null && !course);
 
   const urlSheet: UrlSheet | null =
     search.sheet === "courses" || search.sheet === "warnings"
@@ -133,7 +135,13 @@ function PhoneSheet({ courses }: { courses: ReactNode }) {
             // long names wrap to a second line rather than truncating
             title={
               course ? (
-                <span className="line-clamp-2 whitespace-normal leading-tight">
+                <span
+                  className={cn(
+                    "line-clamp-2 whitespace-normal leading-tight",
+                    titleFadeIn.className,
+                  )}
+                  onAnimationEnd={titleFadeIn.onAnimationEnd}
+                >
                   {titleCase(course.name)}
                 </span>
               ) : (

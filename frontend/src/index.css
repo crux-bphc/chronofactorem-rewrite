@@ -348,9 +348,23 @@ html.theme-transition * {
   }
 }
 
-/* the timetable page shell arriving after its skeleton */
-@keyframes shell-fade {
+/* content arriving in a skeleton's place (useSkeletonFadeIn) */
+@keyframes skeleton-fade-in {
   from {
+    opacity: 0;
+  }
+}
+
+/* a page skeleton's copy fading out over the page that replaced it
+   (useSkeletonCrossfade); above the phone dock, which it covers too */
+.skeleton-ghost {
+  z-index: 30;
+  pointer-events: none;
+  animation: skeleton-ghost-out var(--d-2) var(--e-in-out) forwards;
+}
+
+@keyframes skeleton-ghost-out {
+  to {
     opacity: 0;
   }
 }
