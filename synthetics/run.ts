@@ -186,9 +186,10 @@ const shoot = async (
   });
   rmSync(outDir, { recursive: true, force: true });
 
-  const variants = Object.entries(DEVICES).flatMap(([device, options]) =>
-    THEMES.map((theme) => ({ device, options, theme })),
-  );
+  const variants = Object.entries(DEVICES).map(([device, options]) => ({
+    device,
+    options,
+  }));
   const jobs = synthetics.flatMap((synthetic) => {
     const url = synthetic.url.replace(/\{([\w-]+)\}/g, (_, key) => {
       if (!timetables[key]) {
@@ -213,13 +214,12 @@ const shoot = async (
     user,
     device,
     options,
-    theme,
   }: (typeof jobs)[number]) => {
     const context = await browser.newContext({
       ...options,
       deviceScaleFactor: 1,
       baseURL: FRONTEND_URL,
-      colorScheme: theme,
+      colorScheme: THEMES[0],
       locale: "en-IN",
       timezoneId: "Asia/Kolkata",
       reducedMotion: "reduce",
@@ -253,14 +253,27 @@ const shoot = async (
       await settle();
     }
     await page.evaluate(() => document.fonts.ready);
-    await page.screenshot({
-      path: resolve(outDir, synthetic.name, `${device}-${theme}.png`),
-      fullPage: true,
-      animations: "disabled",
-      caret: "hide",
-    });
+    // the theme follows prefers-color-scheme live, so every theme comes out of
+    // one page load instead of loading the page again for each
+    for (const theme of THEMES) {
+      if (theme !== THEMES[0]) {
+        await page.emulateMedia({ colorScheme: theme });
+        // the dom was already quiet, so wait for the theme to land first
+        await page.waitForFunction(
+          (theme) => document.documentElement.classList.contains(theme),
+          theme,
+        );
+        await settle();
+      }
+      await page.screenshot({
+        path: resolve(outDir, synthetic.name, `${device}-${theme}.png`),
+        fullPage: true,
+        animations: "disabled",
+        caret: "hide",
+      });
+    }
     await context.close();
-    console.log(`shot ${synthetic.name}/${device}-${theme}`);
+    console.log(`shot ${synthetic.name}/${device}`);
   };
 
   // one shared queue instead of a synthetic at a time, so nothing waits on the
