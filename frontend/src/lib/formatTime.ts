@@ -9,6 +9,11 @@ const dateFormat = new Intl.DateTimeFormat("en-US", {
   month: "short",
   day: "numeric",
 });
+const yearDateFormat = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+});
 const headingFormat = new Intl.DateTimeFormat("en-US", {
   weekday: "short",
   month: "short",
@@ -34,6 +39,48 @@ export function formatExam(start: string | null, end: string | null): string {
     ? formatClock(e)
     : `${dateFormat.format(e)}, ${formatClock(e)}`;
   return `${dateFormat.format(s)}, ${formatClock(s)} – ${endText}`;
+}
+
+const relativeFormat = new Intl.RelativeTimeFormat("en-US", {
+  numeric: "auto",
+  style: "narrow",
+});
+const absoluteFormat = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
+});
+
+const MINUTE = 60_000;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+
+/** e.g. `Oct 31, 2026, 4:36 PM`. */
+export const formatTimestamp = (d: Date): string => absoluteFormat.format(d);
+
+/**
+ * How long ago `d` was: `just now`, `5m ago`, `2h ago`, `yesterday`,
+ * `3d ago`. Anything a week or older is an absolute date
+ * (`Oct 3`, or `Oct 3, 2025` outside the current year).
+ */
+export function formatRelative(d: Date, now: Date): string {
+  const elapsed = now.getTime() - d.getTime();
+  if (elapsed < MINUTE) return "just now";
+  if (elapsed < HOUR)
+    return relativeFormat.format(-Math.floor(elapsed / MINUTE), "minute");
+  if (elapsed < DAY)
+    return relativeFormat.format(-Math.floor(elapsed / HOUR), "hour");
+  const days = Math.round(
+    (new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() -
+      new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()) /
+      DAY,
+  );
+  if (days < 7) return relativeFormat.format(-days, "day");
+  return d.getFullYear() === now.getFullYear()
+    ? dateFormat.format(d)
+    : yearDateFormat.format(d);
 }
 
 export const formatDayHeading = (d: Date): string => headingFormat.format(d);

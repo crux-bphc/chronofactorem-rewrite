@@ -10,16 +10,11 @@ import {
   WarningsChip,
 } from "@/components/timetable/HeaderActions";
 import { useTimetableState } from "@/context";
+import { formatRelative, formatTimestamp } from "@/lib/formatTime";
 import { TIMETABLE_TITLE_VT } from "@/lib/sharedTransition";
+import { useNow } from "@/lib/useNow";
 import type { ExportStatus } from "@/lib/useTimetableExport";
 import { timetableMeta } from "@/utils/timetable";
-
-const updatedFormat = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  hour: "numeric",
-  minute: "2-digit",
-});
 
 const Dot = () => (
   <span aria-hidden="true" className="text-ink-faint">
@@ -39,6 +34,8 @@ const TimetableHeader = ({
   const {
     state: { timetable, screenIsLarge },
   } = useTimetableState();
+  // Only the desktop header shows "Last Updated", so only it needs to tick.
+  const now = useNow(screenIsLarge);
 
   if (timetable === undefined) return null;
 
@@ -50,6 +47,8 @@ const TimetableHeader = ({
       </span>
     </Fragment>
   ));
+
+  const updated = new Date(timetable.lastUpdated);
 
   if (!screenIsLarge) {
     return (
@@ -94,7 +93,12 @@ const TimetableHeader = ({
           <Dot />
           <span>
             Last Updated:{" "}
-            {updatedFormat.format(new Date(timetable.lastUpdated))}
+            <time
+              dateTime={updated.toISOString()}
+              title={formatTimestamp(updated)}
+            >
+              {formatRelative(updated, now ?? new Date())}
+            </time>
           </span>
           {page === "view" && <TimetableStatusChip timetable={timetable} />}
         </div>
