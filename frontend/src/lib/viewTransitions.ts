@@ -101,8 +101,8 @@ export function startThemeTransition(
     Math.max(origin.y, window.innerHeight - origin.y),
   );
   const style = getComputedStyle(root);
-  const duration = style.getPropertyValue("--d-3").trim() || "300ms";
-  const easing = style.getPropertyValue("--e-out").trim() || "ease-out";
+  const duration = style.getPropertyValue("--d-4").trim() || "480ms";
+  const easing = style.getPropertyValue("--e-in-out").trim() || "ease-in-out";
   transition.ready
     .then(() => {
       root.animate(
@@ -116,6 +116,7 @@ export function startThemeTransition(
           duration:
             Number.parseFloat(duration) * (duration.endsWith("ms") ? 1 : 1000),
           easing,
+          fill: "forwards",
           pseudoElement: "::view-transition-new(root)",
         },
       );
