@@ -214,6 +214,19 @@
       animation: vt-in-back var(--d-3) var(--e-out) both;
     }
   }
+
+  /* Home card <-> timetable page shared element (lib/sharedTransition.ts) */
+  ::view-transition-group(timetable-title),
+  ::view-transition-group(timetable-grid) {
+    animation-duration: var(--d-3);
+    animation-timing-function: var(--e-out);
+  }
+  ::view-transition-old(timetable-grid),
+  ::view-transition-new(timetable-grid) {
+    block-size: 100%;
+    object-fit: cover;
+    object-position: top left;
+  }
 }
 
 /* Theme change: circular reveal is driven from JS on the new snapshot */

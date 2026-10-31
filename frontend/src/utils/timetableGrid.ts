@@ -74,3 +74,28 @@ export function courseColor(code: string) {
   );
   return courseColors[hash % courseColors.length];
 }
+
+export function parseTiming(entry: string) {
+  const match = /^(Th|M|T|W|F|S)(\d{1,2})$/.exec(
+    entry.slice(entry.lastIndexOf(":") + 1),
+  );
+  if (!match) return null;
+  const day = timetableDays.indexOf(match[1]);
+  const hour = Number(match[2]) - 1;
+  if (day < 0 || hour < 0 || hour >= 13) return null;
+  return { day, hour };
+}
+
+export function buildTimingsPreview(timings: readonly string[]) {
+  const filled = new Set<string>();
+  let dayCount = 5;
+  let hourCount = 9;
+  for (const entry of timings) {
+    const slot = parseTiming(entry);
+    if (!slot) continue;
+    filled.add(`${slot.day}:${slot.hour}`);
+    dayCount = Math.max(dayCount, slot.day + 1);
+    hourCount = Math.max(hourCount, slot.hour + 1);
+  }
+  return { dayCount, hourCount, filled };
+}

@@ -76,12 +76,15 @@ export function NavBar() {
   const props = {
     user,
     pathname,
-    showCreate: !!user && !isEditPage,
     isCreating,
     create,
     showLogin: !user && isUnauthenticated,
   };
-  return isDesktop ? <DesktopNav {...props} /> : <AppBar {...props} />;
+  return isDesktop ? (
+    <DesktopNav {...props} showCreate={!!user && !isEditPage} />
+  ) : (
+    <AppBar {...props} showCreate={!!user && !isEditPage} />
+  );
 }
 
 type BarProps = {
