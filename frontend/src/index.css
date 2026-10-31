@@ -216,6 +216,10 @@
   }
 
   /* Home card <-> timetable page shared element (lib/sharedTransition.ts) */
+  html:active-view-transition-type(shared-timetable) {
+    --vt-timetable-title: timetable-title;
+    --vt-timetable-grid: timetable-grid;
+  }
   ::view-transition-group(timetable-title),
   ::view-transition-group(timetable-grid) {
     animation-duration: var(--d-3);
@@ -401,6 +405,9 @@ html.theme-transition * {
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  html:active-view-transition-type(panel-forward, panel-back) .cf-panel {
+    view-transition-name: cf-panel;
+  }
   html:active-view-transition-type(panel-forward) {
     &::view-transition-old(cf-panel) {
       animation: cf-panel-out-forward var(--d-3) var(--e-in) both;
@@ -534,6 +541,7 @@ html.theme-transition * {
 
 @media (prefers-reduced-motion: no-preference) {
   html:active-view-transition-type(view-morph, orient) {
+    --vt-timetable-grid: timetable-grid;
     & .tt-block {
       view-transition-name: var(--vt);
       view-transition-class: tt-block;

@@ -47,5 +47,9 @@ export function runPanelTransition(
 export const panelForward = (fn: () => unknown) => () =>
   runPanelTransition("forward", fn);
 
-/** Applied to the content root of the list/search view and of the picker. */
-export const PANEL_VT_CLASS = "[view-transition-name:cf-panel]";
+/**
+ * Applied to the content root of the list/search view and of the picker. Named
+ * only during panel slides (index.css), so other transitions don't paint the
+ * panel above the page, e.g. over the copying dialog.
+ */
+export const PANEL_VT_CLASS = "cf-panel";
