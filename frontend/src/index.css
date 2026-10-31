@@ -200,6 +200,32 @@
   }
 }
 
+/* the crux mark behind mostly empty pages (CruxMark). the tint is an opaque
+   colour rather than a translucent accent, so text over it has a known
+   contrast: muted text stays above AA in both themes */
+.crux-mark {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+  color: color-mix(in srgb, var(--accent) 7%, var(--bg));
+
+  & svg {
+    --s: clamp(420px, 115vmin, 960px);
+    /* pushed past the corner so about 60% of the mark shows */
+    position: absolute;
+    width: var(--s);
+    height: var(--s);
+    right: calc(var(--s) * -0.3);
+    bottom: calc(var(--s) * -0.26);
+  }
+}
+.dark .crux-mark {
+  color: color-mix(in srgb, var(--accent) 6%, var(--bg));
+}
+
 @media (prefers-reduced-motion: no-preference) {
   html:active-view-transition-type(forward) {
     &::view-transition-old(root) {
@@ -234,6 +260,30 @@
   }
   ::view-transition-old(app-navbar),
   ::view-transition-new(app-navbar) {
+    animation-duration: var(--d-3);
+  }
+
+  /* the crux mark (CruxMark) holds still like the navbar, so the page slides
+  under it, and it fades on its own when only one of the pages has it.
+  a named group always paints over the root, so the mark would cover the
+  sliding text. it can't go under the root instead: the root snapshot
+  carries the page background, and making that transparent shows the
+  browser's own white. so it blends in. on every channel the tint is darker
+  than the background in light and lighter in dark, so darken (light) and
+  lighten (dark) give exactly the tint over the background and let the ink,
+  which is further from the background than the tint, through unchanged */
+  html:active-view-transition-type(forward, back) .crux-mark {
+    view-transition-name: crux-mark;
+  }
+  ::view-transition-group(crux-mark) {
+    animation: none;
+    mix-blend-mode: darken;
+  }
+  html.dark::view-transition-group(crux-mark) {
+    mix-blend-mode: lighten;
+  }
+  ::view-transition-old(crux-mark),
+  ::view-transition-new(crux-mark) {
     animation-duration: var(--d-3);
   }
 

@@ -3,6 +3,7 @@ import { AxiosError } from "axios";
 import { AtSign, ChevronRight } from "lucide-react";
 import toastHandler from "@/data-access/errors/toastHandler";
 import { authStatusQueryOptions } from "@/data-access/hooks/useAuthStatus";
+import { CruxMark } from "../components/CruxMark";
 import { ThemeButton } from "../components/ThemeButton";
 import { Button } from "../components/ui/button";
 import { useToast } from "../components/ui/use-toast";
@@ -43,7 +44,8 @@ const enter =
 
 function Login() {
   return (
-    <div className="min-h-dvh flex flex-col bg-bg text-ink">
+    <div className="min-h-dvh flex flex-col text-ink">
+      <CruxMark />
       <div className="fixed top-3 right-3">
         <ThemeButton />
       </div>

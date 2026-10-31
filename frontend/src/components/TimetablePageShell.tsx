@@ -3,6 +3,7 @@ import { AxiosError } from "axios";
 import { LoaderCircle } from "lucide-react";
 import type React from "react";
 import { useEffect } from "react";
+import { CruxMark } from "@/components/CruxMark";
 import NotFound from "@/components/NotFound";
 import { TimetableSheet } from "@/components/timetable/TimetableSheet";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -61,6 +62,7 @@ export const TimetablePageError = ({ error }: { error: Error }) => {
       role="alert"
       className="mx-auto flex w-full max-w-[320px] flex-1 flex-col items-center justify-center px-4 py-16 text-center"
     >
+      <CruxMark />
       <h1 className="text-xl font-semibold">Could not load this timetable</h1>
       <p className="mt-2 text-base leading-relaxed text-ink-muted">
         Try refreshing the page. If this keeps happening, report the issue using

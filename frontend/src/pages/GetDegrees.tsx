@@ -4,6 +4,7 @@ import { collegeYearType } from "lib";
 import { useRef, useState } from "react";
 import { z } from "zod";
 import { ButtonLabel } from "@/components/ButtonLabel";
+import { CruxMark } from "@/components/CruxMark";
 import DegreeDropDown from "@/components/DegreeDropDown";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -93,7 +94,8 @@ function GetDegrees() {
   };
 
   return (
-    <div className="min-h-dvh flex flex-col bg-bg text-ink">
+    <div className="min-h-dvh flex flex-col text-ink">
+      <CruxMark />
       <div className="mx-auto w-full max-w-[400px] flex-1 flex flex-col px-6 pt-16 lg:justify-center lg:pt-0">
         <div className="flex-1 lg:flex-none">
           <h1 className="text-3xl font-semibold">Register</h1>
