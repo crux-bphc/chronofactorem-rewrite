@@ -4,6 +4,7 @@ import { Check, ChevronLeft, HelpCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type z from "zod";
 import { useTimetableState } from "@/context";
+import { useRemoveTimetableCourse } from "@/data-access/hooks/useRemoveTimetableCourse";
 import {
   useAddRemoveTimetableSection,
   useSwapTimetableSections,
@@ -123,6 +124,7 @@ const CourseDetailsMenu = ({
   const { openCourse, closeCourse, setType } = useTimetableNav();
   const { mutate: sectionAction } = useAddRemoveTimetableSection(timetable?.id);
   const { mutate: swapSections } = useSwapTimetableSections(timetable?.id);
+  const { mutate: removeCourse } = useRemoveTimetableCourse(timetable?.id);
 
   const pending =
     useIsMutating({ mutationKey: ["sections", timetable?.id] }) > 0;
@@ -172,6 +174,14 @@ const CourseDetailsMenu = ({
           },
         },
       );
+  };
+  const handleRemoveCourse = () => {
+    if (!course || pending || inFlight.current) return;
+    inFlight.current = true;
+    removeCourse(
+      { courseId: course.id, code: course.code },
+      { ...settle, onSuccess: () => closeCourse() },
+    );
   };
   // a section's day and hour, without the course code and room
   const slot = (roomTime: string) => roomTime.split(":").slice(2).join(":");
@@ -417,6 +427,22 @@ const CourseDetailsMenu = ({
           </div>
         )}
       </div>
+      {course && timetable.sections.some((s) => s.courseId === course.id) && (
+        <button
+          type="button"
+          aria-busy={busy || undefined}
+          onClick={handleRemoveCourse}
+          className={cn(
+            "shrink-0 cursor-pointer text-[15px] font-semibold text-danger transition-colors duration-(--d-1) focus-visible:outline-offset-[-2px]",
+            // phone: full-width bar; desktop: outlined button
+            "border-t border-line bg-surface pt-4 pb-[calc(16px+env(safe-area-inset-bottom))] hover:bg-danger-bg",
+            "lg:mb-1 lg:rounded-xl lg:border lg:py-3",
+            busy && "cursor-progress",
+          )}
+        >
+          Remove {course.code} from timetable
+        </button>
+      )}
     </div>
   );
 };
