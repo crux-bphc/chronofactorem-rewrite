@@ -1,13 +1,13 @@
 import { useSearch } from "@tanstack/react-router";
 import { Columns3, Rows3 } from "lucide-react";
-import { useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { skeletonRef } from "@/lib/skeletonFade";
 import type { TimetableSearch } from "@/lib/timetableSearch";
 import { useIsDesktop } from "@/lib/useIsDesktop";
 import { formatAxisHour } from "@/utils/timeFormat";
 import { defaultDay, timetableDayNames } from "@/utils/timetableGrid";
 
-let mountedSkeletons = 0;
+const ref = skeletonRef("timetable");
 
 // a few week-grid tiles to suggest classes: [day, hour, span]
 const weekTiles = [
@@ -24,18 +24,12 @@ const weekTiles = [
 ] as const;
 
 /**
- * Whether a skeleton is on screen. The page shell reads this as it first
- * renders (the skeleton it replaces is still mounted then), so it fades in
- * only after a skeleton, not on fast loads or later remounts.
- */
-export const skeletonShown = () => mountedSkeletons > 0;
-
-/**
  * The editor's and view page's loading state, shaped like their shells
  * (TimetablePageShell, TimetableHeader, TimetableDock) so nothing jumps when
  * the page arrives. It runs before the page's data and TimetableProvider
  * exist, so it reads nothing from the timetable. It carries none of the
- * shared view-transition names: those belong to the real page.
+ * shared view-transition names: those belong to the real page. The shell
+ * crossfades from it when it arrives (useSkeletonCrossfade).
  */
 export function TimetablePageSkeleton({
   page = "edit",
@@ -44,12 +38,6 @@ export function TimetablePageSkeleton({
 }) {
   const isDesktop = useIsDesktop();
   const search = useSearch({ strict: false }) as TimetableSearch;
-  useEffect(() => {
-    mountedSkeletons++;
-    return () => {
-      mountedSkeletons--;
-    };
-  }, []);
   // The header's meta line holds the status chip on the view page, which is
   // taller than the text line (TimetableStatusChip).
   const metaHeight = page === "view" ? "h-[23.5px]" : "h-[1lh]";
@@ -63,7 +51,12 @@ export function TimetablePageSkeleton({
       (window.matchMedia("(max-width: 639px)").matches ? "day" : "week");
     const day = Math.min(search.day ?? defaultDay(5, new Date()), 4);
     return (
-      <div role="status" aria-label="Loading" className="w-full flex-1">
+      <div
+        ref={ref}
+        role="status"
+        aria-label="Loading"
+        className="w-full flex-1"
+      >
         <div className="border-b border-line">
           <div className="mx-auto max-w-[640px] px-4 pt-0.5 pb-3">
             <div className="flex h-[1lh] items-center text-2xl leading-[1.15]">
@@ -185,6 +178,7 @@ export function TimetablePageSkeleton({
 
   return (
     <div
+      ref={ref}
       role="status"
       aria-label="Loading"
       className="flex h-[calc(100dvh-60px)] min-h-[600px] flex-col"
