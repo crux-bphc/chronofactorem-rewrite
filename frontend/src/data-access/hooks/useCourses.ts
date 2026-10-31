@@ -11,7 +11,10 @@ type CourseFilters = {
 const fetchCourses = async (filters?: CourseFilters) => {
   const response = await chronoAPI.get<z.infer<typeof courseType>[]>(
     "/api/course",
-    { params: filters },
+    {
+      params: filters,
+      headers: { "Cache-Control": "max-age=0" },
+    },
   );
   return response.data;
 };

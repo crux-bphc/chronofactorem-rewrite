@@ -7,6 +7,7 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useRef,
 } from "react";
 import useCourse from "@/data-access/hooks/useCourse";
 import { courseQueryOptions } from "@/data-access/hooks/useCourses";
@@ -17,6 +18,7 @@ import {
   filterCoursesInTimetable,
   formatCDCWarningsAndOptions,
   getFilledTimetableSections,
+  hasUnknownCourses,
 } from "@/utils/timetable";
 import reducer from "./reducer";
 import {
@@ -82,7 +84,11 @@ const TimetableDataProvider = ({
   const { data: user, isLoading: isUserLoading } = useUser();
   const { data: timetable, isLoading: isTimetableLoading } =
     useTimetable(timetableId);
-  const { data: courses, isLoading: isCoursesLoading } = useQuery({
+  const {
+    data: courses,
+    isLoading: isCoursesLoading,
+    refetch: refetchCourses,
+  } = useQuery({
     ...courseQueryOptions(
       timetable === undefined
         ? undefined
@@ -136,6 +142,15 @@ const TimetableDataProvider = ({
       dispatch,
     };
   }, [state, search, user, timetable, courses, course]);
+
+  // If there some unknown courses then lets try refetching the courses
+  const refetchedFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (!courses || !timetable || refetchedFor.current === timetable.id) return;
+    if (!hasUnknownCourses(courses, timetable)) return;
+    refetchedFor.current = timetable.id;
+    refetchCourses();
+  }, [courses, timetable, refetchCourses]);
 
   useEffect(() => {
     const media = window.matchMedia("(min-width: 1024px)");

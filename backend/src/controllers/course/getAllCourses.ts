@@ -58,7 +58,8 @@ export const getAllCourses = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Courses do not not exist" });
     }
 
-    return res.header("Cache-Control", "max-age=3600").json(courses);
+    // Don't cache the endpoint on client, Nginx will handle it via ETag
+    return res.header("Cache-Control", "no-cache").json(courses);
   } catch (error) {
     logger.error(error, "An error occurred while fetching courses:");
     return res.status(500).json({ message: "Internal server error" });
