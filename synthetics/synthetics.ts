@@ -199,6 +199,61 @@ export const synthetics: Synthetic[] = [
     },
   },
   {
+    name: "edit-courses",
+    as: "alice",
+    url: "/edit/{alice-packed}",
+    hide: ["navbar", "timetable-header", "grid"],
+    act: async (page) => {
+      await openMenu(page);
+    },
+  },
+  {
+    name: "edit-course-added",
+    as: "alice",
+    url: "/edit/{alice-packed}",
+    hide: ["navbar", "timetable-header", "grid"],
+    act: async (page) => {
+      await openMenu(page);
+      await page.getByRole("button", { name: /^Object Oriented Prog/ }).click();
+      await page
+        .getByRole("button", { name: "Remove CS F213 from timetable" })
+        .waitFor();
+    },
+  },
+  {
+    name: "edit-course-removed",
+    as: "alice",
+    url: "/edit/{alice-packed}",
+    hide: ["navbar", "timetable-header", "grid"],
+    act: async (page) => {
+      // devices share the seeded timetable, so fake the removal
+      let removed: string | undefined;
+      await page.route("**/api/timetable/*/removeCourse", (route) => {
+        removed = route.request().postDataJSON().courseId;
+        return route.fulfill({
+          json: { message: "course removed", sectionIds: [] },
+        });
+      });
+      await page.route(/\/api\/timetable\/[^/]+$/, async (route) => {
+        if (removed === undefined) return route.fallback();
+        const response = await route.fetch();
+        const timetable = await response.json();
+        timetable.sections = timetable.sections.filter(
+          (section: { courseId: string }) => section.courseId !== removed,
+        );
+        return route.fulfill({ response, json: timetable });
+      });
+      await openMenu(page);
+      await page.getByRole("button", { name: /^Object Oriented Prog/ }).click();
+      await page
+        .getByRole("button", { name: "Remove CS F213 from timetable" })
+        .click();
+      await page.getByText("Added · 8", { exact: true }).waitFor();
+      // hovering keeps the toast open for each theme's shot
+      await page.getByText("Removed CS F213", { exact: true }).hover();
+    },
+  },
+  {
     name: "edit-exams",
     as: "alice",
     url: "/edit/{alice-packed}",

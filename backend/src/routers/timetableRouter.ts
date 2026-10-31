@@ -21,6 +21,10 @@ import {
   getTimetableByIdValidator,
 } from "../controllers/timetable/getTimetableById.js";
 import {
+  removeCourse,
+  removeCourseValidator,
+} from "../controllers/timetable/removeCourse.js";
+import {
   removeSection,
   removeSectionValidator,
 } from "../controllers/timetable/removeSection.js";
@@ -51,6 +55,12 @@ timetableRouter.post(
   authenticate,
   removeSectionValidator,
   removeSection,
+);
+timetableRouter.post(
+  "/:id/removeCourse",
+  authenticate,
+  removeCourseValidator,
+  removeCourse,
 );
 timetableRouter.post(
   "/:id/swap",

@@ -1,5 +1,5 @@
 import { type courseType, getClashingExamTimes } from "lib";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, X } from "lucide-react";
 import { Fragment } from "react";
 import type z from "zod";
 import { useTimetableState } from "@/context";
@@ -66,6 +66,8 @@ export function CourseRow({
   course,
   pills,
   onOpen,
+  onRemove,
+  busy,
   clashing,
   className,
   extra,
@@ -73,6 +75,9 @@ export function CourseRow({
   course: Course;
   pills?: string[];
   onOpen?: () => void;
+  // needs onOpen; shows an × in place of the chevron
+  onRemove?: () => void;
+  busy?: boolean;
   clashing?: string[] | null;
   className?: string;
   extra?: React.ReactNode;
@@ -94,7 +99,14 @@ export function CourseRow({
       {pills && pills.length > 0 ? (
         <span className="flex flex-wrap justify-end gap-1">
           {pills.map((p) => (
-            <span key={p} className={badgeVariants({ variant: "pill" })}>
+            <span
+              key={p}
+              // pills are --sunk, the same as the row's hover
+              className={cn(
+                badgeVariants({ variant: "pill" }),
+                "group-hover/row:bg-ev",
+              )}
+            >
               {p}
             </span>
           ))}
@@ -120,20 +132,51 @@ export function CourseRow({
     );
   }
 
-  return (
+  const open = (
     <button
       type="button"
-      data-course-id={course.id}
+      data-course-id={onRemove ? undefined : course.id}
       onClick={onOpen}
       className={cn(
-        "grid min-h-[60px] w-full cursor-pointer grid-cols-[1fr_auto_16px] items-center gap-2.5 text-left transition-colors duration-(--d-1) hover:bg-sunk focus-visible:outline-offset-[-2px]",
+        "grid min-h-[60px] w-full cursor-pointer items-center gap-2.5 text-left transition-colors duration-(--d-1) focus-visible:outline-offset-[-2px]",
         rowPad,
+        // with an ×, the wrapper below takes the hover
+        onRemove
+          ? "grid-cols-[1fr_auto] pr-0"
+          : "group/row grid-cols-[1fr_auto_16px] hover:bg-sunk",
         className,
       )}
     >
       {content}
-      <ChevronRight size={16} className="text-ink-faint" aria-hidden="true" />
+      {!onRemove && (
+        <ChevronRight size={16} className="text-ink-faint" aria-hidden="true" />
+      )}
     </button>
+  );
+
+  if (!onRemove) return open;
+
+  return (
+    <div
+      data-course-id={course.id}
+      className="group/row flex overflow-hidden transition-colors duration-(--d-1) hover:bg-sunk"
+    >
+      {open}
+      <button
+        type="button"
+        aria-label={`Remove ${course.code} from timetable`}
+        aria-busy={busy || undefined}
+        onClick={onRemove}
+        className={cn(
+          "group/x grid w-12 shrink-0 cursor-pointer place-items-center pr-1 text-ink-faint transition-colors duration-(--d-1) group-hover/row:text-ink-muted hover:text-ink focus-visible:outline-offset-[-2px]",
+          busy && "cursor-progress",
+        )}
+      >
+        <span className="grid size-7 place-items-center rounded-md transition-colors duration-(--d-1) group-hover/x:bg-ev">
+          <X size={16} aria-hidden="true" />
+        </span>
+      </button>
+    </div>
   );
 }
 

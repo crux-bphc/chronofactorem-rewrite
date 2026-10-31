@@ -1,7 +1,9 @@
+import { useIsMutating } from "@tanstack/react-query";
 import { unknownDegree } from "lib";
 import { ExternalLink } from "lucide-react";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useTimetableState } from "@/context";
+import { useRemoveTimetableCourse } from "@/data-access/hooks/useRemoveTimetableCourse";
 import { panelForward } from "@/lib/panelTransition";
 import { useTimetableNav } from "@/lib/useTimetableNav";
 import { useWarningsSummary } from "@/lib/useWarningsSummary";
@@ -39,6 +41,24 @@ export function CoursesTab({ editable }: { editable: boolean }) {
   const { openCourse } = useTimetableNav();
   const { notFound } = useWarningsSummary();
   const timetableId = timetable?.id ?? "";
+  const { mutate: removeCourse } = useRemoveTimetableCourse(timetable?.id);
+  const pending =
+    useIsMutating({ mutationKey: ["sections", timetable?.id] }) > 0;
+  // blocks a double tap before useIsMutating catches up
+  const inFlight = useRef(false);
+  const busy = pending || inFlight.current;
+  const handleRemove = (courseId: string, code: string) => {
+    if (pending || inFlight.current) return;
+    inFlight.current = true;
+    removeCourse(
+      { courseId, code },
+      {
+        onSettled: () => {
+          inFlight.current = false;
+        },
+      },
+    );
+  };
 
   const remaining = useMemo(
     () => (editable ? getRemainingCdcs(cdcs, coursesInTimetable) : []),
@@ -167,6 +187,12 @@ export function CoursesTab({ editable }: { editable: boolean }) {
               onOpen={
                 editable ? panelForward(() => openCourse(course.id)) : undefined
               }
+              onRemove={
+                editable
+                  ? () => handleRemove(course.id, course.code)
+                  : undefined
+              }
+              busy={busy}
             />
           ))}
         </div>
