@@ -10,7 +10,7 @@ import { build, preview } from "vite";
 import scenario from "../backend/src/seed/scenarios/starter-pack.json" with {
   type: "json",
 };
-import { synthetics } from "./synthetics.js";
+import { type Part, synthetics } from "./synthetics.js";
 
 const root = resolve(import.meta.dirname, "..");
 const backendDir = resolve(root, "backend");
@@ -197,6 +197,22 @@ const sideBySide = async (shots: Buffer[], path: string) => {
     .toFile(path);
 };
 
+// a hidden part keeps its box, so the layout around it doesn't move, but its
+// contents go invisible and a hatch fills it in, so it reads as hidden on
+// purpose rather than broken
+const hiding = (parts: Part[] = []) =>
+  parts
+    .map(
+      (part) => `
+        [data-shot="${part}"] {
+          background: repeating-linear-gradient(
+            135deg, rgb(128 128 128 / 0.25) 0 6px, transparent 6px 14px
+          ) !important;
+        }
+        [data-shot="${part}"] > * { visibility: hidden !important; }`,
+    )
+    .join("");
+
 const shoot = async (
   timetables: Record<string, string>,
   announcementIds: string[],
@@ -299,6 +315,7 @@ const shoot = async (
           fullPage: true,
           animations: "disabled",
           caret: "hide",
+          style: hiding(synthetic.hide),
         }),
       );
     }

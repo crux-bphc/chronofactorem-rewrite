@@ -7,7 +7,7 @@ import { timetableDayNames } from "@/utils/timetableGrid";
 export function InterimPhoneControls({ dayCount }: { dayCount: number }) {
   const { view, day, setView, showDay } = useSurfaceNav(dayCount);
   return (
-    <div className="mb-3 space-y-2 px-4">
+    <div data-shot="grid" className="mb-3 space-y-2 px-4">
       <div className="flex gap-1.5">
         {timetableDayNames.slice(0, dayCount).map((name, i) => (
           <button

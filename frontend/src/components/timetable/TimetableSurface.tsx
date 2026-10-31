@@ -98,7 +98,7 @@ export function TimetableSurface({
   if (layout === "phone" && view === "day") {
     const shown = Math.min(day, dayCount - 1);
     return (
-      <section aria-label="Weekly timetable">
+      <section data-shot="grid" aria-label="Weekly timetable">
         <Agenda
           cells={cells}
           day={shown}
@@ -122,7 +122,7 @@ export function TimetableSurface({
 
   if (layout === "phone") {
     return (
-      <section aria-label="Weekly timetable">
+      <section data-shot="grid" aria-label="Weekly timetable">
         <WeekGrid
           cells={cells}
           dayCount={dayCount}
@@ -146,7 +146,7 @@ export function TimetableSurface({
   }
 
   return (
-    <section aria-label="Weekly timetable" className="h-full">
+    <section data-shot="grid" aria-label="Weekly timetable" className="h-full">
       <DeskGrid
         cells={cells}
         dayCount={dayCount}

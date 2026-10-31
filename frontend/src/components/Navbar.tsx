@@ -112,7 +112,10 @@ const loginLink = (
 
 function AppBar({ user, showCreate, isCreating, create, showLogin }: BarProps) {
   return (
-    <header className="flex h-[52px] w-full shrink-0 items-center justify-between bg-bg px-4">
+    <header
+      data-shot="navbar"
+      className="flex h-[52px] w-full shrink-0 items-center justify-between bg-bg px-4"
+    >
       {/* About sits next to the wordmark, as on master */}
       <div className="flex items-center gap-1">
         {user ? (
@@ -170,7 +173,10 @@ function DesktopNav({
       active ? "text-ink" : "text-ink-muted",
     );
   return (
-    <header className="flex h-[60px] w-full shrink-0 items-center gap-6 border-b border-line bg-bg px-7">
+    <header
+      data-shot="navbar"
+      className="flex h-[60px] w-full shrink-0 items-center gap-6 border-b border-line bg-bg px-7"
+    >
       {user ? (
         <Link to="/" className="text-[21px] font-bold tracking-tight text-ink">
           ChronoFactorem

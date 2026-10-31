@@ -54,7 +54,10 @@ export function SideMenu({
   const searching = isOnEditPage && searchTerm.trim() !== "";
 
   return (
-    <div className={cn("flex h-full min-h-0 flex-col", PANEL_VT_CLASS)}>
+    <div
+      data-shot="side-menu"
+      className={cn("flex h-full min-h-0 flex-col", PANEL_VT_CLASS)}
+    >
       {isOnEditPage && (
         <div className="relative mx-4 mt-2 mb-2.5 shrink-0 lg:mx-0">
           <Search
