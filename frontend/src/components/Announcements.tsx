@@ -171,8 +171,13 @@ function Announcements() {
   const toastId = useRef<string | undefined>(undefined);
 
   // The open sheet already shows everything; don't leave a toast over it.
+  // Dismiss once: `dismiss` is a new function every render, and dispatching
+  // again would re-render this component and loop.
   useEffect(() => {
-    if (open && toastId.current) dismiss(toastId.current);
+    if (open && toastId.current) {
+      dismiss(toastId.current);
+      toastId.current = undefined;
+    }
   }, [open, dismiss]);
 
   useEffect(() => {
