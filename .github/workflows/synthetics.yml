@@ -23,7 +23,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  SHARDS: 4
+  SHARDS: 2
 
 jobs:
   # the run is cpu bound, so it's split across machines. no playwright
@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        shard: [ 1, 2, 3, 4 ]
+        shard: [ 1, 2 ]
     steps:
       # the exact commit, so every shard shoots the same code
       - name: Checkout
