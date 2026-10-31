@@ -27,14 +27,20 @@ export const getFilledTimetableSections = (
   timetable: z.infer<typeof timetableWithSectionsType>,
 ) => {
   const courseMap = new Map(courses.map((x) => [x.id, x] as const));
-  return timetable.sections.map((x) => {
-    const course = courseMap.get(x.courseId) as z.infer<typeof courseType>;
-    return {
-      ...x,
-      name: course.name,
-      courseId: course.code,
-    };
+  // If course isn't found then mark as unknown course and it'll refetch courses
+  return timetable.sections.flatMap((x) => {
+    const course = courseMap.get(x.courseId);
+    if (!course) return [];
+    return [{ ...x, name: course.name, courseId: course.code }];
   });
+};
+
+export const hasUnknownCourses = (
+  courses: z.infer<typeof courseType>[],
+  timetable: z.infer<typeof timetableWithSectionsType>,
+) => {
+  const ids = new Set(courses.map((x) => x.id));
+  return timetable.sections.some((x) => !ids.has(x.courseId));
 };
 
 export const formatCDCWarningsAndOptions = (
