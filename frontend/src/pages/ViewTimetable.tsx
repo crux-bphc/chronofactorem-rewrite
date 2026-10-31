@@ -7,14 +7,15 @@ import {
   TimetablePageShell,
   timetablePageLoader,
 } from "@/components/TimetablePageShell";
-import { InterimPhoneControls } from "@/components/timetable/InterimPhoneControls";
+import { ExportButton } from "@/components/timetable/HeaderActions";
+import { TimetableDock } from "@/components/timetable/TimetableDock";
+import { TimetablePageSkeleton } from "@/components/timetable/TimetablePageSkeleton";
 import { TimetableSurface } from "@/components/timetable/TimetableSurface";
 import { TimetableProvider, useTimetableState } from "@/context";
 import { timetableSearchSchema } from "@/lib/timetableSearch";
 import { useSurfaceNav } from "@/lib/useSurfaceNav";
 import { useTimetableExport } from "@/lib/useTimetableExport";
 import { buildTimetableGrid } from "@/utils/timetableGrid";
-import CenteredSpinner from "../components/CenteredSpinner";
 import NotFound from "../components/NotFound";
 import { SideMenu } from "../components/SideMenu";
 import { rootRoute } from "../router";
@@ -25,9 +26,10 @@ const viewTimetableRoute = new Route({
   loader: timetablePageLoader,
   validateSearch: timetableSearchSchema,
   loaderDeps: () => ({}),
-  pendingComponent: CenteredSpinner,
+  pendingComponent: () => <TimetablePageSkeleton page="view" />,
+  pendingMs: 200,
   component: () => (
-    <TimetableProvider>
+    <TimetableProvider fallback={<TimetablePageSkeleton page="view" />}>
       <ViewTimetable />
     </TimetableProvider>
   ),
@@ -64,16 +66,27 @@ function ViewTimetable() {
       <TimetablePageShell
         header={
           <TimetableHeader
-            isOnEditPage={false}
-            generateScreenshot={exportPng}
-            isExporting={status === "rendering"}
+            page="view"
+            exportStatus={status}
+            onExport={exportPng}
           />
         }
-        sidebar={SideBar}
-        contentClassName="bg-background"
-        popoverTriggerClassName="top-[-1rem]"
+        panel={SideBar}
+        dock={
+          <TimetableDock
+            dayCount={dayCount}
+            actions={
+              <div className="flex min-w-0 flex-[.6] *:flex-1">
+                <ExportButton
+                  status={status}
+                  onExport={exportPng}
+                  layout="phone"
+                />
+              </div>
+            }
+          />
+        }
       >
-        {!screenIsLarge && <InterimPhoneControls dayCount={dayCount} />}
         <TimetableSurface
           sections={timetableDetailsSections}
           layout={screenIsLarge ? "desktop" : "phone"}

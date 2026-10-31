@@ -290,6 +290,13 @@ html.theme-transition::view-transition-new(root) {
   }
 }
 
+/* the timetable page shell arriving after its skeleton */
+@keyframes shell-fade {
+  from {
+    opacity: 0;
+  }
+}
+
 @keyframes skeleton-sweep {
   from {
     background-position: 200% 0;
@@ -498,7 +505,8 @@ html.theme-transition::view-transition-new(root) {
   }
 }
 
-/* taps during a transition reach the live page underneath */
+/* keep the snapshots from swallowing taps; Chrome still sends taps during a
+   transition to <html>, so the phone dock re-routes its own (TimetableDock) */
 ::view-transition {
   pointer-events: none;
 }
@@ -526,6 +534,14 @@ html.theme-transition::view-transition-new(root) {
       animation: tt-root-out var(--d-2) var(--e-out) both;
     }
     &::view-transition-new(root) {
+      animation: tt-root-in var(--d-2) var(--e-out) both;
+    }
+    /* the grid card is its own group; fade it like the page so the old and
+    new axis labels don't overlap mid-morph */
+    &::view-transition-old(timetable-grid) {
+      animation: tt-root-out var(--d-2) var(--e-out) both;
+    }
+    &::view-transition-new(timetable-grid) {
       animation: tt-root-in var(--d-2) var(--e-out) both;
     }
   }

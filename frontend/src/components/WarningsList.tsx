@@ -3,6 +3,7 @@ import { panelForward } from "@/lib/panelTransition";
 import { titleCase } from "@/lib/titleCase";
 import { useTimetableNav } from "@/lib/useTimetableNav";
 import { useWarningsSummary } from "@/lib/useWarningsSummary";
+import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 
 const overline =
@@ -27,22 +28,23 @@ function Open({ label, onClick }: { label: string; onClick: () => void }) {
 }
 
 /**
- * Warning rows for the tooltip containers and (PR 4) the warnings sheet.
+ * Warning rows for the desktop warnings popover and the phone warnings sheet.
  * `onNavigate` lets the container close itself when a row opens a course.
  */
 export function WarningsList({
-  only,
   onNavigate,
+  className,
 }: {
-  only?: "sections" | "cdcs";
   onNavigate?: () => void;
+  /** On the root, e.g. `[&_*]:lg:mx-0` to drop the row inset in a popover. */
+  className?: string;
 }) {
   const { missingSections, missingCdcs, notFound } = useWarningsSummary();
   const { openCourse, showTab } = useTimetableNav();
 
-  const showSections = only !== "cdcs" && missingSections.length > 0;
-  const showCdcs = only !== "sections" && missingCdcs.length > 0;
-  const showNotFound = only !== "sections" && notFound.length > 0;
+  const showSections = missingSections.length > 0;
+  const showCdcs = missingCdcs.length > 0;
+  const showNotFound = notFound.length > 0;
   if (!showSections && !showCdcs && !showNotFound) return null;
 
   const go = (fn: () => unknown) =>
@@ -52,7 +54,7 @@ export function WarningsList({
     })();
 
   return (
-    <div className="flex flex-col pb-3 lg:pb-0">
+    <div className={cn("flex flex-col pb-3 lg:pb-0", className)}>
       {showSections && (
         <div className={group}>
           {missingSections.flatMap(({ code, courseId, types }) =>

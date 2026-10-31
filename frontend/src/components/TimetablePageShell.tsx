@@ -1,12 +1,12 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { Menu } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 import type React from "react";
-import { useEffect } from "react";
-import BottomSheet from "@/components/BottomSheet";
+import { useEffect, useState } from "react";
 import NotFound from "@/components/NotFound";
-import Spinner from "@/components/Spinner";
-import { Button } from "@/components/ui/button";
+import { skeletonShown } from "@/components/timetable/TimetablePageSkeleton";
+import { TimetableSheet } from "@/components/timetable/TimetableSheet";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useToast } from "@/components/ui/use-toast";
 import { useTimetableState } from "@/context";
@@ -15,8 +15,7 @@ import toastHandler from "@/data-access/errors/toastHandler";
 import { courseQueryOptions } from "@/data-access/hooks/useCourses";
 import { timetableQueryOptions } from "@/data-access/hooks/useTimetable";
 import { userQueryOptions } from "@/data-access/hooks/useUser";
-import { useTimetableNav } from "@/lib/useTimetableNav";
-import { cn } from "@/lib/utils";
+import { TIMETABLE_GRID_VT } from "@/lib/sharedTransition";
 
 export const timetablePageLoader = async ({
   context: { queryClient },
@@ -73,88 +72,101 @@ export const TimetablePageError = ({ error }: { error: Error }) => {
 
 export const TimetablePageShell = ({
   header,
-  sidebar,
-  contentRef,
-  contentClassName,
-  popoverTriggerClassName,
+  panel,
+  dock,
   children,
 }: {
   header: React.ReactNode;
-  sidebar: React.ReactNode;
-  contentRef?: React.Ref<HTMLDivElement>;
-  contentClassName?: string;
-  popoverTriggerClassName?: string;
+  /** The course list or picker: the desktop panel, the phone courses sheet. */
+  panel: React.ReactNode;
+  /** The phone's bottom dock. */
+  dock: React.ReactNode;
   children: React.ReactNode;
 }) => {
   const {
     state: { isCopyingTimetable, screenIsLarge },
   } = useTimetableState();
-  const { search, openSheet, closeSheet } = useTimetableNav();
-  const sidebarOpen = search.sheet === "courses";
+  // Crossfade from the loading skeleton, once: not on fast loads (the route's
+  // view transition is the motion there) or when crossing 1024px. Opacity
+  // only, as a transform would make <main> the dock's containing block.
+  const [fade, setFade] = useState(skeletonShown);
+  const fadeClass = fade
+    ? "motion-safe:animate-[shell-fade_var(--d-2)_var(--e-out)]"
+    : "";
+  const endFade = (e: React.AnimationEvent) => {
+    if (e.target === e.currentTarget) setFade(false);
+  };
 
-  if (isCopyingTimetable) {
+  // The copy flow's wait is intentional feedback (useTimetableActions), so
+  // the dialog can't be dismissed: it closes when the flow clears the flag.
+  const copying = (
+    <Dialog open={isCopyingTimetable}>
+      <DialogContent
+        hideClose
+        aria-describedby={undefined}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+        // focus parks on the dialog itself (nothing in it is interactive)
+        className="flex w-[300px] flex-col items-center gap-4 text-center outline-none"
+      >
+        <LoaderCircle
+          aria-hidden="true"
+          className="size-6 animate-spin text-brand"
+        />
+        <div role="status">
+          <DialogTitle className="text-[15px] font-medium">
+            Please wait while we copy over your timetable...
+          </DialogTitle>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
+  if (!screenIsLarge) {
     return (
-      <div className="flex flex-col text-muted-foreground gap-8 xl:text-xl lg:text-lg md:text-md text-sm bg-background h-[calc(100dvh-5rem)] justify-center w-full items-center">
-        <Spinner />
-        <span>Please wait while we copy over your timetable...</span>
-      </div>
+      <main className={`w-full flex-1 ${fadeClass}`} onAnimationEnd={endFade}>
+        <TooltipProvider>
+          {header}
+          <div
+            style={{ viewTransitionName: TIMETABLE_GRID_VT }}
+            // room to scroll the grid clear of the dock
+            className="mx-auto max-w-[640px] pb-[calc(156px+env(safe-area-inset-bottom))]"
+          >
+            {children}
+          </div>
+          {dock}
+          <TimetableSheet courses={panel} />
+          {copying}
+        </TooltipProvider>
+      </main>
     );
   }
 
   return (
     <main
-      className={cn(
-        "w-full min-w-0",
-        screenIsLarge ? "flex-none h-[calc(100vh-12rem)]" : "flex-1 pb-6",
-        // leave room to scroll the whole grid above the open sheet
-        !screenIsLarge && sidebarOpen && "pb-[calc(max(45dvh,16rem)+1.5rem)]",
-      )}
+      className={`flex h-[calc(100dvh-60px)] min-h-[600px] flex-col ${fadeClass}`}
+      onAnimationEnd={endFade}
     >
       <TooltipProvider>
         {header}
-        {!screenIsLarge && (
-          <BottomSheet
-            open={sidebarOpen}
-            onOpenChange={(open) =>
-              open ? openSheet("courses") : closeSheet()
-            }
-            // tapping the grid shouldn't close the sheet
-            dismissOnOutsideTap={false}
-            title="Courses and exams"
-            description="Browse courses, choose sections, and review exam dates."
-            className="h-[45dvh] min-h-64"
-            trigger={
-              <Button
-                variant="outline"
-                // phones get this button in the header, next to Publish
-                className={cn(
-                  "mb-4 ml-4 gap-2 max-sm:hidden",
-                  popoverTriggerClassName,
-                )}
-              >
-                <Menu className="size-4" />
-                Courses and exams
-              </Button>
-            }
+        {/* 300px below 1280 so DeskGrid's minimums fit at 1024 (1024 - 56
+            gutter - 300 - 20 gap = 648px); the spec's 360px from 1280. The
+            page's px-7 is the 28px gutter for the panel and the grid card */}
+        <div className="grid min-h-0 flex-1 grid-cols-[300px_minmax(0,1fr)] gap-5 px-7 pb-7 xl:grid-cols-[360px_minmax(0,1fr)]">
+          <aside
+            data-shot="side-menu"
+            className="flex min-h-0 flex-col overflow-hidden"
           >
-            <div className="min-h-0 flex-1 overflow-hidden">{sidebar}</div>
-          </BottomSheet>
-        )}
-        <div
-          className={cn(
-            "flex flex-row gap-4 relative min-w-0",
-            screenIsLarge ? "h-full" : "items-start",
-            contentClassName,
-          )}
-          ref={contentRef}
-        >
-          {screenIsLarge && (
-            <aside className="bg-secondary w-[26rem] shrink-0 overflow-hidden">
-              {sidebar}
-            </aside>
-          )}
-          <div className="min-w-0 flex-1">{children}</div>
+            {panel}
+          </aside>
+          <div
+            className="min-h-0"
+            style={{ viewTransitionName: TIMETABLE_GRID_VT }}
+          >
+            {children}
+          </div>
         </div>
+        {copying}
       </TooltipProvider>
     </main>
   );

@@ -25,7 +25,8 @@ export function useWarningsSummary() {
     );
     const count =
       missingSections.reduce((n, s) => n + s.types.length, 0) +
-      missingCdcs.length;
+      missingCdcs.length +
+      notFound.length;
     return {
       missingSections,
       missingCdcs,
@@ -36,7 +37,7 @@ export function useWarningsSummary() {
       title:
         missingSections.length > 0
           ? "Complete the missing sections before publishing"
-          : missingCdcs.length > 0
+          : missingCdcs.length > 0 || notFound.length > 0
             ? "You haven't added all CDCs for this semester to your timetable."
             : null,
     };

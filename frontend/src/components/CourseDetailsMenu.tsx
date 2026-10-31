@@ -9,7 +9,7 @@ import {
   useSwapTimetableSections,
 } from "@/data-access/hooks/useTimetableSectionAction";
 import { formatExam, summarizeRoomTimes } from "@/lib/formatTime";
-import { PANEL_VT_CLASS, panelBack, panelForward } from "@/lib/panelTransition";
+import { PANEL_VT_CLASS, panelForward } from "@/lib/panelTransition";
 import { titleCase } from "@/lib/titleCase";
 import { useTimetableNav } from "@/lib/useTimetableNav";
 import { cn } from "@/lib/utils";
@@ -223,7 +223,7 @@ const CourseDetailsMenu = ({
             <button
               type="button"
               aria-label="Back"
-              onClick={panelBack(closeCourse)}
+              onClick={closeCourse}
               className="-ml-4 grid size-11 shrink-0 cursor-pointer lg:-ml-2 lg:size-9 place-items-center rounded-full text-ink transition-colors duration-(--d-1) hover:bg-sunk"
             >
               <ChevronLeft size={22} aria-hidden="true" />
@@ -238,7 +238,13 @@ const CourseDetailsMenu = ({
           </div>
         )}
         {course && (
-          <div className="flex flex-col pl-7 text-[13px] leading-normal text-ink-muted">
+          <div
+            className={cn(
+              "flex flex-col text-[13px] leading-normal text-ink-muted",
+              // phone sheet: line up with the sheet title after its ‹ button
+              showHeader ? "pl-7" : "pl-[38px]",
+            )}
+          >
             <span>{titleCase(course.name)}</span>
             <ExamLine
               label="Midsem"
@@ -256,7 +262,8 @@ const CourseDetailsMenu = ({
         )}
         {course && currentSectionType && uniqueSectionTypes.length > 0 && (
           <Segmented
-            className="mt-3 h-11 lg:h-10"
+            // the 300px desktop panel (below xl) needs tighter tabs to fit full names
+            className="mt-3 h-11 lg:h-10 lg:max-xl:[&>button]:gap-1 lg:max-xl:[&>button]:px-1.5 lg:max-xl:[&>button]:text-sm"
             aria-label="Section type"
             value={currentSectionType}
             onValueChange={(t) => setType(t)}

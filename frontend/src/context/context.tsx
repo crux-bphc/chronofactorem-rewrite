@@ -8,7 +8,6 @@ import {
   useMemo,
   useReducer,
 } from "react";
-import CenteredSpinner from "@/components/CenteredSpinner";
 import useCourse from "@/data-access/hooks/useCourse";
 import { courseQueryOptions } from "@/data-access/hooks/useCourses";
 import useTimetable from "@/data-access/hooks/useTimetable";
@@ -50,15 +49,22 @@ export const useTimetableState = () => {
 
 export const TimetableProvider = ({
   children,
+  fallback,
 }: {
   children: React.ReactNode;
+  /** Shown while data the route loader didn't wait for (the user) loads. */
+  fallback: React.ReactNode;
 }) => {
   const { timetableId } = useParams({
     strict: false,
   });
   if (timetableId === undefined) throw notFound();
   return (
-    <TimetableDataProvider key={timetableId} timetableId={timetableId}>
+    <TimetableDataProvider
+      key={timetableId}
+      timetableId={timetableId}
+      fallback={fallback}
+    >
       {children}
     </TimetableDataProvider>
   );
@@ -67,9 +73,11 @@ export const TimetableProvider = ({
 const TimetableDataProvider = ({
   children,
   timetableId,
+  fallback,
 }: {
   children: React.ReactNode;
   timetableId: string;
+  fallback: React.ReactNode;
 }) => {
   const { data: user, isLoading: isUserLoading } = useUser();
   const { data: timetable, isLoading: isTimetableLoading } =
@@ -141,7 +149,7 @@ const TimetableDataProvider = ({
   }, []);
 
   if (isUserLoading || isCoursesLoading || isTimetableLoading) {
-    return <CenteredSpinner />;
+    return fallback;
   }
 
   return (
