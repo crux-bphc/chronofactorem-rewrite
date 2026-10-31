@@ -357,8 +357,9 @@ const commit = files.size
 
 const url = (path: string) =>
   `https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${commit}/${path}`;
-const thumb = (path: string) =>
-  `<a href="${url(path)}"><img src="${url(path)}" width="260"></a>`;
+// at its own size, or the comment's width if that's narrower
+const image = (path: string) =>
+  `<a href="${url(path)}"><img src="${url(path)}"></a>`;
 const name = (path: string) => {
   const [synthetic, device] = path.replace(/\.png$/, "").split("/");
   return `\`${synthetic}\` · ${device}`;
@@ -391,19 +392,22 @@ const byRoute = <T>(items: T[], pathOf: (item: T) => string) => {
   }
   return groups;
 };
+// each screenshot under its own heading rather than in a table, which
+// shrinks them to thumbnails
 const section = <T>(
   items: T[],
   pathOf: (item: T) => string,
-  header: string[],
-  row: (item: T) => string[],
+  imageOf: (item: T) => string,
 ) =>
   [...byRoute(items, pathOf)].flatMap(([route, group]) => [
     `### \`${route}\``,
     "",
-    `| ${header.join(" | ")} |`,
-    `|${header.map(() => "---").join("|")}|`,
-    ...group.map((item) => `| ${row(item).join(" | ")} |`),
-    "",
+    ...group.flatMap((item) => [
+      `#### ${name(pathOf(item))}`,
+      "",
+      image(imageOf(item)),
+      "",
+    ]),
   ]);
 
 const lines = [MARKER, "## Screenshots", ""];
@@ -432,13 +436,7 @@ if (noBaseline) {
       ...section(
         changed,
         ([path]) => path,
-        ["", "before", "after", "blink"],
-        ([path, { hash }]) => [
-          name(path),
-          thumb(`img/${baseline[path]}.png`),
-          thumb(`img/${hash}.png`),
-          thumb(blinks.get(path) as string),
-        ],
+        ([path]) => blinks.get(path) as string,
       ),
     );
   }
@@ -449,8 +447,7 @@ if (noBaseline) {
       ...section(
         added,
         ([path]) => path,
-        ["", "after"],
-        ([path, { hash }]) => [name(path), thumb(`img/${hash}.png`)],
+        ([, { hash }]) => `img/${hash}.png`,
       ),
       "</details>",
       "",
@@ -463,8 +460,7 @@ if (noBaseline) {
       ...section(
         removed,
         (path) => path,
-        ["", "before"],
-        (path) => [name(path), thumb(`img/${baseline[path]}.png`)],
+        (path) => `img/${baseline[path]}.png`,
       ),
       "</details>",
       "",
