@@ -2,8 +2,9 @@ import type { QueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { LoaderCircle } from "lucide-react";
 import type React from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import NotFound from "@/components/NotFound";
+import { skeletonShown } from "@/components/timetable/TimetablePageSkeleton";
 import { TimetableSheet } from "@/components/timetable/TimetableSheet";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -85,6 +86,16 @@ export const TimetablePageShell = ({
   const {
     state: { isCopyingTimetable, screenIsLarge },
   } = useTimetableState();
+  // Crossfade from the loading skeleton, once: not on fast loads (the route's
+  // view transition is the motion there) or when crossing 1024px. Opacity
+  // only, as a transform would make <main> the dock's containing block.
+  const [fade, setFade] = useState(skeletonShown);
+  const fadeClass = fade
+    ? "motion-safe:animate-[shell-fade_var(--d-2)_var(--e-out)]"
+    : "";
+  const endFade = (e: React.AnimationEvent) => {
+    if (e.target === e.currentTarget) setFade(false);
+  };
 
   // The copy flow's wait is intentional feedback (useTimetableActions), so
   // the dialog can't be dismissed: it closes when the flow clears the flag.
@@ -113,7 +124,7 @@ export const TimetablePageShell = ({
 
   if (!screenIsLarge) {
     return (
-      <main className="w-full flex-1">
+      <main className={`w-full flex-1 ${fadeClass}`} onAnimationEnd={endFade}>
         <TooltipProvider>
           {header}
           <div
@@ -132,7 +143,10 @@ export const TimetablePageShell = ({
   }
 
   return (
-    <main className="flex h-[calc(100dvh-60px)] min-h-[600px] flex-col">
+    <main
+      className={`flex h-[calc(100dvh-60px)] min-h-[600px] flex-col ${fadeClass}`}
+      onAnimationEnd={endFade}
+    >
       <TooltipProvider>
         {header}
         {/* 300px below 1280 so DeskGrid's minimums fit at 1024 (1024 - 56

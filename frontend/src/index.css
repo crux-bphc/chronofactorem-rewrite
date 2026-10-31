@@ -290,6 +290,13 @@ html.theme-transition::view-transition-new(root) {
   }
 }
 
+/* the timetable page shell arriving after its skeleton */
+@keyframes shell-fade {
+  from {
+    opacity: 0;
+  }
+}
+
 @keyframes skeleton-sweep {
   from {
     background-position: 200% 0;

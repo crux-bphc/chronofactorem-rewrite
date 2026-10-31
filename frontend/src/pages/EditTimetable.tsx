@@ -11,6 +11,7 @@ import {
 } from "@/components/TimetablePageShell";
 import { PublishButton } from "@/components/timetable/HeaderActions";
 import { TimetableDock } from "@/components/timetable/TimetableDock";
+import { TimetablePageSkeleton } from "@/components/timetable/TimetablePageSkeleton";
 import { TimetableSurface } from "@/components/timetable/TimetableSurface";
 import { TimetableProvider, useTimetableState } from "@/context";
 import useCourse from "@/data-access/hooks/useCourse";
@@ -24,7 +25,6 @@ import { useSurfaceNav } from "@/lib/useSurfaceNav";
 import { useTimetableNav } from "@/lib/useTimetableNav";
 import { buildTimetableGrid } from "@/utils/timetableGrid";
 import authenticatedRoute from "../AuthenticatedRoute";
-import CenteredSpinner from "../components/CenteredSpinner";
 import NotFound from "../components/NotFound";
 import { SideMenu } from "../components/SideMenu";
 import { toast } from "../components/ui/use-toast";
@@ -36,9 +36,10 @@ const editTimetableRoute = new Route({
   loader: timetablePageLoader,
   validateSearch: timetableSearchSchema,
   loaderDeps: () => ({}),
-  pendingComponent: CenteredSpinner,
+  pendingComponent: () => <TimetablePageSkeleton page="edit" />,
+  pendingMs: 200,
   component: () => (
-    <TimetableProvider>
+    <TimetableProvider fallback={<TimetablePageSkeleton page="edit" />}>
       <SectionPreviewProvider>
         <EditTimetable />
       </SectionPreviewProvider>

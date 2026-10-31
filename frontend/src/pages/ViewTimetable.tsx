@@ -9,13 +9,13 @@ import {
 } from "@/components/TimetablePageShell";
 import { ExportButton } from "@/components/timetable/HeaderActions";
 import { TimetableDock } from "@/components/timetable/TimetableDock";
+import { TimetablePageSkeleton } from "@/components/timetable/TimetablePageSkeleton";
 import { TimetableSurface } from "@/components/timetable/TimetableSurface";
 import { TimetableProvider, useTimetableState } from "@/context";
 import { timetableSearchSchema } from "@/lib/timetableSearch";
 import { useSurfaceNav } from "@/lib/useSurfaceNav";
 import { useTimetableExport } from "@/lib/useTimetableExport";
 import { buildTimetableGrid } from "@/utils/timetableGrid";
-import CenteredSpinner from "../components/CenteredSpinner";
 import NotFound from "../components/NotFound";
 import { SideMenu } from "../components/SideMenu";
 import { rootRoute } from "../router";
@@ -26,9 +26,10 @@ const viewTimetableRoute = new Route({
   loader: timetablePageLoader,
   validateSearch: timetableSearchSchema,
   loaderDeps: () => ({}),
-  pendingComponent: CenteredSpinner,
+  pendingComponent: () => <TimetablePageSkeleton page="view" />,
+  pendingMs: 200,
   component: () => (
-    <TimetableProvider>
+    <TimetableProvider fallback={<TimetablePageSkeleton page="view" />}>
       <ViewTimetable />
     </TimetableProvider>
   ),
