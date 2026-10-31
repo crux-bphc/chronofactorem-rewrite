@@ -42,14 +42,36 @@ type DeskGridProps = {
 // the phone tiles instead of truncating the code
 const padClass = "px-2.5 py-[9px] @max-[72px]:px-1 @max-[72px]:py-1.5";
 
-function BlockLines({ cell }: { cell: TimetableCell }) {
+// on big monitors the live grid's text steps up a size at 1920px and again
+// at 2560px so it stays in proportion with the much larger blocks. the export
+// keeps one size whatever screen it is made on.
+// on screens that can't hover the editor's × is always shown, so the code
+// wraps whole words below it instead of running under it (as on master)
+function BlockLines({
+  cell,
+  scale,
+  remove = false,
+}: {
+  cell: TimetableCell;
+  scale: boolean;
+  remove?: boolean;
+}) {
   return (
     <>
       <div className="@max-[72px]:hidden">
-        <span className="block truncate text-base font-semibold">
+        <span
+          className={`block truncate font-semibold ${scale ? "text-base min-[1920px]:text-lg min-[2560px]:text-xl" : "text-base"} ${
+            remove ? "[@media(hover:none)]:whitespace-normal" : ""
+          }`}
+        >
+          {remove && (
+            <span className="float-right hidden h-[1em] w-4 [@media(hover:none)]:block" />
+          )}
           {cell.code}
         </span>
-        <span className="mt-[3px] block truncate text-sm text-ink-muted">
+        <span
+          className={`mt-[3px] block truncate text-ink-muted ${scale ? "text-sm min-[1920px]:text-base min-[2560px]:text-lg" : "text-sm"}`}
+        >
           {`${cell.type}${cell.number} · ${cell.room}`}
         </span>
       </div>
@@ -103,9 +125,11 @@ export function DeskGrid({
       {days.map((name, d) => (
         <div
           key={name}
-          className={`self-center text-xs font-semibold tracking-[.06em] text-ink-muted uppercase ${
-            rows ? "" : "text-center"
-          }`}
+          className={`self-center font-semibold tracking-[.06em] text-ink-muted uppercase ${
+            mode === "export"
+              ? "text-xs"
+              : "text-xs min-[1920px]:text-sm min-[2560px]:text-base"
+          } ${rows ? "" : "text-center"}`}
           style={
             rows
               ? { gridColumn: 1, gridRow: d + 2 }
@@ -118,7 +142,11 @@ export function DeskGrid({
       {hours.map((h) => (
         <div
           key={`hour-${h}`}
-          className={`text-sm whitespace-nowrap text-ink-faint ${hourLabelFade(h, nowAt)} ${
+          className={`whitespace-nowrap text-ink-faint ${
+            mode === "export"
+              ? "text-sm"
+              : "text-sm min-[1920px]:text-base min-[2560px]:text-lg"
+          } ${hourLabelFade(h, nowAt)} ${
             rows ? "self-end pl-0.5" : "self-start pr-1 text-right"
           }`}
           style={
@@ -164,7 +192,7 @@ export function DeskGrid({
               }
             >
               <div className={padClass}>
-                <BlockLines cell={cell} />
+                <BlockLines cell={cell} scale={false} />
               </div>
             </div>
           );
@@ -211,11 +239,11 @@ export function DeskGrid({
                     aria-label={`Edit ${cell.courseId} ${cell.type}${cell.number}, press Delete to remove`}
                     className={`flex size-full cursor-pointer flex-col justify-start rounded-md text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring disabled:opacity-60 ${padClass}`}
                   >
-                    <BlockLines cell={cell} />
+                    <BlockLines cell={cell} scale remove />
                   </button>
                 ) : (
                   <div className={`size-full ${padClass}`}>
-                    <BlockLines cell={cell} />
+                    <BlockLines cell={cell} scale />
                   </div>
                 )}
               </TooltipTrigger>
@@ -230,7 +258,7 @@ export function DeskGrid({
                 disabled={pending || leaving}
                 aria-label={`Remove ${cell.code} ${cell.type}${cell.number}`}
                 onClick={leaving ? undefined : () => onRemove?.(cell)}
-                className="absolute top-1 right-1 flex size-5 cursor-pointer items-center justify-center rounded-sm bg-ev-hover text-ink-muted opacity-0 transition-opacity duration-(--d-1) group-focus-within:opacity-100 group-hover:opacity-100 hover:text-ink focus-visible:outline-2 focus-visible:outline-ring disabled:cursor-default"
+                className="absolute top-1 right-1 flex size-5 cursor-pointer items-center justify-center rounded-sm bg-ev-hover text-ink-muted opacity-0 transition-opacity duration-(--d-1) group-focus-within:opacity-100 group-hover:opacity-100 hover:text-ink [@media(hover:none)]:opacity-100 focus-visible:outline-2 focus-visible:outline-ring disabled:cursor-default"
               >
                 <X size={13} />
               </button>
@@ -251,7 +279,7 @@ export function DeskGrid({
             }
           >
             <div className={padClass}>
-              <BlockLines cell={cell} />
+              <BlockLines cell={cell} scale />
             </div>
           </div>
         ))}
