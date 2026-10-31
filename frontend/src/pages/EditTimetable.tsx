@@ -68,7 +68,7 @@ function EditTimetable() {
     () => buildTimetableGrid(timetableDetailsSections),
     [timetableDetailsSections],
   );
-  const { view, day } = useSurfaceNav(dayCount);
+  const { view, day, showDay } = useSurfaceNav(dayCount);
   const pending =
     useIsMutating({ mutationKey: ["sections", timetable?.id] }) > 0;
   // an unknown course id (stale or hand-edited URL) shows the list instead
@@ -204,6 +204,7 @@ function EditTimetable() {
             ? sectionAction({ sectionId: e?.id, action: "remove" })
             : console.log("error:", e);
         }}
+        onShowDay={showDay}
       />
     </TimetablePageShell>
   );
