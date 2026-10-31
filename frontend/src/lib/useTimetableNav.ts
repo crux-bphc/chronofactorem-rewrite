@@ -29,8 +29,8 @@ const isPhone = () => !window.matchMedia("(min-width: 1024px)").matches;
 
 /**
  * Editor/view navigation state lives in URL search params so the browser and
- * phone back button walk back through sheets, courses and section types.
- * Opening a sheet or course pushes; everything else replaces.
+ * phone back button walk back through sheets and courses. Opening a sheet or
+ * another course pushes; everything else (section types included) replaces.
  *
  * Pushed entries record how many entries deep into the open sheet they are
  * (`sheetDepth`), so closing the sheet can pop all of them in one go.
@@ -182,21 +182,21 @@ export function useTimetableNav() {
       ) => {
         const phone = isPhone();
         const cur = router.latestLocation.search;
+        // A `type` deep-links a section type (timetable blocks, clash pills);
+        // without one the default type shows, or the course's current type if
+        // it is already open.
         const update = (p: TimetableSearch): TimetableSearch => ({
           ...p,
           course: courseId,
-          type,
+          type: type ?? (p.course === courseId ? p.type : undefined),
           ...(tab ? { tab } : {}),
           ...(phone ? { sheet: "courses" as const } : {}),
         });
-        // Already showing this course and type: refresh in place, no new entry.
+        // Already showing this course: switch type in place, no new entry, so
+        // back returns to the previous course rather than the previous type.
         // On a phone it only shows inside the courses sheet; `course` alone
         // (say, carried over from desktop) still needs the sheet opened.
-        if (
-          cur.course === courseId &&
-          cur.type === type &&
-          (!phone || cur.sheet === "courses")
-        ) {
+        if (cur.course === courseId && (!phone || cur.sheet === "courses")) {
           await go(update, { push: false });
           return;
         }
