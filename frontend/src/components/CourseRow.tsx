@@ -173,7 +173,7 @@ export function CourseRow({
         )}
       >
         <span className="grid size-7 place-items-center rounded-md transition-colors duration-(--d-1) group-hover/x:bg-ev">
-          <X size={16} aria-hidden="true" />
+          <X size={18} aria-hidden="true" />
         </span>
       </button>
     </div>

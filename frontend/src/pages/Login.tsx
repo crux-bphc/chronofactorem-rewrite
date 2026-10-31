@@ -46,6 +46,7 @@ function Login() {
   return (
     <div className="min-h-dvh flex flex-col text-ink">
       <CruxMark />
+      <div aria-hidden="true" className="fixed top-1 left-1 size-px bg-ink" />
       <div className="fixed top-3 right-3">
         <ThemeButton />
       </div>
