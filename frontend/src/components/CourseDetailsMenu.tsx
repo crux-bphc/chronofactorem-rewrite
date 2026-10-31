@@ -12,6 +12,7 @@ import { formatExam, summarizeRoomTimes } from "@/lib/formatTime";
 import { PANEL_VT_CLASS, panelForward } from "@/lib/panelTransition";
 import { useSkeletonFadeIn } from "@/lib/skeletonFade";
 import { titleCase } from "@/lib/titleCase";
+import { useTypeSlide } from "@/lib/typeSlide";
 import { useTimetableNav } from "@/lib/useTimetableNav";
 import { cn } from "@/lib/utils";
 import {
@@ -182,6 +183,13 @@ const CourseDetailsMenu = ({
   const [pulsedNonce, setPulsedNonce] = useState<number | null>(null);
   const pulse = landed !== null && pulsedNonce !== landed && !reducedMotion();
 
+  const slide = useTypeSlide(
+    currentCourseID,
+    currentSectionType,
+    uniqueSectionTypes,
+    course !== undefined,
+  );
+
   // Rows already selected when a course opens don't play the tick; rows
   // selected (or reselected) while it is open do.
   const selectedIds = new Set(timetable?.sections.map((s) => s.id));
@@ -216,21 +224,114 @@ const CourseDetailsMenu = ({
       (item) => item.courseId === currentCourseID && item.type === type,
     );
 
-  const sections = (course?.sections ?? [])
-    .filter((section) => section.type === currentSectionType)
-    .map((section) => ({
-      section,
-      // picking another section of the same course and type swaps it, so those don't clash
-      clashing: timetable.sections.filter(
-        (item) =>
-          !(item.courseId === section.courseId && item.type === section.type) &&
-          item.roomTime.some((existing) =>
-            section.roomTime.some(
-              (incoming) => slot(existing) === slot(incoming),
+  const sectionsOf = (type: SectionKind) =>
+    (course?.sections ?? [])
+      .filter((section) => section.type === type)
+      .map((section) => ({
+        section,
+        // picking another section of the same course and type swaps it, so those don't clash
+        clashing: timetable.sections.filter(
+          (item) =>
+            !(
+              item.courseId === section.courseId && item.type === section.type
+            ) &&
+            item.roomTime.some((existing) =>
+              section.roomTime.some(
+                (incoming) => slot(existing) === slot(incoming),
+              ),
             ),
-          ),
-      ),
-    }));
+        ),
+      }));
+
+  const renderList = (type: SectionKind, current: boolean) => (
+    <div className={cn(group, fadeIn.className)}>
+      {sectionsOf(type).map(({ section, clashing }) => {
+        if (clashing.length > 0) {
+          return (
+            <div key={section.id} className={rowGrid}>
+              <button
+                type="button"
+                disabled
+                className="col-span-3 grid grid-cols-subgrid text-left opacity-50"
+              >
+                <SectionText section={section} />
+              </button>
+              <div className="col-span-2 col-start-2 min-w-0">
+                <ClashingWith>
+                  {clashing.map((item) => (
+                    <ClashPill
+                      key={item.id}
+                      label={`${item.roomTime[0].split(":")[0]} ${item.type}${item.number}`}
+                      onSelect={
+                        // same course: slide to the type, don't push the panel
+                        item.courseId === currentCourseID
+                          ? () => {
+                              cancelAdvance();
+                              markClashLanding(item.courseId, item.type);
+                              setType(item.type);
+                            }
+                          : panelForward(() => {
+                              markClashLanding(item.courseId, item.type);
+                              return openCourse(item.courseId, item.type);
+                            })
+                      }
+                    />
+                  ))}
+                </ClashingWith>
+              </div>
+            </div>
+          );
+        }
+        const selected = selectedIds.has(section.id);
+        const fresh = selected && !seen.current.ids.has(section.id);
+        return (
+          <button
+            key={section.id}
+            type="button"
+            aria-pressed={selected}
+            aria-busy={busy || undefined}
+            onClick={() => handleSectionClick(section)}
+            onPointerEnter={(e) => {
+              if (e.pointerType === "mouse") hover(section.id);
+            }}
+            onPointerLeave={(e) => {
+              if (e.pointerType === "mouse") hover(null);
+            }}
+            onAnimationEnd={(e) => {
+              if (e.animationName === "cf-ring-pulse") setPulsedNonce(landed);
+            }}
+            className={cn(
+              rowGrid,
+              "relative w-full cursor-pointer items-start text-left transition-colors duration-(--d-2) focus-visible:outline-offset-[-2px]",
+              selected
+                ? "bg-brand-bg bg-[linear-gradient(to_right,var(--accent)_3px,transparent_3px)]"
+                : "hover:bg-sunk",
+              selected && current && pulse && "cf-ring-pulse",
+              busy && "cursor-progress",
+            )}
+          >
+            <SectionText section={section} />
+            {selected ? (
+              <span
+                onAnimationEnd={(e) => {
+                  if (e.animationName === "cf-tick-in")
+                    seen.current.ids.add(section.id);
+                }}
+                className={cn(
+                  "grid size-[22px] place-items-center self-center rounded-full bg-brand text-brand-ink",
+                  fresh && "animate-[cf-tick-in_var(--d-3)_var(--e-spring)]",
+                )}
+              >
+                <Check size={14} strokeWidth={3} aria-hidden="true" />
+              </span>
+            ) : (
+              <span className="size-[22px] self-center rounded-full border-[1.5px] border-line" />
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
 
   return (
     <div className={cn("flex h-full min-h-0 flex-col", PANEL_VT_CLASS)}>
@@ -322,6 +423,7 @@ const CourseDetailsMenu = ({
         )}
       </div>
       <div
+        ref={slide.scrollRef}
         className="min-h-0 flex-1 overflow-y-auto"
         onPointerDownCapture={cancelAdvance}
         onKeyDownCapture={cancelAdvance}
@@ -335,85 +437,34 @@ const CourseDetailsMenu = ({
             ))}
           </div>
         ) : (
-          <div className={cn(group, fadeIn.className)}>
-            {sections.map(({ section, clashing }) => {
-              if (clashing.length > 0) {
+          <div className="overflow-x-clip">
+            {/* desktop cards have no side margins, so the gap keeps lists apart */}
+            <div
+              ref={slide.trackRef}
+              className="relative flow-root [--slide-gap:0px] lg:[--slide-gap:32px]"
+            >
+              {slide.panes.map((pane) => {
+                const offset = slide.offset(pane);
                 return (
-                  <div key={section.id} className={rowGrid}>
-                    <button
-                      type="button"
-                      disabled
-                      className="col-span-3 grid grid-cols-subgrid text-left opacity-50"
-                    >
-                      <SectionText section={section} />
-                    </button>
-                    <div className="col-span-2 col-start-2 min-w-0">
-                      <ClashingWith>
-                        {clashing.map((item) => (
-                          <ClashPill
-                            key={item.id}
-                            label={`${item.roomTime[0].split(":")[0]} ${item.type}${item.number}`}
-                            onSelect={panelForward(() => {
-                              markClashLanding(item.courseId, item.type);
-                              return openCourse(item.courseId, item.type);
-                            })}
-                          />
-                        ))}
-                      </ClashingWith>
-                    </div>
+                  <div
+                    key={pane.type}
+                    data-current={offset === 0 || undefined}
+                    inert={offset !== 0}
+                    aria-hidden={offset !== 0 || undefined}
+                    className={cn(offset !== 0 && "absolute inset-x-0 top-0")}
+                    style={
+                      offset !== 0
+                        ? {
+                            transform: `translateX(calc(${offset} * (100% + var(--slide-gap))))`,
+                          }
+                        : undefined
+                    }
+                  >
+                    {renderList(pane.type, offset === 0)}
                   </div>
                 );
-              }
-              const selected = selectedIds.has(section.id);
-              const fresh = selected && !seen.current.ids.has(section.id);
-              return (
-                <button
-                  key={section.id}
-                  type="button"
-                  aria-pressed={selected}
-                  aria-busy={busy || undefined}
-                  onClick={() => handleSectionClick(section)}
-                  onPointerEnter={(e) => {
-                    if (e.pointerType === "mouse") hover(section.id);
-                  }}
-                  onPointerLeave={(e) => {
-                    if (e.pointerType === "mouse") hover(null);
-                  }}
-                  onAnimationEnd={(e) => {
-                    if (e.animationName === "cf-ring-pulse")
-                      setPulsedNonce(landed);
-                  }}
-                  className={cn(
-                    rowGrid,
-                    "relative w-full cursor-pointer items-start text-left transition-colors duration-(--d-2) focus-visible:outline-offset-[-2px]",
-                    selected
-                      ? "bg-brand-bg bg-[linear-gradient(to_right,var(--accent)_3px,transparent_3px)]"
-                      : "hover:bg-sunk",
-                    selected && pulse && "cf-ring-pulse",
-                    busy && "cursor-progress",
-                  )}
-                >
-                  <SectionText section={section} />
-                  {selected ? (
-                    <span
-                      onAnimationEnd={(e) => {
-                        if (e.animationName === "cf-tick-in")
-                          seen.current.ids.add(section.id);
-                      }}
-                      className={cn(
-                        "grid size-[22px] place-items-center self-center rounded-full bg-brand text-brand-ink",
-                        fresh &&
-                          "animate-[cf-tick-in_var(--d-3)_var(--e-spring)]",
-                      )}
-                    >
-                      <Check size={14} strokeWidth={3} aria-hidden="true" />
-                    </span>
-                  ) : (
-                    <span className="size-[22px] self-center rounded-full border-[1.5px] border-line" />
-                  )}
-                </button>
-              );
-            })}
+              })}
+            </div>
           </div>
         )}
       </div>
