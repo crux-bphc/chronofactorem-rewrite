@@ -23,10 +23,10 @@ function CourseText({
 }) {
   return (
     <span className="flex min-w-0 flex-col">
-      <span className="text-[15px] font-semibold text-ink">{course.code}</span>
-      <span className="text-[12.5px] text-ink-muted">
+      <span className="text-[15px] leading-snug font-semibold text-ink">
         {titleCase(course.name)}
       </span>
+      <span className="text-[12.5px] text-ink-muted">{course.code}</span>
       {extra}
     </span>
   );

@@ -5,6 +5,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { titleCase as nameCase } from "@/lib/titleCase";
 import { formatAxisHour } from "@/utils/timeFormat";
 import {
   blockName,
@@ -46,20 +47,47 @@ const padClass = "px-2.5 py-[9px] @max-[72px]:px-1 @max-[72px]:py-1.5";
 // on screen a code wraps whole words rather than truncating; the editor's ×
 // is always shown (as on master), so there the code floats a spacer under it
 // and words that would run under it wrap below it. the export truncates.
+// with days across, blocks share their day's width, so from 120px wide each
+// has room for the course name, which leads and truncates (the tooltip has it
+// in full) with the code moving down a line. with hours across, a block's
+// width follows its length, so the code stays and a course reads the same in
+// every block.
 function BlockLines({
   cell,
   scale,
+  named,
   remove = false,
 }: {
   cell: TimetableCell;
   scale: boolean;
+  named: boolean;
   remove?: boolean;
 }) {
+  const size = scale
+    ? "text-base min-[1920px]:text-lg min-[2560px]:text-xl min-[3200px]:text-2xl"
+    : "text-base";
+  const subSize = scale
+    ? "text-sm min-[1920px]:text-base min-[2560px]:text-lg min-[3200px]:text-xl"
+    : "text-sm";
   return (
     <>
-      <div className="@max-[72px]:hidden">
+      {named && (
+        <div className="hidden @min-[120px]:block">
+          <span
+            className={`block truncate leading-tight font-semibold ${size} ${remove ? "pr-4" : ""}`}
+          >
+            {nameCase(cell.name)}
+          </span>
+          <span className={`mt-[3px] block truncate text-ink-muted ${subSize}`}>
+            {`${cell.code} · ${cell.type}${cell.number} · ${cell.room}`}
+          </span>
+        </div>
+      )}
+      <div
+        className={`@max-[72px]:hidden ${named ? "@min-[120px]:hidden" : ""}`}
+      >
         <span
-          className={`block font-semibold ${scale ? "text-base min-[1920px]:text-lg min-[2560px]:text-xl min-[3200px]:text-2xl" : "text-base"} ${
+          className={`block font-semibold ${size} ${
             scale ? "leading-tight" : "truncate"
           }`}
         >
@@ -68,9 +96,7 @@ function BlockLines({
           )}
           {cell.code}
         </span>
-        <span
-          className={`mt-[3px] block truncate text-ink-muted ${scale ? "text-sm min-[1920px]:text-base min-[2560px]:text-lg min-[3200px]:text-xl" : "text-sm"}`}
-        >
+        <span className={`mt-[3px] block truncate text-ink-muted ${subSize}`}>
           {`${cell.type}${cell.number} · ${cell.room}`}
         </span>
       </div>
@@ -186,7 +212,7 @@ export function DeskGrid({
               }
             >
               <div className={padClass}>
-                <BlockLines cell={cell} scale={false} />
+                <BlockLines cell={cell} scale={false} named={!rows} />
               </div>
             </div>
           );
@@ -235,11 +261,11 @@ export function DeskGrid({
                     aria-label={`Edit ${cell.courseId} ${cell.type}${cell.number}, press Delete to remove`}
                     className={`flex size-full cursor-pointer flex-col justify-start rounded-md text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring disabled:opacity-60 ${padClass}`}
                   >
-                    <BlockLines cell={cell} scale remove />
+                    <BlockLines cell={cell} scale named={!rows} remove />
                   </button>
                 ) : (
                   <div className={`size-full ${padClass}`}>
-                    <BlockLines cell={cell} scale />
+                    <BlockLines cell={cell} scale named={!rows} />
                   </div>
                 )}
               </TooltipTrigger>
@@ -275,7 +301,7 @@ export function DeskGrid({
             }
           >
             <div className={padClass}>
-              <BlockLines cell={cell} scale />
+              <BlockLines cell={cell} scale named={!rows} />
             </div>
           </div>
         ))}

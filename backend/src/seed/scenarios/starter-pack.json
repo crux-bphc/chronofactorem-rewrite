@@ -129,7 +129,8 @@
           "private": true,
           "draft": true,
           "sections": {
-            "CS F407": ["L1"]
+            "CS F407": ["L1"],
+            "MEL G643": ["L1"]
           }
         }
       ]

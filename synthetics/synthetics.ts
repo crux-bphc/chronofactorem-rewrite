@@ -46,6 +46,12 @@ const search = async (page: Page, term: string) => {
   await page.waitForURL((url) => url.searchParams.get("q") === term);
 };
 
+// the desktop grid with days across; phones and tablets have no toggle
+const vertical = async (page: Page) => {
+  const toggle = page.getByLabel("Make timetable vertical");
+  if (await toggle.isVisible()) await toggle.click();
+};
+
 export const synthetics: Synthetic[] = [
   { name: "login", url: "/login" },
   { name: "about", url: "/about" },
@@ -108,8 +114,10 @@ export const synthetics: Synthetic[] = [
     hide: ["navbar", "timetable-header", "grid"],
     act: async (page) => {
       await search(page, "CS F407");
-      await page.getByText("CS F407").first().click();
-      await page.getByRole("heading", { name: "CS F407" }).waitFor();
+      await page.getByText("Artificial Intelligence").first().click();
+      await page
+        .getByRole("heading", { name: "Artificial Intelligence" })
+        .waitFor();
     },
   },
   {
@@ -129,9 +137,65 @@ export const synthetics: Synthetic[] = [
     hide: ["navbar", "timetable-header", "grid"],
     act: async (page) => {
       await search(page, "CS F407");
-      await page.getByText("CS F407").first().click();
-      await page.getByRole("heading", { name: "CS F407" }).waitFor();
+      await page.getByText("Artificial Intelligence").first().click();
+      await page
+        .getByRole("heading", { name: "Artificial Intelligence" })
+        .waitFor();
       await page.getByRole("button", { name: "Back" }).hover();
+    },
+  },
+  // MEL G643 has the longest course name in the scenario, and no practical
+  // yet so it shows up in the warnings too
+  { name: "edit-long-course-name", as: "hd", url: "/edit/{hd-draft}" },
+  {
+    name: "edit-long-course-name-vertical",
+    as: "hd",
+    url: "/edit/{hd-draft}",
+    hide: ["navbar", "side-menu"],
+    act: vertical,
+  },
+  {
+    name: "edit-long-course-name-courses",
+    as: "hd",
+    url: "/edit/{hd-draft}",
+    hide: ["navbar", "timetable-header", "grid"],
+    act: openMenu,
+  },
+  {
+    name: "edit-long-course-name-picker",
+    as: "hd",
+    url: "/edit/{hd-draft}",
+    hide: ["navbar", "timetable-header", "grid"],
+    act: async (page) => {
+      await openMenu(page);
+      // the phone agenda behind the sheet has the code too
+      await page
+        .locator("[data-course-id]")
+        .filter({ hasText: "MEL G643" })
+        .first()
+        .click();
+      await page
+        .getByRole("heading", { name: /^Verification, Test/ })
+        .waitFor();
+    },
+  },
+  {
+    name: "edit-long-course-name-exams",
+    as: "hd",
+    url: "/edit/{hd-draft}",
+    hide: ["navbar", "timetable-header", "grid"],
+    act: async (page) => {
+      await openTab(page, "Exams");
+    },
+  },
+  {
+    name: "edit-long-course-name-warnings",
+    as: "hd",
+    url: "/edit/{hd-draft}",
+    hide: ["navbar", "grid"],
+    act: async (page) => {
+      await page.getByRole("button", { name: /warnings$/ }).click();
+      await page.getByText("is missing a P section").first().waitFor();
     },
   },
   {
@@ -155,6 +219,37 @@ export const synthetics: Synthetic[] = [
     as: "alice",
     url: "/view/{alice-public}",
     hide: ["navbar"],
+  },
+  {
+    // the downloaded png in each theme, shown in place of the page. vertical,
+    // where the blocks have room for course names
+    name: "view-export",
+    as: "alice",
+    url: "/view/{alice-public}",
+    act: async (page) => {
+      await vertical(page);
+      const images: string[] = [];
+      for (const theme of ["light", "dark"] as const) {
+        await page.emulateMedia({ colorScheme: theme });
+        await page.waitForFunction(
+          (theme) => document.documentElement.classList.contains(theme),
+          theme,
+        );
+        const download = page.waitForEvent("download");
+        await page.getByRole("button", { name: "PNG" }).first().click();
+        const file = await (await download).createReadStream();
+        const chunks: Buffer[] = [];
+        for await (const chunk of file) chunks.push(chunk as Buffer);
+        images.push(Buffer.concat(chunks).toString("base64"));
+      }
+      await page.emulateMedia({ colorScheme: "light" });
+      const img = (png: string) =>
+        `<img style="display:block;width:100%" src="data:image/png;base64,${png}">`;
+      // both theme classes, so the runner's wait for each theme passes
+      await page.setContent(
+        `<html class="light dark"><body style="margin:0">${images.map(img).join("")}</body></html>`,
+      );
+    },
   },
   {
     name: "view-someone-else",

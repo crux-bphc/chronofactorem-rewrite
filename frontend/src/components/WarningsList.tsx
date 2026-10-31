@@ -62,15 +62,15 @@ export function WarningsList({
     <div className={cn("flex flex-col pb-3 lg:pb-0", className)}>
       {showSections && (
         <div className={group}>
-          {missingSections.flatMap(({ code, courseId, types }) =>
+          {missingSections.flatMap(({ code, name, courseId, types }) =>
             types.map((type) => (
               <div key={`${code}${type}`} className={row}>
                 <span className="flex min-w-0 flex-col">
-                  <span className="text-[15px] font-semibold text-ink">
-                    {code}
+                  <span className="text-[15px] leading-snug font-semibold text-ink">
+                    {name ? titleCase(name) : code}
                   </span>
                   <span className="text-[12.5px] text-ink-muted">
-                    is missing a {type} section
+                    {name && `${code} `}is missing a {type} section
                   </span>
                 </span>
                 {courseId && (
@@ -91,12 +91,12 @@ export function WarningsList({
             {missingCdcs.map((e) => (
               <div key={e.courseId ?? e.code} className={row}>
                 <span className="flex min-w-0 flex-col">
-                  <span className="text-[15px] font-semibold text-ink">
-                    {e.code}
+                  <span className="text-[15px] leading-snug font-semibold text-ink">
+                    {e.name ? titleCase(e.name) : e.code}
                   </span>
                   {e.name && (
                     <span className="text-[12.5px] text-ink-muted">
-                      {titleCase(e.name)}
+                      {e.code}
                     </span>
                   )}
                 </span>

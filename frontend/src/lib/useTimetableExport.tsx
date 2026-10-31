@@ -62,9 +62,11 @@ function ExamList({
   kind: "MIDSEM" | "COMPRE";
 }) {
   const {
-    state: { timetable },
+    state: { timetable, coursesInTimetable },
   } = useTimetableState();
   if (timetable === undefined) return null;
+  const nameOf = (code: string) =>
+    coursesInTimetable.find((c) => c?.code === code)?.name;
   const exams = timetable.examTimes
     .filter((e) => e.includes(`|${kind}|`))
     .map((e) => {
@@ -78,7 +80,14 @@ function ExamList({
       <ul className="mt-2 flex flex-col gap-1.5">
         {exams.map((exam) => (
           <li key={exam.code} className="flex gap-3 text-sm">
-            <span className="w-24 shrink-0 font-semibold">{exam.code}</span>
+            <span className="w-72 shrink-0 truncate">
+              <span className="font-semibold">
+                {titleCase(nameOf(exam.code) ?? exam.code)}
+              </span>
+              {nameOf(exam.code) && (
+                <span className="text-ink-muted">{` · ${exam.code}`}</span>
+              )}
+            </span>
             <span className="text-ink-muted">
               {formatExamRange(new Date(exam.start), new Date(exam.end))}
             </span>
@@ -199,10 +208,10 @@ export function useTimetableExport(): {
                     className="rounded-md border border-line bg-surface px-3 py-2"
                   >
                     <div className="text-sm">
-                      <span className="font-semibold">{course.code}</span>
-                      <span className="text-ink-muted">
-                        {`: ${titleCase(course.name)}`}
+                      <span className="font-semibold">
+                        {titleCase(course.name)}
                       </span>
+                      <span className="text-ink-muted">{` · ${course.code}`}</span>
                     </div>
                     <div className="text-xs text-ink-faint">
                       {timetable.sections
