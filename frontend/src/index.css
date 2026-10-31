@@ -434,26 +434,22 @@ html.theme-transition * {
 }
 @keyframes cf-panel-out-forward {
   to {
-    transform: translateX(-24px);
-    opacity: 0;
+    transform: translateX(calc(-100% - var(--cf-panel-gap, 0px)));
   }
 }
 @keyframes cf-panel-in-forward {
   from {
-    transform: translateX(24px);
-    opacity: 0;
+    transform: translateX(calc(100% + var(--cf-panel-gap, 0px)));
   }
 }
 @keyframes cf-panel-out-back {
   to {
-    transform: translateX(24px);
-    opacity: 0;
+    transform: translateX(calc(100% + var(--cf-panel-gap, 0px)));
   }
 }
 @keyframes cf-panel-in-back {
   from {
-    transform: translateX(-24px);
-    opacity: 0;
+    transform: translateX(calc(-100% - var(--cf-panel-gap, 0px)));
   }
 }
 .cf-ring-pulse::after {
@@ -471,9 +467,25 @@ html.theme-transition * {
   html:active-view-transition-type(panel-forward, panel-back) .cf-panel {
     view-transition-name: cf-panel;
   }
+  /* snapshots ignore parent overflow; keep the push inside the panel */
+  ::view-transition-image-pair(cf-panel) {
+    overflow: clip;
+  }
+  /* phone panels are inset 16px a side; desktop ones touch without a gap */
+  @media (min-width: 1024px) {
+    :root {
+      --cf-panel-gap: 32px;
+    }
+  }
+  /* no cross-fade, so drop the UA's plus-lighter blend */
+  ::view-transition-old(cf-panel),
+  ::view-transition-new(cf-panel) {
+    mix-blend-mode: normal;
+    opacity: 1;
+  }
   html:active-view-transition-type(panel-forward) {
     &::view-transition-old(cf-panel) {
-      animation: cf-panel-out-forward var(--d-3) var(--e-in) both;
+      animation: cf-panel-out-forward var(--d-3) var(--e-out) both;
     }
     &::view-transition-new(cf-panel) {
       animation: cf-panel-in-forward var(--d-3) var(--e-out) both;
@@ -481,7 +493,7 @@ html.theme-transition * {
   }
   html:active-view-transition-type(panel-back) {
     &::view-transition-old(cf-panel) {
-      animation: cf-panel-out-back var(--d-3) var(--e-in) both;
+      animation: cf-panel-out-back var(--d-3) var(--e-out) both;
     }
     &::view-transition-new(cf-panel) {
       animation: cf-panel-in-back var(--d-3) var(--e-out) both;
