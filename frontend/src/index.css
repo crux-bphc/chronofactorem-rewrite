@@ -558,7 +558,13 @@ html.theme-transition * {
       animation: tt-root-in var(--d-2) var(--e-out) both;
     }
     /* the grid card is its own group; fade it like the page so the old and
-    new axis labels don't overlap mid-morph */
+    new axis labels don't overlap mid-morph. the home-card rule covers the
+    group with each snapshot, which blows the agenda's time column up while
+    the group is still week-sized, so keep these at their own size too */
+    &::view-transition-old(timetable-grid),
+    &::view-transition-new(timetable-grid) {
+      object-fit: none;
+    }
     &::view-transition-old(timetable-grid) {
       animation: tt-root-out var(--d-2) var(--e-out) both;
     }
