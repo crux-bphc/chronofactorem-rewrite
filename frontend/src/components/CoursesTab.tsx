@@ -1,9 +1,12 @@
+import { unknownDegree } from "lib";
+import { ExternalLink } from "lucide-react";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useTimetableState } from "@/context";
 import { panelForward } from "@/lib/panelTransition";
 import { useTimetableNav } from "@/lib/useTimetableNav";
+import { useWarningsSummary } from "@/lib/useWarningsSummary";
 import { cn } from "@/lib/utils";
-import { getRemainingCdcs } from "@/utils/timetable";
+import { cdcIssueUrl, cdcListFor, getRemainingCdcs } from "@/utils/timetable";
 import { CourseRow, OptionalSet } from "./CourseRow";
 import { Collapse } from "./ui/collapse";
 
@@ -34,6 +37,7 @@ export function CoursesTab({ editable }: { editable: boolean }) {
     state: { timetable, coursesInTimetable, cdcs },
   } = useTimetableState();
   const { openCourse } = useTimetableNav();
+  const { notFound } = useWarningsSummary();
   const timetableId = timetable?.id ?? "";
 
   const remaining = useMemo(
@@ -143,6 +147,13 @@ export function CoursesTab({ editable }: { editable: boolean }) {
       : live.has(e.course.id),
   );
 
+  // Nothing to look up without a known degree and year.
+  const noCdcList =
+    timetable.year !== 0 &&
+    !timetable.degrees.includes(unknownDegree) &&
+    cdcListFor(timetable) === undefined;
+  const showCdcNotice = editable && (noCdcList || notFound.length > 0);
+
   return (
     <div ref={listRef} className="flex flex-col pt-2 pb-6">
       <div className={overline}>Added · {coursesInTimetable.length}</div>
@@ -203,6 +214,28 @@ export function CoursesTab({ editable }: { editable: boolean }) {
             })}
           </div>
         </>
+      )}
+      {showCdcNotice && (
+        <div className="mx-4 mt-[22px] flex flex-col gap-1 rounded-xl bg-sunk px-3.5 py-3 text-[13px] text-ink-muted lg:mx-0">
+          <span>
+            {notFound.length > 0
+              ? "Chrono could not find some of your CDCs in the list of courses."
+              : `Chrono has no CDCs listed for ${timetable.degrees.join("")} ${timetable.year}-${timetable.semester}.`}
+          </span>
+          {notFound.map((w) => (
+            <span key={w}>{w}</span>
+          ))}
+          <span>
+            {notFound.length > 0 ? "Please " : "If you have CDCs, please "}
+            <a
+              href={cdcIssueUrl(timetable, notFound)}
+              className="inline-flex items-baseline gap-1 text-brand underline underline-offset-2"
+            >
+              {notFound.length > 0 ? "report this issue" : "let us know"}
+              <ExternalLink size={12} />
+            </a>
+          </span>
+        </div>
       )}
     </div>
   );

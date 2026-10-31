@@ -43,15 +43,12 @@ export const hasUnknownCourses = (
   return timetable.sections.some((x) => !ids.has(x.courseId));
 };
 
-export const formatCDCWarningsAndOptions = (
-  courses: z.infer<typeof courseType>[],
-  timetable: z.infer<typeof timetableWithSectionsType>,
-) => {
-  let cdcs: string[];
-  const coursesList = [];
+type CdcTimetable = Pick<
+  z.infer<typeof timetableWithSectionsType>,
+  "degrees" | "year" | "semester"
+>;
 
-  if (timetable === undefined || courses === undefined) return [];
-
+export const cdcListFor = (timetable: CdcTimetable): string[] | undefined => {
   // CDCs.json is keyed by degree combo: the timetable's degrees sorted,
   // reversed, and joined (for example "B1A1"). Each combo maps
   // "year-semester" to course codes, where "ECON/MGTS F211/F211" means
@@ -66,11 +63,21 @@ export const formatCDCWarningsAndOptions = (
   const cdcListKey =
     `${timetable.year}-${timetable.semester}` as keyof (typeof CDCList)[typeof degree];
 
-  if (degree in CDCList && cdcListKey in CDCList[degree]) {
-    cdcs = CDCList[degree][cdcListKey];
-  } else {
-    return [];
-  }
+  return degree in CDCList && cdcListKey in CDCList[degree]
+    ? CDCList[degree][cdcListKey]
+    : undefined;
+};
+
+export const formatCDCWarningsAndOptions = (
+  courses: z.infer<typeof courseType>[],
+  timetable: z.infer<typeof timetableWithSectionsType>,
+) => {
+  const coursesList = [];
+
+  if (timetable === undefined || courses === undefined) return [];
+
+  const cdcs = cdcListFor(timetable);
+  if (cdcs === undefined) return [];
 
   // Code based on temp frontend
   for (let i = 0; i < cdcs.length; i++) {
@@ -189,4 +196,27 @@ export const timetableMeta = (t: {
   parts.push(`${t.acadYear}–${String(t.acadYear + 1).slice(2)}`);
   if (!t.degrees.includes(unknownDegree)) parts.push(t.degrees.join(""));
   return parts;
+};
+
+// Pre-fill data we know so that issues are more helpful and easier to file
+export const cdcIssueUrl = (
+  t: CdcTimetable & { acadYear: number },
+  notFound: string[],
+): string => {
+  const sem = `${t.year}-${t.semester}`;
+  const body = [
+    notFound.length > 0
+      ? "Chrono could not find some of my CDCs in the list of courses."
+      : "Chrono does not list any CDCs for my degree and semester.",
+    "",
+    `- Degree: ${t.degrees.join(", ")}`,
+    `- Year and semester: ${sem}`,
+    `- Timetable: ${t.acadYear}–${String(t.acadYear + 1).slice(2)}, semester ${t.semester}`,
+    ...(notFound.length > 0 ? ["", ...notFound.map((w) => `- ${w}`)] : []),
+  ].join("\n");
+  const params = new URLSearchParams({
+    title: `CDCs not found for ${t.degrees.join("")} ${sem}`,
+    body,
+  });
+  return `https://github.com/crux-bphc/chronofactorem-rewrite/issues/new?${params}`;
 };

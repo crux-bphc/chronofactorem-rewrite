@@ -1,9 +1,11 @@
 import { ArrowUpRight } from "lucide-react";
+import { useTimetableState } from "@/context";
 import { panelForward } from "@/lib/panelTransition";
 import { titleCase } from "@/lib/titleCase";
 import { useTimetableNav } from "@/lib/useTimetableNav";
 import { useWarningsSummary } from "@/lib/useWarningsSummary";
 import { cn } from "@/lib/utils";
+import { cdcIssueUrl } from "@/utils/timetable";
 import { Button } from "./ui/button";
 
 const overline =
@@ -41,6 +43,9 @@ export function WarningsList({
 }) {
   const { missingSections, missingCdcs, notFound } = useWarningsSummary();
   const { openCourse, showTab } = useTimetableNav();
+  const {
+    state: { timetable },
+  } = useTimetableState();
 
   const showSections = missingSections.length > 0;
   const showCdcs = missingCdcs.length > 0;
@@ -117,7 +122,11 @@ export function WarningsList({
             <span className="text-ink">
               Please{" "}
               <a
-                href="https://github.com/crux-bphc/chronofactorem-rewrite/issues"
+                href={
+                  timetable
+                    ? cdcIssueUrl(timetable, notFound)
+                    : "https://github.com/crux-bphc/chronofactorem-rewrite/issues"
+                }
                 className="text-brand"
               >
                 report this issue
