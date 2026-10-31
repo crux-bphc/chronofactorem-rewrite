@@ -141,7 +141,6 @@ export function TimetableSurface({
                 axis="y"
                 label={label}
                 cell={{ gridColumn: pos.day + 2, gridRow: pos.hour + 2 }}
-                band={{ gridColumn: "2 / -1", gridRow: pos.hour + 2 }}
               />
             )
           }
@@ -174,11 +173,6 @@ export function TimetableSurface({
                 orientation === "rows"
                   ? { gridRow: pos.day + 2, gridColumn: pos.hour + 2 }
                   : { gridColumn: pos.day + 2, gridRow: pos.hour + 2 }
-              }
-              band={
-                orientation === "rows"
-                  ? { gridRow: "2 / -1", gridColumn: pos.hour + 2 }
-                  : { gridColumn: "2 / -1", gridRow: pos.hour + 2 }
               }
             />
           )
