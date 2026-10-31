@@ -237,10 +237,7 @@
     animation-duration: var(--d-3);
   }
 
-  /* toasts sit above everything, sheets included. left in the root snapshot,
-  any named snapshot (the course panel, the grid) would paint over a toast and
-  blink it out until the transition ends, so lift them into their own group on
-  top and show them live, like the phone dock */
+  /* render toasts above everything */
   html:active-view-transition-type(
     forward,
     back,
