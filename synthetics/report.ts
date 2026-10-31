@@ -9,6 +9,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { crc32 } from "node:zlib";
 import sharp from "sharp";
 import { synthetics } from "./synthetics.js";
 
@@ -78,42 +79,94 @@ const read = (commit: string, path: string) =>
 const sha256 = (data: Buffer) =>
   createHash("sha256").update(data).digest("hex");
 
-// the changed pixels in red over a faded copy of the new screenshot
-const diffImage = async (before: Buffer, after: Buffer) => {
-  const [a, b] = await Promise.all(
-    [before, after].map((png) =>
-      sharp(png).removeAlpha().raw().toBuffer({ resolveWithObject: true }),
+// a png's chunks, after its 8-byte signature
+const chunks = (png: Buffer) => {
+  const out: { type: string; data: Buffer }[] = [];
+  for (let at = 8; at < png.length; ) {
+    const length = png.readUInt32BE(at);
+    out.push({
+      type: png.toString("latin1", at + 4, at + 8),
+      data: png.subarray(at + 8, at + 8 + length),
+    });
+    at += length + 12;
+  }
+  return out;
+};
+const chunk = (type: string, data: Buffer) => {
+  const head = Buffer.alloc(8);
+  head.writeUInt32BE(data.length);
+  head.write(type, 4, "latin1");
+  const crc = Buffer.alloc(4);
+  crc.writeUInt32BE(crc32(Buffer.concat([head.subarray(4), data])));
+  return Buffer.concat([head, data, crc]);
+};
+
+// before and after as the two frames of an animated png that switches
+// between them, so a change shows up as flicker. apng rather than webp or gif
+// because raw.githubusercontent.com only serves .png as an image, and
+// github's image proxy drops anything else. sharp can't write apng, so it
+// encodes each frame and their image data is put into one file here. the
+// smaller screenshot is padded with white to the larger
+const BLINK_MS = 800;
+const blinkImage = async (before: Buffer, after: Buffer) => {
+  const sizes = await Promise.all(
+    [before, after].map((png) => sharp(png).metadata()),
+  );
+  const width = Math.max(...sizes.map((size) => size.width));
+  const height = Math.max(...sizes.map((size) => size.height));
+  const frames = await Promise.all(
+    [before, after].map(async (png, i) =>
+      chunks(
+        await sharp(png)
+          .removeAlpha()
+          .toColourspace("srgb")
+          .extend({
+            right: width - sizes[i].width,
+            bottom: height - sizes[i].height,
+            background: "#ffffff",
+          })
+          .png({ compressionLevel: 9 })
+          .toBuffer(),
+      ),
     ),
   );
-  const width = Math.max(a.info.width, b.info.width);
-  const height = Math.max(a.info.height, b.info.height);
-  const out = Buffer.alloc(width * height * 3);
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const o = (y * width + x) * 3;
-      const inA = x < a.info.width && y < a.info.height;
-      const inB = x < b.info.width && y < b.info.height;
-      const ia = (y * a.info.width + x) * 3;
-      const ib = (y * b.info.width + x) * 3;
-      const same =
-        inA &&
-        inB &&
-        a.data[ia] === b.data[ib] &&
-        a.data[ia + 1] === b.data[ib + 1] &&
-        a.data[ia + 2] === b.data[ib + 2];
-      if (same) {
-        for (let c = 0; c < 3; c++)
-          out[o + c] = 255 - (255 - b.data[ib + c]) / 4;
-      } else {
-        out[o] = 230;
-        out[o + 1] = 30;
-        out[o + 2] = 30;
-      }
-    }
-  }
-  return sharp(out, { raw: { width, height, channels: 3 } })
-    .png({ compressionLevel: 9 })
-    .toBuffer();
+  const [ihdr, otherIhdr] = frames.map(
+    (frame) => frame.find(({ type }) => type === "IHDR")?.data as Buffer,
+  );
+  if (!ihdr.equals(otherIhdr)) throw new Error("blink frames don't match");
+  let sequence = 0;
+  const frameControl = () => {
+    const data = Buffer.alloc(26);
+    data.writeUInt32BE(sequence++);
+    data.writeUInt32BE(width, 4);
+    data.writeUInt32BE(height, 8);
+    // offset 0,0, then the delay as a fraction of a second, then no disposal
+    // and the frame replacing the last rather than drawn over it
+    data.writeUInt16BE(BLINK_MS, 20);
+    data.writeUInt16BE(1000, 22);
+    return chunk("fcTL", data);
+  };
+  const animation = Buffer.alloc(8);
+  animation.writeUInt32BE(frames.length);
+  // and 0 plays, which loops forever
+  return Buffer.concat([
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    chunk("IHDR", ihdr),
+    chunk("acTL", animation),
+    ...frames.flatMap((frame, i) => [
+      frameControl(),
+      ...frame
+        .filter(({ type }) => type === "IDAT")
+        .map(({ data }) => {
+          // the first frame is the png's own image, later ones are fdAT
+          if (!i) return chunk("IDAT", data);
+          const number = Buffer.alloc(4);
+          number.writeUInt32BE(sequence++);
+          return chunk("fdAT", Buffer.concat([number, data]));
+        }),
+    ]),
+    chunk("IEND", Buffer.alloc(0)),
+  ]);
 };
 
 type Manifest = Record<string, string>;
@@ -239,15 +292,15 @@ const files = new Map<string, Buffer>();
 for (const [, { data, hash }] of noBaseline ? [] : [...changed, ...added]) {
   files.set(`img/${hash}.png`, data);
 }
-const diffs = new Map<string, string>();
+const blinks = new Map<string, string>();
 await Promise.all(
   changed.map(async ([path, { data, hash }]) => {
-    const name = `diff/${baseline[path]}-${hash}.png`;
+    const name = `blink/${baseline[path]}-${hash}.png`;
     const before = read(parent?.commit as string, `img/${baseline[path]}.png`);
     if (!before)
       throw new Error(`no img/${baseline[path]}.png in refs/${IMAGES_REF}`);
-    files.set(name, await diffImage(before, data));
-    diffs.set(path, name);
+    files.set(name, await blinkImage(before, data));
+    blinks.set(path, name);
   }),
 );
 // a merge that changed no screenshot leaves the baseline alone
@@ -347,12 +400,12 @@ if (noBaseline) {
       ...section(
         changed,
         ([path]) => path,
-        ["", "before", "after", "diff"],
+        ["", "before", "after", "blink"],
         ([path, { hash }]) => [
           name(path),
           thumb(`img/${baseline[path]}.png`),
           thumb(`img/${hash}.png`),
-          thumb(diffs.get(path) as string),
+          thumb(blinks.get(path) as string),
         ],
       ),
     );
