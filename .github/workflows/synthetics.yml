@@ -1,20 +1,25 @@
-name: Update synthetics screenshots
+name: Synthetics screenshots
 
+# master's screenshots are the baseline, a pull request gets a comment with
+# what it changes against that. see synthetics/report.ts
 on:
   pull_request:
     types: [ labeled, synchronize ]
     # only what can change a screenshot
-    paths:
+    paths: &paths
       - frontend/**
       - backend/**
       - lib/**
       - synthetics/**
       - pnpm-lock.yaml
       - .github/workflows/synthetics.yml
+  push:
+    branches: [ master ]
+    paths: *paths
 
 # new pushes should cancel older ones
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 env:
@@ -27,7 +32,7 @@ jobs:
   # the 2.5gb image pull
   shoot:
     # same ready gate as ci.yml
-    if: ${{ (github.event.label.name == 'ready' || contains(github.event.pull_request.labels.*.name, 'ready')) && github.event.pull_request.head.repo.full_name == github.repository }}
+    if: ${{ github.event_name == 'push' || ((github.event.label.name == 'ready' || contains(github.event.pull_request.labels.*.name, 'ready')) && github.event.pull_request.head.repo.full_name == github.repository) }}
     runs-on: ubuntu-24.04
     strategy:
       matrix:
@@ -37,7 +42,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       # the runner ships postgres, starting it beats pulling an image. it boots
       # in the background while everything else installs
@@ -88,19 +93,40 @@ jobs:
           path: synthetics/screenshots
           retention-days: 1
 
-  commit:
+  report:
     needs: shoot
     runs-on: ubuntu-24.04
     permissions:
+      # writes the images under refs/synthetics/images, not to any branch
       contents: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
-      # wiped first so screenshots of removed synthetics go away too
-      - run: rm -rf synthetics/screenshots
+      - name: Install Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Install pnpm
+        run: npm i -g pnpm@11.18.0 --no-fund --no-audit
+
+      - name: Cache dependencies and Chromium
+        id: cache
+        uses: actions/cache@v6
+        with:
+          path: |
+            node_modules
+            */node_modules
+            ~/.cache/ms-playwright
+          key: synthetics-modules-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: pnpm install -r --frozen-lockfile
 
       - uses: actions/download-artifact@v8
         with:
@@ -108,21 +134,10 @@ jobs:
           path: synthetics/screenshots
           merge-multiple: true
 
-      # commits made with this token don't trigger workflows, so this can't
-      # loop
-      # human comment: what the FUCK!
-      # https://github.com/orgs/community/discussions/119597
-      # how is this real holy shit
-      - name: Commit changed screenshots
-        run: |
-          if [ "$(git rev-parse HEAD)" != "${{ github.event.pull_request.head.sha }}" ]; then
-            echo "the branch moved on since these were shot, its own run commits"
-            exit 0
-          fi
-          git add -A synthetics/screenshots
-          git diff --cached --quiet && exit 0
-          git diff --cached --stat | tail -1
-          git -c user.name="github-actions[bot]" \
-            -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
-            commit -m "chore: update synthetics screenshots"
-          git push
+      - name: Report
+        run: pnpm -C synthetics report
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BASELINE: ${{ github.event_name == 'push' }}

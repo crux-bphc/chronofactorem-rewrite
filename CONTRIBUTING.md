@@ -21,11 +21,11 @@
 
 ## Screenshots (beta)
 
-A bunch of important pages are defined in `synthetics/synthetics.ts`, against the `starter-pack` seed scenario (`backend/src/seed/scenarios/starter-pack.json`). In CI we're trying to generate a folder of screenshots `synthetics/screenshots/`, on a mix of devices, in both light and dark mode. Once a PR has the `ready` label, a bot re-checks them on every push and commits whatever changed to the PR branch, so the PR's "Files changed" tab shows exactly which screens your change touched.
+A bunch of important pages are defined in `synthetics/synthetics.ts`, against the `starter-pack` seed scenario (`backend/src/seed/scenarios/starter-pack.json`). CI screenshots them on a phone, a tablet and a laptop, in both light and dark mode. Every merge to master makes those screenshots the baseline. Once a PR has the `ready` label, every push gets compared against it, and a bot comment on the PR shows each screen that changed, before, after, and a diff with the changed pixels in red. The comment is edited in place, so there's always just one.
 
-- Pull before pushing again, since the bot may have committed to your branch.
-- If screenshots conflict while rebasing, you can commit any side, the CI bot will overwrite with the latest screenshots anyways
+- The bot never commits to your branch, so there's nothing to pull.
+- The images live under `refs/synthetics/images` in this repo, not on a branch, so they don't bloat clones. Nothing there is ever deleted, so old reports keep working.
 - To add a screen, add an entry to `synthetics/synthetics.ts`, and add any data it needs to the `starter-pack` scenario.
-- To take them locally, run `pnpm -C synthetics start` with a Postgres reachable through `DB_HOST`/`PGPORT`/`POSTGRES_USER`/`POSTGRES_PASSWORD`. Local screenshots usually won't byte-match CI's (different fonts and OS), so don't commit them, just rely on CI.
+- To take them locally, run `pnpm -C synthetics start` with a Postgres reachable through `DB_HOST`/`PGPORT`/`POSTGRES_USER`/`POSTGRES_PASSWORD`. They land in `synthetics/screenshots/`, which is gitignored.
 
 Since this can be a bit flaky and runs in CI we want to be a bit careful with this, it should be considered unstable for now and PR reviewers should verify the screenshots properly.
