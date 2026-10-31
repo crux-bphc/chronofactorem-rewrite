@@ -91,28 +91,30 @@ function GetDegrees() {
 
   return (
     <div className="min-h-dvh flex flex-col bg-bg text-ink">
-      <div className="mx-auto w-full max-w-[400px] px-6 pt-16 flex-1">
-        <h1 className="text-3xl font-semibold">Register</h1>
-        <div className="mt-8">
-          <DegreeDropDown
-            firstDegree={firstDegree}
-            secondDegree={secondDegree}
-            setFirstDegree={setFirstDegree}
-            setSecondDegree={setSecondDegree}
-            year={year}
-            showLabels
-          />
+      <div className="mx-auto w-full max-w-[400px] flex-1 flex flex-col px-6 pt-16 lg:justify-center lg:pt-0">
+        <div className="flex-1 lg:flex-none">
+          <h1 className="text-3xl font-semibold">Register</h1>
+          <div className="mt-8">
+            <DegreeDropDown
+              firstDegree={firstDegree}
+              secondDegree={secondDegree}
+              setFirstDegree={setFirstDegree}
+              setSecondDegree={setSecondDegree}
+              year={year}
+              showLabels
+            />
+          </div>
         </div>
-      </div>
-      <div className="mx-auto w-full max-w-[400px] px-6 pt-6">
-        <Button
-          className="w-full"
-          onClick={handleSubmit}
-          disabled={isPending}
-          aria-busy={isPending}
-        >
-          <ButtonLabel loading={isPending}>Continue</ButtonLabel>
-        </Button>
+        <div className="pt-6 lg:pt-8">
+          <Button
+            className="w-full"
+            onClick={handleSubmit}
+            disabled={isPending}
+            aria-busy={isPending}
+          >
+            <ButtonLabel loading={isPending}>Continue</ButtonLabel>
+          </Button>
+        </div>
       </div>
       <p className="text-sm text-ink-muted text-center px-6 pt-6 pb-[22px]">
         Powered by CRUx: The Programming and Computing Club of BITS Hyderabad

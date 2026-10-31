@@ -1,6 +1,6 @@
 import { Link, Route } from "@tanstack/react-router";
 import { AxiosError } from "axios";
-import { ChevronRight } from "lucide-react";
+import { AtSign, ChevronRight } from "lucide-react";
 import toastHandler from "@/data-access/errors/toastHandler";
 import { authStatusQueryOptions } from "@/data-access/hooks/useAuthStatus";
 import { ThemeButton } from "../components/ThemeButton";
@@ -56,7 +56,10 @@ function Login() {
         </div>
         <div className={enter} style={stagger(1)}>
           <Button className="w-full mt-7" asChild>
-            <a href="/api/auth/logto">Login</a>
+            <a href="/api/auth/logto">
+              <AtSign className="size-5" />
+              Login
+            </a>
           </Button>
         </div>
         <div className={enter} style={stagger(2)}>
