@@ -1,5 +1,6 @@
 import type { courseType, timetableWithSectionsType } from "lib";
 import type z from "zod";
+import type { CDCType } from "@/context/types";
 import CDCList from "@/data/CDCs.json";
 
 export const filterCoursesInTimetable = (
@@ -73,18 +74,29 @@ export const formatCDCWarningsAndOptions = (
         options.push(`${depts.split("/")[j]} ${codes.split("/")[j]}`);
       }
       const matchedCourses = courses.filter((e) => options.includes(e.code));
-      if (matchedCourses.length < options.length) {
+      if (matchedCourses.length === 0) {
         coursesList.push({
           id: null,
           type: "warning" as const,
           warning: `One CDC of ${options.join(", ")} not found`,
         });
       } else {
+        // A partly found set still offers the options that exist; each
+        // missing option is reported on its own.
         coursesList.push({
           id: null,
           type: "optional" as const,
           options: matchedCourses,
         });
+        for (const code of options) {
+          if (!matchedCourses.some((e) => e.code === code)) {
+            coursesList.push({
+              id: null,
+              type: "warning" as const,
+              warning: `CDC ${code} not found`,
+            });
+          }
+        }
       }
     } else {
       const matchedCourses = courses.filter((e) => e.code === cdcs[i]);
@@ -102,3 +114,59 @@ export const formatCDCWarningsAndOptions = (
 
   return coursesList;
 };
+
+type Course = z.infer<typeof courseType>;
+
+export type RemainingEntry =
+  | { kind: "course"; course: Course }
+  | { kind: "set"; key: string; options: Course[] };
+
+/**
+ * CDCs not yet in the timetable, in CDC order. A set leaves as soon as any
+ * of its options is added. Not-found warnings are never included.
+ */
+export const getRemainingCdcs = (
+  cdcs: CDCType[],
+  added: Course[],
+): RemainingEntry[] => {
+  const addedIds = new Set(added.map((c) => c.id));
+  const remaining: RemainingEntry[] = [];
+  for (const cdc of cdcs) {
+    if (cdc.id !== null) {
+      if (!addedIds.has(cdc.id))
+        remaining.push({ kind: "course", course: cdc });
+    } else if (cdc.type === "optional") {
+      if (!cdc.options.some((o) => addedIds.has(o.id))) {
+        remaining.push({
+          kind: "set",
+          key: cdc.options.map((o) => o.id).join("|"),
+          options: cdc.options,
+        });
+      }
+    }
+  }
+  return remaining;
+};
+
+/** CDCs missing from the timetable. An unsatisfied set has no course id. */
+export const getMissingCdcs = (
+  cdcs: CDCType[],
+  added: Course[],
+): { courseId: string | null; code: string; name: string }[] =>
+  getRemainingCdcs(cdcs, added).map((entry) => {
+    const single =
+      entry.kind === "course"
+        ? entry.course
+        : entry.options.length === 1
+          ? entry.options[0]
+          : null;
+    return single
+      ? { courseId: single.id, code: single.code, name: single.name }
+      : {
+          courseId: null,
+          code: (entry as Extract<RemainingEntry, { kind: "set" }>).options
+            .map((c) => c.code)
+            .join(" (or) "),
+          name: "",
+        };
+  });

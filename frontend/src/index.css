@@ -272,3 +272,111 @@ html.theme-transition::view-transition-new(root) {
     background-position: -200% 0;
   }
 }
+
+/* Courses motion */
+@keyframes cf-roll-out {
+  to {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+@keyframes cf-roll-in {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+@keyframes cf-tick-in {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes cf-ring-pulse {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  40% {
+    opacity: 0.9;
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+@keyframes cf-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes cf-hop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+@keyframes cf-panel-out-forward {
+  to {
+    transform: translateX(-24px);
+    opacity: 0;
+  }
+}
+@keyframes cf-panel-in-forward {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+}
+@keyframes cf-panel-out-back {
+  to {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+}
+@keyframes cf-panel-in-back {
+  from {
+    transform: translateX(-24px);
+    opacity: 0;
+  }
+}
+.cf-ring-pulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid var(--accent);
+  pointer-events: none;
+  /* Starts once the push transition that landed here has played. */
+  animation: cf-ring-pulse 600ms var(--e-out) var(--d-3) 1 both;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html:active-view-transition-type(panel-forward) {
+    &::view-transition-old(cf-panel) {
+      animation: cf-panel-out-forward var(--d-3) var(--e-in) both;
+    }
+    &::view-transition-new(cf-panel) {
+      animation: cf-panel-in-forward var(--d-3) var(--e-out) both;
+    }
+  }
+  html:active-view-transition-type(panel-back) {
+    &::view-transition-old(cf-panel) {
+      animation: cf-panel-out-back var(--d-3) var(--e-in) both;
+    }
+    &::view-transition-new(cf-panel) {
+      animation: cf-panel-in-back var(--d-3) var(--e-out) both;
+    }
+  }
+}

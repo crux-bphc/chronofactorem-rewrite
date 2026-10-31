@@ -15,13 +15,25 @@ export type Synthetic = {
   unreadAnnouncements?: boolean;
 };
 
-// on phones the side menu tabs live behind a button
-const openTab = async (page: Page, name: string) => {
+// on phones the side menu lives behind a button
+const openMenu = async (page: Page) => {
   const menu = page.getByRole("button", { name: "Courses and exams" });
-  const tab = page.getByRole("tab", { name });
-  await menu.or(tab).first().waitFor();
+  const tabs = page.getByRole("tablist", { name: "Timetable details" });
+  await menu.or(tabs).first().waitFor();
   if (await menu.isVisible()) await menu.click();
-  await tab.click();
+};
+
+const openTab = async (page: Page, name: string) => {
+  await openMenu(page);
+  await page.getByRole("tab", { name }).click();
+};
+
+// the search box is debounced into ?q=, and the results only filter once
+// that lands
+const search = async (page: Page, term: string) => {
+  await openMenu(page);
+  await page.getByRole("searchbox", { name: "Search Courses" }).fill(term);
+  await page.waitForURL((url) => url.searchParams.get("q") === term);
 };
 
 export const synthetics: Synthetic[] = [
@@ -50,8 +62,7 @@ export const synthetics: Synthetic[] = [
     as: "alice",
     url: "/edit/{alice-packed}",
     act: async (page) => {
-      await openTab(page, "Search");
-      await page.getByPlaceholder("Search Courses").fill("CS F");
+      await search(page, "CS F");
     },
   },
   {
@@ -59,10 +70,9 @@ export const synthetics: Synthetic[] = [
     as: "alice",
     url: "/edit/{alice-packed}",
     act: async (page) => {
-      await openTab(page, "Search");
-      await page.getByPlaceholder("Search Courses").fill("CS F407");
+      await search(page, "CS F407");
       await page.getByText("CS F407").first().click();
-      await page.getByText("CS F407: ").waitFor();
+      await page.getByRole("heading", { name: "CS F407" }).waitFor();
     },
   },
   {
