@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTimetableState } from "@/context";
 import { PANEL_VT_CLASS } from "@/lib/panelTransition";
@@ -39,6 +39,14 @@ export function SideMenu({
     }, 200);
     return () => clearTimeout(id);
   }, [draftTerm, setQuery]);
+  const inputRef = useRef<HTMLInputElement>(null);
+  // Clearing skips the debounce so the normal list comes straight back.
+  const clearSearch = () => {
+    lastSent.current = "";
+    setDraftTerm("");
+    setQuery("");
+    inputRef.current?.focus();
+  };
 
   if (timetable === undefined) return;
 
@@ -66,13 +74,31 @@ export function SideMenu({
             className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-ink-faint"
           />
           <Input
+            ref={inputRef}
             type="search"
             aria-label="Search Courses"
             placeholder="Search Courses"
             value={draftTerm}
             onChange={(e) => setDraftTerm(e.target.value)}
-            className="pl-10 text-base [&::-webkit-search-cancel-button]:appearance-none"
+            // the phone sheet leaves Escape to us while there's text
+            onKeyDown={(e) => {
+              if (e.key === "Escape" && draftTerm !== "") {
+                e.preventDefault();
+                clearSearch();
+              }
+            }}
+            className="pr-11 pl-10 text-base [&::-webkit-search-cancel-button]:appearance-none"
           />
+          {draftTerm !== "" && (
+            <button
+              type="button"
+              aria-label="Clear search"
+              onClick={clearSearch}
+              className="absolute top-1/2 right-1.5 grid size-8 -translate-y-1/2 cursor-pointer place-items-center rounded-full text-ink-muted transition-colors duration-(--d-1) after:absolute after:-inset-1.5 after:content-[''] hover:bg-sunk hover:text-ink focus-visible:outline-2 focus-visible:outline-ring"
+            >
+              <X size={18} aria-hidden="true" />
+            </button>
+          )}
         </div>
       )}
       {searching ? (
