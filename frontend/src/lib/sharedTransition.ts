@@ -1,12 +1,7 @@
-// frontend/src/lib/sharedTransition.ts
 import type { ParsedLocation } from "@tanstack/react-router";
 
-/**
- * Shared-element view transition between a home card and the timetable
- * pages. A name may appear only once per page, so home gives them to the
- * card of the timetable at the other end of the navigation, and to no card
- * at all when home is entered from or left for any other page.
- */
+// A view-transition name may appear only once per page, so only the card
+// at the other end of a home <-> timetable navigation gets these.
 export const TIMETABLE_TITLE_VT = "timetable-title";
 export const TIMETABLE_GRID_VT = "timetable-grid";
 
@@ -32,10 +27,7 @@ const timetableId = (location: ParsedLocation | undefined) =>
   location?.pathname.match(/^\/(?:edit|view|finalize)\/([^/]+)\/?$/)?.[1] ??
   null;
 
-/**
- * Router `onBeforeNavigate` hook: runs before the old snapshot is taken, so
- * home names the card only for a move between it and that timetable's page.
- */
+// Must run on onBeforeNavigate, before the old snapshot is taken.
 export function trackSharedTimetable(info: {
   fromLocation?: ParsedLocation;
   toLocation: ParsedLocation;
