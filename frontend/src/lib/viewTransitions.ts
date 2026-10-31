@@ -1,4 +1,5 @@
 import type { ParsedLocation } from "@tanstack/react-router";
+import { timetableId } from "./sharedTransition";
 import type { TimetableSearch } from "./timetableSearch";
 
 export const prefersReducedMotion = () =>
@@ -47,7 +48,9 @@ export function markSheetClosing(): void {
  * search moves pass `viewTransition: false` (or their own types), so in
  * practice this covers route changes and history pops. Search-only pops that
  * move the course panel slide it; other search-only moves and reduced-motion
- * users get no transition.
+ * users get no transition. Route changes also morph the timetable title and
+ * grid (`shared-timetable`), except into a different timetable, such as a
+ * fresh copy, whose page should replace the old one whole.
  */
 export function routeTransitionTypes(info: {
   fromLocation?: ParsedLocation;
@@ -71,7 +74,11 @@ export function routeTransitionTypes(info: {
       return false;
     return back ? ["panel-back"] : ["panel-forward"];
   }
-  return back ? ["back"] : ["forward"];
+  const from = timetableId(info.fromLocation);
+  const to = timetableId(info.toLocation);
+  const types = back ? ["back"] : ["forward"];
+  if (!from || !to || from === to) types.push("shared-timetable");
+  return types;
 }
 
 /**
