@@ -9,6 +9,7 @@ import {
 } from "@/utils/timetableGrid";
 import { EmptyState, emptyTimetableHint } from "./EmptyState";
 import { NowLine } from "./NowLine";
+import { RemoveButton } from "./RemoveButton";
 
 type AgendaProps = {
   cells: TimetableCell[];
@@ -24,10 +25,18 @@ type AgendaProps = {
   onRemove?: (cell: TimetableCell) => void;
 };
 
-const blockClass =
-  "flex w-full justify-between gap-2 rounded-lg bg-ev px-3 pt-[9px] pb-2.5 text-left";
+const blockClass = "rounded-lg bg-ev";
+const bodyClass =
+  "flex w-full justify-between gap-2 rounded-lg px-3 pt-[9px] pb-2.5 text-left";
 
-function BlockBody({ cell }: { cell: TimetableCell }) {
+/** `remove` floats a spacer where the editor's × sits so the room clears it. */
+function BlockBody({
+  cell,
+  remove = false,
+}: {
+  cell: TimetableCell;
+  remove?: boolean;
+}) {
   return (
     <>
       <span className="min-w-0">
@@ -38,6 +47,9 @@ function BlockBody({ cell }: { cell: TimetableCell }) {
       </span>
       <span className="shrink-0 text-right">
         <span className="block whitespace-nowrap text-sm font-medium">
+          {remove && (
+            <span aria-hidden="true" className="float-right h-4 w-4" />
+          )}
           {cell.room}
         </span>
         <span className="block text-sm text-ink-muted">
@@ -162,41 +174,53 @@ export function Agenda({
                     </div>
                   </div>
                   {mode === "edit" ? (
-                    <button
-                      type="button"
-                      disabled={pending || item.cell.presence === "leaving"}
-                      inert={item.cell.presence === "leaving"}
+                    // the open button and the × are siblings, never nested
+                    <div
                       data-presence={item.cell.presence ?? "present"}
-                      onClick={
-                        item.cell.presence === "leaving"
-                          ? undefined
-                          : (event) => onOpen?.(item.cell, event)
-                      }
-                      onKeyDown={
-                        item.cell.presence === "leaving"
-                          ? undefined
-                          : (event) => {
-                              if (
-                                event.key === "Delete" ||
-                                event.key === "Backspace"
-                              ) {
-                                event.preventDefault();
-                                onRemove?.(item.cell);
-                              }
-                            }
-                      }
-                      aria-label={`Edit ${item.cell.courseId} ${item.cell.type}${item.cell.number}, press Delete to remove`}
+                      inert={item.cell.presence === "leaving"}
                       style={named(item.cell).style}
-                      className={`${blockClass} ${named(item.cell).className} cursor-pointer hover:bg-ev-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring disabled:opacity-60`}
+                      className={`${blockClass} ${named(item.cell).className} relative hover:bg-ev-hover`}
                     >
-                      <BlockBody cell={item.cell} />
-                    </button>
+                      <button
+                        type="button"
+                        disabled={pending || item.cell.presence === "leaving"}
+                        onClick={
+                          item.cell.presence === "leaving"
+                            ? undefined
+                            : (event) => onOpen?.(item.cell, event)
+                        }
+                        onKeyDown={
+                          item.cell.presence === "leaving"
+                            ? undefined
+                            : (event) => {
+                                if (
+                                  event.key === "Delete" ||
+                                  event.key === "Backspace"
+                                ) {
+                                  event.preventDefault();
+                                  onRemove?.(item.cell);
+                                }
+                              }
+                        }
+                        aria-label={`Edit ${item.cell.courseId} ${item.cell.type}${item.cell.number}, press Delete to remove`}
+                        className={`${bodyClass} cursor-pointer focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring disabled:opacity-60`}
+                      >
+                        <BlockBody cell={item.cell} remove />
+                      </button>
+                      <RemoveButton
+                        cell={item.cell}
+                        disabled={pending || item.cell.presence === "leaving"}
+                        onRemove={onRemove}
+                        iconSize={14}
+                        className="top-1.5 right-1.5 size-5 after:size-11"
+                      />
+                    </div>
                   ) : (
                     <div
                       data-presence={item.cell.presence ?? "present"}
                       inert={item.cell.presence === "leaving"}
                       style={named(item.cell).style}
-                      className={`${blockClass} ${named(item.cell).className}`}
+                      className={`${blockClass} ${bodyClass} ${named(item.cell).className}`}
                     >
                       <BlockBody cell={item.cell} />
                     </div>
