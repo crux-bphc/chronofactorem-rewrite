@@ -155,7 +155,7 @@ export const TimetablePageShell = ({
         <div className="grid min-h-0 flex-1 grid-cols-[300px_minmax(0,1fr)] gap-5 px-7 pb-7 xl:grid-cols-[360px_minmax(0,1fr)]">
           <aside
             data-shot="side-menu"
-            className="flex min-h-0 flex-col overflow-hidden"
+            className="-mx-2 flex min-h-0 flex-col overflow-hidden px-2"
           >
             {panel}
           </aside>

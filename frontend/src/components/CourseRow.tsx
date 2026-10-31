@@ -126,7 +126,7 @@ export function CourseRow({
       data-course-id={course.id}
       onClick={onOpen}
       className={cn(
-        "grid min-h-[60px] w-full cursor-pointer grid-cols-[1fr_auto_16px] items-center gap-2.5 text-left transition-colors duration-(--d-1) hover:bg-sunk",
+        "grid min-h-[60px] w-full cursor-pointer grid-cols-[1fr_auto_16px] items-center gap-2.5 text-left transition-colors duration-(--d-1) hover:bg-sunk focus-visible:outline-offset-[-2px]",
         rowPad,
         className,
       )}
