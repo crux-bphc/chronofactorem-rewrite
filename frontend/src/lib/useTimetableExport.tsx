@@ -5,9 +5,9 @@ import { TimetableSurface } from "@/components/timetable/TimetableSurface";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { toast } from "@/components/ui/use-toast";
 import { useTimetableState } from "@/context";
+import { formatExamRange } from "@/utils/timeFormat";
 import { timetableMeta } from "@/utils/timetable";
 import { titleCase } from "@/utils/timetableGrid";
-import { formatExamRange } from "./timeFormat";
 import { useOrientation } from "./useOrientation";
 
 export type ExportStatus = "idle" | "rendering" | "done";
