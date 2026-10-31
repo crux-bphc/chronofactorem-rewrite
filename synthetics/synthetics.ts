@@ -18,8 +18,10 @@ export type Synthetic = {
 // on phones the side menu tabs live behind a button
 const openTab = async (page: Page, name: string) => {
   const menu = page.getByRole("button", { name: "Courses and exams" });
+  const tab = page.getByRole("tab", { name });
+  await menu.or(tab).first().waitFor();
   if (await menu.isVisible()) await menu.click();
-  await page.getByRole("tab", { name }).click();
+  await tab.click();
 };
 
 export const synthetics: Synthetic[] = [

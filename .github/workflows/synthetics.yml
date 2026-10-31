@@ -3,56 +3,110 @@ name: Update synthetics screenshots
 on:
   pull_request:
     types: [ labeled, synchronize ]
+    # only what can change a screenshot
+    paths:
+      - frontend/**
+      - backend/**
+      - lib/**
+      - synthetics/**
+      - pnpm-lock.yaml
+      - .github/workflows/synthetics.yml
 
 # new pushes should cancel older ones
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
+env:
+  SHARDS: 8
+
 jobs:
-  screenshots:
+  # the run is cpu bound, so it's split across machines. no playwright
+  # container: chromium is pinned by the playwright version and the app ships
+  # its own fonts, so the bare runner renders the exact same pixels, without
+  # the 2.5gb image pull
+  shoot:
     # same ready gate as ci.yml
     if: ${{ (github.event.label.name == 'ready' || contains(github.event.pull_request.labels.*.name, 'ready')) && github.event.pull_request.head.repo.full_name == github.repository }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        shard: [ 1, 2, 3, 4, 5, 6, 7, 8 ]
+    steps:
+      # the exact commit, so every shard shoots the same code
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      # the runner ships postgres, starting it beats pulling an image. it boots
+      # in the background while everything else installs
+      - name: Start Postgres
+        run: sudo systemctl start --no-block postgresql.service
+
+      # any node 24 is already in the runner's tool cache, an exact patch
+      # version gets downloaded every time
+      - name: Install Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Install pnpm
+        run: npm i -g pnpm@11.18.0 --no-fund --no-audit
+
+      # node_modules itself rather than the pnpm store: restoring it takes as
+      # long, and then there's nothing left to install
+      - name: Cache dependencies and Chromium
+        id: cache
+        uses: actions/cache@v6
+        with:
+          path: |
+            node_modules
+            */node_modules
+            ~/.cache/ms-playwright
+          key: synthetics-modules-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          pnpm install -r --frozen-lockfile
+          pnpm -C synthetics exec playwright install --only-shell chromium
+
+      - name: Create Postgres user
+        run: |
+          until pg_isready -q; do sleep 0.2; done
+          sudo -u postgres psql -c "CREATE ROLE chrono SUPERUSER LOGIN PASSWORD 'chrono'"
+
+      - name: Take screenshots
+        run: pnpm -C synthetics start
+        env:
+          SHARD: ${{ matrix.shard }}/${{ env.SHARDS }}
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: screenshots-${{ matrix.shard }}
+          path: synthetics/screenshots
+          retention-days: 1
+
+  commit:
+    needs: shoot
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
-    container: mcr.microsoft.com/playwright:v1.64.1-noble
-    services:
-      postgres:
-        image: postgres:15.18-bookworm
-        env:
-          POSTGRES_USER: chrono
-          POSTGRES_PASSWORD: chrono
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-    env:
-      DB_HOST: postgres
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
           ref: ${{ github.head_ref }}
 
-      - uses: pnpm/action-setup@v6
-        name: Install pnpm
+      # wiped first so screenshots of removed synthetics go away too
+      - run: rm -rf synthetics/screenshots
+
+      - uses: actions/download-artifact@v8
         with:
-          version: 11.18.0
-          run_install: false
-
-      - name: Install Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: 24.14.1
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install -r --frozen-lockfile
-
-      - name: Take screenshots
-        run: pnpm -C synthetics start
+          pattern: screenshots-*
+          path: synthetics/screenshots
+          merge-multiple: true
 
       # commits made with this token don't trigger workflows, so this can't
       # loop
@@ -61,9 +115,13 @@ jobs:
       # how is this real holy shit
       - name: Commit changed screenshots
         run: |
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git add synthetics/screenshots
+          if [ "$(git rev-parse HEAD)" != "${{ github.event.pull_request.head.sha }}" ]; then
+            echo "the branch moved on since these were shot, its own run commits"
+            exit 0
+          fi
+          git add -A synthetics/screenshots
           git diff --cached --quiet && exit 0
+          git diff --cached --stat | tail -1
           git -c user.name="github-actions[bot]" \
             -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -m "chore: update synthetics screenshots"
