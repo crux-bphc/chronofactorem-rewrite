@@ -13,9 +13,10 @@ import { crc32 } from "node:zlib";
 import sharp from "sharp";
 import { synthetics } from "./synthetics.js";
 
-// compares a run's screenshots with the baseline (master's latest), and
-// reports what changed in the step summary and, on a pull request, in one
-// comment that's edited on every run.
+// compares a run's screenshots with the baseline (master's screenshots where
+// a pull request branched off, or master's latest on master), and reports
+// what changed in the step summary and, on a pull request, in one comment
+// that's edited on every run.
 //
 // the images live in this repo under a ref that isn't a branch, so clones
 // never download them, and get there with plain git rather than the api. that ref only ever moves forward, every image is named
@@ -190,6 +191,36 @@ const tip = () => {
   return { commit: git(["rev-parse", REF]).toString().trim() };
 };
 
+// the baseline as of the commit a pull request branched off master, so what
+// master merged since isn't put on the pull request. master only makes a
+// baseline when its screenshots change, so the newest one made from that
+// commit or before it is exactly what master looked like there. this fetches
+// the store's whole history, still without contents
+const mergeBase = (head: string) => {
+  try {
+    git(["fetch", "--quiet", "--filter=blob:none", "origin", `+${REF}:${REF}`]);
+  } catch (error) {
+    const stderr = String((error as { stderr?: Buffer }).stderr);
+    if (stderr.includes("couldn't find remote ref")) return undefined;
+    throw error;
+  }
+  const base = git(["merge-base", head, "origin/master"]).toString().trim();
+  for (const line of git(["log", "--format=%H %s", REF])
+    .toString()
+    .split("\n")) {
+    // the pull requests' own screenshots are stored in between
+    const [, commit, source] = line.match(/^(\w+) baseline from (\w+)$/) ?? [];
+    if (!source) continue;
+    try {
+      git(["merge-base", "--is-ancestor", source, base]);
+      return { commit };
+    } catch {
+      // made after the pull request branched off
+    }
+  }
+  return undefined;
+};
+
 const readManifest = (commit: string | undefined): Manifest => {
   const file = commit && read(commit, "manifest.json");
   return file ? JSON.parse(file.toString()) : {};
@@ -278,7 +309,8 @@ const shots = new Map(
     }),
 );
 
-const parent = tip();
+const parent =
+  BASELINE === "true" ? tip() : mergeBase(process.env.HEAD_SHA || "HEAD");
 const baseline = readManifest(parent?.commit);
 const noBaseline = BASELINE !== "true" && !Object.keys(baseline).length;
 const changed = [...shots].filter(

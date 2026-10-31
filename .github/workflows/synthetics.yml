@@ -1,7 +1,8 @@
 name: Synthetics screenshots
 
 # master's screenshots are the baseline, a pull request gets a comment with
-# what it changes against that. see synthetics/report.ts
+# what it changes against master's screenshots where it branched off. see
+# synthetics/report.ts
 on:
   pull_request:
     types: [ opened, reopened, ready_for_review, labeled, synchronize ]
@@ -109,6 +110,10 @@ jobs:
         uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          # master's history without file contents, to find where a pull
+          # request branched off
+          fetch-depth: 0
+          filter: blob:none
 
       - name: Install Node.js
         uses: actions/setup-node@v7
