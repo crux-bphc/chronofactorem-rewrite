@@ -241,11 +241,9 @@ html.theme-transition::view-transition-old(root) {
 html.theme-transition::view-transition-new(root) {
   z-index: 1;
 }
-/* Named elements would be captured as their own groups, painted over root:
-   they would cover open menus and skip the reveal. Keep the whole page in
-   root for the theme change. */
+
 html.theme-transition * {
-  /* biome-ignore lint/complexity/noImportantStyles: must beat the inline names on shared elements */
+  /* biome-ignore lint/complexity/noImportantStyles: must override the inline names on shared elements */
   view-transition-name: none !important;
 }
 
