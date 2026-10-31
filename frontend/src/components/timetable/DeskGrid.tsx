@@ -8,7 +8,6 @@ import {
 import { formatAxisHour } from "@/utils/timeFormat";
 import {
   blockName,
-  hourLabelFade,
   type TimetableCell,
   timetableDayNames,
   titleCase,
@@ -35,8 +34,6 @@ type DeskGridProps = {
   ghostVisible?: boolean;
   /** The now-line slot (C5). */
   now?: React.ReactNode;
-  /** Now as hours since the first axis hour; hides the hour label it nears. */
-  nowAt?: number | null;
 };
 
 // blocks are size containers: under 72px wide they stack dept / number like
@@ -96,7 +93,6 @@ export function DeskGrid({
   ghostCells = [],
   ghostVisible = false,
   now,
-  nowAt = null,
 }: DeskGridProps) {
   const rows = orientation === "rows";
   // a cell's place: days down the side and hours across, or transposed
@@ -148,9 +144,7 @@ export function DeskGrid({
             mode === "export"
               ? "text-sm"
               : "text-sm min-[1920px]:text-base min-[2560px]:text-lg min-[3200px]:text-xl"
-          } ${hourLabelFade(h, nowAt)} ${
-            rows ? "self-end pl-0.5" : "self-start pr-1 text-right"
-          }`}
+          } ${rows ? "self-end pl-0.5" : "self-start pr-1 text-right"}`}
           style={
             rows
               ? { gridColumn: h + 2, gridRow: 1 }

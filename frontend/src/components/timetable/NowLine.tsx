@@ -8,9 +8,7 @@ const dot = "now-dot pointer-events-none absolute size-2.5 rounded-full bg-now";
 function AgendaLine({ label }: { label: string }) {
   return (
     <div className="mb-2.5 grid grid-cols-[64px_1fr] items-center gap-3">
-      <div className="whitespace-nowrap text-right text-sm font-semibold text-now">
-        {label}
-      </div>
+      <div aria-hidden="true" />
       <div
         role="img"
         aria-label={`Now, ${label}`}
@@ -24,13 +22,13 @@ function AgendaLine({ label }: { label: string }) {
 
 /**
  * The now-line for the class that is on: at the share of the class gone by,
- * the time in the time column and a rule from there to the block's left edge,
- * where the dot sits. It never crosses the block. Laid over the agenda row's
+ * a short rule from the right edge of the time column to the block's left
+ * edge, where the dot sits. It never crosses the block. Laid over the agenda row's
  * two-column grid.
  */
 function ThroughLine({ label, at }: { label: string; at: number }) {
-  // the row clips its content (it collapses on removal), so keep the label
-  // and dot inside it at the very start and end of the class
+  // the row clips its content (it collapses on removal), so keep the dot
+  // inside it at the very start and end of the class
   const top = `clamp(10px, ${at * 100}%, 100% - 10px)`;
   return (
     <div className="pointer-events-none absolute inset-0 grid grid-cols-[64px_1fr] gap-3">
@@ -38,17 +36,11 @@ function ThroughLine({ label, at }: { label: string; at: number }) {
         <div
           role="img"
           aria-label={`Now, ${label}, during a class`}
-          className="now-rule absolute -right-3 w-3.5 h-0.5 -translate-y-1/2 bg-now"
+          className="now-rule absolute -right-3 w-3 h-0.5 -translate-y-1/2 bg-now"
           style={{ top }}
         >
           <span className={`${dot} top-1/2 -right-1.5 -translate-y-1/2`} />
         </div>
-        <span
-          className="now-rule absolute right-0 -translate-y-1/2 whitespace-nowrap rounded-full bg-bg pl-1 text-sm font-semibold text-now"
-          style={{ top }}
-        >
-          {label}
-        </span>
       </div>
     </div>
   );
@@ -58,17 +50,13 @@ type GridProps = {
   pos: Pos;
   /** x: desktop rows (time runs across). y: phone week and desktop columns. */
   axis: "x" | "y";
-  label: string;
   /** where today's cell for pos.hour sits in the grid */
   cell: CSSProperties;
 };
 
 // the line is drawn only across today's column (or row), from a dot at its
-// start. the time sits on the line as a pill: at the end of today's column,
-// clear of the left-aligned block text (when time runs across, above the dot
-// in the gap over today's row). a column too narrow for both (phone week)
-// puts it straight after the dot instead
-function GridLine({ pos, axis, label, cell }: GridProps) {
+// start
+function GridLine({ pos, axis, cell }: GridProps) {
   const x = axis === "x";
   const f = { "--f": pos.fraction, containerType: "size" } as CSSProperties;
   return (
@@ -87,15 +75,6 @@ function GridLine({ pos, axis, label, cell }: GridProps) {
             : "translateY(calc(var(--f) * 100cqh - 1px))",
         }}
       >
-        <span
-          className={`absolute rounded-full bg-surface px-1.5 text-[11px] leading-4 font-semibold whitespace-nowrap text-now ring-1 ring-now/40 ${
-            x
-              ? "-top-[15px] left-1/2 -translate-x-1/2"
-              : "top-1/2 right-[7px] -translate-y-1/2 @max-[120px]:right-auto @max-[120px]:left-2"
-          }`}
-        >
-          {label}
-        </span>
         <span
           className={`${dot} ${
             x

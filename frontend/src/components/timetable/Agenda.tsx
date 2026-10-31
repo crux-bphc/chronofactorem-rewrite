@@ -122,14 +122,6 @@ export function Agenda({
     const at = elapsed(cell);
     return at >= 0 && at < 1;
   };
-  // the time column's start and end times sit at 10–30px and 30–50px of a
-  // ~67px row; the one the now time would sit on fades out for it
-  const covered = (cell: TimetableCell) => {
-    if (!isDuring(cell)) return { start: false, end: false };
-    const y = Math.min(Math.max(elapsed(cell) * 67, 10), 57);
-    return { start: y < 40, end: y > 20 && y < 60 };
-  };
-
   return (
     <div className="tt-agenda px-4">
       {items.map((item, i) => (
@@ -162,14 +154,10 @@ export function Agenda({
               <div className="min-h-0 overflow-hidden">
                 <div className="relative mb-1.5 grid grid-cols-[64px_1fr] gap-3">
                   <div className="pt-2.5 text-right">
-                    <div
-                      className={`whitespace-nowrap text-sm font-medium transition-opacity duration-(--d-2) ${covered(item.cell).start ? "opacity-0" : ""}`}
-                    >
+                    <div className="whitespace-nowrap text-sm font-medium">
                       {formatClock(item.cell.hour)}
                     </div>
-                    <div
-                      className={`whitespace-nowrap text-sm text-ink-faint transition-opacity duration-(--d-2) ${covered(item.cell).end ? "opacity-0" : ""}`}
-                    >
+                    <div className="whitespace-nowrap text-sm text-ink-faint">
                       {formatSlotEnd(item.cell.hour, item.cell.span)}
                     </div>
                   </div>

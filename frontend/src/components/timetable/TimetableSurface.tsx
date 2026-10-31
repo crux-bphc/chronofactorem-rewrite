@@ -94,13 +94,6 @@ export function TimetableSurface({
   // the now-line belongs to the live view page only, never the editor or export
   const date = useNow(mode === "view" && !!showNow);
   const pos = date ? nowPosition(date, dayCount, hourCount) : null;
-  const label = date ? formatNow(date) : "";
-  // the pill sits at the top of today's row when time runs across, so on
-  // Monday it would cover the hour labels above; those fade out for it
-  const nowAt =
-    pos && orientation === "rows" && pos.day === 0
-      ? pos.hour + pos.fraction
-      : null;
 
   if (layout === "phone" && view === "day") {
     const shown = Math.min(day, dayCount - 1);
@@ -111,8 +104,12 @@ export function TimetableSurface({
           day={shown}
           mode={mode}
           now={
-            pos && pos.day === shown
-              ? { hour: pos.hour, fraction: pos.fraction, label }
+            date && pos && pos.day === shown
+              ? {
+                  hour: pos.hour,
+                  fraction: pos.fraction,
+                  label: formatNow(date),
+                }
               : null
           }
           pending={pending}
@@ -139,7 +136,6 @@ export function TimetableSurface({
               <NowLine.Grid
                 pos={pos}
                 axis="y"
-                label={label}
                 cell={{ gridColumn: pos.day + 2, gridRow: pos.hour + 2 }}
               />
             )
@@ -162,13 +158,11 @@ export function TimetableSurface({
         onRemove={onRemove}
         ghostCells={ghostCells}
         ghostVisible={ghost.visible}
-        nowAt={nowAt}
         now={
           pos && (
             <NowLine.Grid
               pos={pos}
               axis={orientation === "rows" ? "x" : "y"}
-              label={label}
               cell={
                 orientation === "rows"
                   ? { gridRow: pos.day + 2, gridColumn: pos.hour + 2 }

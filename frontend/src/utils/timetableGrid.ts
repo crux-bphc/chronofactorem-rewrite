@@ -101,16 +101,6 @@ export function nowPosition(
   return { day, hour, fraction: now.getMinutes() / 60 };
 }
 
-/**
- * Class for a desktop rows hour label: fades out while the now pill (centred
- * on the line, about 0.4 of an hour wide either side) would cover it. A label
- * runs about half an hour to the right of its hour.
- */
-export function hourLabelFade(hour: number, nowAt: number | null): string {
-  const near = nowAt !== null && nowAt - 0.9 < hour && hour < nowAt + 0.4;
-  return `transition-opacity duration-(--d-2) ${near ? "opacity-0" : ""}`;
-}
-
 export function splitCode(code: string): { dept: string; number: string } {
   const i = code.lastIndexOf(" ");
   if (i < 0) return { dept: "", number: code };
