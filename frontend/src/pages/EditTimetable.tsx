@@ -9,6 +9,7 @@ import {
   TimetablePageShell,
   timetablePageLoader,
 } from "@/components/TimetablePageShell";
+import { PublishButton } from "@/components/timetable/HeaderActions";
 import { InterimPhoneControls } from "@/components/timetable/InterimPhoneControls";
 import { TimetableSurface } from "@/components/timetable/TimetableSurface";
 import { TimetableProvider, useTimetableState } from "@/context";
@@ -151,11 +152,16 @@ function EditTimetable() {
 
   return (
     <TimetablePageShell
-      header={<TimetableHeader isOnEditPage={true} />}
+      header={<TimetableHeader page="edit" />}
       panel={SideBar}
       dock={null}
     >
-      {!screenIsLarge && <InterimPhoneControls dayCount={dayCount} />}
+      {!screenIsLarge && (
+        <InterimPhoneControls
+          dayCount={dayCount}
+          action={<PublishButton layout="phone" />}
+        />
+      )}
       <TimetableSurface
         sections={timetableDetailsSections}
         layout={screenIsLarge ? "desktop" : "phone"}

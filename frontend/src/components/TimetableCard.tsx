@@ -1,10 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { type timetableType, unknownDegree } from "lib";
-import { Archive, Edit2, Ellipsis, Globe, Lock, Trash } from "lucide-react";
+import { Edit2, Ellipsis, Trash } from "lucide-react";
 import { type CSSProperties, useRef, useState } from "react";
 import type { z } from "zod";
 import DeleteTimetableDialog from "@/components/DeleteTimetableDialog";
-import { Badge } from "@/components/ui/badge";
+import TimetableStatusChip from "@/components/TimetableStatusChip";
 import {
   Dialog,
   DialogClose,
@@ -58,39 +58,6 @@ export function formatCardMeta(t: Timetable, now: Date = new Date()): string {
     }).format(updated),
   );
   return parts.join(" · ");
-}
-
-function StatusChip({ timetable }: { timetable: Timetable }) {
-  if (timetable.draft) return <Badge variant="chip">Draft</Badge>;
-  if (timetable.archived) {
-    const Visibility = timetable.private ? Lock : Globe;
-    return (
-      <Badge variant="chip">
-        <Archive className="size-3" />
-        Archived
-        <span aria-hidden="true" className="text-ink-faint">
-          ·
-        </span>
-        <Visibility className="size-3" />
-        <span className="sr-only">
-          , {timetable.private ? "private" : "public"}
-        </span>
-      </Badge>
-    );
-  }
-  if (timetable.private)
-    return (
-      <Badge variant="chip">
-        <Lock className="size-3" />
-        Private
-      </Badge>
-    );
-  return (
-    <Badge variant="chip-brand">
-      <Globe className="size-3" />
-      Public
-    </Badge>
-  );
 }
 
 function TimetableCard({
@@ -150,7 +117,7 @@ function TimetableCard({
           {formatCardMeta(timetable)}
         </div>
         <div className="mt-[7px]">
-          <StatusChip timetable={timetable} />
+          <TimetableStatusChip timetable={timetable} />
         </div>
       </div>
 

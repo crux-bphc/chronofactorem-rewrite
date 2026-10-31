@@ -12,10 +12,14 @@ type EditTimetableParams = {
   };
 };
 
+// Shared so every caller sees one edit in flight, wherever it was started.
+export const editTimetableKey = ["editTimetable"];
+
 const useEditTimetable = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   return useMutation({
+    mutationKey: editTimetableKey,
     mutationFn: (data: EditTimetableParams) => {
       return chronoAPI.post(`/api/timetable/${data.id}/edit`, data.body);
     },

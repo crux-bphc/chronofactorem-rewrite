@@ -1,13 +1,31 @@
-import { Columns3, Rows3 } from "lucide-react";
+import { Columns3, Menu, Rows3 } from "lucide-react";
+import type React from "react";
+import { Button } from "@/components/ui/button";
 import { Segmented } from "@/components/ui/segmented";
 import { useSurfaceNav } from "@/lib/useSurfaceNav";
+import { useTimetableNav } from "@/lib/useTimetableNav";
 import { timetableDayNames } from "@/utils/timetableGrid";
 
 /** Interim phone controls. Remove when PR 4's dock lands. */
-export function InterimPhoneControls({ dayCount }: { dayCount: number }) {
+export function InterimPhoneControls({
+  dayCount,
+  action,
+}: {
+  dayCount: number;
+  /** Publish or PNG, until the dock carries them. */
+  action: React.ReactNode;
+}) {
   const { view, day, setView, showDay } = useSurfaceNav(dayCount);
+  const { openSheet } = useTimetableNav();
   return (
-    <div data-shot="grid" className="mb-3 space-y-2 px-4">
+    <div data-shot="grid" className="mt-3 mb-3 space-y-2 px-4">
+      <div className="flex gap-2 [&>*]:flex-1">
+        <Button variant="secondary" onClick={() => openSheet("courses")}>
+          <Menu aria-hidden="true" />
+          Courses and exams
+        </Button>
+        {action}
+      </div>
       <div className="flex gap-1.5">
         {timetableDayNames.slice(0, dayCount).map((name, i) => (
           <button
