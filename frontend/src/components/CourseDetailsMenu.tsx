@@ -10,6 +10,7 @@ import {
   useSwapTimetableSections,
 } from "@/data-access/hooks/useTimetableSectionAction";
 import { formatExam, summarizeRoomTimes } from "@/lib/formatTime";
+import { HapticTap, haptic } from "@/lib/haptics";
 import { PANEL_VT_CLASS, panelForward } from "@/lib/panelTransition";
 import { useSkeletonFadeIn } from "@/lib/skeletonFade";
 import { titleCase } from "@/lib/titleCase";
@@ -149,6 +150,7 @@ const CourseDetailsMenu = ({
     cancelAdvance();
     if (!timetable || pending || inFlight.current) return;
     inFlight.current = true;
+    haptic("selection");
     if (timetable.sections.some((item) => item.id === section.id)) {
       sectionAction({ sectionId: section.id, action: "remove" }, settle);
       return;
@@ -179,6 +181,7 @@ const CourseDetailsMenu = ({
   const handleRemoveCourse = () => {
     if (!course || pending || inFlight.current) return;
     inFlight.current = true;
+    haptic("selection");
     removeCourse(
       { courseId: course.id, code: course.code },
       { ...settle, onSuccess: () => closeCourse() },
@@ -337,6 +340,7 @@ const CourseDetailsMenu = ({
             ) : (
               <span className="size-[22px] self-center rounded-full border-[1.5px] border-line" />
             )}
+            {!busy && <HapticTap />}
           </button>
         );
       })}
@@ -484,7 +488,7 @@ const CourseDetailsMenu = ({
           aria-busy={busy || undefined}
           onClick={handleRemoveCourse}
           className={cn(
-            "shrink-0 cursor-pointer text-[15px] font-semibold text-danger transition-colors duration-(--d-1) focus-visible:outline-offset-[-2px]",
+            "relative shrink-0 cursor-pointer text-[15px] font-semibold text-danger transition-colors duration-(--d-1) focus-visible:outline-offset-[-2px]",
             // phone: full-width bar; desktop: outlined button
             "border-t border-line bg-surface pt-4 pb-[calc(16px+env(safe-area-inset-bottom))] hover:bg-danger-bg",
             "lg:mb-1 lg:rounded-xl lg:border lg:py-3",
@@ -492,6 +496,7 @@ const CourseDetailsMenu = ({
           )}
         >
           Remove {course.code} from timetable
+          {!busy && <HapticTap />}
         </button>
       )}
     </div>

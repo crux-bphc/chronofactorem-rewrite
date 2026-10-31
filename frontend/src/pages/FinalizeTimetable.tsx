@@ -10,6 +10,7 @@ import useEditTimetable from "@/data-access/hooks/useEditTimetable";
 import useTimetable, {
   timetableQueryOptions,
 } from "@/data-access/hooks/useTimetable";
+import { HapticTap, haptic } from "@/lib/haptics";
 import { TIMETABLE_TITLE_VT } from "@/lib/sharedTransition";
 import { cn } from "@/lib/utils";
 import authenticatedRoute from "../AuthenticatedRoute";
@@ -77,9 +78,11 @@ function FinalizeTimetable() {
     if (copyTimer.current) clearTimeout(copyTimer.current);
     try {
       await navigator.clipboard.writeText(link);
+      haptic("success");
       setCopied(true);
       copyTimer.current = setTimeout(() => setCopied(false), 2000);
     } catch {
+      haptic("error");
       setCopied(false);
       toast({
         title: "Could not copy link",
@@ -102,6 +105,8 @@ function FinalizeTimetable() {
       },
       {
         onSuccess: () => {
+          // after the server answers, so Android only: iOS ticks only on a tap
+          haptic("success");
           router.navigate({
             to: "/",
           });
@@ -235,6 +240,7 @@ function FinalizeTimetable() {
                 Copied!
               </span>
             </span>
+            <HapticTap className="max-lg:-inset-[7px]" />
           </Button>
           <span aria-live="polite" className="sr-only">
             {copied ? "Copied!" : ""}

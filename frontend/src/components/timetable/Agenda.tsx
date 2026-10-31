@@ -208,6 +208,7 @@ export function Agenda({
                         onRemove={onRemove}
                         iconSize={14}
                         className="top-1.5 right-1.5 size-5 after:size-11"
+                        hitClassName="size-11"
                       />
                     </div>
                   ) : (

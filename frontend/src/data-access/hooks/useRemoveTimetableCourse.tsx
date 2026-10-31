@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
+import { HapticTap, haptic } from "@/lib/haptics";
 import chronoAPI from "../axios";
 import toastHandler from "../errors/toastHandler";
 
@@ -23,7 +24,10 @@ export const useRemoveTimetableCourse = (timetableId: string | undefined) => {
     },
     // refetch on failure too: earlier sections may already be back
     onSettled: invalidate,
-    onError: (error) => toastHandler(error, toast),
+    onError: (error) => {
+      haptic("error");
+      toastHandler(error, toast);
+    },
   });
 
   return useMutation({
@@ -43,14 +47,22 @@ export const useRemoveTimetableCourse = (timetableId: string | undefined) => {
         action: (
           <ToastAction
             altText={`Undo removing ${code}`}
-            onClick={() => restore(sectionIds)}
+            className="relative"
+            onClick={() => {
+              haptic("selection");
+              restore(sectionIds);
+            }}
           >
             Undo
+            <HapticTap />
           </ToastAction>
         ),
       });
       return invalidate();
     },
-    onError: (error) => toastHandler(error, toast),
+    onError: (error) => {
+      haptic("error");
+      toastHandler(error, toast);
+    },
   });
 };

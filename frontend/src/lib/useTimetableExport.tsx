@@ -5,6 +5,7 @@ import { TimetableSurface } from "@/components/timetable/TimetableSurface";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { toast } from "@/components/ui/use-toast";
 import { useTimetableState } from "@/context";
+import { haptic } from "@/lib/haptics";
 import { formatExamRange } from "@/utils/timeFormat";
 import { timetableMeta } from "@/utils/timetable";
 import { titleCase } from "@/utils/timetableGrid";
@@ -151,6 +152,7 @@ export function useTimetableExport(): {
       link.download = "timetable.png";
       link.href = url;
       link.click();
+      haptic("success");
       // Safari and Firefox read the blob after click() returns; revoking on the
       // next tick can cancel the download, so give it time (as FileSaver does)
       setTimeout(() => URL.revokeObjectURL(url), 40_000);

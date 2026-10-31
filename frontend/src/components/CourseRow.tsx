@@ -3,6 +3,7 @@ import { ChevronRight, X } from "lucide-react";
 import { Fragment } from "react";
 import type z from "zod";
 import { useTimetableState } from "@/context";
+import { HapticTap } from "@/lib/haptics";
 import { panelForward } from "@/lib/panelTransition";
 import { titleCase } from "@/lib/titleCase";
 import { useTimetableNav } from "@/lib/useTimetableNav";
@@ -168,13 +169,14 @@ export function CourseRow({
         aria-busy={busy || undefined}
         onClick={onRemove}
         className={cn(
-          "group/x grid w-12 shrink-0 cursor-pointer place-items-center pr-1 text-ink-faint transition-colors duration-(--d-1) group-hover/row:text-ink-muted hover:text-ink focus-visible:outline-offset-[-2px]",
+          "group/x relative grid w-12 shrink-0 cursor-pointer place-items-center pr-1 text-ink-faint transition-colors duration-(--d-1) group-hover/row:text-ink-muted hover:text-ink focus-visible:outline-offset-[-2px]",
           busy && "cursor-progress",
         )}
       >
         <span className="grid size-7 place-items-center rounded-md transition-colors duration-(--d-1) group-hover/x:bg-ev">
           <X size={16} aria-hidden="true" />
         </span>
+        {!busy && <HapticTap />}
       </button>
     </div>
   );
