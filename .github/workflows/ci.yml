@@ -2,7 +2,7 @@ name: Build and lint code
 
 on:
   pull_request:
-    types: [ labeled, synchronize ]
+    types: [ opened, reopened, ready_for_review, labeled, synchronize ]
   push:
     branches: [ master ]
   merge_group:
@@ -15,7 +15,14 @@ concurrency:
 
 jobs:
   build-and-lint:
-    if: ${{ github.event.label.name == 'ready' || contains(github.event.pull_request.labels.*.name, 'ready') || github.event_name == 'push' || github.event_name == 'merge_group' }}
+    # runs on PRs labelled `ready`, and on non-draft PRs from crux-bphc
+    # members/collaborators without the label. labelling something other than
+    # `ready` doesn't re-run it
+    if: >-
+      ${{ github.event_name != 'pull_request'
+      || (github.event.action == 'labeled' && github.event.label.name == 'ready')
+      || (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, 'ready')
+        || (!github.event.pull_request.draft && contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.pull_request.author_association)))) }}
     # GitHub-hosted: free for this public repo, and every job gets its own
     # VM, which eliminates the serial queue on the single self-hosted runner
     # (deploys stay self-hosted in pipeline.yml/release.yml)

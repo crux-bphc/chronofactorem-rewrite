@@ -4,7 +4,7 @@ name: Synthetics screenshots
 # what it changes against that. see synthetics/report.ts
 on:
   pull_request:
-    types: [ labeled, synchronize ]
+    types: [ opened, reopened, ready_for_review, labeled, synchronize ]
     # only what can change a screenshot
     paths: &paths
       - frontend/**
@@ -31,8 +31,12 @@ jobs:
   # its own fonts, so the bare runner renders the exact same pixels, without
   # the 2.5gb image pull
   shoot:
-    # same ready gate as ci.yml
-    if: ${{ github.event_name == 'push' || ((github.event.label.name == 'ready' || contains(github.event.pull_request.labels.*.name, 'ready')) && github.event.pull_request.head.repo.full_name == github.repository) }}
+    # same ready gate as ci.yml, and never on forks
+    if: >-
+      ${{ github.event_name == 'push' || (github.event.pull_request.head.repo.full_name == github.repository && (
+      (github.event.action == 'labeled' && github.event.label.name == 'ready')
+      || (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, 'ready')
+        || (!github.event.pull_request.draft && contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.pull_request.author_association)))))) }}
     runs-on: ubuntu-24.04
     strategy:
       matrix:
