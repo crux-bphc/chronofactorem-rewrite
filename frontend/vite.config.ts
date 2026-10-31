@@ -15,8 +15,7 @@ const disallowedPaths = [
   "/getDegrees",
 ];
 
-// robots.txt and sitemap.xml need absolute URLs, so build them from
-// VITE_FRONTEND_URL rather than keeping them in public/.
+// don't hardcode URLs in robots.txt and sitemap.xml
 function crawlerFiles(): Plugin {
   let siteUrl: string | undefined;
   return {
