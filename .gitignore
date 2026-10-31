@@ -15,3 +15,6 @@ mise.toml
 .claude/
 .remember/
 docs/superpowers/
+
+# synthetics/report.ts keeps these under refs/synthetics/images
+synthetics/screenshots/
