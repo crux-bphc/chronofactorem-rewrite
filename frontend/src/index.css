@@ -148,8 +148,11 @@
   --d-1: 120ms;
   --d-2: 200ms;
   --d-3: 300ms;
+  /* Whole-screen motion, such as the theme reveal */
+  --d-4: 480ms;
   --e-out: cubic-bezier(0.2, 0, 0, 1);
   --e-in: cubic-bezier(0.3, 0, 1, 1);
+  --e-in-out: cubic-bezier(0.4, 0, 0.2, 1);
   /* One small overshoot (~6%) settling within --d-3 */
   --e-spring: linear(
     0,
@@ -244,6 +247,9 @@ html.theme-transition::view-transition-old(root) {
 }
 html.theme-transition::view-transition-new(root) {
   z-index: 1;
+  /* hidden until the reveal starts, which can be a frame after the
+     snapshots first paint */
+  clip-path: circle(0);
 }
 
 html.theme-transition * {
