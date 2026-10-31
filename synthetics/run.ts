@@ -25,14 +25,14 @@ const API = `http://localhost:${BACKEND_PORT}`;
 // the browser clock; the scenario pins every timestamp in the database
 const NOW = new Date("2026-10-14T10:30:00+05:30");
 
-// real device presets (viewport, touch, mobile layout), plus the two most
-// common desktop resolutions. everything renders at 1x to keep pngs small
+// one device per form factor, each where the tailwind layout is tightest: the
+// narrowest phone below sm, a tablet right on md and still on the phone nav
+// below lg, and the smallest common laptop, above xl but below 2xl.
+// everything renders at 1x to keep pngs small
 const DEVICES = {
   "iphone-15": devices["iPhone 15"],
-  "pixel-7": devices["Pixel 7"],
   "ipad-mini": devices["iPad Mini"],
   "laptop-1366": { viewport: { width: 1366, height: 768 } },
-  "desktop-1920": { viewport: { width: 1920, height: 1080 } },
 };
 const THEMES = ["light", "dark"] as const;
 
