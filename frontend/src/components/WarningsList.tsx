@@ -3,6 +3,7 @@ import { panelForward } from "@/lib/panelTransition";
 import { titleCase } from "@/lib/titleCase";
 import { useTimetableNav } from "@/lib/useTimetableNav";
 import { useWarningsSummary } from "@/lib/useWarningsSummary";
+import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 
 const overline =
@@ -33,9 +34,12 @@ function Open({ label, onClick }: { label: string; onClick: () => void }) {
 export function WarningsList({
   only,
   onNavigate,
+  className,
 }: {
   only?: "sections" | "cdcs";
   onNavigate?: () => void;
+  /** On the root, e.g. `[&_*]:lg:mx-0` to drop the row inset in a popover. */
+  className?: string;
 }) {
   const { missingSections, missingCdcs, notFound } = useWarningsSummary();
   const { openCourse, showTab } = useTimetableNav();
@@ -52,7 +56,7 @@ export function WarningsList({
     })();
 
   return (
-    <div className="flex flex-col pb-3 lg:pb-0">
+    <div className={cn("flex flex-col pb-3 lg:pb-0", className)}>
       {showSections && (
         <div className={group}>
           {missingSections.flatMap(({ code, courseId, types }) =>

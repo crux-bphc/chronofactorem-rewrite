@@ -141,7 +141,10 @@ function EditTimetable() {
 
   const SideBar =
     currentCourseID !== null && (isCourseLoading || courseData) ? (
-      <CourseDetailsMenu showHeader onSectionHover={handleSectionHover} />
+      <CourseDetailsMenu
+        showHeader={screenIsLarge}
+        onSectionHover={handleSectionHover}
+      />
     ) : (
       <SideMenu isOnEditPage={true} isScreenshotMode={false} />
     );
@@ -149,7 +152,8 @@ function EditTimetable() {
   return (
     <TimetablePageShell
       header={<TimetableHeader isOnEditPage={true} />}
-      sidebar={SideBar}
+      panel={SideBar}
+      dock={null}
     >
       {!screenIsLarge && <InterimPhoneControls dayCount={dayCount} />}
       <TimetableSurface

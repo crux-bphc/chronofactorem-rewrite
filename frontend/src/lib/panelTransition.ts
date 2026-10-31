@@ -47,8 +47,5 @@ export function runPanelTransition(
 export const panelForward = (fn: () => unknown) => () =>
   runPanelTransition("forward", fn);
 
-export const panelBack = (fn: () => unknown) => () =>
-  runPanelTransition("back", fn);
-
 /** Applied to the content root of the list/search view and of the picker. */
 export const PANEL_VT_CLASS = "[view-transition-name:cf-panel]";

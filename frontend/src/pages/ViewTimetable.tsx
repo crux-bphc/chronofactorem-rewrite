@@ -69,9 +69,8 @@ function ViewTimetable() {
             isExporting={status === "rendering"}
           />
         }
-        sidebar={SideBar}
-        contentClassName="bg-background"
-        popoverTriggerClassName="top-[-1rem]"
+        panel={SideBar}
+        dock={null}
       >
         {!screenIsLarge && <InterimPhoneControls dayCount={dayCount} />}
         <TimetableSurface
