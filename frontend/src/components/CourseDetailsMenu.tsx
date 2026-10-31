@@ -40,6 +40,8 @@ const group =
 
 const rowGrid = "grid grid-cols-[40px_1fr_auto] gap-x-2.5 px-3.5 py-[13px]";
 
+const ADVANCE_DELAY = 350;
+
 const reducedMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -133,7 +135,15 @@ const CourseDetailsMenu = ({
       inFlight.current = false;
     },
   };
+  // Short delay before moving to next tab
+  const advance = useRef<number | undefined>(undefined);
+  const cancelAdvance = () => window.clearTimeout(advance.current);
+  useEffect(() => cancelAdvance, []);
+  const at = useRef("");
+  at.current = `${currentCourseID}:${currentSectionType}`;
+
   const handleSectionClick = (section: Section) => {
+    cancelAdvance();
     if (!timetable || pending || inFlight.current) return;
     inFlight.current = true;
     if (timetable.sections.some((item) => item.id === section.id)) {
@@ -154,7 +164,11 @@ const CourseDetailsMenu = ({
           onSuccess: () => {
             const next =
               uniqueSectionTypes[uniqueSectionTypes.indexOf(section.type) + 1];
-            if (next) setType(next);
+            if (!next) return;
+            const from = at.current;
+            advance.current = window.setTimeout(() => {
+              if (at.current === from) setType(next);
+            }, ADVANCE_DELAY);
           },
         },
       );
@@ -279,7 +293,10 @@ const CourseDetailsMenu = ({
             )}
             aria-label="Section type"
             value={currentSectionType}
-            onValueChange={(t) => setType(t)}
+            onValueChange={(t) => {
+              cancelAdvance();
+              setType(t);
+            }}
             options={uniqueSectionTypes.map((type) => {
               const pick = chosen(type);
               return {
@@ -304,7 +321,11 @@ const CourseDetailsMenu = ({
           />
         )}
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div
+        className="min-h-0 flex-1 overflow-y-auto"
+        onPointerDownCapture={cancelAdvance}
+        onKeyDownCapture={cancelAdvance}
+      >
         {course === undefined ? (
           <div className={group}>
             {[0, 1, 2, 3].map((i) => (
