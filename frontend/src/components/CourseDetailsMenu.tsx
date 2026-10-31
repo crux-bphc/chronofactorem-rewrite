@@ -264,6 +264,9 @@ const CourseDetailsMenu = ({
               const pick = chosen(type);
               return {
                 value: type,
+                "aria-label": `${typeNames[type]}, ${
+                  pick ? `${pick.type}${pick.number}` : "none chosen"
+                }`,
                 label: (
                   <>
                     <span className="truncate">{typeNames[type]}</span>

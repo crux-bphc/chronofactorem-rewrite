@@ -153,16 +153,20 @@ export const getMissingCdcs = (
   cdcs: CDCType[],
   added: Course[],
 ): { courseId: string | null; code: string; name: string }[] =>
-  getRemainingCdcs(cdcs, added).map((entry) =>
-    entry.kind === "course"
-      ? {
-          courseId: entry.course.id,
-          code: entry.course.code,
-          name: entry.course.name,
-        }
+  getRemainingCdcs(cdcs, added).map((entry) => {
+    const single =
+      entry.kind === "course"
+        ? entry.course
+        : entry.options.length === 1
+          ? entry.options[0]
+          : null;
+    return single
+      ? { courseId: single.id, code: single.code, name: single.name }
       : {
           courseId: null,
-          code: entry.options.map((c) => c.code).join(" (or) "),
+          code: (entry as Extract<RemainingEntry, { kind: "set" }>).options
+            .map((c) => c.code)
+            .join(" (or) "),
           name: "",
-        },
-  );
+        };
+  });
