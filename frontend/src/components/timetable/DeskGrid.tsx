@@ -1,4 +1,4 @@
-import { Bird, X } from "lucide-react";
+import { X } from "lucide-react";
 import { TileBody } from "@/components/timetable/WeekGrid";
 import {
   Tooltip,
@@ -13,6 +13,7 @@ import {
   timetableDayNames,
   titleCase,
 } from "@/utils/timetableGrid";
+import { EmptyState, emptyTimetableHint } from "./EmptyState";
 
 const vtStyle = (cell: TimetableCell) =>
   ({ "--vt": blockName(cell) }) as React.CSSProperties;
@@ -45,8 +46,9 @@ const padClass = "px-2.5 py-[9px] @max-[72px]:px-1 @max-[72px]:py-1.5";
 // on big monitors the live grid's text steps up a size at 1920px and again
 // at 2560px so it stays in proportion with the much larger blocks. the export
 // keeps one size whatever screen it is made on.
-// on screens that can't hover the editor's × is always shown, so the code
-// wraps whole words below it instead of running under it (as on master)
+// on screen a code wraps whole words rather than truncating; the editor's ×
+// is always shown (as on master), so there the code floats a spacer under it
+// and words that would run under it wrap below it. the export truncates.
 function BlockLines({
   cell,
   scale,
@@ -60,12 +62,12 @@ function BlockLines({
     <>
       <div className="@max-[72px]:hidden">
         <span
-          className={`block truncate font-semibold ${scale ? "text-base min-[1920px]:text-lg min-[2560px]:text-xl min-[3200px]:text-2xl" : "text-base"} ${
-            remove ? "[@media(hover:none)]:whitespace-normal" : ""
+          className={`block font-semibold ${scale ? "text-base min-[1920px]:text-lg min-[2560px]:text-xl min-[3200px]:text-2xl" : "text-base"} ${
+            scale ? "leading-tight" : "truncate"
           }`}
         >
           {remove && (
-            <span className="float-right hidden h-[1em] w-4 [@media(hover:none)]:block" />
+            <span aria-hidden="true" className="float-right h-[1em] w-4" />
           )}
           {cell.code}
         </span>
@@ -76,7 +78,7 @@ function BlockLines({
         </span>
       </div>
       <div className="hidden leading-[1.15] @max-[72px]:block">
-        <TileBody cell={cell} />
+        <TileBody cell={cell} spacer={remove ? "h-3 w-5" : undefined} />
       </div>
     </>
   );
@@ -169,12 +171,9 @@ export function DeskGrid({
         />
       ))}
       {mode !== "export" && cells.length === 0 && ghostCells.length === 0 && (
-        <Bird
-          role="img"
-          aria-label="No classes"
-          size={112}
-          strokeWidth={1.25}
-          className="z-1 self-center justify-self-center text-ink-faint"
+        <EmptyState
+          hint={emptyTimetableHint(mode)}
+          className="z-1 self-center justify-self-center px-4"
           style={{ gridColumn: "2 / -1", gridRow: "2 / -1" }}
         />
       )}
@@ -206,7 +205,7 @@ export function DeskGrid({
             style={leaving ? style : { ...style, ...vtStyle(cell) }}
             data-presence={cell.presence ?? "present"}
             inert={leaving}
-            className={`@container group relative z-1 min-w-0 overflow-hidden rounded-md bg-ev ${
+            className={`@container relative z-1 min-w-0 overflow-hidden rounded-md bg-ev ${
               leaving ? "" : "tt-block"
             } ${
               edit
@@ -258,7 +257,7 @@ export function DeskGrid({
                 disabled={pending || leaving}
                 aria-label={`Remove ${cell.code} ${cell.type}${cell.number}`}
                 onClick={leaving ? undefined : () => onRemove?.(cell)}
-                className="absolute top-1 right-1 flex size-5 cursor-pointer items-center justify-center rounded-sm bg-ev-hover text-ink-muted opacity-0 transition-opacity duration-(--d-1) group-focus-within:opacity-100 group-hover:opacity-100 hover:text-ink [@media(hover:none)]:opacity-100 focus-visible:outline-2 focus-visible:outline-ring disabled:cursor-default"
+                className="absolute top-1 right-1 flex size-5 cursor-pointer items-center justify-center rounded-sm text-ink-muted transition-colors duration-(--d-1) hover:bg-ev-hover hover:text-ink focus-visible:outline-2 focus-visible:outline-ring disabled:cursor-default"
               >
                 <X size={13} />
               </button>

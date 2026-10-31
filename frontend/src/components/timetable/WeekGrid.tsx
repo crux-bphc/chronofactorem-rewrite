@@ -1,12 +1,11 @@
-import { Bird } from "lucide-react";
 import { formatAxisHour } from "@/utils/timeFormat";
 import {
   blockName,
-  hourLabelFade,
   splitCode,
   type TimetableCell,
   timetableDayNames,
 } from "@/utils/timetableGrid";
+import { EmptyState, emptyTimetableHint } from "./EmptyState";
 
 type WeekGridProps = {
   cells: TimetableCell[];
@@ -21,23 +20,51 @@ type WeekGridProps = {
   onRemove?: (cell: TimetableCell) => void;
   /** The now-line slot (C5). */
   now?: React.ReactNode;
-  /** Now as hours since the first axis hour; hides the hour label it nears. */
-  nowAt?: number | null;
 };
 
+// tiles are size containers: narrow ones (phone) stack dept / number so the
+// number never truncates; from 88px wide (tablet) the code fits on one line
 const tileClass =
-  "relative z-1 flex min-w-0 flex-col justify-start overflow-hidden rounded-sm bg-ev px-[7px] pt-1.5 pb-[5px] text-left leading-[1.15]";
+  "@container relative z-1 flex min-w-0 flex-col justify-start overflow-hidden rounded-sm bg-ev px-[7px] pt-1.5 pb-[5px] text-left leading-[1.15]";
 
-export function TileBody({ cell }: { cell: TimetableCell }) {
+/**
+ * A grid tile's text. `spacer` floats a box of that size at the top right of
+ * the first line so a word that would run under the editor's × wraps below it.
+ */
+export function TileBody({
+  cell,
+  spacer,
+}: {
+  cell: TimetableCell;
+  spacer?: string;
+}) {
   const { dept, number } = splitCode(cell.code);
+  const float = spacer && (
+    <span aria-hidden="true" className={`float-right ${spacer}`} />
+  );
+  const sub = `${cell.type}${cell.number} · ${cell.room}`;
   return (
     <>
-      <span className="block truncate text-xs font-medium text-ink-muted">
-        {dept}
+      <span className="contents @min-[88px]:hidden">
+        <span
+          className={`block text-xs font-medium text-ink-muted ${spacer ? "" : "truncate"}`}
+        >
+          {float}
+          {dept}
+        </span>
+        <span className="block truncate text-base font-semibold">{number}</span>
+        <span className="block truncate text-xs text-ink-muted">{sub}</span>
       </span>
-      <span className="block truncate text-base font-semibold">{number}</span>
-      <span className="block truncate text-xs text-ink-muted">
-        {`${cell.type}${cell.number} · ${cell.room}`}
+      <span className="hidden @min-[88px]:contents">
+        <span
+          className={`block text-base font-semibold ${spacer ? "" : "truncate"}`}
+        >
+          {float}
+          {cell.code}
+        </span>
+        <span className="mt-0.5 block truncate text-xs text-ink-muted">
+          {sub}
+        </span>
       </span>
     </>
   );
@@ -52,14 +79,14 @@ export function WeekGrid({
   onOpen,
   onRemove,
   now,
-  nowAt = null,
 }: WeekGridProps) {
   return (
     <div
-      className="tt-week relative grid gap-x-[3px] gap-y-1.5 px-2.5 py-1"
+      // rows grow from 48px to 64px on tablets, where the tiles are wide
+      className="tt-week relative grid gap-x-[3px] gap-y-1.5 px-2.5 py-1 [--tt-row:48px] sm:[--tt-row:64px]"
       style={{
         gridTemplateColumns: `40px repeat(${dayCount}, minmax(0, 1fr))`,
-        gridTemplateRows: `22px repeat(${hourCount}, 48px)`,
+        gridTemplateRows: `22px repeat(${hourCount}, var(--tt-row))`,
       }}
     >
       {timetableDayNames.slice(0, dayCount).map((name, d) => (
@@ -79,7 +106,7 @@ export function WeekGrid({
             style={{ gridColumn: "2 / -1", gridRow: h + 2 }}
           />
           <div
-            className={`pr-1 text-right text-xs whitespace-nowrap text-ink-faint ${hourLabelFade(h, nowAt)}`}
+            className="pr-1 text-right text-xs whitespace-nowrap text-ink-faint"
             style={{
               gridColumn: 1,
               gridRow: h + 2,
@@ -91,12 +118,9 @@ export function WeekGrid({
         </div>
       ))}
       {cells.length === 0 && (
-        <Bird
-          role="img"
-          aria-label="No classes"
-          size={112}
-          strokeWidth={1.25}
-          className="z-1 self-center justify-self-center text-ink-faint"
+        <EmptyState
+          hint={emptyTimetableHint(mode)}
+          className="z-1 self-center justify-self-center px-4"
           style={{ gridColumn: "2 / -1", gridRow: "2 / -1" }}
         />
       )}

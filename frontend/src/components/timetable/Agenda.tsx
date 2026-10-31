@@ -1,12 +1,13 @@
-import { Bird } from "lucide-react";
 import { Fragment, useEffect, useMemo, useRef } from "react";
 import { formatClock, formatSlotEnd } from "@/utils/timeFormat";
 import {
   blockName,
   buildAgenda,
   type TimetableCell,
+  timetableDayNames,
   titleCase,
 } from "@/utils/timetableGrid";
+import { EmptyState, emptyTimetableHint } from "./EmptyState";
 import { NowLine } from "./NowLine";
 
 type AgendaProps = {
@@ -26,16 +27,23 @@ type AgendaProps = {
 const blockClass =
   "flex w-full justify-between gap-2 rounded-lg bg-ev px-3 pt-[9px] pb-2.5 text-left";
 
-function BlockBody({ cell }: { cell: TimetableCell }) {
+// while the now-line runs through a block its text sits above the line with
+// a halo of the block's colour, so the line reads as passing behind the text
+// rather than striking it out
+const haloClass =
+  "relative z-1 [text-shadow:0_0_2px_var(--ev),0_0_2px_var(--ev),0_0_4px_var(--ev),0_0_4px_var(--ev)]";
+
+function BlockBody({ cell, during }: { cell: TimetableCell; during: boolean }) {
+  const halo = during ? haloClass : "";
   return (
     <>
-      <span className="min-w-0">
+      <span className={`min-w-0 ${halo}`}>
         <span className="block text-lg font-semibold">{cell.code}</span>
         <span className="block text-sm text-ink-muted">
           {titleCase(cell.name)}
         </span>
       </span>
-      <span className="shrink-0 text-right">
+      <span className={`shrink-0 text-right ${halo}`}>
         <span className="block whitespace-nowrap text-sm font-medium">
           {cell.room}
         </span>
@@ -81,12 +89,12 @@ export function Agenda({
   if (items.length === 0) {
     return (
       <div className="tt-agenda flex justify-center px-4 py-12">
-        <Bird
-          role="img"
-          aria-label="No classes"
-          size={112}
-          strokeWidth={1.25}
-          className="text-ink-faint"
+        <EmptyState
+          hint={
+            cells.length === 0
+              ? emptyTimetableHint(mode)
+              : `No classes on ${timetableDayNames[day]}.`
+          }
         />
       </div>
     );
@@ -101,13 +109,21 @@ export function Agenda({
           style: { "--vt": blockName(cell) } as React.CSSProperties,
         };
 
-  // the 10 minutes after a class are its break, not part of it
-  const isDuring = (cell: TimetableCell) =>
-    !!now &&
-    cell.hour <= now.hour &&
-    now.hour + now.fraction < cell.hour + cell.span - 1 / 6;
-  const during = (cell: TimetableCell) =>
-    isDuring(cell) ? "shadow-[inset_3px_0_0_var(--now)]" : "";
+  // the 10 minutes after a class are its break, not part of it. during the
+  // class the now-line runs through its block at the share gone by (0–1)
+  const elapsed = (cell: TimetableCell) =>
+    now ? (now.hour + now.fraction - cell.hour) / (cell.span - 1 / 6) : -1;
+  const isDuring = (cell: TimetableCell) => {
+    const at = elapsed(cell);
+    return at >= 0 && at < 1;
+  };
+  // the time column's start and end times sit at 10–30px and 30–50px of a
+  // ~67px row; the one the now time would sit on fades out for it
+  const covered = (cell: TimetableCell) => {
+    if (!isDuring(cell)) return { start: false, end: false };
+    const y = Math.min(Math.max(elapsed(cell) * 67, 10), 57);
+    return { start: y < 40, end: y > 20 && y < 60 };
+  };
 
   return (
     <div className="tt-agenda px-4">
@@ -139,12 +155,16 @@ export function Agenda({
           ) : (
             <div className="tt-row" data-row-presence={item.cell.presence}>
               <div className="min-h-0 overflow-hidden">
-                <div className="mb-1.5 grid grid-cols-[64px_1fr] gap-3">
+                <div className="relative mb-1.5 grid grid-cols-[64px_1fr] gap-3">
                   <div className="pt-2.5 text-right">
-                    <div className="whitespace-nowrap text-sm font-medium">
+                    <div
+                      className={`whitespace-nowrap text-sm font-medium transition-opacity duration-(--d-2) ${covered(item.cell).start ? "opacity-0" : ""}`}
+                    >
                       {formatClock(item.cell.hour)}
                     </div>
-                    <div className="whitespace-nowrap text-sm text-ink-faint">
+                    <div
+                      className={`whitespace-nowrap text-sm text-ink-faint transition-opacity duration-(--d-2) ${covered(item.cell).end ? "opacity-0" : ""}`}
+                    >
                       {formatSlotEnd(item.cell.hour, item.cell.span)}
                     </div>
                   </div>
@@ -174,30 +194,41 @@ export function Agenda({
                       }
                       aria-label={`Edit ${item.cell.courseId} ${item.cell.type}${item.cell.number}, press Delete to remove`}
                       style={named(item.cell).style}
-                      className={`${blockClass} ${named(item.cell).className} ${during(item.cell)} cursor-pointer hover:bg-ev-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring disabled:opacity-60`}
+                      className={`${blockClass} ${named(item.cell).className} cursor-pointer hover:bg-ev-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring disabled:opacity-60`}
                     >
-                      <BlockBody cell={item.cell} />
+                      <BlockBody
+                        cell={item.cell}
+                        during={isDuring(item.cell)}
+                      />
                     </button>
                   ) : (
                     <div
                       data-presence={item.cell.presence ?? "present"}
                       inert={item.cell.presence === "leaving"}
                       style={named(item.cell).style}
-                      className={`${blockClass} ${named(item.cell).className} ${during(item.cell)}`}
+                      className={`${blockClass} ${named(item.cell).className}`}
                     >
-                      <BlockBody cell={item.cell} />
+                      <BlockBody
+                        cell={item.cell}
+                        during={isDuring(item.cell)}
+                      />
                     </div>
+                  )}
+                  {now && isDuring(item.cell) && (
+                    <NowLine.Through
+                      label={now.label}
+                      at={elapsed(item.cell)}
+                    />
                   )}
                 </div>
               </div>
             </div>
           )}
-          {now && i === nowIndex && (
-            <NowLine.Agenda
-              label={now.label}
-              during={item.kind === "class" && isDuring(item.cell)}
-            />
-          )}
+          {now &&
+            i === nowIndex &&
+            !(item.kind === "class" && isDuring(item.cell)) && (
+              <NowLine.Agenda label={now.label} />
+            )}
         </Fragment>
       ))}
     </div>
