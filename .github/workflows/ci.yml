@@ -31,20 +31,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      # pnpm must be installed before setup-node for cache: pnpm to work
-      - uses: pnpm/action-setup@v6
-        name: Install pnpm
-        with:
-          version: 11.18.0
-          run_install: false
-
+      # any node 24 is already in the runner's tool cache, an exact patch
+      # version gets downloaded every time
       - name: Install Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: 24.14.1
-          cache: pnpm
+          node-version: 24
+
+      - name: Install pnpm
+        run: npm i -g pnpm@11.18.0 --no-fund --no-audit
+
+      # node_modules itself rather than the pnpm store: restoring it takes as
+      # long, and then there's nothing left to install
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v6
+        with:
+          path: |
+            node_modules
+            */node_modules
+          key: ci-modules-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
 
       - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
         run: pnpm install -r --frozen-lockfile
 
       - name: Build lib
