@@ -513,6 +513,15 @@ html.theme-transition::view-transition-new(root) {
       animation-duration: var(--d-3);
       animation-timing-function: var(--e-out);
     }
+    /* the UA default scales each snapshot to the group's width, which
+    stretches text between an agenda row and a week tile. keep the text at
+    its own size, pinned top-left, and let the growing box reveal it */
+    &::view-transition-old(.tt-block),
+    &::view-transition-new(.tt-block) {
+      height: 100%;
+      object-fit: none;
+      object-position: top left;
+    }
     &::view-transition-old(root) {
       animation: tt-root-out var(--d-2) var(--e-out) both;
     }
@@ -524,9 +533,13 @@ html.theme-transition::view-transition-new(root) {
     & .tt-agenda {
       view-transition-name: tt-agenda;
     }
+    /* only the agenda slides: the new page sits plainly on top of the old
+    one. without normal blending the two would add up (plus-lighter) and
+    brighten the page, and the old day pill would show through */
     &::view-transition-old(root),
     &::view-transition-new(root) {
       animation: none;
+      mix-blend-mode: normal;
     }
   }
   html:active-view-transition-type(day-next) {
