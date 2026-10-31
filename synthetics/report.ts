@@ -1,6 +1,14 @@
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { appendFileSync, readdirSync, readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import {
+  appendFileSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 import sharp from "sharp";
 import { synthetics } from "./synthetics.js";
 
@@ -9,7 +17,7 @@ import { synthetics } from "./synthetics.js";
 // comment that's edited on every run.
 //
 // the images live in this repo under a ref that isn't a branch, so clones
-// never download them. that ref only ever moves forward, every image is named
+// never download them, and get there with plain git rather than the api. that ref only ever moves forward, every image is named
 // after its hash and every link pins a commit, so a report keeps showing
 // exactly what it showed for as long as the repo exists
 
@@ -48,22 +56,24 @@ const github = async <T>(
   return { status: res.status, data: (await res.json()) as T };
 };
 
-// a file's bytes as of a commit
-const read = async (commit: string, path: string) => {
-  const res = await fetch(
-    `https://api.github.com/repos/${GITHUB_REPOSITORY}/contents/${path}?ref=${commit}`,
-    {
-      headers: {
-        authorization: `Bearer ${GITHUB_TOKEN}`,
-        accept: "application/vnd.github.raw",
-        "x-github-api-version": "2022-11-28",
-      },
-    },
-  );
-  if (res.status === 404) return undefined;
-  if (!res.ok) throw new Error(`reading ${path}: ${res.status}`);
-  return Buffer.from(await res.arrayBuffer());
-};
+const REF = `refs/${IMAGES_REF}`;
+const git = (
+  args: string[],
+  options: { input?: string | Buffer; env?: Record<string, string> } = {},
+) =>
+  execFileSync("git", args, {
+    input: options.input,
+    env: { ...process.env, ...options.env },
+    maxBuffer: 1 << 30,
+    stdio: "pipe",
+  });
+
+// a file's bytes as of a commit. the store is fetched without file contents,
+// so this downloads just the one file
+const read = (commit: string, path: string) =>
+  git(["ls-tree", "--full-tree", commit, "--", path]).length
+    ? git(["cat-file", "blob", `${commit}:${path}`])
+    : undefined;
 
 const sha256 = (data: Buffer) =>
   createHash("sha256").update(data).digest("hex");
@@ -108,60 +118,101 @@ const diffImage = async (before: Buffer, after: Buffer) => {
 
 type Manifest = Record<string, string>;
 
-const tip = async () => {
-  const ref = await github<{ object: { sha: string } }>(
-    `/git/ref/${IMAGES_REF}`,
-  );
-  if (ref.status === 404) return undefined;
-  const commit = await github<{ tree: { sha: string } }>(
-    `/git/commits/${ref.data.object.sha}`,
-  );
-  return { commit: ref.data.object.sha, tree: commit.data.tree.sha };
+// the store's latest commit, fetched with its file list but no contents
+const tip = () => {
+  try {
+    git([
+      "fetch",
+      "--quiet",
+      "--depth=1",
+      "--filter=blob:none",
+      "origin",
+      `+${REF}:${REF}`,
+    ]);
+  } catch (error) {
+    const stderr = String((error as { stderr?: Buffer }).stderr);
+    if (stderr.includes("couldn't find remote ref")) return undefined;
+    throw error;
+  }
+  return { commit: git(["rev-parse", REF]).toString().trim() };
 };
 
-const readManifest = async (commit: string | undefined): Promise<Manifest> => {
-  const file = commit && (await read(commit, "manifest.json"));
+const readManifest = (commit: string | undefined): Manifest => {
+  const file = commit && read(commit, "manifest.json");
   return file ? JSON.parse(file.toString()) : {};
 };
 
-// adds files on top of the ref's tip, retrying if another run moved it first.
-// nothing is ever removed, so older links keep resolving
-const store = async (files: Map<string, Buffer>, message: string) => {
-  const tree = await Promise.all(
-    [...files].map(async ([path, data]) => {
-      const blob = await github<{ sha: string }>("/git/blobs", {
-        method: "POST",
-        body: { content: data.toString("base64"), encoding: "base64" },
+// adds files on top of the store's tip in one push, retrying if another run
+// moved it first. one push instead of an api call per image, which ran into
+// github's limits on creating content. images are named after their hash, so
+// any already stored are skipped. nothing is ever removed, so older links
+// keep resolving
+const BOT = {
+  name: "github-actions[bot]",
+  email: "41898282+github-actions[bot]@users.noreply.github.com",
+};
+const store = (files: Map<string, Buffer>, message: string) => {
+  const blobs = [...files].map(([path, data]) => ({
+    path,
+    sha: git(["hash-object", "-w", "--stdin"], { input: data })
+      .toString()
+      .trim(),
+  }));
+  const dir = mkdtempSync(join(tmpdir(), "synthetics-"));
+  const env = {
+    GIT_INDEX_FILE: join(dir, "index"),
+    GIT_AUTHOR_NAME: BOT.name,
+    GIT_AUTHOR_EMAIL: BOT.email,
+    GIT_COMMITTER_NAME: BOT.name,
+    GIT_COMMITTER_EMAIL: BOT.email,
+  };
+  try {
+    for (let attempt = 0; attempt < 10; attempt++) {
+      const parent = tip();
+      const stored = new Set(
+        parent
+          ? git(["ls-tree", "--full-tree", "-r", "--name-only", parent.commit])
+              .toString()
+              .split("\n")
+          : [],
+      );
+      const fresh = blobs.filter(
+        ({ path }) => path === "manifest.json" || !stored.has(path),
+      );
+      if (parent && !fresh.length) return parent.commit;
+      rmSync(env.GIT_INDEX_FILE, { force: true });
+      if (parent) git(["read-tree", parent.commit], { env });
+      git(["update-index", "--index-info"], {
+        env,
+        input: fresh
+          .map(({ path, sha }) => `100644 ${sha}\t${path}`)
+          .join("\n"),
       });
-      return { path, mode: "100644", type: "blob", sha: blob.data.sha };
-    }),
-  );
-  for (let attempt = 0; attempt < 10; attempt++) {
-    const parent = await tip();
-    const newTree = await github<{ sha: string }>("/git/trees", {
-      method: "POST",
-      body: { base_tree: parent?.tree, tree },
-    });
-    const commit = await github<{ sha: string }>("/git/commits", {
-      method: "POST",
-      body: {
-        message,
-        tree: newTree.data.sha,
-        parents: parent ? [parent.commit] : [],
-      },
-    });
-    const moved = parent
-      ? await github(`/git/refs/${IMAGES_REF}`, {
-          method: "PATCH",
-          body: { sha: commit.data.sha, force: false },
-        })
-      : await github("/git/refs", {
-          method: "POST",
-          body: { ref: `refs/${IMAGES_REF}`, sha: commit.data.sha },
-        });
-    if (moved.status < 300) return commit.data.sha;
+      const tree = git(["write-tree"], { env }).toString().trim();
+      const commit = git(
+        [
+          "commit-tree",
+          tree,
+          ...(parent ? ["-p", parent.commit] : []),
+          "-m",
+          message,
+        ],
+        { env },
+      )
+        .toString()
+        .trim();
+      try {
+        git(["push", "--quiet", "origin", `${commit}:${REF}`]);
+        return commit;
+      } catch (error) {
+        const stderr = String((error as { stderr?: Buffer }).stderr);
+        if (!/rejected|fetch first|non-fast-forward/.test(stderr)) throw error;
+      }
+    }
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
   }
-  throw new Error(`couldn't move refs/${IMAGES_REF}`);
+  throw new Error(`couldn't move ${REF}`);
 };
 
 const shots = new Map(
@@ -174,8 +225,8 @@ const shots = new Map(
     }),
 );
 
-const parent = await tip();
-const baseline = await readManifest(parent?.commit);
+const parent = tip();
+const baseline = readManifest(parent?.commit);
 const noBaseline = BASELINE !== "true" && !Object.keys(baseline).length;
 const changed = [...shots].filter(
   ([path, { hash }]) => baseline[path] && baseline[path] !== hash,
@@ -192,10 +243,7 @@ const diffs = new Map<string, string>();
 await Promise.all(
   changed.map(async ([path, { data, hash }]) => {
     const name = `diff/${baseline[path]}-${hash}.png`;
-    const before = await read(
-      parent?.commit as string,
-      `img/${baseline[path]}.png`,
-    );
+    const before = read(parent?.commit as string, `img/${baseline[path]}.png`);
     if (!before)
       throw new Error(`no img/${baseline[path]}.png in refs/${IMAGES_REF}`);
     files.set(name, await diffImage(before, data));
@@ -214,7 +262,7 @@ if (BASELINE === "true" && (changed.length || added.length || removed.length)) {
 }
 
 const commit = files.size
-  ? await store(
+  ? store(
       files,
       BASELINE === "true"
         ? `baseline from ${process.env.GITHUB_SHA}`
