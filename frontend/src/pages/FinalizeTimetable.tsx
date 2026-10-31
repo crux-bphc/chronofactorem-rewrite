@@ -10,7 +10,7 @@ import useEditTimetable from "@/data-access/hooks/useEditTimetable";
 import useTimetable, {
   timetableQueryOptions,
 } from "@/data-access/hooks/useTimetable";
-import { setSharedTimetable, TIMETABLE_TITLE_VT } from "@/lib/sharedTransition";
+import { TIMETABLE_TITLE_VT } from "@/lib/sharedTransition";
 import { cn } from "@/lib/utils";
 import authenticatedRoute from "../AuthenticatedRoute";
 import { Button } from "../components/ui/button";
@@ -102,7 +102,6 @@ function FinalizeTimetable() {
       },
       {
         onSuccess: () => {
-          setSharedTimetable(timetable.id);
           router.navigate({
             to: "/",
           });

@@ -1,7 +1,14 @@
 import { Route } from "@tanstack/react-router";
 import type { timetableType } from "lib";
 import { Plus } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { flushSync } from "react-dom";
 import type { z } from "zod";
 import { ButtonLabel } from "@/components/ButtonLabel";
@@ -12,7 +19,11 @@ import { handleLoginRedirect } from "@/data-access/errors/handlers";
 import toastHandler from "@/data-access/errors/toastHandler";
 import useCreateTimetable from "@/data-access/hooks/useCreateTimetable";
 import useUser, { userQueryOptions } from "@/data-access/hooks/useUser";
-import { getSharedTimetable, setSharedTimetable } from "@/lib/sharedTransition";
+import {
+  getSharedTimetable,
+  setSharedTimetable,
+  subscribeSharedTimetable,
+} from "@/lib/sharedTransition";
 import { cn } from "@/lib/utils";
 import authenticatedRoute from "../AuthenticatedRoute";
 import TimetableCard from "../components/TimetableCard";
@@ -285,7 +296,10 @@ function Home() {
   const { mutate: createTimetable, isPending: isCreating } =
     useCreateTimetable();
 
-  const [sharedId, setSharedId] = useState(getSharedTimetable);
+  const sharedId = useSyncExternalStore(
+    subscribeSharedTimetable,
+    getSharedTimetable,
+  );
   const timetables = user?.timetables;
   const { leaving, deleted, collapse, done } = useCollapsingCards(timetables);
   const stagger = useRef(!staggered).current;
@@ -295,8 +309,7 @@ function Home() {
   }, [hasData]);
 
   const onOpen = (id: string) => {
-    setSharedTimetable(id);
-    flushSync(() => setSharedId(id));
+    flushSync(() => setSharedTimetable(id));
   };
 
   const { drafts, published, archived } = useMemo(() => {
