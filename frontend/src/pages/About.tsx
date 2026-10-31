@@ -1,4 +1,5 @@
 import { Route } from "@tanstack/react-router";
+import { CruxMark } from "../components/CruxMark";
 import { rootRoute } from "../router";
 
 const aboutRoute = new Route({
@@ -10,6 +11,7 @@ const aboutRoute = new Route({
 function About() {
   return (
     <main className="mx-auto w-full max-w-[640px] px-4 pt-2 pb-[calc(4rem+env(safe-area-inset-bottom))] lg:max-w-[720px] lg:px-7 lg:pt-10">
+      <CruxMark />
       <h1 className="text-2xl font-semibold lg:text-3xl">
         About ChronoFactorem
       </h1>
