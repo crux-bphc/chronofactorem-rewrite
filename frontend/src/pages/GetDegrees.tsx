@@ -23,11 +23,11 @@ const getDegreesRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "getDegrees",
   validateSearch: z.object({ year: collegeYearType }),
-  loader: ({ context: { queryClient } }) =>
+  loader: ({ context: { queryClient }, preload }) =>
     queryClient
       .ensureQueryData(userQueryOptions)
       .then(() => {
-        router.navigate({ to: "/" });
+        if (!preload) router.navigate({ to: "/" });
       })
       .catch((error) => {
         if (
@@ -36,7 +36,10 @@ const getDegreesRoute = new Route({
           error.response.status === 401
         ) {
           // The one exception to doing nothing is if they don't have a valid session cookie (from Google OAuth)
-          if (error.response.data.error === "user session expired") {
+          if (
+            error.response.data.error === "user session expired" &&
+            !preload
+          ) {
             router.navigate({ to: "/login" });
           }
         }

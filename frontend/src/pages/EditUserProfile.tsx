@@ -17,11 +17,11 @@ import { router } from "../router";
 const editUserProfileRoute = new Route({
   getParentRoute: () => authenticatedRoute,
   path: "editProfile",
-  loader: async ({ context: { queryClient } }) => {
+  loader: async ({ context: { queryClient }, preload }) => {
     try {
       return await queryClient.ensureQueryData(userQueryOptions);
     } catch (error: unknown) {
-      handleLoginRedirect(error);
+      if (!preload) handleLoginRedirect(error);
       throw error;
     }
   },
