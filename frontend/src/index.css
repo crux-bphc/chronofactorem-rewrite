@@ -498,7 +498,8 @@ html.theme-transition::view-transition-new(root) {
   }
 }
 
-/* taps during a transition reach the live page underneath */
+/* keep the snapshots from swallowing taps; Chrome still sends taps during a
+   transition to <html>, so the phone dock re-routes its own (TimetableDock) */
 ::view-transition {
   pointer-events: none;
 }

@@ -8,7 +8,7 @@ import {
   timetablePageLoader,
 } from "@/components/TimetablePageShell";
 import { ExportButton } from "@/components/timetable/HeaderActions";
-import { InterimPhoneControls } from "@/components/timetable/InterimPhoneControls";
+import { TimetableDock } from "@/components/timetable/TimetableDock";
 import { TimetableSurface } from "@/components/timetable/TimetableSurface";
 import { TimetableProvider, useTimetableState } from "@/context";
 import { timetableSearchSchema } from "@/lib/timetableSearch";
@@ -71,20 +71,21 @@ function ViewTimetable() {
           />
         }
         panel={SideBar}
-        dock={null}
-      >
-        {!screenIsLarge && (
-          <InterimPhoneControls
+        dock={
+          <TimetableDock
             dayCount={dayCount}
-            action={
-              <ExportButton
-                status={status}
-                onExport={exportPng}
-                layout="phone"
-              />
+            actions={
+              <div className="flex min-w-0 flex-[.6] *:flex-1">
+                <ExportButton
+                  status={status}
+                  onExport={exportPng}
+                  layout="phone"
+                />
+              </div>
             }
           />
-        )}
+        }
+      >
         <TimetableSurface
           sections={timetableDetailsSections}
           layout={screenIsLarge ? "desktop" : "phone"}

@@ -10,7 +10,7 @@ import {
   timetablePageLoader,
 } from "@/components/TimetablePageShell";
 import { PublishButton } from "@/components/timetable/HeaderActions";
-import { InterimPhoneControls } from "@/components/timetable/InterimPhoneControls";
+import { TimetableDock } from "@/components/timetable/TimetableDock";
 import { TimetableSurface } from "@/components/timetable/TimetableSurface";
 import { TimetableProvider, useTimetableState } from "@/context";
 import useCourse from "@/data-access/hooks/useCourse";
@@ -154,14 +154,17 @@ function EditTimetable() {
     <TimetablePageShell
       header={<TimetableHeader page="edit" />}
       panel={SideBar}
-      dock={null}
-    >
-      {!screenIsLarge && (
-        <InterimPhoneControls
+      dock={
+        <TimetableDock
           dayCount={dayCount}
-          action={<PublishButton layout="phone" />}
+          actions={
+            <div className="flex min-w-0 flex-[.7] *:flex-1">
+              <PublishButton layout="phone" />
+            </div>
+          }
         />
-      )}
+      }
+    >
       <TimetableSurface
         sections={timetableDetailsSections}
         layout={screenIsLarge ? "desktop" : "phone"}

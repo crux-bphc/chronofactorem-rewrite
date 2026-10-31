@@ -191,7 +191,11 @@ export function PublishButton({ layout }: { layout: Layout }) {
       className={cn(fade, blocked && "opacity-45")}
       onClick={() => {
         if (!blocked) publish();
-        else openSheet(summary.count > 0 ? "warnings" : "courses");
+        // Blocked with no courses: the fix is adding one, even when CDCs are
+        // missing too. Otherwise missing sections block it, and Warnings lists
+        // them.
+        else
+          openSheet(coursesInTimetable.length === 0 ? "courses" : "warnings");
       }}
     >
       {content}
