@@ -110,18 +110,22 @@ const loginLink = (
 function AppBar({ user, showCreate, isCreating, create, showLogin }: BarProps) {
   return (
     <header className="flex h-[52px] w-full shrink-0 items-center justify-between bg-bg px-4">
-      {user ? (
-        <Link
-          to="/"
-          className="relative flex h-11 items-center text-[20px] font-bold tracking-tight text-ink"
-        >
-          Chrono
-        </Link>
-      ) : (
-        <span className="text-[20px] font-bold tracking-tight text-ink">
-          Chrono
-        </span>
-      )}
+      {/* About sits next to the wordmark, as on master */}
+      <div className="flex items-center gap-1">
+        {user ? (
+          <Link
+            to="/"
+            className="relative flex h-11 items-center text-[20px] font-bold tracking-tight text-ink"
+          >
+            Chrono
+          </Link>
+        ) : (
+          <span className="text-[20px] font-bold tracking-tight text-ink">
+            Chrono
+          </span>
+        )}
+        {aboutIcon}
+      </div>
       <div className="flex items-center gap-1">
         {user ? (
           <>
@@ -135,13 +139,11 @@ function AppBar({ user, showCreate, isCreating, create, showLogin }: BarProps) {
                 <Plus className="size-5" />
               </Button>
             )}
-            {aboutIcon}
             <Announcements />
             <AvatarMenu user={user} />
           </>
         ) : (
           <>
-            {aboutIcon}
             <ThemeButton />
             {showLogin && loginLink}
           </>
