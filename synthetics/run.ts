@@ -1,10 +1,11 @@
 import { type ChildProcess, spawn } from "node:child_process";
 import { generateKeyPairSync } from "node:crypto";
-import { rmSync } from "node:fs";
+import { mkdirSync, rmSync } from "node:fs";
 import { availableParallelism } from "node:os";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import pg from "pg";
 import { chromium, devices, type Page } from "playwright";
+import sharp from "sharp";
 import { build, preview } from "vite";
 import scenario from "../backend/src/seed/scenarios/starter-pack.json" with {
   type: "json",
@@ -169,6 +170,33 @@ const trackRequests = async (page: Page) => {
   };
 };
 
+// the themes next to each other in one png, so a review sees both at once
+const GAP = 32;
+const sideBySide = async (shots: Buffer[], path: string) => {
+  const sizes = await Promise.all(shots.map((shot) => sharp(shot).metadata()));
+  let left = 0;
+  const placed = shots.map((input, i) => {
+    const at = { input, left, top: 0 };
+    left += sizes[i].width + GAP;
+    return at;
+  });
+  mkdirSync(dirname(path), { recursive: true });
+  await sharp({
+    create: {
+      width: left - GAP,
+      height: Math.max(...sizes.map((size) => size.height)),
+      channels: 3,
+      background: "#808080",
+    },
+  })
+    .composite(placed)
+    // screenshots are opaque, and the slowest compression is still quick at
+    // this size and keeps the pngs smaller than chromium's
+    .removeAlpha()
+    .png({ compressionLevel: 9 })
+    .toFile(path);
+};
+
 const shoot = async (
   timetables: Record<string, string>,
   announcementIds: string[],
@@ -255,6 +283,7 @@ const shoot = async (
     await page.evaluate(() => document.fonts.ready);
     // the theme follows prefers-color-scheme live, so every theme comes out of
     // one page load instead of loading the page again for each
+    const shots: Buffer[] = [];
     for (const theme of THEMES) {
       if (theme !== THEMES[0]) {
         await page.emulateMedia({ colorScheme: theme });
@@ -265,14 +294,16 @@ const shoot = async (
         );
         await settle();
       }
-      await page.screenshot({
-        path: resolve(outDir, synthetic.name, `${device}-${theme}.png`),
-        fullPage: true,
-        animations: "disabled",
-        caret: "hide",
-      });
+      shots.push(
+        await page.screenshot({
+          fullPage: true,
+          animations: "disabled",
+          caret: "hide",
+        }),
+      );
     }
     await context.close();
+    await sideBySide(shots, resolve(outDir, synthetic.name, `${device}.png`));
     console.log(`shot ${synthetic.name}/${device}`);
   };
 
