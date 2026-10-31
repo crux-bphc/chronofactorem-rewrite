@@ -218,6 +218,25 @@
     }
   }
 
+  /* the navbar holds still while the page slides under it, and only
+  crossfades what changed (the active link, the create button). only while
+  it sits at the top of both pages (data-navbar-still, lib/viewTransitions.ts),
+  since a scrolled page would make it jump. an open dialog's scrim covers it,
+  and a named navbar would paint above the scrim, so it slides with the page
+  then */
+  html[data-navbar-still]:active-view-transition-type(forward, back):not(
+    :has([role="dialog"], [role="alertdialog"])
+  ) .app-navbar {
+    view-transition-name: app-navbar;
+  }
+  ::view-transition-group(app-navbar) {
+    animation: none;
+  }
+  ::view-transition-old(app-navbar),
+  ::view-transition-new(app-navbar) {
+    animation-duration: var(--d-3);
+  }
+
   /* Home card <-> timetable page shared element (lib/sharedTransition.ts) */
   html:active-view-transition-type(shared-timetable) {
     --vt-timetable-title: timetable-title;

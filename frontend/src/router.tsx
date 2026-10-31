@@ -5,7 +5,10 @@ import authenticatedRoute from "./AuthenticatedRoute";
 import NotFound from "./components/NotFound";
 import { rootSearchSchema } from "./lib/rootSearch";
 import { trackSharedTimetable } from "./lib/sharedTransition";
-import { routeTransitionTypes } from "./lib/viewTransitions";
+import {
+  releaseStillNavbar,
+  routeTransitionTypes,
+} from "./lib/viewTransitions";
 import aboutRoute from "./pages/About";
 import editTimetableRoute from "./pages/EditTimetable";
 import editUserProfileRoute from "./pages/EditUserProfile";
@@ -82,6 +85,9 @@ export const router = new Router({
 });
 
 router.subscribe("onBeforeNavigate", trackSharedTimetable);
+// runs after the router's own scroll restoration, which subscribes when the
+// router is constructed
+router.subscribe("onRendered", releaseStillNavbar);
 
 // Register things for typesafety
 declare module "@tanstack/react-router" {
