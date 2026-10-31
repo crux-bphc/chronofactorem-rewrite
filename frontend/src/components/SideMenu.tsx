@@ -8,7 +8,7 @@ import CourseSearchResults from "./CourseSearchResults";
 import { CoursesTab } from "./CoursesTab";
 import ExamTab from "./ExamTab";
 import { Input } from "./ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Tabs } from "./ui/tabs";
 
 export function SideMenu({
   isOnEditPage,
@@ -107,34 +107,21 @@ export function SideMenu({
         </div>
       ) : (
         <Tabs
+          aria-label="Timetable details"
           value={currentTab}
-          onValueChange={(tab) => setTab(tab as typeof currentTab)}
-          className="flex min-h-0 flex-1 flex-col"
-        >
-          <TabsList
-            aria-label="Timetable details"
-            className="flex shrink-0 justify-start gap-5 px-4 lg:px-0"
-          >
-            <TabsTrigger value="courses" className="min-h-11 px-0 text-sm">
-              Courses · {coursesInTimetable.length}
-            </TabsTrigger>
-            <TabsTrigger value="exams" className="min-h-11 px-0 text-sm">
-              Exams
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent
-            value="courses"
-            className="mt-0 min-h-0 flex-1 overflow-y-auto"
-          >
-            <CoursesTab editable={isOnEditPage} />
-          </TabsContent>
-          <TabsContent
-            value="exams"
-            className="mt-0 min-h-0 flex-1 overflow-y-auto"
-          >
-            <ExamTab />
-          </TabsContent>
-        </Tabs>
+          onValueChange={setTab}
+          className="flex-1"
+          listClassName="shrink-0 justify-start gap-5 px-4 lg:px-0"
+          tabClassName="min-h-11 px-0 text-sm"
+          tabs={[
+            {
+              value: "courses",
+              label: `Courses · ${coursesInTimetable.length}`,
+              content: <CoursesTab editable={isOnEditPage} />,
+            },
+            { value: "exams", label: "Exams", content: <ExamTab /> },
+          ]}
+        />
       )}
     </div>
   );
