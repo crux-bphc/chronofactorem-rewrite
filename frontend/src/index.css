@@ -242,6 +242,11 @@ html.theme-transition::view-transition-new(root) {
   z-index: 1;
 }
 
+html.theme-transition * {
+  /* biome-ignore lint/complexity/noImportantStyles: must override the inline names on shared elements */
+  view-transition-name: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
