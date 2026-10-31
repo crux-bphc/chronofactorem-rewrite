@@ -1,23 +1,18 @@
-import { AlertTriangle, ArrowUpRightFromCircle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { useState } from "react";
-import BottomSheet, {
-  BottomSheetList,
-  BottomSheetRow,
-} from "@/components/BottomSheet";
-import { Button } from "@/components/ui/button";
+import BottomSheet from "@/components/BottomSheet";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { WarningsList } from "@/components/WarningsList";
 import { useTimetableState } from "@/context";
-import { useTimetableNav } from "@/lib/useTimetableNav";
 
 export const TimetableWarningsTooltip = () => {
   const {
     state: { courses, timetable, screenIsLarge },
   } = useTimetableState();
-  const { openCourse } = useTimetableNav();
   const [open, setOpen] = useState(false);
 
   if (
@@ -27,17 +22,6 @@ export const TimetableWarningsTooltip = () => {
   ) {
     return null;
   }
-
-  const missingSections = timetable.warnings.flatMap((warning) => {
-    const [code, types] = warning.split(":");
-    const course = courses.find((x) => x.code === code);
-    return types.split("").map((type) => ({ warning, code, type, course }));
-  });
-
-  const goToSection = (courseID: string, type: string) => {
-    setOpen(false);
-    openCourse(courseID, type as "L" | "P" | "T");
-  };
 
   const trigger = (
     <button
@@ -84,20 +68,7 @@ export const TimetableWarningsTooltip = () => {
         className="max-h-[65dvh]"
         trigger={trigger}
       >
-        <BottomSheetList>
-          {missingSections.map(({ code, type, course }) => (
-            <BottomSheetRow
-              key={code + type}
-              disabled={course === undefined}
-              onClick={() => course && goToSection(course.id, type)}
-            >
-              {course ? `${code}: ${course.name}` : code}
-              <span className="block font-normal text-muted-foreground">
-                missing a {type} section
-              </span>
-            </BottomSheetRow>
-          ))}
-        </BottomSheetList>
+        <WarningsList only="sections" onNavigate={() => setOpen(false)} />
       </BottomSheet>
     );
   }
@@ -105,29 +76,8 @@ export const TimetableWarningsTooltip = () => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>{trigger}</PopoverTrigger>
-      <PopoverContent className="w-auto px-3 py-1.5 bg-muted text-foreground border-muted-foreground/40 text-md">
-        {timetable.warnings.map((warning) => (
-          <div className="pb-2" key={warning}>
-            <span className="font-bold">{warning.split(":")[0]} is</span>
-            <div className="flex flex-col pl-4">
-              {missingSections
-                .filter((x) => x.warning === warning)
-                .map(({ code, type, course }) => (
-                  <div className="flex items-center" key={type}>
-                    <span>missing a {type} section</span>
-                    <Button
-                      aria-label={`Go to ${code} ${type} sections`}
-                      disabled={course === undefined}
-                      onClick={() => course && goToSection(course.id, type)}
-                      className="p-2 w-fit h-fit ml-2 mb-1 bg-transparent hover:bg-slate-300 dark:hover:bg-muted-foreground/30 text-secondary-foreground rounded-full"
-                    >
-                      <ArrowUpRightFromCircle className="w-4 h-4 text-foreground" />
-                    </Button>
-                  </div>
-                ))}
-            </div>
-          </div>
-        ))}
+      <PopoverContent className="w-80 p-3">
+        <WarningsList only="sections" onNavigate={() => setOpen(false)} />
       </PopoverContent>
     </Popover>
   );

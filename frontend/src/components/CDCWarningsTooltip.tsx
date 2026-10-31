@@ -1,97 +1,23 @@
-import { AlertOctagon, ArrowUpRightFromCircle } from "lucide-react";
-import { useMemo, useState } from "react";
-import BottomSheet, {
-  BottomSheetList,
-  BottomSheetRow,
-} from "@/components/BottomSheet";
-import { Button } from "@/components/ui/button";
+import { AlertOctagon } from "lucide-react";
+import { useState } from "react";
+import BottomSheet from "@/components/BottomSheet";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { WarningsList } from "@/components/WarningsList";
 import { useTimetableState } from "@/context";
-import { useTimetableNav } from "@/lib/useTimetableNav";
+import { useWarningsSummary } from "@/lib/useWarningsSummary";
 
 export const CDCWarningsTooltip = () => {
   const {
-    state: { cdcs, coursesInTimetable, screenIsLarge },
+    state: { screenIsLarge },
   } = useTimetableState();
-  const { showTab, openCourse } = useTimetableNav();
+  const { missingCdcs, notFound } = useWarningsSummary();
   const [open, setOpen] = useState(false);
 
-  const cdcNotFoundWarning = useMemo(
-    () =>
-      cdcs.filter((e) => e.id === null && e.type === "warning") as {
-        id: null;
-        type: "warning";
-        warning: string;
-      }[],
-    [cdcs],
-  );
-
-  const missingCDCs = useMemo(() => {
-    const missing: {
-      id: string;
-      code: string;
-      name: string;
-    }[] = [];
-    for (let i = 0; i < cdcs.length; i++) {
-      if (cdcs[i].id === null) {
-        const option = cdcs[i] as
-          | {
-              id: null;
-              type: "warning";
-              warning: string;
-            }
-          | {
-              id: null;
-              type: "optional";
-              options: {
-                id: string;
-                code: string;
-                name: string;
-              }[];
-            };
-        if (
-          option.type === "optional" &&
-          !option.options.some((e) =>
-            coursesInTimetable
-              .map((added) => added.id)
-              .includes(e.id as string),
-          )
-        ) {
-          const splitCodes = option.options.map((e) => e.code).join(" (or) ");
-          missing.push({
-            id: "",
-            code: splitCodes,
-            name: "",
-          });
-        }
-      } else {
-        if (
-          !coursesInTimetable.map((e) => e.id).includes(cdcs[i].id as string)
-        ) {
-          missing.push(
-            cdcs[i] as {
-              id: string;
-              code: string;
-              name: string;
-            },
-          );
-        }
-      }
-    }
-    return missing;
-  }, [coursesInTimetable, cdcs]);
-
-  const handleMissingCDCClick = (courseId: string) => {
-    setOpen(false);
-    if (courseId === "") showTab("courses");
-    else openCourse(courseId);
-  };
-
-  if (missingCDCs.length === 0 && cdcNotFoundWarning.length === 0) return null;
+  if (missingCdcs.length === 0 && notFound.length === 0) return null;
 
   const trigger = (
     <button
@@ -101,23 +27,11 @@ export const CDCWarningsTooltip = () => {
     >
       <AlertOctagon className="w-5 h-5 md:w-6 md:h-6 m-1 max-sm:m-0 max-sm:size-4" />
       <span className="sm:hidden">
-        {missingCDCs.length > 0
-          ? `${missingCDCs.length} missing CDC${missingCDCs.length > 1 ? "s" : ""}`
+        {missingCdcs.length > 0
+          ? `${missingCdcs.length} missing CDC${missingCdcs.length > 1 ? "s" : ""}`
           : "CDCs not found"}
       </span>
     </button>
-  );
-
-  const reportLink = (
-    <a
-      href="https://github.com/crux-bphc/chronofactorem-rewrite/issues"
-      className="text-blue-700 dark:text-blue-400 flex pl-1"
-    >
-      <span className="text-blue-700 dark:text-blue-400">
-        report this issue
-      </span>
-      <ArrowUpRightFromCircle className="w-4 h-4 ml-1" />
-    </a>
   );
 
   if (!screenIsLarge) {
@@ -131,29 +45,7 @@ export const CDCWarningsTooltip = () => {
         className="max-h-[65dvh]"
         trigger={trigger}
       >
-        <BottomSheetList>
-          {missingCDCs.map((e) => (
-            <BottomSheetRow
-              key={e.id + e.code}
-              onClick={() => handleMissingCDCClick(e.id)}
-            >
-              {e.name ? `${e.code}: ${e.name}` : e.code}
-            </BottomSheetRow>
-          ))}
-          {cdcNotFoundWarning.length > 0 && (
-            <div className="flex flex-col gap-1 border-t-2 border-slate-300 px-4 py-3 text-sm dark:border-slate-600">
-              <span className="font-bold">
-                Chrono could not find some of your CDCs in the list of courses.
-              </span>
-              <span className="flex">Please{reportLink}</span>
-              {cdcNotFoundWarning.map((e) => (
-                <span className="text-muted-foreground" key={e.warning}>
-                  {e.warning}
-                </span>
-              ))}
-            </div>
-          )}
-        </BottomSheetList>
+        <WarningsList only="cdcs" onNavigate={() => setOpen(false)} />
       </BottomSheet>
     );
   }
@@ -161,54 +53,13 @@ export const CDCWarningsTooltip = () => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>{trigger}</PopoverTrigger>
-      <PopoverContent className="w-auto px-3 py-1.5 bg-muted text-foreground border-muted-foreground/40 text-md">
-        {missingCDCs.length > 0 && (
-          <div className="flex flex-col">
-            <span>
-              You haven't added all CDCs for this semester to your timetable.
-            </span>
-            <span className="font-bold pt-2">CDCs missing:</span>
-            {missingCDCs.map((e) => (
-              <div className="flex items-center" key={e.id}>
-                <span className="ml-2">{e.code}</span>
-                <Button
-                  onClick={() => {
-                    handleMissingCDCClick(e.id);
-                  }}
-                  className="p-2 w-fit h-fit ml-2 mb-1 bg-transparent hover:bg-slate-300 dark:hover:bg-slate-700 text-secondary-foreground rounded-full"
-                >
-                  <ArrowUpRightFromCircle className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
+      <PopoverContent className="w-80 p-3">
+        {missingCdcs.length > 0 && (
+          <p className="pb-1 text-sm text-ink">
+            You haven't added all CDCs for this semester to your timetable.
+          </p>
         )}
-        {cdcNotFoundWarning.length > 0 && (
-          <div className="flex flex-col">
-            <span className="font-bold">
-              Chrono could not find some of your CDCs in the list of courses.
-            </span>
-            <span className="flex">
-              Please
-              <a
-                href="https://github.com/crux-bphc/chronofactorem-rewrite/issues"
-                className="text-blue-700 dark:text-blue-400 flex pl-1"
-              >
-                <span className="text-blue-700 dark:text-blue-400">
-                  report this issue
-                </span>
-                <ArrowUpRightFromCircle className="w-4 h-4 ml-1" />
-              </a>
-            </span>
-            <span className="font-bold pt-2">Error List:</span>
-
-            {cdcNotFoundWarning.map((e) => (
-              <span className="ml-2" key={e.id}>
-                {e.warning}
-              </span>
-            ))}
-          </div>
-        )}
+        <WarningsList only="cdcs" onNavigate={() => setOpen(false)} />
       </PopoverContent>
     </Popover>
   );
