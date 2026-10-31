@@ -118,7 +118,7 @@ export function DeskGrid({
             }
           : {
               gridTemplateColumns: `48px repeat(${dayCount}, minmax(86px, 1fr))`,
-              gridTemplateRows: `26px repeat(${hourCount}, minmax(44px, 1fr))`,
+              gridTemplateRows: `26px repeat(${hourCount}, minmax(${mode === "export" ? 56 : 44}px, 1fr))`,
             }
       }
     >
@@ -168,7 +168,7 @@ export function DeskGrid({
           style={{ gridColumn: "2 / -1", gridRow: i + 2 }}
         />
       ))}
-      {cells.length === 0 && ghostCells.length === 0 && (
+      {mode !== "export" && cells.length === 0 && ghostCells.length === 0 && (
         <Bird
           role="img"
           aria-label="No classes"
