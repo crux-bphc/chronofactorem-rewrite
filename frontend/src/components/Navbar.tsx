@@ -93,6 +93,14 @@ type BarProps = {
   showLogin: boolean;
 };
 
+const aboutIcon = (
+  <Button variant="quiet" size="icon" aria-label="About" asChild>
+    <Link to="/about">
+      <Info />
+    </Link>
+  </Button>
+);
+
 const loginLink = (
   <Button variant="quiet" size="sm" asChild>
     <Link to="/login">Login</Link>
@@ -119,7 +127,6 @@ function AppBar({ user, showCreate, isCreating, create, showLogin }: BarProps) {
           <>
             {showCreate && (
               <Button
-                variant="quiet"
                 size="icon"
                 aria-label="Create a timetable"
                 disabled={isCreating}
@@ -128,16 +135,13 @@ function AppBar({ user, showCreate, isCreating, create, showLogin }: BarProps) {
                 <Plus className="size-5" />
               </Button>
             )}
+            {aboutIcon}
             <Announcements />
             <AvatarMenu user={user} />
           </>
         ) : (
           <>
-            <Button variant="quiet" size="icon" aria-label="About" asChild>
-              <Link to="/about">
-                <Info />
-              </Link>
-            </Button>
+            {aboutIcon}
             <ThemeButton />
             {showLogin && loginLink}
           </>

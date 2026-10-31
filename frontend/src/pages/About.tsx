@@ -10,7 +10,7 @@ const aboutRoute = new Route({
 
 function About() {
   return (
-    <main className="px-4 pt-8 sm:px-16 lg:pl-20">
+    <main className="px-4 pt-8 pb-[calc(4rem+env(safe-area-inset-bottom))] sm:px-16 lg:pl-20">
       <h1 className="text-4xl font-bold tracking-tight">
         About ChronoFactorem
       </h1>

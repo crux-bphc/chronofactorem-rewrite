@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Info, LogOut, Monitor, Moon, Sun, User } from "lucide-react";
+import { LogOut, Monitor, Moon, Sun, User } from "lucide-react";
 import { useRef } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import {
@@ -84,12 +84,6 @@ export function AvatarMenu({ user }: { user: { name: string } }) {
           <Link to="/editProfile">
             <User className="size-4" />
             <span>Edit Profile</span>
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild className="lg:hidden">
-          <Link to="/about">
-            <Info className="size-4" />
-            <span>About</span>
           </Link>
         </DropdownMenuItem>
         {/* An item so keyboard users can reach it: arrows move onto the row,
