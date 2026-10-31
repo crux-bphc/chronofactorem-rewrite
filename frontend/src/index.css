@@ -529,6 +529,14 @@ html.theme-transition::view-transition-new(root) {
     &::view-transition-new(root) {
       animation: tt-root-in var(--d-2) var(--e-out) both;
     }
+    /* the grid card is its own group; fade it like the page so the old and
+    new axis labels don't overlap mid-morph */
+    &::view-transition-old(timetable-grid) {
+      animation: tt-root-out var(--d-2) var(--e-out) both;
+    }
+    &::view-transition-new(timetable-grid) {
+      animation: tt-root-in var(--d-2) var(--e-out) both;
+    }
   }
   html:active-view-transition-type(day-next, day-prev) {
     & .tt-agenda {

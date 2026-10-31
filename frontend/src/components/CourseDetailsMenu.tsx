@@ -262,7 +262,8 @@ const CourseDetailsMenu = ({
         )}
         {course && currentSectionType && uniqueSectionTypes.length > 0 && (
           <Segmented
-            className="mt-3 h-11 lg:h-10"
+            // the 300px desktop panel (below xl) needs tighter tabs to fit full names
+            className="mt-3 h-11 lg:h-10 lg:max-xl:[&>button]:gap-1 lg:max-xl:[&>button]:px-1.5 lg:max-xl:[&>button]:text-sm"
             aria-label="Section type"
             value={currentSectionType}
             onValueChange={(t) => setType(t)}

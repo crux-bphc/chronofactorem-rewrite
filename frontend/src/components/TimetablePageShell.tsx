@@ -114,14 +114,25 @@ export const TimetablePageShell = ({
   }
 
   return (
-    <main className="w-full min-w-0 flex-none h-[calc(100vh-12rem)]">
+    <main className="flex h-[calc(100dvh-60px)] min-h-[600px] flex-col">
       <TooltipProvider>
         {header}
-        <div className="relative flex h-full min-w-0 flex-row gap-4">
-          <aside className="bg-secondary w-[26rem] shrink-0 overflow-hidden">
+        {/* 300px below 1280 so DeskGrid's minimums fit at 1024 (1024 - 56
+            gutter - 300 - 20 gap = 648px); the spec's 360px from 1280. The
+            page's px-7 is the 28px gutter for the panel and the grid card */}
+        <div className="grid min-h-0 flex-1 grid-cols-[300px_minmax(0,1fr)] gap-5 px-7 pb-7 xl:grid-cols-[360px_minmax(0,1fr)]">
+          <aside
+            data-shot="side-menu"
+            className="flex min-h-0 flex-col overflow-hidden"
+          >
             {panel}
           </aside>
-          <div className="min-w-0 flex-1">{children}</div>
+          <div
+            className="min-h-0"
+            style={{ viewTransitionName: TIMETABLE_GRID_VT }}
+          >
+            {children}
+          </div>
         </div>
       </TooltipProvider>
     </main>
