@@ -18,11 +18,29 @@ const tsrIndex = (location: ParsedLocation) =>
 
 /**
  * Whether a search-only move swaps the course panel: a different course (or
- * none), or one open sheet replaced by another.
+ * none), or one open sheet replaced by another. A sheet opening or closing
+ * is the sheet's own motion, so it never slides the panel.
  */
-export const panelMoved = (a: TimetableSearch, b: TimetableSearch): boolean =>
-  (a.course ?? null) !== (b.course ?? null) ||
-  (!!a.sheet && !!b.sheet && a.sheet !== b.sheet);
+export const panelMoved = (a: TimetableSearch, b: TimetableSearch): boolean => {
+  if (!!a.sheet !== !!b.sheet) return false;
+  return (
+    (a.course ?? null) !== (b.course ?? null) ||
+    (!!a.sheet && a.sheet !== b.sheet)
+  );
+};
+
+let sheetClosePending = false;
+
+/**
+ * Marks the next history pop as part of closing the sheet, so it does not
+ * slide the course panel under the sheet's own exit. Self-clears.
+ */
+export function markSheetClosing(): void {
+  sheetClosePending = true;
+  setTimeout(() => {
+    sheetClosePending = false;
+  }, 1000);
+}
 
 /**
  * View transition types for router navigations without explicit types. In-app
@@ -40,6 +58,10 @@ export function routeTransitionTypes(info: {
   if (typeof window !== "undefined" && prefersReducedMotion()) return false;
   const back = tsrIndex(info.toLocation) < tsrIndex(info.fromLocation);
   if (!info.pathChanged) {
+    if (sheetClosePending) {
+      sheetClosePending = false;
+      return false;
+    }
     if (
       !panelMoved(
         info.fromLocation.search as TimetableSearch,

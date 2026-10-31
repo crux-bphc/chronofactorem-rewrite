@@ -2,6 +2,7 @@ import { useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 import { useCallback, useMemo } from "react";
 import type { TimetableSearch } from "./timetableSearch";
 import {
+  markSheetClosing,
   prefersReducedMotion,
   type SurfaceTransition,
   supportsTransitionTypes,
@@ -119,7 +120,7 @@ export function useTimetableNav() {
       search,
       openSheet: (sheet: "courses" | "warnings") => {
         if (router.latestLocation.search.sheet === sheet) return;
-        if (sheet === "warnings") {
+        if (sheet === "warnings" && isPhone()) {
           return go(
             ({ course: _c, type: _t, q: _q, ...p }) => ({ ...p, sheet }),
             { push: true },
@@ -143,8 +144,14 @@ export function useTimetableNav() {
             unsub();
             go(stripSheet, { push: false, transition: undefined });
           });
-          // don't leave a stray listener behind if the move never resolves
-          timer = setTimeout(unsub, 1000);
+          // don't leave a stray listener behind if the move never resolves,
+          // and never leave the URL claiming a sheet the user just closed
+          timer = setTimeout(() => {
+            unsub();
+            if (router.latestLocation.search.sheet)
+              go(stripSheet, { push: false, transition: undefined });
+          }, 1000);
+          markSheetClosing();
         }
         router.history.go(-sheetDepth);
       },
