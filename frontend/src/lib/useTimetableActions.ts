@@ -49,10 +49,9 @@ export function useTimetableActions(): {
       isCopyingTimetable: true,
     });
     setTimeout(() => {
-      // the copying spinner unmounts this header before the
-      // copy finishes, and react query drops per-call mutate
-      // callbacks once their component unmounts, so navigate
-      // from the promise instead
+      // react query drops per-call mutate callbacks once their
+      // component unmounts (the caller may be a menu that closes),
+      // so navigate from the promise instead
       copyTimetable(timetable.id)
         .then((res) =>
           router.navigate({

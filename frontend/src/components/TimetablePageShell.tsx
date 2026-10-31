@@ -1,10 +1,11 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
+import { LoaderCircle } from "lucide-react";
 import type React from "react";
 import { useEffect } from "react";
 import NotFound from "@/components/NotFound";
-import Spinner from "@/components/Spinner";
 import { TimetableSheet } from "@/components/timetable/TimetableSheet";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useToast } from "@/components/ui/use-toast";
 import { useTimetableState } from "@/context";
@@ -85,14 +86,30 @@ export const TimetablePageShell = ({
     state: { isCopyingTimetable, screenIsLarge },
   } = useTimetableState();
 
-  if (isCopyingTimetable) {
-    return (
-      <div className="flex flex-col text-muted-foreground gap-8 xl:text-xl lg:text-lg md:text-md text-sm bg-background h-[calc(100dvh-5rem)] justify-center w-full items-center">
-        <Spinner />
-        <span>Please wait while we copy over your timetable...</span>
-      </div>
-    );
-  }
+  // The copy flow's wait is intentional feedback (useTimetableActions), so
+  // the dialog can't be dismissed: it closes when the flow clears the flag.
+  const copying = (
+    <Dialog open={isCopyingTimetable}>
+      <DialogContent
+        hideClose
+        aria-describedby={undefined}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+        // focus parks on the dialog itself (nothing in it is interactive)
+        className="flex w-[300px] flex-col items-center gap-4 text-center outline-none"
+      >
+        <LoaderCircle
+          aria-hidden="true"
+          className="size-6 animate-spin text-brand"
+        />
+        <div role="status">
+          <DialogTitle className="text-[15px] font-medium">
+            Please wait while we copy over your timetable...
+          </DialogTitle>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 
   if (!screenIsLarge) {
     return (
@@ -108,6 +125,7 @@ export const TimetablePageShell = ({
           </div>
           {dock}
           <TimetableSheet courses={panel} />
+          {copying}
         </TooltipProvider>
       </main>
     );
@@ -134,6 +152,7 @@ export const TimetablePageShell = ({
             {children}
           </div>
         </div>
+        {copying}
       </TooltipProvider>
     </main>
   );
