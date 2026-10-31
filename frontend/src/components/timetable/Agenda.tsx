@@ -123,7 +123,7 @@ export function Agenda({
     return at >= 0 && at < 1;
   };
   return (
-    <div className="tt-agenda px-4">
+    <div className="tt-agenda px-4 pt-3">
       {items.map((item, i) => (
         <Fragment
           key={
