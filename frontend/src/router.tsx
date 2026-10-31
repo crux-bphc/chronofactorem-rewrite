@@ -3,6 +3,7 @@ import { Router, rootRouteWithContext } from "@tanstack/react-router";
 import { AxiosError } from "axios";
 import authenticatedRoute from "./AuthenticatedRoute";
 import NotFound from "./components/NotFound";
+import { rootSearchSchema } from "./lib/rootSearch";
 import { routeTransitionTypes } from "./lib/viewTransitions";
 import aboutRoute from "./pages/About";
 import editTimetableRoute from "./pages/EditTimetable";
@@ -35,6 +36,7 @@ export const rootRoute = rootRouteWithContext<{
   queryClient: QueryClient;
 }>()({
   component: RootComponent,
+  validateSearch: rootSearchSchema,
 });
 
 const routeTree = rootRoute.addChildren([

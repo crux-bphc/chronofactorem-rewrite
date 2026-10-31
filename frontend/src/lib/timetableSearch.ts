@@ -1,7 +1,10 @@
 import { z } from "zod";
 
 export const timetableSearchSchema = z.object({
-  sheet: z.enum(["courses", "warnings"]).optional().catch(undefined),
+  sheet: z
+    .enum(["courses", "warnings", "announcements"])
+    .optional()
+    .catch(undefined),
   // Interim: narrows to "courses" | "exams" once the CDC and search tabs fold away.
   tab: z
     .enum(["cdcs", "search", "courses", "exams"])

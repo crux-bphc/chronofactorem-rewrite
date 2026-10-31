@@ -1,8 +1,9 @@
 import { Route } from "@tanstack/react-router";
 import { AxiosError } from "axios";
 import { collegeYearType } from "lib";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { z } from "zod";
+import { ButtonLabel } from "@/components/ButtonLabel";
 import DegreeDropDown from "@/components/DegreeDropDown";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -52,14 +53,15 @@ function GetDegrees() {
   const [firstDegree, setFirstDegree] = useState<string | null>(null);
   const [secondDegree, setSecondDegree] = useState<string | null>(null);
   const { toast } = useToast();
-  const { mutate: createUser } = useCreateUser();
+  const { mutate: createUser, isPending } = useCreateUser();
+  // isPending lags a render behind a fast double tap, so guard synchronously.
+  const submitting = useRef(false);
 
   const handleSubmit = async () => {
     if (firstDegree) {
       if (firstDegree?.includes("B") && year >= 2 && secondDegree === null) {
         toast({
           title: "Select your second degree!",
-          variant: "destructive",
         });
         return;
       }
@@ -67,9 +69,14 @@ function GetDegrees() {
         firstDegree?.includes("B") && year >= 2 && secondDegree !== "A0"
           ? [firstDegree, secondDegree]
           : [firstDegree];
+      if (submitting.current) return;
+      submitting.current = true;
       createUser(
         { degrees },
         {
+          onError: () => {
+            submitting.current = false;
+          },
           onSuccess: () => {
             router.navigate({ to: "/" });
           },
@@ -78,43 +85,41 @@ function GetDegrees() {
     } else {
       toast({
         title: "Select your degree!",
-        variant: "destructive",
       });
     }
   };
 
   return (
-    <>
-      <div className="flex bg-background h-screen w-full justify-center">
-        <div className="flex flex-col items-center pt-48">
-          <div className="text-center">
-            <h1 className="scroll-m-20 leading-relaxed text-3xl md:text-6xl font-bold">
-              Register
-            </h1>
-            <p className="text-muted-foreground mx-4 not-md:text-xs font-semibold">
-              Select your degree
-              {firstDegree?.includes("B") && year >= 2 ? "s" : ""} so we can
-              help build your timetable
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-2">
+    <div className="min-h-dvh flex flex-col bg-bg text-ink">
+      <div className="mx-auto w-full max-w-[400px] flex-1 flex flex-col px-6 pt-16 lg:justify-center lg:pt-0">
+        <div className="flex-1 lg:flex-none">
+          <h1 className="text-3xl font-semibold">Register</h1>
+          <div className="mt-8">
             <DegreeDropDown
               firstDegree={firstDegree}
               secondDegree={secondDegree}
               setFirstDegree={setFirstDegree}
               setSecondDegree={setSecondDegree}
               year={year}
+              showLabels
             />
           </div>
-          <Button className="w-fit mt-4" onClick={handleSubmit} size="lg">
-            Continue
+        </div>
+        <div className="pt-6 lg:pt-8">
+          <Button
+            className="w-full"
+            onClick={handleSubmit}
+            disabled={isPending}
+            aria-busy={isPending}
+          >
+            <ButtonLabel loading={isPending}>Continue</ButtonLabel>
           </Button>
         </div>
       </div>
-      <span className="fixed bottom-0 bg-muted w-full text-center py-1 text-xs md:px-0 px-8 tracking-tight md:text-lg text-muted-foreground">
+      <p className="text-sm text-ink-muted text-center px-6 pt-6 pb-[22px]">
         Powered by CRUx: The Programming and Computing Club of BITS Hyderabad
-      </span>
-    </>
+      </p>
+    </div>
   );
 }
 
