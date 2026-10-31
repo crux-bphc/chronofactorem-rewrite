@@ -179,6 +179,7 @@ export function WeekGrid({
               onRemove={onRemove}
               iconSize={10}
               className="top-[3px] right-px size-3.5 after:size-7"
+              hitClassName="size-7"
             />
           </div>
         ) : (

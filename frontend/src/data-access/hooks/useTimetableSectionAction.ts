@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
+import { haptic } from "@/lib/haptics";
 import chronoAPI from "../axios";
 import toastHandler from "../errors/toastHandler";
 
@@ -33,7 +34,10 @@ export const useAddRemoveTimetableSection = (
         queryKey: ["timetable", timetableId],
       });
     },
-    onError: (error) => toastHandler(error, toast),
+    onError: (error) => {
+      haptic("error");
+      toastHandler(error, toast);
+    },
   });
 };
 
@@ -61,6 +65,9 @@ export const useSwapTimetableSections = (timetableId: string | undefined) => {
         queryKey: ["timetable", timetableId],
       });
     },
-    onError: (error) => toastHandler(error, toast),
+    onError: (error) => {
+      haptic("error");
+      toastHandler(error, toast);
+    },
   });
 };

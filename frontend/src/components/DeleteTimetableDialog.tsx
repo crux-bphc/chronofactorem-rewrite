@@ -14,6 +14,7 @@ import {
   SheetHeader,
 } from "@/components/ui/sheet";
 import useDeleteTimetable from "@/data-access/hooks/useDeleteTimetable";
+import { HapticTap, haptic } from "@/lib/haptics";
 import { useIsDesktop } from "@/lib/useIsDesktop";
 
 const description =
@@ -106,12 +107,15 @@ export const DeleteTimetableDialog = ({
           </SheetClose>
           <Button
             variant="danger"
+            className="relative"
             onClick={() => {
+              haptic("warning");
               confirm();
               onOpenChange(false);
             }}
           >
             Delete
+            <HapticTap />
           </Button>
         </div>
       </SheetContent>

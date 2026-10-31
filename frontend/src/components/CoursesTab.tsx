@@ -4,6 +4,7 @@ import { ExternalLink } from "lucide-react";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useTimetableState } from "@/context";
 import { useRemoveTimetableCourse } from "@/data-access/hooks/useRemoveTimetableCourse";
+import { haptic } from "@/lib/haptics";
 import { panelForward } from "@/lib/panelTransition";
 import { useTimetableNav } from "@/lib/useTimetableNav";
 import { useWarningsSummary } from "@/lib/useWarningsSummary";
@@ -50,6 +51,7 @@ export function CoursesTab({ editable }: { editable: boolean }) {
   const handleRemove = (courseId: string, code: string) => {
     if (pending || inFlight.current) return;
     inFlight.current = true;
+    haptic("selection");
     removeCourse(
       { courseId, code },
       {
