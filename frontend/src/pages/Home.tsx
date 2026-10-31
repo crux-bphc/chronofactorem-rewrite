@@ -4,7 +4,6 @@ import { Plus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import type { z } from "zod";
-import { BottomBar } from "@/components/BottomBar";
 import { ButtonLabel } from "@/components/ButtonLabel";
 import { EmptyBird } from "@/components/EmptyBird";
 import ReportIssue from "@/components/ReportIssue";
@@ -24,7 +23,7 @@ import { router } from "../router";
 type Timetable = z.infer<typeof timetableType>;
 
 const mainClass =
-  "mx-auto w-full max-w-[640px] px-4 pb-28 lg:max-w-[1100px] lg:px-7 lg:pb-12";
+  "mx-auto w-full max-w-[640px] px-4 pb-12 lg:max-w-[1100px] lg:px-7";
 const gridClass = "grid gap-2 lg:grid-cols-3 lg:gap-3.5";
 const overlineClass =
   "mt-5 mb-2 text-xs font-semibold tracking-[.07em] text-ink-muted uppercase lg:mt-7 lg:mb-2.5";
@@ -401,7 +400,6 @@ function Home() {
             startIndex={archivedAt}
             {...sectionProps}
           />
-          <BottomBar className="lg:hidden">{createButton()}</BottomBar>
         </>
       )}
     </main>

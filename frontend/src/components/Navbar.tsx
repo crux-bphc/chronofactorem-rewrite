@@ -80,11 +80,10 @@ export function NavBar() {
     create,
     showLogin: !user && isUnauthenticated,
   };
-  // the phone "+" only shows on the view page; Home has its own bottom bar
   return isDesktop ? (
     <DesktopNav {...props} showCreate={!!user && !isEditPage} />
   ) : (
-    <AppBar {...props} showCreate={!!user && pathname.startsWith("/view/")} />
+    <AppBar {...props} showCreate={!!user && !isEditPage} />
   );
 }
 
