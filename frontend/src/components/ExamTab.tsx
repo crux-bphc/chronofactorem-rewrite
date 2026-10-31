@@ -110,7 +110,7 @@ const ExamTab = ({ all }: { all?: boolean }) => {
     <div className="flex flex-col pt-2 pb-6">
       <Segmented
         aria-label="Exam type"
-        className="mx-4 lg:mx-0"
+        className="mx-4 h-11 lg:mx-0 lg:h-10"
         value={kind}
         onValueChange={setExam}
         options={OPTIONS}

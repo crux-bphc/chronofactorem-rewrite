@@ -162,9 +162,8 @@ const CourseDetailsMenu = ({
   const slot = (roomTime: string) => roomTime.split(":").slice(2).join(":");
 
   const landed = useClashLanding(course?.id ?? null, currentSectionType);
-  const landingKey = `${course?.id}|${currentSectionType}`;
-  const [pulsedKey, setPulsedKey] = useState<string | null>(null);
-  const pulse = landed && pulsedKey !== landingKey && !reducedMotion();
+  const [pulsedNonce, setPulsedNonce] = useState<number | null>(null);
+  const pulse = landed !== null && pulsedNonce !== landed && !reducedMotion();
 
   // Rows already selected when a course opens don't play the tick; rows
   // selected (or reselected) while it is open do.
@@ -257,7 +256,7 @@ const CourseDetailsMenu = ({
         )}
         {course && currentSectionType && uniqueSectionTypes.length > 0 && (
           <Segmented
-            className="mt-3"
+            className="mt-3 h-11 lg:h-10"
             aria-label="Section type"
             value={currentSectionType}
             onValueChange={(t) => setType(t)}
@@ -330,11 +329,15 @@ const CourseDetailsMenu = ({
                   aria-pressed={selected}
                   aria-busy={busy || undefined}
                   onClick={() => handleSectionClick(section)}
-                  onMouseEnter={() => hover(section.id)}
-                  onMouseLeave={() => hover(null)}
+                  onPointerEnter={(e) => {
+                    if (e.pointerType === "mouse") hover(section.id);
+                  }}
+                  onPointerLeave={(e) => {
+                    if (e.pointerType === "mouse") hover(null);
+                  }}
                   onAnimationEnd={(e) => {
                     if (e.animationName === "cf-ring-pulse")
-                      setPulsedKey(landingKey);
+                      setPulsedNonce(landed);
                   }}
                   className={cn(
                     rowGrid,
@@ -349,6 +352,10 @@ const CourseDetailsMenu = ({
                   <SectionText section={section} />
                   {selected ? (
                     <span
+                      onAnimationEnd={(e) => {
+                        if (e.animationName === "cf-tick-in")
+                          seen.current.ids.add(section.id);
+                      }}
                       className={cn(
                         "grid size-[22px] place-items-center self-center rounded-full bg-brand text-brand-ink",
                         fresh &&

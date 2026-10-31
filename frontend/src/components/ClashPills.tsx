@@ -63,28 +63,35 @@ export function useExamClashPills(clashing: string[] | null) {
   );
 }
 
-let landing: { courseId: string; type: string } | null = null;
+let landing: { courseId: string; type: string; nonce: number } | null = null;
+let landingNonce = 0;
 
 export function markClashLanding(courseId: string, type: "L" | "P" | "T") {
-  landing = { courseId, type };
+  landing = { courseId, type, nonce: ++landingNonce };
 }
 
 /**
- * True for the render matching the marked course and type. Render stays pure:
- * the one-shot slot is read here and cleared in an effect after commit.
+ * The nonce of the clash landing on this course and type, or null. Every pill
+ * tap gets a fresh nonce, so each landing can pulse once; opening the same
+ * course any other way carries the old nonce and so never pulses again. Render
+ * stays pure: the one-shot slot is read here and cleared in an effect.
  */
 export function useClashLanding(
   courseId: string | null,
   type: string | null,
-): boolean {
-  const matches =
-    landing !== null && landing.courseId === courseId && landing.type === type;
+): number | null {
   const key = `${courseId}|${type}`;
-  const [landedKey, setLandedKey] = useState<string | null>(null);
+  const pending =
+    landing !== null && landing.courseId === courseId && landing.type === type
+      ? landing.nonce
+      : null;
+  const [landed, setLanded] = useState<{ key: string; nonce: number } | null>(
+    null,
+  );
   useEffect(() => {
-    if (!matches) return;
+    if (pending === null) return;
     landing = null;
-    setLandedKey(key);
-  }, [matches, key]);
-  return matches || landedKey === key;
+    setLanded({ key, nonce: pending });
+  }, [pending, key]);
+  return pending ?? (landed?.key === key ? landed.nonce : null);
 }
