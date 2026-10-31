@@ -23,34 +23,32 @@ function AgendaLine({ label }: { label: string }) {
 }
 
 /**
- * The now-line drawn through the class that is on: across the block at the
- * share of the class gone by, with the time in the time column beside it.
- * Laid over the agenda row's two-column grid, under the block's text.
+ * The now-line for the class that is on: at the share of the class gone by,
+ * the time in the time column and a rule from there to the block's left edge,
+ * where the dot sits. It never crosses the block. Laid over the agenda row's
+ * two-column grid.
  */
 function ThroughLine({ label, at }: { label: string; at: number }) {
   // the row clips its content (it collapses on removal), so keep the label
   // and dot inside it at the very start and end of the class
-  const top = (inset: number) =>
-    `clamp(${inset}px, ${at * 100}%, 100% - ${inset}px)`;
+  const top = `clamp(10px, ${at * 100}%, 100% - 10px)`;
   return (
-    <div className="pointer-events-none absolute inset-0 z-0 grid grid-cols-[64px_1fr] gap-3">
-      <div className="relative">
-        <span
-          className="now-rule absolute right-0 -translate-y-1/2 whitespace-nowrap rounded-full bg-bg pl-1 text-sm font-semibold text-now"
-          style={{ top: top(10) }}
-        >
-          {label}
-        </span>
-      </div>
+    <div className="pointer-events-none absolute inset-0 grid grid-cols-[64px_1fr] gap-3">
       <div className="relative">
         <div
           role="img"
           aria-label={`Now, ${label}, during a class`}
-          className="now-rule absolute right-0 left-0 h-0.5 -translate-y-1/2 bg-now"
-          style={{ top: top(5) }}
+          className="now-rule absolute -right-3 left-0 h-0.5 -translate-y-1/2 bg-now"
+          style={{ top }}
         >
-          <span className={`${dot} top-1/2 -left-1 -translate-y-1/2`} />
+          <span className={`${dot} top-1/2 -right-1.5 -translate-y-1/2`} />
         </div>
+        <span
+          className="now-rule absolute right-0 -translate-y-1/2 whitespace-nowrap rounded-full bg-bg pl-1 text-sm font-semibold text-now"
+          style={{ top }}
+        >
+          {label}
+        </span>
       </div>
     </div>
   );

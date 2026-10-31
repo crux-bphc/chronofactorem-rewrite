@@ -27,23 +27,16 @@ type AgendaProps = {
 const blockClass =
   "flex w-full justify-between gap-2 rounded-lg bg-ev px-3 pt-[9px] pb-2.5 text-left";
 
-// while the now-line runs through a block its text sits above the line with
-// a halo of the block's colour, so the line reads as passing behind the text
-// rather than striking it out
-const haloClass =
-  "relative z-1 [text-shadow:0_0_2px_var(--ev),0_0_2px_var(--ev),0_0_4px_var(--ev),0_0_4px_var(--ev)]";
-
-function BlockBody({ cell, during }: { cell: TimetableCell; during: boolean }) {
-  const halo = during ? haloClass : "";
+function BlockBody({ cell }: { cell: TimetableCell }) {
   return (
     <>
-      <span className={`min-w-0 ${halo}`}>
+      <span className="min-w-0">
         <span className="block text-lg font-semibold">{cell.code}</span>
         <span className="block text-sm text-ink-muted">
           {titleCase(cell.name)}
         </span>
       </span>
-      <span className={`shrink-0 text-right ${halo}`}>
+      <span className="shrink-0 text-right">
         <span className="block whitespace-nowrap text-sm font-medium">
           {cell.room}
         </span>
@@ -196,10 +189,7 @@ export function Agenda({
                       style={named(item.cell).style}
                       className={`${blockClass} ${named(item.cell).className} cursor-pointer hover:bg-ev-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring disabled:opacity-60`}
                     >
-                      <BlockBody
-                        cell={item.cell}
-                        during={isDuring(item.cell)}
-                      />
+                      <BlockBody cell={item.cell} />
                     </button>
                   ) : (
                     <div
@@ -208,10 +198,7 @@ export function Agenda({
                       style={named(item.cell).style}
                       className={`${blockClass} ${named(item.cell).className}`}
                     >
-                      <BlockBody
-                        cell={item.cell}
-                        during={isDuring(item.cell)}
-                      />
+                      <BlockBody cell={item.cell} />
                     </div>
                   )}
                   {now && isDuring(item.cell) && (
