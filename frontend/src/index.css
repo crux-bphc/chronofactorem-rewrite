@@ -433,6 +433,22 @@ html.theme-transition * {
   }
 }
 
+/* The section a hovered pick would swap out: a faded, struck-through
+   danger tint, dashed like the ghost that replaces it */
+.tt-outgoing {
+  background-color: color-mix(in oklab, var(--danger-bg) 60%, var(--ev));
+  outline: 1.5px dashed color-mix(in oklab, var(--danger) 70%, transparent);
+  outline-offset: -1.5px;
+  & span {
+    color: var(--muted);
+  }
+  & span.font-semibold {
+    text-decoration: line-through;
+    text-decoration-color: var(--danger);
+    text-decoration-thickness: 1.5px;
+  }
+}
+
 /* Sections animate in and out (spec §9). The surface tags each block with
    data-presence; the export never gets "entering" or "leaving". */
 [data-presence] {

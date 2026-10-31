@@ -140,6 +140,13 @@ function EditTimetable() {
     preview && !timetable.sections.some((item) => item.id === preview.id)
       ? preview
       : null;
+  // show ghost for what's about to be swapped out
+  const outgoing =
+    ghost &&
+    (timetableDetailsSections.find(
+      (item) => item.courseId === ghost.courseId && item.type === ghost.type,
+    )?.id ??
+      null);
 
   const SideBar =
     currentCourseID !== null && (isCourseLoading || courseData) ? (
@@ -174,6 +181,7 @@ function EditTimetable() {
         orientation={isVertical ? "columns" : "rows"}
         mode="edit"
         preview={ghost}
+        outgoing={outgoing}
         pending={pending}
         onOpen={(e, event) => {
           if (e?.courseId && e?.type) {

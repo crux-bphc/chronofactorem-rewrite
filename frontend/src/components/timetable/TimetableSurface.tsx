@@ -26,6 +26,7 @@ export type SurfaceProps = {
   mode: SurfaceMode;
   showNow?: boolean;
   preview?: TimetableSectionType | null;
+  outgoing?: string | null;
   pending?: boolean;
   onOpen?: (
     cell: TimetableCell,
@@ -43,6 +44,7 @@ export function TimetableSurface({
   mode,
   showNow,
   preview,
+  outgoing,
   pending,
   onOpen,
   onRemove,
@@ -158,6 +160,7 @@ export function TimetableSurface({
         onRemove={onRemove}
         ghostCells={ghostCells}
         ghostVisible={ghost.visible}
+        outgoing={ghost.visible ? outgoing : null}
         now={
           pos && (
             <NowLine.Grid

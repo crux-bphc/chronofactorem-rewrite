@@ -29,9 +29,9 @@ type DeskGridProps = {
     event: React.MouseEvent | React.KeyboardEvent,
   ) => void;
   onRemove?: (cell: TimetableCell) => void;
-  /** The hovered picker section, as cells (edit mode only). */
   ghostCells?: TimetableCell[];
   ghostVisible?: boolean;
+  outgoing?: string | null;
   /** The now-line slot (C5). */
   now?: React.ReactNode;
 };
@@ -92,6 +92,7 @@ export function DeskGrid({
   onRemove,
   ghostCells = [],
   ghostVisible = false,
+  outgoing,
   now,
 }: DeskGridProps) {
   const rows = orientation === "rows";
@@ -192,16 +193,18 @@ export function DeskGrid({
         }
         const edit = mode === "edit";
         const leaving = cell.presence === "leaving";
+        const going = !leaving && cell.id === outgoing;
         return (
           <div
             key={key}
             // live blocks carry their morph name (C7); export and leaving don't
             style={leaving ? style : { ...style, ...vtStyle(cell) }}
             data-presence={cell.presence ?? "present"}
+            data-outgoing={going ? "" : undefined}
             inert={leaving}
-            className={`@container relative z-1 min-w-0 overflow-hidden rounded-md bg-ev ${
-              leaving ? "" : "tt-block"
-            } ${
+            className={`@container relative z-1 min-w-0 overflow-hidden rounded-md ${
+              going ? "tt-outgoing" : "bg-ev"
+            } ${leaving ? "" : "tt-block"} ${
               edit
                 ? "hover:bg-ev-hover hover:shadow-[inset_0_0_0_1.5px_var(--ink)]"
                 : ""
