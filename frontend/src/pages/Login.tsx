@@ -11,11 +11,11 @@ import { rootRoute, router } from "../router";
 const loginRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "login",
-  loader: ({ context: { queryClient } }) =>
+  loader: ({ context: { queryClient }, preload }) =>
     queryClient
       .ensureQueryData(authStatusQueryOptions)
       .then((data) => {
-        if (data) {
+        if (data && !preload) {
           router.navigate({
             to: data.redirect,
           });

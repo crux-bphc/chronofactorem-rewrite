@@ -281,9 +281,9 @@ function HomeSkeleton() {
 const homeRoute = new Route({
   getParentRoute: () => authenticatedRoute,
   path: "/",
-  loader: ({ context: { queryClient } }) =>
+  loader: ({ context: { queryClient }, preload }) =>
     queryClient.ensureQueryData(userQueryOptions).catch((error) => {
-      handleLoginRedirect(error);
+      if (!preload) handleLoginRedirect(error);
       throw error;
     }),
   component: Home,
