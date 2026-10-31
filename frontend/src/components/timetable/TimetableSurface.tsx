@@ -105,7 +105,11 @@ export function TimetableSurface({
           cells={cells}
           day={shown}
           mode={mode}
-          now={pos && pos.day === shown ? { hour: pos.hour, label } : null}
+          now={
+            pos && pos.day === shown
+              ? { hour: pos.hour, fraction: pos.fraction, label }
+              : null
+          }
           pending={pending}
           onOpen={onOpen}
           onRemove={onRemove}

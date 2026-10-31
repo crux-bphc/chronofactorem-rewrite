@@ -60,7 +60,7 @@ function BlockLines({
     <>
       <div className="@max-[72px]:hidden">
         <span
-          className={`block truncate font-semibold ${scale ? "text-base min-[1920px]:text-lg min-[2560px]:text-xl" : "text-base"} ${
+          className={`block truncate font-semibold ${scale ? "text-base min-[1920px]:text-lg min-[2560px]:text-xl min-[3200px]:text-2xl" : "text-base"} ${
             remove ? "[@media(hover:none)]:whitespace-normal" : ""
           }`}
         >
@@ -70,7 +70,7 @@ function BlockLines({
           {cell.code}
         </span>
         <span
-          className={`mt-[3px] block truncate text-ink-muted ${scale ? "text-sm min-[1920px]:text-base min-[2560px]:text-lg" : "text-sm"}`}
+          className={`mt-[3px] block truncate text-ink-muted ${scale ? "text-sm min-[1920px]:text-base min-[2560px]:text-lg min-[3200px]:text-xl" : "text-sm"}`}
         >
           {`${cell.type}${cell.number} · ${cell.room}`}
         </span>
@@ -128,7 +128,7 @@ export function DeskGrid({
           className={`self-center font-semibold tracking-[.06em] text-ink-muted uppercase ${
             mode === "export"
               ? "text-xs"
-              : "text-xs min-[1920px]:text-sm min-[2560px]:text-base"
+              : "text-xs min-[1920px]:text-sm min-[2560px]:text-base min-[3200px]:text-lg"
           } ${rows ? "" : "text-center"}`}
           style={
             rows
@@ -145,7 +145,7 @@ export function DeskGrid({
           className={`whitespace-nowrap text-ink-faint ${
             mode === "export"
               ? "text-sm"
-              : "text-sm min-[1920px]:text-base min-[2560px]:text-lg"
+              : "text-sm min-[1920px]:text-base min-[2560px]:text-lg min-[3200px]:text-xl"
           } ${hourLabelFade(h, nowAt)} ${
             rows ? "self-end pl-0.5" : "self-start pr-1 text-right"
           }`}

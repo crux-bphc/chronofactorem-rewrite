@@ -73,6 +73,7 @@ export function useTimetableExport(): {
   const exportPng = useCallback(async () => {
     if (busy.current) return;
     busy.current = true;
+    clearTimeout(doneTimer.current);
     setStatus("rendering");
     try {
       // wait for the offscreen frame to mount and lay out
@@ -94,9 +95,10 @@ export function useTimetableExport(): {
       link.download = "timetable.png";
       link.href = dataUrl;
       link.click();
+      // the "done" window is feedback only; a new export may start in it
+      busy.current = false;
       setStatus("done");
       doneTimer.current = setTimeout(() => {
-        busy.current = false;
         setStatus("idle");
       }, DONE_MS);
     } catch (error) {

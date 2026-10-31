@@ -1,5 +1,5 @@
 import { Bird } from "lucide-react";
-import { Fragment, useMemo } from "react";
+import { Fragment, useEffect, useMemo, useRef } from "react";
 import { formatClock, formatSlotEnd } from "@/utils/timeFormat";
 import {
   blockName,
@@ -15,7 +15,7 @@ type AgendaProps = {
   mode: "edit" | "view" | "export";
   pending?: boolean;
   /** Today's grid hour and the formatted time; set only when it is on this day. */
-  now?: { hour: number; label: string } | null;
+  now?: { hour: number; fraction: number; label: string } | null;
   onOpen?: (
     cell: TimetableCell,
     event: React.MouseEvent | React.KeyboardEvent,
@@ -58,6 +58,15 @@ export function Agenda({
   onRemove,
 }: AgendaProps) {
   const items = useMemo(() => buildAgenda(cells, day), [cells, day]);
+  // free rows that appear later (a removal opens a gap) grow in like blocks
+  const seen = useRef<{ day: number; keys: Set<string> } | null>(null);
+  const freeKeys = new Set(
+    items.flatMap((i) => (i.kind === "free" ? [`free-${i.from}`] : [])),
+  );
+  const prior = seen.current?.day === day ? seen.current.keys : null;
+  useEffect(() => {
+    seen.current = { day, keys: freeKeys };
+  });
   // the item the now-line follows: the free gap or the class holding this
   // hour. before the first class or after the last, there is none.
   const nowIndex = now
@@ -92,10 +101,13 @@ export function Agenda({
           style: { "--vt": blockName(cell) } as React.CSSProperties,
         };
 
+  // the 10 minutes after a class are its break, not part of it
+  const isDuring = (cell: TimetableCell) =>
+    !!now &&
+    cell.hour <= now.hour &&
+    now.hour + now.fraction < cell.hour + cell.span - 1 / 6;
   const during = (cell: TimetableCell) =>
-    now && cell.hour <= now.hour && now.hour < cell.hour + cell.span
-      ? "shadow-[inset_3px_0_0_var(--now)]"
-      : "";
+    isDuring(cell) ? "shadow-[inset_3px_0_0_var(--now)]" : "";
 
   return (
     <div className="tt-agenda px-4">
@@ -108,7 +120,14 @@ export function Agenda({
           }
         >
           {item.kind === "free" ? (
-            <div className="tt-row">
+            <div
+              className="tt-row"
+              data-row-presence={
+                prior && !prior.has(`free-${item.from}`)
+                  ? "entering"
+                  : undefined
+              }
+            >
               <div className="min-h-0 overflow-hidden">
                 <div className="mb-1.5 grid grid-cols-[64px_1fr] gap-3">
                   <div className="col-start-2 pt-1 pb-2.5 pl-0.5 text-sm text-ink-faint">
@@ -155,7 +174,7 @@ export function Agenda({
                       }
                       aria-label={`Edit ${item.cell.courseId} ${item.cell.type}${item.cell.number}, press Delete to remove`}
                       style={named(item.cell).style}
-                      className={`${blockClass} ${named(item.cell).className} ${during(item.cell)} cursor-pointer hover:bg-ev-hover focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60`}
+                      className={`${blockClass} ${named(item.cell).className} ${during(item.cell)} cursor-pointer hover:bg-ev-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring disabled:opacity-60`}
                     >
                       <BlockBody cell={item.cell} />
                     </button>
@@ -174,7 +193,10 @@ export function Agenda({
             </div>
           )}
           {now && i === nowIndex && (
-            <NowLine.Agenda label={now.label} during={item.kind === "class"} />
+            <NowLine.Agenda
+              label={now.label}
+              during={item.kind === "class" && isDuring(item.cell)}
+            />
           )}
         </Fragment>
       ))}
