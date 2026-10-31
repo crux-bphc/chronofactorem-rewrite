@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useRef } from "react";
+import { Fragment, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { titleCase } from "@/lib/titleCase";
 import { formatClock, formatSlotEnd } from "@/utils/timeFormat";
 import {
@@ -80,6 +80,13 @@ export function Agenda({
   useEffect(() => {
     seen.current = { day, keys: freeKeys };
   });
+  // a new day starts at the top, set before the swipe's new snapshot
+  const shownDay = useRef(day);
+  useLayoutEffect(() => {
+    if (shownDay.current === day) return;
+    shownDay.current = day;
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [day]);
   // the item the now-line follows: the free gap or the class holding this
   // hour. before the first class or after the last, there is none.
   const nowIndex = now

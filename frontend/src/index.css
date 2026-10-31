@@ -625,26 +625,32 @@ html.theme-transition * {
    transition runs, so route transitions and the export never see them. */
 @keyframes tt-day-out-next {
   to {
-    opacity: 0;
-    transform: translateX(-32px);
+    transform: translateX(-100%);
   }
 }
 @keyframes tt-day-in-next {
   from {
-    opacity: 0;
-    transform: translateX(32px);
+    transform: translateX(100%);
   }
 }
 @keyframes tt-day-out-prev {
   to {
-    opacity: 0;
-    transform: translateX(32px);
+    transform: translateX(100%);
   }
 }
 @keyframes tt-day-in-prev {
   from {
-    opacity: 0;
-    transform: translateX(-32px);
+    transform: translateX(-100%);
+  }
+}
+@keyframes tt-day-scroll-out {
+  to {
+    transform: translateY(var(--tt-day-scroll, 0px));
+  }
+}
+@keyframes tt-day-scroll-in {
+  from {
+    transform: translateY(calc(-1 * var(--tt-day-scroll, 0px)));
   }
 }
 @keyframes tt-root-out {
@@ -729,27 +735,49 @@ html.theme-transition * {
     }
     /* only the agenda slides: the new page sits plainly on top of the old
     one. without normal blending the two would add up (plus-lighter) and
-    brighten the page, and the old day pill would show through */
+    brighten the page, and the old day pill would show through. both scroll
+    back to the top together when the page was scrolled (useSurfaceNav) */
     &::view-transition-old(root),
     &::view-transition-new(root) {
-      animation: none;
       mix-blend-mode: normal;
+      animation-duration: var(--d-3);
+      animation-timing-function: var(--e-out);
+      animation-fill-mode: both;
+    }
+    &::view-transition-old(root) {
+      animation-name: tt-day-scroll-out;
+    }
+    &::view-transition-new(root) {
+      animation-name: tt-day-scroll-in;
+    }
+    /* clip only the sides: the two days can differ in height */
+    &::view-transition-group(tt-agenda) {
+      overflow-x: clip;
+      animation-duration: var(--d-3);
+      animation-timing-function: var(--e-out);
+    }
+    &::view-transition-old(tt-agenda),
+    &::view-transition-new(tt-agenda) {
+      mix-blend-mode: normal;
+      animation-duration: var(--d-3);
+      animation-timing-function: var(--e-out);
+      animation-fill-mode: both;
     }
   }
   html:active-view-transition-type(day-next) {
     &::view-transition-old(tt-agenda) {
-      animation: tt-day-out-next var(--d-2) var(--e-in) both;
+      animation-name: tt-day-out-next;
     }
     &::view-transition-new(tt-agenda) {
-      animation: tt-day-in-next var(--d-2) var(--e-out) both;
+      animation-name: tt-day-in-next;
     }
   }
   html:active-view-transition-type(day-prev) {
     &::view-transition-old(tt-agenda) {
-      animation: tt-day-out-prev var(--d-2) var(--e-in) both;
+      animation-name: tt-day-out-prev;
     }
     &::view-transition-new(tt-agenda) {
-      animation: tt-day-in-prev var(--d-2) var(--e-out) both;
+      animation-name: tt-day-in-prev;
     }
   }
 }

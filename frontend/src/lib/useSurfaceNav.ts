@@ -34,6 +34,12 @@ export function useSurfaceNav(dayCount: number) {
       const cur = latest();
       if (cur.view === "day") {
         if (d === cur.day) return;
+        // the swipe scrolls back up from here; read it before a shorter day
+        // clamps it
+        document.documentElement.style.setProperty(
+          "--tt-day-scroll",
+          `${window.scrollY}px`,
+        );
         return showDay(d, d > cur.day ? "day-next" : "day-prev");
       }
       return showDay(d, "view-morph");

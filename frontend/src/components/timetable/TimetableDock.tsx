@@ -21,7 +21,7 @@ export function TimetableDock({
   const { openSheet } = useTimetableNav();
   const dockRef = useRef<HTMLDivElement>(null);
 
-  // While a view transition runs (a day slide takes --d-2), Chrome hit-tests
+  // While a view transition runs (a day swipe takes --d-3), Chrome hit-tests
   // every tap to <html>, not the page under the transition overlay, so a
   // quick second tap on a pill would be lost. Hand such taps to the dock
   // button under the finger; it is fixed, so its box is where it shows.
@@ -64,7 +64,7 @@ export function TimetableDock({
                 width: `calc((100% - ${(dayCount - 1) * 4}px) / ${dayCount})`,
                 transform: `translateX(calc(${day} * (100% + 4px)))`,
                 transition:
-                  "transform var(--d-2) var(--e-out), opacity var(--d-1)",
+                  "transform var(--d-3) var(--e-out), opacity var(--d-1)",
                 opacity: view === "day" ? 1 : 0,
               }}
             />

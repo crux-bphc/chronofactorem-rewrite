@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useFadingValue } from "@/lib/sectionPreview";
+import { useDaySwipe } from "@/lib/useDaySwipe";
 import { useNow } from "@/lib/useNow";
 import { useSectionPresence } from "@/lib/useSectionPresence";
 import { formatNow } from "@/utils/timeFormat";
@@ -33,6 +34,7 @@ export type SurfaceProps = {
     event: React.MouseEvent | React.KeyboardEvent,
   ) => void;
   onRemove?: (cell: TimetableCell) => void;
+  onShowDay?: (day: number) => void; // phone day view swipes
 };
 
 export function TimetableSurface({
@@ -48,6 +50,7 @@ export function TimetableSurface({
   pending,
   onOpen,
   onRemove,
+  onShowDay,
 }: SurfaceProps) {
   // only the desktop editor ghosts the hovered picker section; it lingers
   // for --d-1 (120ms) after the hover ends so it can fade out
@@ -96,11 +99,12 @@ export function TimetableSurface({
   // the now-line belongs to the live view page only, never the editor or export
   const date = useNow(mode === "view" && !!showNow);
   const pos = date ? nowPosition(date, dayCount, hourCount) : null;
+  const swipe = useDaySwipe(day, dayCount, onShowDay);
 
   if (layout === "phone" && view === "day") {
     const shown = Math.min(day, dayCount - 1);
     return (
-      <section data-shot="grid" aria-label="Weekly timetable">
+      <section data-shot="grid" aria-label="Weekly timetable" {...swipe}>
         <Agenda
           cells={cells}
           day={shown}

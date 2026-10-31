@@ -51,7 +51,7 @@ function ViewTimetable() {
     () => buildTimetableGrid(timetableDetailsSections),
     [timetableDetailsSections],
   );
-  const { view, day } = useSurfaceNav(dayCount);
+  const { view, day, showDay } = useSurfaceNav(dayCount);
 
   const { status, exportPng, exportElement } = useTimetableExport();
 
@@ -95,6 +95,7 @@ function ViewTimetable() {
           orientation={isVertical ? "columns" : "rows"}
           mode="view"
           showNow
+          onShowDay={showDay}
         />
       </TimetablePageShell>
       {exportElement}
