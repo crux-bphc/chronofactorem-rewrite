@@ -353,7 +353,7 @@ const CourseDetailsMenu = ({
                     rowGrid,
                     "relative w-full cursor-pointer items-start text-left transition-colors duration-(--d-2) focus-visible:outline-offset-[-2px]",
                     selected
-                      ? "bg-brand-bg shadow-[inset_3px_0_0_var(--accent)]"
+                      ? "bg-brand-bg bg-[linear-gradient(to_right,var(--accent)_3px,transparent_3px)]"
                       : "hover:bg-sunk",
                     selected && pulse && "cf-ring-pulse",
                     busy && "cursor-progress",
