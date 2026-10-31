@@ -237,6 +237,33 @@
     animation-duration: var(--d-3);
   }
 
+  /* toasts sit above everything, sheets included. left in the root snapshot,
+  any named snapshot (the course panel, the grid) would paint over a toast and
+  blink it out until the transition ends, so lift them into their own group on
+  top and show them live, like the phone dock */
+  html:active-view-transition-type(
+    forward,
+    back,
+    panel-forward,
+    panel-back,
+    view-morph,
+    orient,
+    day-next,
+    day-prev
+  ) .toast-viewport {
+    view-transition-name: app-toasts;
+  }
+  ::view-transition-group(app-toasts) {
+    z-index: 2;
+    animation: none;
+  }
+  ::view-transition-old(app-toasts) {
+    display: none;
+  }
+  ::view-transition-new(app-toasts) {
+    animation: none;
+  }
+
   /* Home card <-> timetable page shared element (lib/sharedTransition.ts) */
   html:active-view-transition-type(shared-timetable) {
     --vt-timetable-title: timetable-title;
