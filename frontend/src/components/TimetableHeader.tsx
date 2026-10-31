@@ -154,7 +154,10 @@ const TimetableHeader = ({
   return (
     <>
       {/* phones: title, one meta line, then the two things you came for */}
-      <div className="flex flex-col gap-3 p-4 sm:hidden">
+      <div
+        data-shot="timetable-header"
+        className="flex flex-col gap-3 p-4 sm:hidden"
+      >
         <div className="flex items-start gap-2">
           <div className="min-w-0 flex-1">
             <p className="text-xl font-bold leading-tight break-words">
@@ -267,7 +270,10 @@ const TimetableHeader = ({
         )}
       </div>
 
-      <div className="flex flex-wrap justify-between gap-x-4 gap-y-2 p-4 max-sm:hidden">
+      <div
+        data-shot="timetable-header"
+        className="flex flex-wrap justify-between gap-x-4 gap-y-2 p-4 max-sm:hidden"
+      >
         <span className="min-w-0">
           <p className="font-bold break-words lg:text-3xl text-md sm:text-lg md:text-xl">
             {timetable.name}
