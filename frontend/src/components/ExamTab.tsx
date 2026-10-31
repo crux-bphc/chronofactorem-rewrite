@@ -65,11 +65,13 @@ function DayGroups({ kind }: { kind: ExamKind }) {
                   className="flex items-center justify-between gap-3 px-4 py-3"
                 >
                   <div className="min-w-0">
-                    <div className="text-[15px] font-semibold text-ink">
-                      {exam.code}
+                    <div className="text-[15px] leading-snug font-semibold text-ink">
+                      {name ?? exam.code}
                     </div>
                     {name && (
-                      <div className="text-[12.5px] text-ink-muted">{name}</div>
+                      <div className="text-[12.5px] text-ink-muted">
+                        {exam.code}
+                      </div>
                     )}
                   </div>
                   <span className="shrink-0 text-sm font-medium text-ink">

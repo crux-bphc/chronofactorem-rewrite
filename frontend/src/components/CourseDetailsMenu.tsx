@@ -229,8 +229,8 @@ const CourseDetailsMenu = ({
               <ChevronLeft size={22} aria-hidden="true" />
             </button>
             {course ? (
-              <h2 className="min-w-0 truncate text-[19px] font-semibold text-ink">
-                {course.code}
+              <h2 className="line-clamp-2 min-w-0 text-[19px] leading-tight font-semibold text-ink">
+                {titleCase(course.name)}
               </h2>
             ) : (
               <Skeleton className="h-5 w-24" />
@@ -245,7 +245,7 @@ const CourseDetailsMenu = ({
               showHeader ? "pl-7" : "pl-[38px]",
             )}
           >
-            <span>{titleCase(course.name)}</span>
+            <span>{course.code}</span>
             <ExamLine
               label="Midsem"
               start={course.midsemStartTime}

@@ -1,11 +1,11 @@
 import { Fragment, useEffect, useMemo, useRef } from "react";
+import { titleCase } from "@/lib/titleCase";
 import { formatClock, formatSlotEnd } from "@/utils/timeFormat";
 import {
   blockName,
   buildAgenda,
   type TimetableCell,
   timetableDayNames,
-  titleCase,
 } from "@/utils/timetableGrid";
 import { EmptyState, emptyTimetableHint } from "./EmptyState";
 import { NowLine } from "./NowLine";
@@ -40,10 +40,10 @@ function BlockBody({
   return (
     <>
       <span className="min-w-0">
-        <span className="block text-lg font-semibold">{cell.code}</span>
-        <span className="block text-sm text-ink-muted">
+        <span className="block text-lg leading-snug font-semibold">
           {titleCase(cell.name)}
         </span>
+        <span className="block text-sm text-ink-muted">{cell.code}</span>
       </span>
       <span className="shrink-0 text-right">
         <span className="block whitespace-nowrap text-sm font-medium">

@@ -13,9 +13,11 @@ export function useWarningsSummary() {
   return useMemo(() => {
     const missingSections = (timetable?.warnings ?? []).map((warning) => {
       const [code, types = ""] = warning.split(":");
+      const course = courses?.find((c) => c.code === code);
       return {
         code,
-        courseId: courses?.find((c) => c.code === code)?.id ?? null,
+        name: course?.name ?? null,
+        courseId: course?.id ?? null,
         types: types.split("").filter((t): t is SectionType => /[LPT]/.test(t)),
       };
     });
