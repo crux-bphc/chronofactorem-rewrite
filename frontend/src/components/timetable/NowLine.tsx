@@ -36,7 +36,7 @@ function ThroughLine({ label, at }: { label: string; at: number }) {
         <div
           role="img"
           aria-label={`Now, ${label}, during a class`}
-          className="now-rule absolute -right-3 w-3 h-0.5 -translate-y-1/2 bg-now"
+          className="now-rule absolute -right-3 w-2 h-0.5 -translate-y-1/2 bg-now"
           style={{ top }}
         >
           <span className={`${dot} top-1/2 -right-1.5 -translate-y-1/2`} />
