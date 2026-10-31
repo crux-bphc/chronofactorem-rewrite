@@ -6,7 +6,7 @@ RUN corepack enable pnpm && corepack install -g pnpm@11.18.0
 WORKDIR /usr/src/app/frontend
 COPY --chown=node:node frontend/tsconfig.json ./
 COPY --chown=node:node frontend/tsconfig.node.json ./
-COPY --chown=node:node frontend/public ./
+COPY --chown=node:node frontend/public ./public
 COPY --chown=node:node frontend/tailwind.config.js ./
 COPY --chown=node:node frontend/vite.config.ts ./
 COPY --chown=node:node frontend/components.json ./
