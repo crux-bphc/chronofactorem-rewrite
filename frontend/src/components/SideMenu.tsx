@@ -1,5 +1,7 @@
+import { useEffect, useRef, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
-import { TimetableActionType, useTimetableState } from "@/context";
+import { useTimetableState } from "@/context";
+import { useTimetableNav } from "@/lib/useTimetableNav";
 import CDCList from "./CDCList";
 import CourseSearchResults from "./CourseSearchResults";
 import EditCoursesTab from "./EditCoursesTab";
@@ -18,9 +20,27 @@ export function SideMenu({
 }) {
   const {
     state: { timetable, currentTab, searchTerm },
-    dispatch,
   } = useTimetableState();
+  const { setTab, setQuery } = useTimetableNav();
   const [debouncedSearchTerm] = useDebounceValue(searchTerm, 500);
+  // The input is edited locally; the URL (replace) follows after a short
+  // delay so async router updates never fight the caret or IME.
+  const [draftTerm, setDraftTerm] = useState(searchTerm);
+  const lastSent = useRef(searchTerm);
+  useEffect(() => {
+    if (searchTerm !== lastSent.current) {
+      lastSent.current = searchTerm;
+      setDraftTerm(searchTerm);
+    }
+  }, [searchTerm]);
+  useEffect(() => {
+    if (draftTerm === lastSent.current) return;
+    const id = setTimeout(() => {
+      lastSent.current = draftTerm;
+      setQuery(draftTerm);
+    }, 200);
+    return () => clearTimeout(id);
+  }, [draftTerm, setQuery]);
 
   if (timetable === undefined) return;
 
@@ -29,17 +49,12 @@ export function SideMenu({
     <div className="bg-secondary h-full min-h-0 w-full">
       <Tabs
         value={isScreenshotMode ? "exams" : currentTab}
-        onValueChange={(tab) =>
-          dispatch({
-            type: TimetableActionType.SetMenuTab,
-            tab: tab as typeof currentTab,
-          })
-        }
+        onValueChange={(tab) => setTab(tab as typeof currentTab)}
         className="flex h-full min-h-0 flex-col py-2"
       >
         {!isScreenshotMode && <SideMenuTabs isOnEditPage={isOnEditPage} />}
         <TabsContent
-          value="CDCs"
+          value="cdcs"
           className="min-h-0 flex-1 overflow-y-auto data-[state=inactive]:hidden"
         >
           <CDCList />
@@ -54,13 +69,8 @@ export function SideMenu({
         >
           <div className="px-4 pb-4">
             <Input
-              value={searchTerm}
-              onChange={(e) =>
-                dispatch({
-                  type: TimetableActionType.SetSearchTerm,
-                  searchTerm: e.target.value,
-                })
-              }
+              value={draftTerm}
+              onChange={(e) => setDraftTerm(e.target.value)}
               placeholder="Search Courses"
               className="text-md p-2"
             />

@@ -1,7 +1,8 @@
 import { getClashingExamTimes } from "lib";
 import { Bird, ChevronRight, HelpCircle } from "lucide-react";
 import { useMemo } from "react";
-import { TimetableActionType, useTimetableState } from "@/context";
+import { useTimetableState } from "@/context";
+import { useTimetableNav } from "@/lib/useTimetableNav";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export const CourseSearchResults = ({
@@ -11,8 +12,8 @@ export const CourseSearchResults = ({
 }) => {
   const {
     state: { courses, timetable },
-    dispatch,
   } = useTimetableState();
+  const { openCourse } = useTimetableNav();
 
   const courseSearchResults = useMemo(() => {
     if (!courses || !timetable) return [];
@@ -36,11 +37,7 @@ export const CourseSearchResults = ({
           aria-disabled={!!course.clashing}
           onClick={() => {
             if (!course.clashing) {
-              dispatch({
-                type: TimetableActionType.SetSelectedCourseAndSection,
-                courseID: course.id,
-                sectionType: null,
-              });
+              openCourse(course.id);
             }
           }}
           key={course.id}

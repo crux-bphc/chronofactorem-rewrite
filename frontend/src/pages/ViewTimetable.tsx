@@ -11,6 +11,7 @@ import {
 } from "@/components/TimetablePageShell";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TimetableProvider, useTimetableState } from "@/context";
+import { timetableSearchSchema } from "@/lib/timetableSearch";
 import CenteredSpinner from "../components/CenteredSpinner";
 import NotFound from "../components/NotFound";
 import { SideMenu } from "../components/SideMenu";
@@ -22,6 +23,8 @@ const viewTimetableRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "view/$timetableId",
   loader: timetablePageLoader,
+  validateSearch: timetableSearchSchema,
+  loaderDeps: () => ({}),
   pendingComponent: CenteredSpinner,
   component: () => (
     <TimetableProvider>

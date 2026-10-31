@@ -1,16 +1,17 @@
 import { ChevronRight } from "lucide-react";
-import { TimetableActionType, useTimetableState } from "@/context";
+import { useTimetableState } from "@/context";
+import { useTimetableNav } from "@/lib/useTimetableNav";
 import { Button } from "./ui/button";
 import { TabsContent } from "./ui/tabs";
 
 const EditCoursesTab = () => {
   const {
     state: { coursesInTimetable },
-    dispatch,
   } = useTimetableState();
+  const { openCourse } = useTimetableNav();
   return (
     <TabsContent
-      value="currentCourses"
+      value="courses"
       className="flex min-h-0 flex-1 data-[state=inactive]:hidden overflow-y-auto flex-col px-2 gap-2"
     >
       {coursesInTimetable.map((course) => {
@@ -18,11 +19,7 @@ const EditCoursesTab = () => {
           <Button
             variant={"secondary"}
             onClick={() => {
-              dispatch({
-                type: TimetableActionType.SetSelectedCourseAndSection,
-                courseID: course.id,
-                sectionType: null,
-              });
+              openCourse(course.id);
             }}
             key={course.id}
             className="h-auto min-h-16 shrink-0 whitespace-normal py-2 rounded-none text-left bg-secondary dark:hover:bg-slate-700 hover:bg-slate-200"

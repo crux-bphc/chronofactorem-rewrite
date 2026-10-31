@@ -30,6 +30,7 @@ import {
 import { TimetableActionType, useTimetableState } from "@/context";
 import useCopyTimetable from "@/data-access/hooks/useCopyTimetable";
 import useEditTimetable from "@/data-access/hooks/useEditTimetable";
+import { useTimetableNav } from "@/lib/useTimetableNav";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { router } from "../router";
@@ -47,6 +48,7 @@ const TimetableHeader = ({
     state: { isVertical, user, courses, timetable, screenIsLarge },
     dispatch,
   } = useTimetableState();
+  const { openSheet } = useTimetableNav();
   const { mutateAsync: editTimetable, isPending: isEditing } =
     useEditTimetable();
   const { mutateAsync: copyTimetable } = useCopyTimetable();
@@ -227,9 +229,7 @@ const TimetableHeader = ({
           <Button
             variant="outline"
             className="h-10 flex-1"
-            onClick={() =>
-              dispatch({ type: TimetableActionType.SetSidebarOpen, open: true })
-            }
+            onClick={() => openSheet("courses")}
           >
             <Menu className="size-4" />
             Courses and exams

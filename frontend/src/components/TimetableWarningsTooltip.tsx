@@ -10,13 +10,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { TimetableActionType, useTimetableState } from "@/context";
+import { useTimetableState } from "@/context";
+import { useTimetableNav } from "@/lib/useTimetableNav";
 
 export const TimetableWarningsTooltip = () => {
   const {
     state: { courses, timetable, screenIsLarge },
-    dispatch,
   } = useTimetableState();
+  const { openCourse } = useTimetableNav();
   const [open, setOpen] = useState(false);
 
   if (
@@ -34,12 +35,8 @@ export const TimetableWarningsTooltip = () => {
   });
 
   const goToSection = (courseID: string, type: string) => {
-    dispatch({
-      type: TimetableActionType.SetSelectedCourseAndSection,
-      courseID,
-      sectionType: type as "L" | "P" | "T",
-    });
     setOpen(false);
+    openCourse(courseID, type as "L" | "P" | "T");
   };
 
   const trigger = (

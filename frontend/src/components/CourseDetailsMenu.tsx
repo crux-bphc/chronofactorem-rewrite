@@ -2,19 +2,20 @@ import { useIsMutating } from "@tanstack/react-query";
 import type { sectionType } from "lib";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import type z from "zod";
-import { TimetableActionType, useTimetableState } from "@/context";
+import { useTimetableState } from "@/context";
 import {
   useAddRemoveTimetableSection,
   useSwapTimetableSections,
 } from "@/data-access/hooks/useTimetableSectionAction";
+import { useTimetableNav } from "@/lib/useTimetableNav";
 import { Button } from "./ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 const CourseDetailsMenu = () => {
   const {
     state: { timetable, course, uniqueSectionTypes, currentSectionType },
-    dispatch,
   } = useTimetableState();
+  const { openCourse, closeCourse, setType } = useTimetableNav();
   const { mutate: sectionAction } = useAddRemoveTimetableSection(timetable?.id);
   const { mutate: swapSections } = useSwapTimetableSections(timetable?.id);
 
@@ -38,11 +39,7 @@ const CourseDetailsMenu = () => {
           onSuccess: () => {
             const next =
               uniqueSectionTypes[uniqueSectionTypes.indexOf(section.type) + 1];
-            if (next)
-              dispatch({
-                type: TimetableActionType.SetSelectedSectionType,
-                sectionType: next,
-              });
+            if (next) setType(next);
           },
         },
       );
@@ -58,13 +55,7 @@ const CourseDetailsMenu = () => {
         <Button
           variant={"ghost"}
           className="rounded-full flex ml-2 px-2 mr-2 items-center hover:bg-secondary-foreground/10"
-          onClick={() =>
-            dispatch({
-              type: TimetableActionType.SetSelectedCourseAndSection,
-              courseID: null,
-              sectionType: null,
-            })
-          }
+          onClick={() => closeCourse()}
         >
           <ArrowLeft />
         </Button>
@@ -82,10 +73,7 @@ const CourseDetailsMenu = () => {
               <TabsTrigger
                 value={sectionType}
                 onClick={() => {
-                  dispatch({
-                    type: TimetableActionType.SetSelectedSectionType,
-                    sectionType: sectionType,
-                  });
+                  setType(sectionType);
                 }}
                 key={sectionType}
                 className="text-xl font-bold w-full"
@@ -167,11 +155,7 @@ const CourseDetailsMenu = () => {
                                     type="button"
                                     className="text-blue-300 dark:text-blue-400 cursor-pointer inline-flex items-baseline gap-1"
                                     onClick={() =>
-                                      dispatch({
-                                        type: TimetableActionType.SetSelectedCourseAndSection,
-                                        courseID: item.courseId,
-                                        sectionType: item.type,
-                                      })
+                                      openCourse(item.courseId, item.type)
                                     }
                                   >
                                     {`${item.roomTime[0].split(":")[0]} ${item.type}${item.number}`}

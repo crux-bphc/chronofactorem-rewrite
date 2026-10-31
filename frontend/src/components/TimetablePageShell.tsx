@@ -9,12 +9,13 @@ import Spinner from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useToast } from "@/components/ui/use-toast";
-import { TimetableActionType, useTimetableState } from "@/context";
+import { useTimetableState } from "@/context";
 import { handleLoginRedirect } from "@/data-access/errors/handlers";
 import toastHandler from "@/data-access/errors/toastHandler";
 import { courseQueryOptions } from "@/data-access/hooks/useCourses";
 import { timetableQueryOptions } from "@/data-access/hooks/useTimetable";
 import { userQueryOptions } from "@/data-access/hooks/useUser";
+import { useTimetableNav } from "@/lib/useTimetableNav";
 import { cn } from "@/lib/utils";
 
 export const timetablePageLoader = async ({
@@ -83,13 +84,10 @@ export const TimetablePageShell = ({
   children: React.ReactNode;
 }) => {
   const {
-    state: { isCopyingTimetable, screenIsLarge, sidebarOpen },
-    dispatch,
+    state: { isCopyingTimetable, screenIsLarge },
   } = useTimetableState();
-  useEffect(() => {
-    if (screenIsLarge)
-      dispatch({ type: TimetableActionType.SetSidebarOpen, open: false });
-  }, [screenIsLarge, dispatch]);
+  const { search, openSheet, closeSheet } = useTimetableNav();
+  const sidebarOpen = search.sheet === "courses";
 
   if (isCopyingTimetable) {
     return (
@@ -115,7 +113,7 @@ export const TimetablePageShell = ({
           <BottomSheet
             open={sidebarOpen}
             onOpenChange={(open) =>
-              dispatch({ type: TimetableActionType.SetSidebarOpen, open })
+              open ? openSheet("courses") : closeSheet()
             }
             // tapping the grid shouldn't close the sheet
             dismissOnOutsideTap={false}
