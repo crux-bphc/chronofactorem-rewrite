@@ -1,15 +1,13 @@
 import { Moon, Sun } from "lucide-react";
-import { useTheme } from "@/components/ThemeProvider";
+import { useSystemTheme, useTheme } from "@/components/ThemeProvider";
 import { Button } from "@/components/ui/button";
 
 /** Flips between explicit light and dark. Used where the avatar menu isn't available. */
 export function ThemeButton() {
   const { theme, setTheme } = useTheme();
+  const system = useSystemTheme();
   // the class the provider applied is the resolved theme, whatever the setting
-  const isDark =
-    theme === "dark" ||
-    (theme === "system" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const isDark = (theme === "system" ? system : theme) === "dark";
   const Icon = isDark ? Moon : Sun;
 
   return (

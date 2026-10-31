@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { LogOut, Monitor, Moon, Sun, User } from "lucide-react";
+import { LogOut, Moon, Sun, User } from "lucide-react";
 import { useRef } from "react";
-import { useTheme } from "@/components/ThemeProvider";
+import { useSystemTheme, useTheme } from "@/components/ThemeProvider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,38 +22,43 @@ const THEME_NAMES: Record<Theme, string> = {
   system: "Auto",
 };
 
-const OPTIONS = [
-  {
-    value: "light" as const,
-    label: (
-      <>
-        <Sun className="size-3.5" />
-        Light
-      </>
-    ),
-  },
-  {
-    value: "dark" as const,
-    label: (
-      <>
-        <Moon className="size-3.5" />
-        Dark
-      </>
-    ),
-  },
-  {
-    value: "system" as const,
-    label: (
-      <>
-        <Monitor className="size-3.5" />
-        Auto
-      </>
-    ),
-  },
-];
+const optionsFor = (system: "light" | "dark") => {
+  // Auto shows the icon of the theme the OS currently resolves to
+  const AutoIcon = system === "dark" ? Moon : Sun;
+  return [
+    {
+      value: "light" as const,
+      label: (
+        <>
+          <Sun className="size-3.5" />
+          Light
+        </>
+      ),
+    },
+    {
+      value: "dark" as const,
+      label: (
+        <>
+          <Moon className="size-3.5" />
+          Dark
+        </>
+      ),
+    },
+    {
+      value: "system" as const,
+      label: (
+        <>
+          <AutoIcon className="size-3.5" />
+          Auto
+        </>
+      ),
+    },
+  ];
+};
 
 export function AvatarMenu({ user }: { user: { name: string } }) {
   const { theme, setTheme } = useTheme();
+  const system = useSystemTheme();
   const pointer = useRef<{ x: number; y: number } | null>(null);
 
   const change = (next: Theme, fallback: HTMLElement) => {
@@ -118,7 +123,7 @@ export function AvatarMenu({ user }: { user: { name: string } }) {
             aria-label="Theme"
             className="w-full"
             value={theme}
-            options={OPTIONS}
+            options={optionsFor(system)}
             onValueChange={(v) => {
               const el = document.activeElement as HTMLElement | null;
               change(v, el ?? document.body);

@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { flushSync } from "react-dom";
 import { startThemeTransition } from "@/lib/viewTransitions";
 
@@ -21,6 +27,21 @@ const initialState: ThemeProviderState = {
   setTheme: () => null,
 };
 
+const DARK_QUERY = "(prefers-color-scheme: dark)";
+
+/** The theme the OS currently asks for; follows changes while the page is open. */
+export function useSystemTheme(): "light" | "dark" {
+  const dark = useSyncExternalStore(
+    (notify) => {
+      const mq = window.matchMedia(DARK_QUERY);
+      mq.addEventListener("change", notify);
+      return () => mq.removeEventListener("change", notify);
+    },
+    () => window.matchMedia(DARK_QUERY).matches,
+  );
+  return dark ? "dark" : "light";
+}
+
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
@@ -33,23 +54,15 @@ export function ThemeProvider({
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme,
   );
 
+  const systemTheme = useSystemTheme();
+
   useEffect(() => {
     const root = window.document.documentElement;
 
     root.classList.remove("light", "dark");
 
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-
-      root.classList.add(systemTheme);
-      return;
-    }
-
-    root.classList.add(theme);
-  }, [theme]);
+    root.classList.add(theme === "system" ? systemTheme : theme);
+  }, [theme, systemTheme]);
 
   const value = {
     theme,
