@@ -16,6 +16,8 @@ export type TimetableCell = Omit<TimetableSectionType, "roomTime"> & {
   day: number;
   hour: number;
   span: number;
+  /** Set by the surface while a section animates in or out. */
+  presence?: "present" | "entering" | "leaving";
 };
 
 export function buildTimetableGrid(sections: TimetableSectionType[]) {
@@ -58,21 +60,69 @@ export function buildTimetableGrid(sections: TimetableSectionType[]) {
   return { cells, dayCount, hourCount };
 }
 
-const courseColors = [
-  "bg-emerald-100 text-emerald-950 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-100 dark:border-emerald-800",
-  "bg-sky-100 text-sky-950 border-sky-300 dark:bg-sky-950 dark:text-sky-100 dark:border-sky-800",
-  "bg-violet-100 text-violet-950 border-violet-300 dark:bg-violet-950 dark:text-violet-100 dark:border-violet-800",
-  "bg-amber-100 text-amber-950 border-amber-300 dark:bg-amber-950 dark:text-amber-100 dark:border-amber-800",
-  "bg-rose-100 text-rose-950 border-rose-300 dark:bg-rose-950 dark:text-rose-100 dark:border-rose-800",
-  "bg-cyan-100 text-cyan-950 border-cyan-300 dark:bg-cyan-950 dark:text-cyan-100 dark:border-cyan-800",
-];
+export type AgendaItem =
+  | { kind: "class"; cell: TimetableCell }
+  | { kind: "free"; from: number; to: number };
 
-export function courseColor(code: string) {
-  const hash = [...code].reduce(
-    (value, letter) => (value * 31 + letter.charCodeAt(0)) >>> 0,
-    0,
+export function buildAgenda(cells: TimetableCell[], day: number): AgendaItem[] {
+  const dayCells = cells
+    .filter((cell) => cell.day === day)
+    .sort((a, b) => a.hour - b.hour);
+  const items: AgendaItem[] = [];
+  let prevEnd: number | null = null;
+  for (const cell of dayCells) {
+    if (prevEnd !== null && cell.hour > prevEnd) {
+      items.push({ kind: "free", from: prevEnd, to: cell.hour });
+    }
+    items.push({ kind: "class", cell });
+    prevEnd = Math.max(prevEnd ?? 0, cell.hour + cell.span);
+  }
+  return items;
+}
+
+export function defaultDay(dayCount: number, now: Date): number {
+  const dow = now.getDay();
+  if (dow >= 1 && dow <= 5) return dow - 1;
+  if (dow === 6 && dayCount === 6) return 5;
+  return 0;
+}
+
+export function nowPosition(
+  now: Date,
+  dayCount: number,
+  hourCount: number,
+): { day: number; hour: number; fraction: number } | null {
+  const dow = now.getDay();
+  if (dow === 0) return null;
+  const day = dow - 1;
+  if (day >= dayCount) return null;
+  const hour = now.getHours() - 8;
+  if (hour < 0 || hour >= hourCount) return null;
+  return { day, hour, fraction: now.getMinutes() / 60 };
+}
+
+export function splitCode(code: string): { dept: string; number: string } {
+  const i = code.lastIndexOf(" ");
+  if (i < 0) return { dept: "", number: code };
+  return { dept: code.slice(0, i), number: code.slice(i + 1) };
+}
+
+export function blockName(cell: TimetableCell): string {
+  return `tt-${cell.id}-${cell.day}-${cell.hour}`.replace(
+    /[^a-zA-Z0-9_-]/g,
+    "_",
   );
-  return courseColors[hash % courseColors.length];
+}
+
+export function titleCase(name: string): string {
+  return name
+    .split(" ")
+    .map((word) =>
+      /^[IVX]+$/i.test(word)
+        ? word.toUpperCase()
+        : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+    )
+    .join(" ");
 }
 
 export function parseTiming(entry: string) {
