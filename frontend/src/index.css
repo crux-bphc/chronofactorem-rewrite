@@ -1,76 +1,261 @@
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+/* One family, two faces: Host Grotesk for letters, DM Sans for digits. */
+@font-face {
+  font-family: "Chrono";
+  font-weight: 400 700;
+  font-display: block;
+  src: url("/fonts/host-grotesk-latin.woff2") format("woff2");
+}
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+@font-face {
+  font-family: "Chrono";
+  font-weight: 400 700;
+  font-display: block;
+  src: url("/fonts/dm-sans-latin.woff2") format("woff2");
+  unicode-range: U+0030-0039;
+}
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+:root {
+  color-scheme: light;
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --sunk: #eceef2;
+  --ev: #e9ecf1;
+  --ev-hover: #dfe3ea;
+  --line: #e0e3e9;
+  --ink: #14171d;
+  --muted: #5d6471;
+  --faint: #99a0ac;
+  --accent: #164a9e;
+  --accent-ink: #ffffff;
+  --accent-bg: #e6edf8;
+  --danger: #c2361f;
+  --danger-bg: #fbe6e1;
+  --now: #d23a2a;
+  --scrim: rgba(16, 20, 28, 0.34);
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 8px 24px rgba(16, 24, 40, 0.08);
+  /* legacy shadcn: text on --danger */
+  --danger-ink: #ffffff;
+}
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+.dark {
+  color-scheme: dark;
+  --bg: #0f1115;
+  --surface: #171a20;
+  --sunk: #1f232a;
+  --ev: #222731;
+  --ev-hover: #2a303b;
+  --line: #2a2f38;
+  --ink: #e8eaee;
+  --muted: #9aa1ad;
+  --faint: #646b77;
+  --accent: #8db4f5;
+  --accent-ink: #0b1426;
+  --accent-bg: #18243a;
+  --danger: #f07a63;
+  --danger-bg: #3b1c16;
+  --now: #f0715a;
+  --scrim: rgba(0, 0, 0, 0.55);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px rgba(0, 0, 0, 0.5);
+  --danger-ink: var(--bg);
+}
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+@theme inline {
+  --font-sans: "Chrono", system-ui, sans-serif;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+  --text-xs: 11px;
+  --text-xs--line-height: 1.4;
+  --text-sm: 12.5px;
+  --text-sm--line-height: 1.4;
+  --text-base: 14px;
+  --text-base--line-height: 1.5;
+  --text-lg: 15px;
+  --text-lg--line-height: 1.5;
+  --text-xl: 19px;
+  --text-xl--line-height: 1.3;
+  --text-2xl: 24px;
+  --text-2xl--line-height: 1.25;
+  --text-3xl: 32px;
+  --text-3xl--line-height: 1.2;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+  --radius-sm: 7px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+  --radius-sheet: 22px;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+  --shadow-float: var(--shadow);
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-sunk: var(--sunk);
+  --color-ev: var(--ev);
+  --color-ev-hover: var(--ev-hover);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--muted);
+  --color-ink-faint: var(--faint);
+  --color-brand: var(--accent);
+  --color-brand-ink: var(--accent-ink);
+  --color-brand-bg: var(--accent-bg);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-danger-ink: var(--danger-ink);
+  --color-now: var(--now);
+  --color-gridline: color-mix(in srgb, var(--line) 55%, transparent);
 
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-  }
+  /* Legacy shadcn names, kept until the pages are redone (PR 8). */
+  --color-background: var(--bg);
+  --color-foreground: var(--ink);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--ink);
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--ink);
+  --color-primary: var(--accent);
+  --color-primary-foreground: var(--accent-ink);
+  --color-secondary: var(--sunk);
+  --color-secondary-foreground: var(--ink);
+  --color-muted: var(--sunk);
+  --color-muted-foreground: var(--muted);
+  --color-accent: var(--ev-hover);
+  --color-accent-foreground: var(--ink);
+  --color-destructive: var(--danger);
+  --color-destructive-foreground: var(--danger-ink);
+  --color-border: var(--line);
+  --color-input: var(--line);
+  --color-ring: var(--accent);
 }
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: var(--line);
   }
 
   body {
-    @apply bg-background text-foreground;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Motion system (spec section 9) */
+:root {
+  --d-1: 120ms;
+  --d-2: 200ms;
+  --d-3: 300ms;
+  --e-out: cubic-bezier(0.2, 0, 0, 1);
+  --e-in: cubic-bezier(0.3, 0, 1, 1);
+  /* One small overshoot (~6%) settling within --d-3 */
+  --e-spring: linear(
+    0,
+    0.2 6%,
+    0.55 14%,
+    0.85 22%,
+    1.02 32%,
+    1.06 40%,
+    1.04 48%,
+    1.01 60%,
+    0.995 75%,
+    1
+  );
+}
+
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+@keyframes vt-out-forward {
+  to {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+}
+@keyframes vt-in-forward {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+}
+@keyframes vt-out-back {
+  to {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+}
+@keyframes vt-in-back {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html:active-view-transition-type(forward) {
+    &::view-transition-old(root) {
+      animation: vt-out-forward var(--d-3) var(--e-in) both;
+    }
+    &::view-transition-new(root) {
+      animation: vt-in-forward var(--d-3) var(--e-out) both;
+    }
+  }
+  html:active-view-transition-type(back) {
+    &::view-transition-old(root) {
+      animation: vt-out-back var(--d-3) var(--e-in) both;
+    }
+    &::view-transition-new(root) {
+      animation: vt-in-back var(--d-3) var(--e-out) both;
+    }
+  }
+}
+
+/* Theme change: circular reveal is driven from JS on the new snapshot */
+html.theme-transition::view-transition-old(root),
+html.theme-transition::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html.theme-transition::view-transition-old(root) {
+  z-index: 0;
+}
+html.theme-transition::view-transition-new(root) {
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must win over component styles */
+    animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must win over component styles */
+    animation-iteration-count: 1 !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must win over component styles */
+    transition-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must win over component styles */
+    scroll-behavior: auto !important;
+  }
+  ::view-transition-group(*),
+  ::view-transition-image-pair(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must win over component styles */
+    animation: none !important;
+  }
+}
+
+@keyframes skeleton-sweep {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
   }
 }

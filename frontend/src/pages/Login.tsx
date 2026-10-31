@@ -3,7 +3,7 @@ import { AxiosError } from "axios";
 import { AtSign } from "lucide-react";
 import toastHandler from "@/data-access/errors/toastHandler";
 import { authStatusQueryOptions } from "@/data-access/hooks/useAuthStatus";
-import { ModeToggle } from "../components/ModeToggle";
+import { ThemeButton } from "../components/ThemeButton";
 import { Button } from "../components/ui/button";
 import { useToast } from "../components/ui/use-toast";
 import { rootRoute, router } from "../router";
@@ -42,7 +42,7 @@ function Login() {
     <>
       <div className="flex bg-background h-screen w-full justify-center items-center">
         <div className="fixed top-4 right-4">
-          <ModeToggle />
+          <ThemeButton />
         </div>
         <div className="flex flex-col items-center gap-2">
           <h2 className="scroll-m-20 text-md md:text-lg lg:text-xl tracking-tight text-muted-foreground">

@@ -1,22 +1,36 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { AxiosError } from "axios";
-import { Info, LogOut, Pencil, Plus } from "lucide-react";
+import { Info, Plus } from "lucide-react";
+import { useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import useCreateTimetable from "@/data-access/hooks/useCreateTimetable";
 import useUser from "@/data-access/hooks/useUser";
+import { cn } from "@/lib/utils";
 import { router } from "../router";
 import Announcements from "./Announcements";
-import { ModeToggle } from "./ModeToggle";
+import { AvatarMenu } from "./AvatarMenu";
 import ReportIssue from "./ReportIssue";
+import { ThemeButton } from "./ThemeButton";
+
+type User = NonNullable<ReturnType<typeof useUser>["data"]>;
+
+const desktopQuery = "(min-width: 1024px)";
+
+// Only one bar is mounted: two copies would double the announcement fetch
+// and its "new announcements" toast.
+function useIsDesktop() {
+  return useSyncExternalStore(
+    (notify) => {
+      const media = window.matchMedia(desktopQuery);
+      media.addEventListener("change", notify);
+      return () => media.removeEventListener("change", notify);
+    },
+    () => window.matchMedia(desktopQuery).matches,
+  );
+}
 
 export function NavBar() {
+  const isDesktop = useIsDesktop();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isEditPage =
     pathname.includes("/edit/") || pathname.includes("/finalize/");
@@ -37,110 +51,17 @@ export function NavBar() {
   const { mutate: createTimetable, isPending: isCreating } =
     useCreateTimetable();
 
-  const renderNavbarBasedOnQueryFetch = (userQueryResultData: typeof user) => (
-    <div className="flex min-h-18 w-full shrink-0 items-center justify-between gap-2 border-b px-3 py-3 sm:px-6">
-      <div className="flex min-w-0 items-center gap-2 sm:gap-4">
-        {userQueryResultData ? (
-          <Link to="/">
-            <ChronoLogoText />
-          </Link>
-        ) : (
-          <ChronoLogoText />
-        )}
-        {userQueryResultData && !isEditPage && (
-          <Button
-            aria-label="Create a timetable"
-            disabled={isCreating}
-            className="text-green-200 not-md:h-fit w-fit text-xl px-2 md:px-4 bg-green-900 hover:bg-green-800"
-            onClick={
-              userQueryResultData
-                ? () =>
-                    createTimetable(void null, {
-                      onSuccess: (_response) => {
-                        router.navigate({
-                          to: "/edit/$timetableId",
-                          params: { timetableId: _response.data.id },
-                        });
-                      },
-                    })
-                : undefined
-            }
-          >
-            <div className="hidden md:flex">Create a timetable</div>
-            <div className="flex md:hidden">
-              <Plus className="h-6 w-6" />
-            </div>
-          </Button>
-        )}
-        <Button variant="link" size="sm" className="text-lg" asChild>
-          <Link to="/about" aria-label="About ChronoFactorem">
-            <div className="hidden md:flex">About</div>
-            <div className="flex md:hidden">
-              <Info className="size-4" />
-            </div>
-          </Link>
-        </Button>
-      </div>
+  const create = () =>
+    createTimetable(void null, {
+      onSuccess: (_response) => {
+        router.navigate({
+          to: "/edit/$timetableId",
+          params: { timetableId: _response.data.id },
+        });
+      },
+    });
 
-      <div className="flex flex-row items-center md:gap-4 gap-2">
-        {userQueryResultData ? (
-          <>
-            <Announcements />
-            <ModeToggle />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  aria-label="My account"
-                  className="size-9 shrink-0 rounded-full text-foreground bg-accent text-sm font-medium cursor-pointer focus-visible:outline-2 focus-visible:outline-ring"
-                >
-                  <span>{userQueryResultData.name[0]}</span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="lg:w-56 w-fit">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuItem asChild>
-                  <Link to="/editProfile">
-                    <Pencil className="mr-2 h-4 w-4" />
-                    <span>Edit Profile</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  asChild
-                  className="focus:bg-destructive/90 focus:text-destructive-foreground cursor-pointer"
-                  onClick={() => {
-                    // the backend clears the auth cookies and ends the logto sso session
-                    window.location.href = "/api/auth/logout";
-                  }}
-                >
-                  <div>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </div>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
-        ) : (
-          <>
-            <ModeToggle />
-            {isUnauthenticated && (
-              <Link
-                to="/login"
-                className="text-primary text-lg p-2 rounded-full hover:bg-muted transition h-fit duration-200 ease-in-out"
-              >
-                Login
-              </Link>
-            )}
-          </>
-        )}
-      </div>
-    </div>
-  );
-  if (isUserFetching) {
-    return renderNavbarBasedOnQueryFetch(user);
-  }
-  if (isUserError && !isUnauthenticated) {
+  if (!isUserFetching && isUserError && !isUnauthenticated) {
     return (
       <ReportIssue
         error={JSON.stringify(
@@ -149,15 +70,148 @@ export function NavBar() {
       />
     );
   }
-  // user is undefined here when the visitor is logged out, so the navbar
-  // renders without the parts that need authentication
-  return renderNavbarBasedOnQueryFetch(user);
+
+  // user is undefined when the visitor is logged out, so the bars render
+  // without the parts that need authentication
+  const props = {
+    user,
+    pathname,
+    showCreate: !!user && !isEditPage,
+    isCreating,
+    create,
+    showLogin: !user && isUnauthenticated,
+  };
+  return isDesktop ? <DesktopNav {...props} /> : <AppBar {...props} />;
 }
 
-function ChronoLogoText() {
+type BarProps = {
+  user: User | undefined;
+  pathname: string;
+  showCreate: boolean;
+  isCreating: boolean;
+  create: () => void;
+  showLogin: boolean;
+};
+
+const aboutIcon = (
+  <Button variant="quiet" size="icon" aria-label="About" asChild>
+    <Link to="/about">
+      <Info />
+    </Link>
+  </Button>
+);
+
+const loginLink = (
+  <Button variant="quiet" size="sm" asChild>
+    <Link to="/login">Login</Link>
+  </Button>
+);
+
+function AppBar({ user, showCreate, isCreating, create, showLogin }: BarProps) {
   return (
-    <h1 className="md:after:content-['Factorem'] scroll-m-20 cursor-pointer text-2xl mb-1 font-extrabold tracking-tighter md:tracking-tight lg:text-3xl text-foreground">
-      Chrono
-    </h1>
+    <header className="flex h-[52px] w-full shrink-0 items-center justify-between bg-bg px-4">
+      {/* About sits next to the wordmark, as on master */}
+      <div className="flex items-center gap-1">
+        {user ? (
+          <Link
+            to="/"
+            className="relative flex h-11 items-center text-[20px] font-bold tracking-tight text-ink"
+          >
+            Chrono
+          </Link>
+        ) : (
+          <span className="text-[20px] font-bold tracking-tight text-ink">
+            Chrono
+          </span>
+        )}
+        {aboutIcon}
+      </div>
+      <div className="flex items-center gap-1">
+        {user ? (
+          <>
+            {showCreate && (
+              <Button
+                size="icon"
+                aria-label="Create a timetable"
+                disabled={isCreating}
+                onClick={create}
+              >
+                <Plus className="size-5" />
+              </Button>
+            )}
+            <Announcements />
+            <AvatarMenu user={user} />
+          </>
+        ) : (
+          <>
+            <ThemeButton />
+            {showLogin && loginLink}
+          </>
+        )}
+      </div>
+    </header>
+  );
+}
+
+function DesktopNav({
+  user,
+  pathname,
+  showCreate,
+  isCreating,
+  create,
+  showLogin,
+}: BarProps) {
+  const linkClass = (active: boolean) =>
+    cn(
+      "text-base font-medium transition-colors duration-(--d-1) hover:text-ink",
+      active ? "text-ink" : "text-ink-muted",
+    );
+  return (
+    <header className="flex h-[60px] w-full shrink-0 items-center gap-6 border-b border-line bg-bg px-7">
+      {user ? (
+        <Link to="/" className="text-[21px] font-bold tracking-tight text-ink">
+          ChronoFactorem
+        </Link>
+      ) : (
+        <span className="text-[21px] font-bold tracking-tight text-ink">
+          ChronoFactorem
+        </span>
+      )}
+      <nav className="flex items-center gap-5" aria-label="Main">
+        {user && (
+          <Link to="/" className={linkClass(pathname === "/")}>
+            Timetables
+          </Link>
+        )}
+        <Link to="/about" className={linkClass(pathname.startsWith("/about"))}>
+          About
+        </Link>
+      </nav>
+      <div className="flex-1" />
+      <div className="flex items-center gap-2">
+        {user ? (
+          <>
+            {showCreate && (
+              <Button
+                size="sm"
+                disabled={isCreating}
+                onClick={create}
+                className="mr-1"
+              >
+                <Plus />
+                Create a timetable
+              </Button>
+            )}
+            <Announcements />
+            <AvatarMenu user={user} />
+          </>
+        ) : (
+          <>
+            <ThemeButton />
+            {showLogin && loginLink}
+          </>
+        )}
+      </div>
+    </header>
   );
 }
