@@ -183,12 +183,19 @@ const trackRequests = async (page: Page) => {
   page.on("requestfinished", done);
   page.on("requestfailed", done);
   return async () => {
+    const start = performance.now();
     for (;;) {
+      if (performance.now() - start > 30_000) {
+        throw new Error(`${page.url()} never settled`);
+      }
       if (inflight === 0 && performance.now() - last >= QUIET_MS) {
-        const domQuiet = await page.evaluate(
-          () =>
-            performance.now() -
-            (window as unknown as { lastMutation: number }).lastMutation,
+        // a skeleton means something is still loading, even if nothing has
+        // been asked for yet
+        const domQuiet = await page.evaluate(() =>
+          document.querySelector("[data-skeleton]")
+            ? 0
+            : performance.now() -
+              (window as unknown as { lastMutation: number }).lastMutation,
         );
         if (domQuiet >= QUIET_MS && inflight === 0) return;
       }
@@ -243,7 +250,7 @@ const hiding = (parts: Part[] = []) =>
 // chrome's fullPage capture can drop a scroll container's horizontal offset
 // (the phone side menu's tab track lands back on its first tab), so while a
 // shot is taken each offset is held as a translate of the scrolled content
-// instead. the page never sees the scroll events this causes
+// instead. the page doesn't see that, see holdDuringShots
 type Pinned = {
   el: HTMLElement;
   left: number;
@@ -252,15 +259,8 @@ type Pinned = {
 };
 const pinScroll = (page: Page) =>
   page.evaluate(() => {
-    const w = window as unknown as { pinned?: Pinned[]; stopScroll?: boolean };
-    if (!w.stopScroll) {
-      w.stopScroll = true;
-      for (const type of ["scroll", "scrollend"]) {
-        window.addEventListener(type, (e) => e.stopImmediatePropagation(), {
-          capture: true,
-        });
-      }
-    }
+    const w = window as unknown as { pinned?: Pinned[]; shooting?: boolean };
+    w.shooting = true;
     w.pinned = [];
     for (const el of document.querySelectorAll<HTMLElement>("*")) {
       const left = el.scrollLeft;
@@ -289,7 +289,7 @@ const pinScroll = (page: Page) =>
   });
 const unpinScroll = (page: Page) =>
   page.evaluate(() => {
-    const w = window as unknown as { pinned?: Pinned[] };
+    const w = window as unknown as { pinned?: Pinned[]; shooting?: boolean };
     for (const { el, left, snap, children } of w.pinned ?? []) {
       for (const { child, translate } of children) {
         child.style.translate = translate;
@@ -302,7 +302,36 @@ const unpinScroll = (page: Page) =>
       el.scrollLeft = left;
     }
     w.pinned = [];
+    w.shooting = false;
   });
+
+// a full-page shot resizes the viewport for the shot, and pinScroll scrolls,
+// so while one is taken the page gets no scroll or resize events and resize
+// observers wait. otherwise it moves things mid-shot: the phone sheet resizes
+// for a keyboard when its search box has focus, and the tabs move their
+// underline to the pinned offset
+const holdDuringShots = () => {
+  const w = window as unknown as { shooting?: boolean };
+  const hold = (e: Event) => {
+    if (w.shooting) e.stopImmediatePropagation();
+  };
+  for (const type of ["scroll", "scrollend", "resize"]) {
+    window.addEventListener(type, hold, { capture: true });
+  }
+  // there's no keyboard, so the visual viewport only resizes for shots, and
+  // the phone sheet would size itself to that
+  window.visualViewport?.addEventListener("resize", (e) =>
+    e.stopImmediatePropagation(),
+  );
+  const Native = window.ResizeObserver;
+  window.ResizeObserver = class extends Native {
+    constructor(callback: ResizeObserverCallback) {
+      super((entries, observer) => {
+        if (!w.shooting) callback(entries, observer);
+      });
+    }
+  };
+};
 
 const shoot = async (
   timetables: Record<string, string>,
@@ -360,6 +389,9 @@ const shoot = async (
       reducedMotion: "reduce",
     });
     await context.clock.setFixedTime(NOW);
+    // tsx wraps named functions in an __name helper, which functions sent to
+    // the page would otherwise call and not find
+    await context.addInitScript({ content: "window.__name = (f) => f;" });
     // seeded Math.random
     await context.addInitScript(() => {
       let seed = 1;
@@ -368,6 +400,7 @@ const shoot = async (
         return (seed - 1) / 2147483646;
       };
     });
+    await context.addInitScript(holdDuringShots);
     if (!synthetic.unreadAnnouncements) {
       await context.addInitScript((read) => {
         localStorage.setItem("readAnnouncements", read);
