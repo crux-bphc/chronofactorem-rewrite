@@ -5,6 +5,7 @@ import { useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
 import useCreateTimetable from "@/data-access/hooks/useCreateTimetable";
 import useUser from "@/data-access/hooks/useUser";
+import { preloadEditorOnIntent } from "@/lib/preloadOnIntent";
 import { cn } from "@/lib/utils";
 import { router } from "../router";
 import Announcements from "./Announcements";
@@ -141,6 +142,7 @@ function AppBar({ user, showCreate, isCreating, create, showLogin }: BarProps) {
                 aria-label="Create a timetable"
                 disabled={isCreating}
                 onClick={create}
+                {...preloadEditorOnIntent()}
               >
                 <Plus className="size-5" />
               </Button>
@@ -205,6 +207,7 @@ function DesktopNav({
                 size="sm"
                 disabled={isCreating}
                 onClick={create}
+                {...preloadEditorOnIntent()}
                 className="mr-1"
               >
                 <Plus />

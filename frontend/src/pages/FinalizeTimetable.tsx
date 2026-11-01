@@ -8,6 +8,7 @@ import { toast } from "@/components/ui/use-toast";
 import useEditTimetable from "@/data-access/hooks/useEditTimetable";
 import useTimetable from "@/data-access/hooks/useTimetable";
 import { HapticTap, haptic } from "@/lib/haptics";
+import { preloadOnIntent } from "@/lib/preloadOnIntent";
 import { TIMETABLE_TITLE_VT } from "@/lib/sharedTransition";
 import { cn } from "@/lib/utils";
 import { Button } from "../components/ui/button";
@@ -126,6 +127,10 @@ function FinalizeTimetable() {
         variant="quiet"
         size="sm"
         className="-ml-2.5"
+        {...preloadOnIntent({
+          to: "/edit/$timetableId",
+          params: { timetableId },
+        })}
         onClick={() =>
           router.navigate({
             to: "/edit/$timetableId",
@@ -235,7 +240,12 @@ function FinalizeTimetable() {
         </div>
       </fieldset>
       <BottomBar>
-        <Button onClick={finish} disabled={isPending} aria-busy={isPending}>
+        <Button
+          onClick={finish}
+          disabled={isPending}
+          aria-busy={isPending}
+          {...preloadOnIntent({ to: "/" })}
+        >
           <ButtonLabel loading={isPending}>Finish</ButtonLabel>
         </Button>
       </BottomBar>
