@@ -13,7 +13,6 @@ export function useTimetableActions(): {
   edit(): void;
   publish(): void;
   isEditing: boolean;
-  /** spread on the buttons, to preload the page each one opens */
   intent: Record<
     "copy" | "edit" | "publish",
     Partial<ReturnType<typeof preloadOnIntent>>

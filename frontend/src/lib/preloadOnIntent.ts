@@ -1,12 +1,7 @@
 import type { NavigateOptions } from "@tanstack/react-router";
 import { router } from "../router";
 
-// <Link> preloads its page on hover and focus (defaultPreload: "intent"), but
-// buttons that navigate from a handler don't. These give such buttons the same
-// head start. Loaders only make GET requests, so preloading has no side
-// effects.
-
-/** Hover/focus handlers that load a page's code and run its loader. */
+// Used on buttons that navigate to pages with loaders, so we can preload those
 export const preloadOnIntent = (to: NavigateOptions) => {
   const preload = () => {
     router.preloadRoute(to);
@@ -14,8 +9,7 @@ export const preloadOnIntent = (to: NavigateOptions) => {
   return { onPointerEnter: preload, onFocus: preload };
 };
 
-/** For a page whose params come back from a mutation, so only its code can
- * load ahead. */
+// Used on buttons that navigate to pages with loaders, so we can preload those
 export const preloadEditorOnIntent = () => {
   const preload = () => {
     router.loadRouteChunk(router.routesByPath["/edit/$timetableId"]);
