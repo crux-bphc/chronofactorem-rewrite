@@ -15,6 +15,7 @@ import { PANEL_VT_CLASS, panelForward } from "@/lib/panelTransition";
 import { useSkeletonFadeIn } from "@/lib/skeletonFade";
 import { titleCase } from "@/lib/titleCase";
 import { useTypeSlide } from "@/lib/typeSlide";
+import { useSwipe } from "@/lib/useSwipe";
 import { useTimetableNav } from "@/lib/useTimetableNav";
 import { cn } from "@/lib/utils";
 import {
@@ -201,6 +202,16 @@ const CourseDetailsMenu = ({
     currentSectionType,
     uniqueSectionTypes,
     course !== undefined,
+  );
+  const swipe = useSwipe(
+    currentSectionType ? uniqueSectionTypes.indexOf(currentSectionType) : -1,
+    uniqueSectionTypes.length,
+    course && currentSectionType
+      ? (i) => {
+          cancelAdvance();
+          setType(uniqueSectionTypes[i]);
+        }
+      : undefined,
   );
 
   // Rows already selected when a course opens don't play the tick; rows
@@ -441,6 +452,7 @@ const CourseDetailsMenu = ({
         className="min-h-0 flex-1 overflow-y-auto"
         onPointerDownCapture={cancelAdvance}
         onKeyDownCapture={cancelAdvance}
+        {...swipe}
       >
         {course === undefined ? (
           <div className={group}>
