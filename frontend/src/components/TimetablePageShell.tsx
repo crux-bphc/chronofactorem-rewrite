@@ -122,8 +122,6 @@ export const TimetablePageShell = ({
           {header}
           <div
             style={{ viewTransitionName: TIMETABLE_GRID_VT }}
-            // room to scroll the grid clear of the dock; the day view stretches
-            // down to it so a swipe below a short day still counts
             className="mx-auto flex w-full max-w-[640px] flex-1 flex-col pb-[calc(156px+env(safe-area-inset-bottom))]"
           >
             {children}
