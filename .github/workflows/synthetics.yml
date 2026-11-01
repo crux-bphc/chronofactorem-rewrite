@@ -18,10 +18,11 @@ on:
     branches: [ master ]
     paths: *paths
 
-# new pushes should cancel older ones
+# new pushes to a pull request cancel older ones. master's queue instead, every
+# merge has to leave its baseline
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   SHARDS: 2

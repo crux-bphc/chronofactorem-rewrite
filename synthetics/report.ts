@@ -343,8 +343,11 @@ for (const [, { data, hash }] of noBaseline ? [] : [...changed, ...added]) {
 }
 const blinks = new Map<string, string>();
 const changes = new Map<string, Change[]>();
+// master's report only goes to its step summary, the pull request already
+// showed these changes, so it skips the slow part
+const details = BASELINE !== "true";
 await Promise.all(
-  changed.map(async ([path, { data, hash }]) => {
+  (details ? changed : []).map(async ([path, { data, hash }]) => {
     const name = `blink/${baseline[path]}-${hash}.png`;
     const before = read(parent?.commit as string, `img/${baseline[path]}.png`);
     if (!before)
@@ -463,10 +466,12 @@ if (noBaseline) {
         .map(([route, group]) => `\`${route}\` ${group.length}`)
         .join(" · "),
       "",
-      ...section(grouped.shown, (path) => path, blinkOf),
     );
   }
-  if (grouped.repeats.length) {
+  if (details && changed.length) {
+    lines.push(...section(grouped.shown, (path) => path, blinkOf));
+  }
+  if (details && grouped.repeats.length) {
     lines.push(
       `<details><summary>Same changes as above (${grouped.repeats.length})</summary>`,
       "",
@@ -480,7 +485,7 @@ if (noBaseline) {
       "",
     );
   }
-  if (grouped.tiny.length) {
+  if (details && grouped.tiny.length) {
     lines.push(
       `<details><summary>Tiny changes, possibly noise (${grouped.tiny.length})</summary>`,
       "",
@@ -489,7 +494,7 @@ if (noBaseline) {
       "",
     );
   }
-  if (added.length) {
+  if (details && added.length) {
     lines.push(
       "<details><summary>New</summary>",
       "",
@@ -502,7 +507,7 @@ if (noBaseline) {
       "",
     );
   }
-  if (removed.length) {
+  if (details && removed.length) {
     lines.push(
       "<details><summary>Removed</summary>",
       "",
