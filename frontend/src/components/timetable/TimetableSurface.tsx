@@ -104,7 +104,12 @@ export function TimetableSurface({
   if (layout === "phone" && view === "day") {
     const shown = Math.min(day, dayCount - 1);
     return (
-      <section data-shot="grid" aria-label="Weekly timetable" {...swipe}>
+      <section
+        data-shot="grid"
+        aria-label="Weekly timetable"
+        className="flex-1"
+        {...swipe}
+      >
         <Agenda
           cells={cells}
           day={shown}

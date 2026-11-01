@@ -117,13 +117,12 @@ export const TimetablePageShell = ({
 
   if (!screenIsLarge) {
     return (
-      <main className="w-full flex-1">
+      <main className="flex w-full flex-1 flex-col">
         <TooltipProvider>
           {header}
           <div
             style={{ viewTransitionName: TIMETABLE_GRID_VT }}
-            // room to scroll the grid clear of the dock
-            className="mx-auto max-w-[640px] pb-[calc(156px+env(safe-area-inset-bottom))]"
+            className="mx-auto flex w-full max-w-[640px] flex-1 flex-col pb-[calc(156px+env(safe-area-inset-bottom))]"
           >
             {children}
           </div>
