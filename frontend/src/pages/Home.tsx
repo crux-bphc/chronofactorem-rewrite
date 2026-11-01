@@ -1,4 +1,4 @@
-import { Route } from "@tanstack/react-router";
+import { createLazyRoute } from "@tanstack/react-router";
 import type { timetableType } from "lib";
 import { Plus } from "lucide-react";
 import {
@@ -13,32 +13,27 @@ import { flushSync } from "react-dom";
 import type { z } from "zod";
 import { ButtonLabel } from "@/components/ButtonLabel";
 import { EmptyBird } from "@/components/EmptyBird";
+import {
+  gridClass,
+  HomeSkeleton,
+  mainClass,
+  overlineClass,
+} from "@/components/HomeSkeleton";
 import ReportIssue from "@/components/ReportIssue";
-import { Skeleton } from "@/components/ui/skeleton";
-import { handleLoginRedirect } from "@/data-access/errors/handlers";
-import toastHandler from "@/data-access/errors/toastHandler";
 import useCreateTimetable from "@/data-access/hooks/useCreateTimetable";
-import useUser, { userQueryOptions } from "@/data-access/hooks/useUser";
+import useUser from "@/data-access/hooks/useUser";
 import {
   getSharedTimetable,
   setSharedTimetable,
   subscribeSharedTimetable,
 } from "@/lib/sharedTransition";
-import { skeletonRef, useSkeletonCrossfade } from "@/lib/skeletonFade";
+import { useSkeletonCrossfade } from "@/lib/skeletonFade";
 import { cn } from "@/lib/utils";
-import authenticatedRoute from "../AuthenticatedRoute";
 import TimetableCard from "../components/TimetableCard";
 import { Button } from "../components/ui/button";
-import { useToast } from "../components/ui/use-toast";
 import { router } from "../router";
 
 type Timetable = z.infer<typeof timetableType>;
-
-const mainClass =
-  "mx-auto w-full max-w-[640px] px-4 pb-12 lg:max-w-[1100px] lg:px-7";
-const gridClass = "grid gap-2 lg:grid-cols-3 lg:gap-3.5";
-const overlineClass =
-  "mt-5 mb-2 text-xs font-semibold tracking-[.07em] text-ink-muted uppercase lg:mt-7 lg:mb-2.5";
 
 const byUpdated = (a: Timetable, b: Timetable) =>
   new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime();
@@ -243,57 +238,6 @@ const TimetableSection = ({
   );
 };
 
-const homeSkeletonRef = skeletonRef("home");
-
-function HomeSkeleton() {
-  return (
-    <main ref={homeSkeletonRef} className={mainClass} aria-busy="true">
-      <h1 className="pt-2 text-2xl font-semibold lg:pt-10 lg:text-3xl">
-        Timetables
-      </h1>
-      <Skeleton className="mt-5 mb-2 h-3 w-20 lg:mt-7 lg:mb-2.5" />
-      <div className={gridClass}>
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            className="grid grid-cols-[92px_1fr_auto] items-center gap-3.5 rounded-xl border border-line bg-surface p-3.5"
-          >
-            <Skeleton className="h-16 w-[92px] rounded-[8px]" />
-            {/* Rows sized by the card's own line heights; the desktop meta
-                line usually wraps in a third of 1100px. */}
-            <div className="min-w-0">
-              <div className="flex h-[1lh] items-center text-lg">
-                <Skeleton className="h-3.5 w-2/5" />
-              </div>
-              <div className="mt-[3px] flex h-[1lh] items-center text-sm lg:h-[2lh]">
-                <Skeleton className="h-3 w-3/5" />
-              </div>
-              <Skeleton className="mt-[7px] h-[calc(1lh+6px)] w-16 rounded-full text-sm" />
-            </div>
-            <div className="size-9" />
-          </div>
-        ))}
-      </div>
-    </main>
-  );
-}
-
-const homeRoute = new Route({
-  getParentRoute: () => authenticatedRoute,
-  path: "/",
-  loader: ({ context: { queryClient }, preload }) =>
-    queryClient.ensureQueryData(userQueryOptions).catch((error) => {
-      if (!preload) handleLoginRedirect(error);
-      throw error;
-    }),
-  component: Home,
-  pendingComponent: HomeSkeleton,
-  errorComponent: ({ error }) => {
-    const { toast } = useToast();
-    toastHandler(error, toast);
-  },
-});
-
 function Home() {
   const { data: user, isLoading, isError, error } = useUser();
   const { mutate: createTimetable, isPending: isCreating } =
@@ -423,4 +367,6 @@ function Home() {
   );
 }
 
-export default homeRoute;
+export const Route = createLazyRoute("/authenticated/")({
+  component: Home,
+});

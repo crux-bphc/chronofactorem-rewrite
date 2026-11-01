@@ -6,6 +6,10 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import "./index.css";
 import { queryClient, router } from "./router";
 
+// a deploy deletes the old chunks, so a tab opened before it can't load the
+// pages it hasn't visited yet; reloading picks up the new build
+window.addEventListener("vite:preloadError", () => window.location.reload());
+
 const rootElement = document.getElementById("root");
 
 if (rootElement) {

@@ -9,15 +9,15 @@ import {
   releaseStillNavbar,
   routeTransitionTypes,
 } from "./lib/viewTransitions";
-import aboutRoute from "./pages/About";
-import editTimetableRoute from "./pages/EditTimetable";
-import editUserProfileRoute from "./pages/EditUserProfile";
-import finalizeTimetableRoute from "./pages/FinalizeTimetable";
-import getDegreesRoute from "./pages/GetDegrees";
-import homeRoute from "./pages/Home";
-import loginRoute from "./pages/Login";
-import viewTimetableRoute from "./pages/ViewTimetable";
 import RootComponent from "./RootComponent";
+import aboutRoute from "./routes/about";
+import editTimetableRoute from "./routes/edit";
+import editUserProfileRoute from "./routes/editProfile";
+import finalizeTimetableRoute from "./routes/finalize";
+import getDegreesRoute from "./routes/getDegrees";
+import homeRoute from "./routes/home";
+import loginRoute from "./routes/login";
+import viewTimetableRoute from "./routes/view";
 
 export const queryClient = new QueryClient({
   defaultOptions: {

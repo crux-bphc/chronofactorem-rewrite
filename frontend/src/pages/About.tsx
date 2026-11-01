@@ -1,12 +1,5 @@
-import { Route } from "@tanstack/react-router";
+import { createLazyRoute } from "@tanstack/react-router";
 import { CruxMark } from "../components/CruxMark";
-import { rootRoute } from "../router";
-
-const aboutRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: "about",
-  component: About,
-});
 
 function About() {
   return (
@@ -65,4 +58,6 @@ function About() {
   );
 }
 
-export default aboutRoute;
+export const Route = createLazyRoute("/about")({
+  component: About,
+});
