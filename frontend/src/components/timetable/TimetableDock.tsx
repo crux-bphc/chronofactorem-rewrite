@@ -72,12 +72,13 @@ export function TimetableDock({
               <button
                 key={name}
                 type="button"
-                aria-label={name}
                 aria-pressed={view === "day" && day === i}
                 onClick={() => showDay(i)}
                 className="relative z-[1] min-h-11 min-w-0 flex-1 cursor-pointer rounded-full text-base font-medium text-ink-muted transition-colors duration-(--d-2) aria-pressed:text-bg focus-visible:outline-2 focus-visible:outline-ring"
               >
+                {/* full name for screen readers, "Mon" for voice control */}
                 {name.slice(0, 3)}
+                <span className="sr-only">{name.slice(3)}</span>
               </button>
             ))}
           </div>

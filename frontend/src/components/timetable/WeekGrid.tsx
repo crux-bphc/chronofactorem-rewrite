@@ -166,7 +166,7 @@ export function WeekGrid({
                       }
                     }
               }
-              aria-label={`Edit ${cell.courseId} ${cell.type}${cell.number}, press Delete to remove`}
+              aria-description="Press Delete to remove"
               className={`${padClass} size-full cursor-pointer rounded-sm @max-[87px]:px-1.5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring disabled:opacity-60`}
             >
               <TileBody cell={cell} spacer="h-3 w-3" reserve="pr-2.5" />

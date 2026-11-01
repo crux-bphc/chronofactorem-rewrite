@@ -197,7 +197,7 @@ export function Agenda({
                                 }
                               }
                         }
-                        aria-label={`Edit ${item.cell.courseId} ${item.cell.type}${item.cell.number}, press Delete to remove`}
+                        aria-description="Press Delete to remove"
                         className={`${bodyClass} cursor-pointer focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring disabled:opacity-60`}
                       >
                         <BlockBody cell={item.cell} remove />
