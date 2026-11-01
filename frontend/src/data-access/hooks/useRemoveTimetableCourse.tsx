@@ -9,8 +9,12 @@ import toastHandler from "../errors/toastHandler";
 export const useRemoveTimetableCourse = (timetableId: string | undefined) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const invalidate = () =>
-    queryClient.invalidateQueries({ queryKey: ["timetable", timetableId] });
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ["user"] });
+    return queryClient.invalidateQueries({
+      queryKey: ["timetable", timetableId],
+    });
+  };
 
   const { mutate: restore } = useMutation({
     mutationKey: ["sections", timetableId],

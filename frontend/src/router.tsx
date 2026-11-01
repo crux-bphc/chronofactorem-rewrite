@@ -23,6 +23,8 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
+      // since we use loaders
+      staleTime: 30_000,
       retry: (failureCount, error) => {
         if (
           error instanceof AxiosError &&

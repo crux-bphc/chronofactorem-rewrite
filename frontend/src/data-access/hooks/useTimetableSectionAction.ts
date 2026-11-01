@@ -30,6 +30,8 @@ export const useAddRemoveTimetableSection = (
       return result.data;
     },
     onSuccess: () => {
+      // home lists timetables by last edit
+      queryClient.invalidateQueries({ queryKey: ["user"] });
       return queryClient.invalidateQueries({
         queryKey: ["timetable", timetableId],
       });
@@ -61,6 +63,8 @@ export const useSwapTimetableSections = (timetableId: string | undefined) => {
       });
     },
     onSuccess: () => {
+      // home lists timetables by last edit
+      queryClient.invalidateQueries({ queryKey: ["user"] });
       return queryClient.invalidateQueries({
         queryKey: ["timetable", timetableId],
       });
