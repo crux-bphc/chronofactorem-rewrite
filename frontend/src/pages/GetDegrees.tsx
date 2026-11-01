@@ -1,8 +1,7 @@
 import { Route } from "@tanstack/react-router";
 import { AxiosError } from "axios";
-import { collegeYearType } from "lib";
 import { useRef, useState } from "react";
-import { z } from "zod";
+import * as z from "zod/mini";
 import { ButtonLabel } from "@/components/ButtonLabel";
 import { CruxMark } from "@/components/CruxMark";
 import DegreeDropDown from "@/components/DegreeDropDown";
@@ -23,7 +22,8 @@ Then, we do nothing (no error toasts) and just let them fill out their degrees.
 const getDegreesRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "getDegrees",
-  validateSearch: z.object({ year: collegeYearType }),
+  // same bounds as collegeYearType in lib, which uses full zod
+  validateSearch: z.object({ year: z.int().check(z.minimum(1), z.maximum(6)) }),
   loader: ({ context: { queryClient }, preload }) =>
     queryClient
       .ensureQueryData(userQueryOptions)
