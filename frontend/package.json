@@ -36,7 +36,6 @@
     "lib": "workspace:*",
     "lucide-react": "^1.25.0",
     "react": "^19.2.7",
-    "react-cookie": "^8.1.2",
     "react-dom": "^19.2.7",
     "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.3.3",
