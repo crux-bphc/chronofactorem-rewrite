@@ -224,7 +224,11 @@ export const synthetics: Synthetic[] = [
     hide: ["navbar", "timetable-header", "grid"],
     act: async (page) => {
       await openMenu(page);
-      await page.getByRole("button", { name: /^Object Oriented Prog/ }).click();
+      // grid blocks share the course name, so stay inside the menu
+      await page
+        .getByRole("tabpanel")
+        .getByRole("button", { name: /^Object Oriented Prog/ })
+        .click();
       await page
         .getByRole("button", { name: "Remove CS F213 from timetable" })
         .waitFor();
@@ -254,7 +258,11 @@ export const synthetics: Synthetic[] = [
         return route.fulfill({ response, json: timetable });
       });
       await openMenu(page);
-      await page.getByRole("button", { name: /^Object Oriented Prog/ }).click();
+      // grid blocks share the course name, so stay inside the menu
+      await page
+        .getByRole("tabpanel")
+        .getByRole("button", { name: /^Object Oriented Prog/ })
+        .click();
       await page
         .getByRole("button", { name: "Remove CS F213 from timetable" })
         .click();

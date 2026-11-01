@@ -258,7 +258,7 @@ export function DeskGrid({
                             }
                           }
                     }
-                    aria-label={`Edit ${cell.courseId} ${cell.type}${cell.number}, press Delete to remove`}
+                    aria-description="Press Delete to remove"
                     className={`flex size-full cursor-pointer flex-col justify-start rounded-md text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring disabled:opacity-60 ${padClass}`}
                   >
                     <BlockLines cell={cell} scale named={!rows} remove />
