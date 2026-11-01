@@ -1,4 +1,3 @@
-import { toBlob } from "html-to-image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReportIssueToastAction from "@/components/ReportIssueToastAction";
 import { TimetableSurface } from "@/components/timetable/TimetableSurface";
@@ -126,6 +125,8 @@ export function useTimetableExport(): {
     clearTimeout(doneTimer.current);
     setStatus("rendering");
     try {
+      // loaded on first export, since most visits never export
+      const htmlToImage = import("html-to-image");
       // wait for the offscreen frame to mount and lay out
       await new Promise<void>((resolve) =>
         requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
@@ -137,6 +138,7 @@ export function useTimetableExport(): {
           "The timetable image could not be prepared. Please try again.",
         );
       // toBlob encodes the PNG off the main thread, unlike toPng's toDataURL
+      const { toBlob } = await htmlToImage;
       const blob = await toBlob(node, {
         pixelRatio: 2,
         cacheBust: true,
