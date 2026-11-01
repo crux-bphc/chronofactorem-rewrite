@@ -1,32 +1,19 @@
-import { Route } from "@tanstack/react-router";
+import { createLazyRoute } from "@tanstack/react-router";
 import { Check, ChevronLeft, Copy, Globe, Lock } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { BottomBar } from "@/components/BottomBar";
 import { ButtonLabel } from "@/components/ButtonLabel";
 import ReportIssue from "@/components/ReportIssue";
-import { TimetablePageError } from "@/components/TimetablePageShell";
 import { toast } from "@/components/ui/use-toast";
 import useEditTimetable from "@/data-access/hooks/useEditTimetable";
-import useTimetable, {
-  timetableQueryOptions,
-} from "@/data-access/hooks/useTimetable";
+import useTimetable from "@/data-access/hooks/useTimetable";
 import { HapticTap, haptic } from "@/lib/haptics";
 import { TIMETABLE_TITLE_VT } from "@/lib/sharedTransition";
 import { cn } from "@/lib/utils";
-import authenticatedRoute from "../AuthenticatedRoute";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { router } from "../router";
-
-const finalizeTimetableRoute = new Route({
-  getParentRoute: () => authenticatedRoute,
-  path: "finalize/$timetableId",
-  loader: ({ context: { queryClient }, params: { timetableId } }) =>
-    queryClient.ensureQueryData(timetableQueryOptions(timetableId)),
-  component: FinalizeTimetable,
-  errorComponent: TimetablePageError,
-});
 
 function FinalizeTimetable() {
   const headingOptions = [
@@ -42,7 +29,7 @@ function FinalizeTimetable() {
   const [privateTimetable, setPrivate] = useState(false);
   const [copied, setCopied] = useState(false);
   const nameInput = useRef<HTMLInputElement>(null);
-  const { timetableId } = finalizeTimetableRoute.useParams();
+  const { timetableId } = Route.useParams();
   const {
     data: timetable,
     isError: isTimetableError,
@@ -256,4 +243,6 @@ function FinalizeTimetable() {
   );
 }
 
-export default finalizeTimetableRoute;
+export const Route = createLazyRoute("/authenticated/finalize/$timetableId")({
+  component: FinalizeTimetable,
+});

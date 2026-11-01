@@ -1,41 +1,17 @@
-import { Route } from "@tanstack/react-router";
+import { createLazyRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 import ReportIssue from "@/components/ReportIssue";
 import TimetableHeader from "@/components/TimetableHeader";
-import {
-  TimetablePageError,
-  TimetablePageShell,
-  timetablePageLoader,
-} from "@/components/TimetablePageShell";
+import { TimetablePageShell } from "@/components/TimetablePageShell";
 import { ExportButton } from "@/components/timetable/HeaderActions";
 import { TimetableDock } from "@/components/timetable/TimetableDock";
 import { TimetablePageSkeleton } from "@/components/timetable/TimetablePageSkeleton";
 import { TimetableSurface } from "@/components/timetable/TimetableSurface";
 import { TimetableProvider, useTimetableState } from "@/context";
-import { timetableSearchSchema } from "@/lib/timetableSearch";
 import { useSurfaceNav } from "@/lib/useSurfaceNav";
 import { useTimetableExport } from "@/lib/useTimetableExport";
 import { buildTimetableGrid } from "@/utils/timetableGrid";
-import NotFound from "../components/NotFound";
 import { SideMenu } from "../components/SideMenu";
-import { rootRoute } from "../router";
-
-const viewTimetableRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: "view/$timetableId",
-  loader: timetablePageLoader,
-  validateSearch: timetableSearchSchema,
-  loaderDeps: () => ({}),
-  pendingComponent: () => <TimetablePageSkeleton page="view" />,
-  pendingMs: 200,
-  component: () => (
-    <TimetableProvider fallback={<TimetablePageSkeleton page="view" />}>
-      <ViewTimetable />
-    </TimetableProvider>
-  ),
-  notFoundComponent: NotFound,
-  errorComponent: TimetablePageError,
-});
 
 function ViewTimetable() {
   const {
@@ -103,4 +79,10 @@ function ViewTimetable() {
   );
 }
 
-export default viewTimetableRoute;
+export const Route = createLazyRoute("/view/$timetableId")({
+  component: () => (
+    <TimetableProvider fallback={<TimetablePageSkeleton page="view" />}>
+      <ViewTimetable />
+    </TimetableProvider>
+  ),
+});

@@ -1,4 +1,4 @@
-import { Route } from "@tanstack/react-router";
+import { createLazyRoute } from "@tanstack/react-router";
 import { getBatchFromEmail, unknownDegree } from "lib";
 import { useRef, useState } from "react";
 import { BottomBar } from "@/components/BottomBar";
@@ -6,31 +6,10 @@ import { ButtonLabel } from "@/components/ButtonLabel";
 import DegreeDropDown from "@/components/DegreeDropDown";
 import ReportIssue from "@/components/ReportIssue";
 import { Button } from "@/components/ui/button";
-import { handleLoginRedirect } from "@/data-access/errors/handlers";
-import toastHandler from "@/data-access/errors/toastHandler";
 import useEditUser from "@/data-access/hooks/useEditUser";
-import useUser, { userQueryOptions } from "@/data-access/hooks/useUser";
-import authenticatedRoute from "../AuthenticatedRoute";
+import useUser from "@/data-access/hooks/useUser";
 import { useToast } from "../components/ui/use-toast";
 import { router } from "../router";
-
-const editUserProfileRoute = new Route({
-  getParentRoute: () => authenticatedRoute,
-  path: "editProfile",
-  loader: async ({ context: { queryClient }, preload }) => {
-    try {
-      return await queryClient.ensureQueryData(userQueryOptions);
-    } catch (error: unknown) {
-      if (!preload) handleLoginRedirect(error);
-      throw error;
-    }
-  },
-  component: EditUserProfile,
-  errorComponent: ({ error }) => {
-    const { toast } = useToast();
-    toastHandler(error, toast);
-  },
-});
 
 function EditUserProfile() {
   const { data: user, isLoading, isError, error } = useUser();
@@ -137,4 +116,6 @@ function EditUserProfile() {
   );
 }
 
-export default editUserProfileRoute;
+export const Route = createLazyRoute("/authenticated/editProfile")({
+  component: EditUserProfile,
+});

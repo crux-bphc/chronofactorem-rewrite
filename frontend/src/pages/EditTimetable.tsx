@@ -1,14 +1,10 @@
 import { useIsMutating } from "@tanstack/react-query";
-import { Route } from "@tanstack/react-router";
+import { createLazyRoute } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
 import CourseDetailsMenu from "@/components/CourseDetailsMenu";
 import ReportIssue from "@/components/ReportIssue";
 import TimetableHeader from "@/components/TimetableHeader";
-import {
-  TimetablePageError,
-  TimetablePageShell,
-  timetablePageLoader,
-} from "@/components/TimetablePageShell";
+import { TimetablePageShell } from "@/components/TimetablePageShell";
 import { PublishButton } from "@/components/timetable/HeaderActions";
 import { TimetableDock } from "@/components/timetable/TimetableDock";
 import { TimetablePageSkeleton } from "@/components/timetable/TimetablePageSkeleton";
@@ -20,34 +16,12 @@ import {
   SectionPreviewProvider,
   useSectionPreview,
 } from "@/lib/sectionPreview";
-import { timetableSearchSchema } from "@/lib/timetableSearch";
 import { useSurfaceNav } from "@/lib/useSurfaceNav";
 import { useTimetableNav } from "@/lib/useTimetableNav";
 import { buildTimetableGrid } from "@/utils/timetableGrid";
-import authenticatedRoute from "../AuthenticatedRoute";
-import NotFound from "../components/NotFound";
 import { SideMenu } from "../components/SideMenu";
 import { toast } from "../components/ui/use-toast";
 import { router } from "../router";
-
-const editTimetableRoute = new Route({
-  getParentRoute: () => authenticatedRoute,
-  path: "edit/$timetableId",
-  loader: timetablePageLoader,
-  validateSearch: timetableSearchSchema,
-  loaderDeps: () => ({}),
-  pendingComponent: () => <TimetablePageSkeleton page="edit" />,
-  pendingMs: 200,
-  component: () => (
-    <TimetableProvider fallback={<TimetablePageSkeleton page="edit" />}>
-      <SectionPreviewProvider>
-        <EditTimetable />
-      </SectionPreviewProvider>
-    </TimetableProvider>
-  ),
-  notFoundComponent: NotFound,
-  errorComponent: TimetablePageError,
-});
 
 function EditTimetable() {
   const {
@@ -210,4 +184,12 @@ function EditTimetable() {
   );
 }
 
-export default editTimetableRoute;
+export const Route = createLazyRoute("/authenticated/edit/$timetableId")({
+  component: () => (
+    <TimetableProvider fallback={<TimetablePageSkeleton page="edit" />}>
+      <SectionPreviewProvider>
+        <EditTimetable />
+      </SectionPreviewProvider>
+    </TimetableProvider>
+  ),
+});
