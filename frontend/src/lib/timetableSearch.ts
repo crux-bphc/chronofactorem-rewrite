@@ -1,17 +1,18 @@
-import { z } from "zod";
+import * as z from "zod/mini";
+
+// zod/mini, since full zod would add ~60 kB to every page for search params
+const loose = <T extends z.ZodMiniType>(schema: T) =>
+  z.catch(z.optional(schema), undefined);
 
 export const timetableSearchSchema = z.object({
-  sheet: z
-    .enum(["courses", "warnings", "announcements"])
-    .optional()
-    .catch(undefined),
-  tab: z.enum(["courses", "exams"]).optional().catch(undefined),
-  exam: z.enum(["midsem", "compre"]).optional().catch(undefined),
-  course: z.string().min(1).optional().catch(undefined),
-  type: z.enum(["L", "P", "T"]).optional().catch(undefined),
-  view: z.enum(["day", "week"]).optional().catch(undefined),
-  day: z.number().int().min(0).max(5).optional().catch(undefined),
-  q: z.string().optional().catch(undefined),
+  sheet: loose(z.enum(["courses", "warnings", "announcements"])),
+  tab: loose(z.enum(["courses", "exams"])),
+  exam: loose(z.enum(["midsem", "compre"])),
+  course: loose(z.string().check(z.minLength(1))),
+  type: loose(z.enum(["L", "P", "T"])),
+  view: loose(z.enum(["day", "week"])),
+  day: loose(z.int().check(z.minimum(0), z.maximum(5))),
+  q: loose(z.string()),
 });
 
 export type TimetableSearch = z.infer<typeof timetableSearchSchema>;

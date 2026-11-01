@@ -10,6 +10,7 @@
       "default": "./src/index.js"
     }
   },
+  "sideEffects": false,
   "keywords": [],
   "author": "",
   "license": "ISC",
