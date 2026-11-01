@@ -62,4 +62,20 @@ export default defineConfig({
       "@": path.resolve(import.meta.dirname, "./src"),
     },
   },
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          // libraries that change far less often than the app, so browsers
+          // keep them cached across deploys
+          groups: [
+            {
+              name: "vendor",
+              test: /node_modules[\\/](react|react-dom|scheduler|@tanstack[\\/][^\\/]+)[\\/]/,
+            },
+          ],
+        },
+      },
+    },
+  },
 });
