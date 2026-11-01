@@ -22,6 +22,7 @@ import {
 import ReportIssue from "@/components/ReportIssue";
 import useCreateTimetable from "@/data-access/hooks/useCreateTimetable";
 import useUser from "@/data-access/hooks/useUser";
+import { preloadEditorOnIntent } from "@/lib/preloadOnIntent";
 import {
   getSharedTimetable,
   setSharedTimetable,
@@ -297,6 +298,7 @@ function Home() {
       aria-busy={isCreating}
       disabled={isCreating}
       onClick={create}
+      {...preloadEditorOnIntent()}
     >
       <ButtonLabel loading={isCreating}>
         <Plus />

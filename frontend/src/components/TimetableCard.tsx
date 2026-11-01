@@ -23,6 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import useEditTimetable from "@/data-access/hooks/useEditTimetable";
+import { preloadOnIntent } from "@/lib/preloadOnIntent";
 import { TIMETABLE_GRID_VT, TIMETABLE_TITLE_VT } from "@/lib/sharedTransition";
 import { cn } from "@/lib/utils";
 import { router } from "../router";
@@ -162,6 +163,10 @@ function TimetableCard({
           ) : (
             <DropdownMenuItem
               disabled={isPending}
+              {...preloadOnIntent({
+                to: "/edit/$timetableId",
+                params: { timetableId: timetable.id },
+              })}
               onSelect={() => {
                 onOpen(timetable.id);
                 editTimetableAsync({

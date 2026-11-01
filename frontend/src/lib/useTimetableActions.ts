@@ -5,6 +5,7 @@ import useEditTimetable, {
   editTimetableKey,
 } from "@/data-access/hooks/useEditTimetable";
 import { router } from "../router";
+import { preloadEditorOnIntent, preloadOnIntent } from "./preloadOnIntent";
 
 /** Copy, edit and publish for the timetable on the editor and view pages. */
 export function useTimetableActions(): {
@@ -12,6 +13,11 @@ export function useTimetableActions(): {
   edit(): void;
   publish(): void;
   isEditing: boolean;
+  /** spread on the buttons, to preload the page each one opens */
+  intent: Record<
+    "copy" | "edit" | "publish",
+    Partial<ReturnType<typeof preloadOnIntent>>
+  >;
 } {
   const {
     state: { timetable },
@@ -79,5 +85,21 @@ export function useTimetableActions(): {
     });
   };
 
-  return { copy, edit, publish, isEditing };
+  const intent = {
+    copy: preloadEditorOnIntent(),
+    edit: timetable
+      ? preloadOnIntent({
+          to: "/edit/$timetableId",
+          params: { timetableId: timetable.id },
+        })
+      : {},
+    publish: timetable
+      ? preloadOnIntent({
+          to: "/finalize/$timetableId",
+          params: { timetableId: timetable.id },
+        })
+      : {},
+  };
+
+  return { copy, edit, publish, isEditing, intent };
 }

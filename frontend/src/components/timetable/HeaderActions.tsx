@@ -138,7 +138,7 @@ export function PublishButton({ layout }: { layout: Layout }) {
     state: { coursesInTimetable },
   } = useTimetableState();
   const summary = useWarningsSummary();
-  const { publish } = useTimetableActions();
+  const { publish, intent } = useTimetableActions();
   const { openSheet } = useTimetableNav();
   const reasonId = useId();
 
@@ -159,7 +159,13 @@ export function PublishButton({ layout }: { layout: Layout }) {
   if (layout === "desktop") {
     if (!blocked)
       return (
-        <Button variant="primary" size="sm" className={fade} onClick={publish}>
+        <Button
+          variant="primary"
+          size="sm"
+          className={fade}
+          onClick={publish}
+          {...intent.publish}
+        >
           {content}
         </Button>
       );
@@ -189,6 +195,7 @@ export function PublishButton({ layout }: { layout: Layout }) {
       aria-disabled={blocked || undefined}
       aria-describedby={blocked ? reasonId : undefined}
       className={cn(fade, blocked && "opacity-45")}
+      {...(blocked ? {} : intent.publish)}
       onClick={() => {
         if (!blocked) publish();
         // Blocked with no courses: the fix is adding one, even when CDCs are
@@ -261,7 +268,7 @@ export function MoreMenu({
   const {
     state: { user, timetable },
   } = useTimetableState();
-  const { copy, edit, isEditing } = useTimetableActions();
+  const { copy, edit, isEditing, intent } = useTimetableActions();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
 
@@ -290,6 +297,7 @@ export function MoreMenu({
             <DropdownMenuItem
               disabled={timetable.archived || isEditing}
               onSelect={copy}
+              {...intent.copy}
             >
               <Copy />
               {timetable.archived
@@ -301,6 +309,7 @@ export function MoreMenu({
             <DropdownMenuItem
               disabled={timetable.archived || isEditing}
               onSelect={edit}
+              {...intent.edit}
             >
               <Edit2 />
               {timetable.archived
