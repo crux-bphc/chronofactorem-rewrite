@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { useFadingValue } from "@/lib/sectionPreview";
-import { useDaySwipe } from "@/lib/useDaySwipe";
 import { useNow } from "@/lib/useNow";
 import { useSectionPresence } from "@/lib/useSectionPresence";
+import { useSwipe } from "@/lib/useSwipe";
 import { formatNow } from "@/utils/timeFormat";
 import type { TimetableSectionType } from "@/utils/timetable";
 import {
@@ -99,7 +99,7 @@ export function TimetableSurface({
   // the now-line belongs to the live view page only, never the editor or export
   const date = useNow(mode === "view" && !!showNow);
   const pos = date ? nowPosition(date, dayCount, hourCount) : null;
-  const swipe = useDaySwipe(day, dayCount, onShowDay);
+  const swipe = useSwipe(day, dayCount, onShowDay);
 
   if (layout === "phone" && view === "day") {
     const shown = Math.min(day, dayCount - 1);

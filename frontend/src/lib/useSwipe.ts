@@ -5,17 +5,17 @@ const MIN_DISTANCE = 48;
 const EDGE = 24;
 
 /**
- * Touch swipes across the phone's day view: left for the next day, right for
- * the previous. Vertical drags stay the page's scroll.
+ * Touch swipes between `count` panes (days, section types): left for the
+ * next, right for the previous. Vertical drags stay the page's scroll.
  */
-export function useDaySwipe(
-  day: number,
-  dayCount: number,
-  showDay?: (day: number) => void,
+export function useSwipe(
+  index: number,
+  count: number,
+  show?: (index: number) => void,
 ) {
   const start = useRef<{ id: number; x: number; y: number } | null>(null);
   return useMemo(() => {
-    if (!showDay) return {};
+    if (!show) return {};
     return {
       style: { touchAction: "pan-y pinch-zoom" },
       onPointerDown: (e: React.PointerEvent) => {
@@ -31,12 +31,12 @@ export function useDaySwipe(
         const dy = e.clientY - from.y;
         if (Math.abs(dx) < MIN_DISTANCE || Math.abs(dx) < 2 * Math.abs(dy))
           return;
-        const next = day + (dx < 0 ? 1 : -1);
-        if (next >= 0 && next < dayCount) showDay(next);
+        const next = index + (dx < 0 ? 1 : -1);
+        if (next >= 0 && next < count) show(next);
       },
       onPointerCancel: () => {
         start.current = null;
       },
     };
-  }, [day, dayCount, showDay]);
+  }, [index, count, show]);
 }
