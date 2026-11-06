@@ -17,6 +17,14 @@
   unicode-range: U+0030-0039;
 }
 
+/* Atkinson Hyperlegible Next for the timetable: one variable file, 200-800 */
+@font-face {
+  font-family: "Chrono Timetable";
+  font-weight: 200 800;
+  font-display: block;
+  src: url("/fonts/atkinson-hyperlegible-next-latin.woff2") format("woff2");
+}
+
 :root {
   color-scheme: light;
   --bg: #f5f6f8;
@@ -64,6 +72,7 @@
 
 @theme inline {
   --font-sans: "Chrono", system-ui, sans-serif;
+  --font-timetable: "Chrono Timetable", "Chrono", system-ui, sans-serif;
 
   --text-xs: 11px;
   --text-xs--line-height: 1.4;

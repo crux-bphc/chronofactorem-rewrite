@@ -1,4 +1,4 @@
-Chrono self-hosts two font families, both licensed under the SIL Open Font
+Chrono self-hosts three font families, all licensed under the SIL Open Font
 License, Version 1.1.
 
 Host Grotesk
@@ -8,6 +8,10 @@ Host Grotesk
 DM Sans
   Copyright 2014 The DM Sans Project Authors
   (https://github.com/googlefonts/dm-fonts)
+
+Atkinson Hyperlegible Next
+  Copyright 2020-2024 The Atkinson Hyperlegible Next Project Authors
+  (https://github.com/googlefonts/atkinson-hyperlegible-next)
 
 -----------------------------------------------------------
 SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007

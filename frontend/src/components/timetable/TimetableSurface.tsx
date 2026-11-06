@@ -107,7 +107,7 @@ export function TimetableSurface({
       <section
         data-shot="grid"
         aria-label="Weekly timetable"
-        className="flex-1"
+        className="flex-1 font-timetable"
         {...swipe}
       >
         <Agenda
@@ -133,7 +133,11 @@ export function TimetableSurface({
 
   if (layout === "phone") {
     return (
-      <section data-shot="grid" aria-label="Weekly timetable">
+      <section
+        data-shot="grid"
+        aria-label="Weekly timetable"
+        className="font-timetable"
+      >
         <WeekGrid
           cells={cells}
           dayCount={dayCount}
@@ -157,7 +161,11 @@ export function TimetableSurface({
   }
 
   return (
-    <section data-shot="grid" aria-label="Weekly timetable" className="h-full">
+    <section
+      data-shot="grid"
+      aria-label="Weekly timetable"
+      className="h-full font-timetable"
+    >
       <DeskGrid
         cells={cells}
         dayCount={dayCount}
