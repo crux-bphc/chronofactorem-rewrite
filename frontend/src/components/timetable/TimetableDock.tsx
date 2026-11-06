@@ -59,7 +59,7 @@ export function TimetableDock({
             {/* one shared thumb slides between the pills, back/forward too */}
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute inset-y-0 left-0 rounded-full bg-ink"
+              className="pointer-events-none absolute inset-y-0 left-0 rounded-full bg-brand"
               style={{
                 width: `calc((100% - ${(dayCount - 1) * 4}px) / ${dayCount})`,
                 transform: `translateX(calc(${day} * (100% + 4px)))`,
@@ -74,7 +74,7 @@ export function TimetableDock({
                 type="button"
                 aria-pressed={view === "day" && day === i}
                 onClick={() => showDay(i)}
-                className="relative z-[1] min-h-11 min-w-0 flex-1 cursor-pointer rounded-full text-base font-medium text-ink-muted transition-colors duration-(--d-2) aria-pressed:text-bg focus-visible:outline-2 focus-visible:outline-ring"
+                className="relative z-[1] min-h-11 min-w-0 flex-1 cursor-pointer rounded-full text-base font-medium text-ink-muted transition-colors duration-(--d-2) aria-pressed:text-brand-ink focus-visible:outline-2 focus-visible:outline-ring"
               >
                 {/* full name for screen readers, "Mon" for voice control */}
                 {name.slice(0, 3)}
