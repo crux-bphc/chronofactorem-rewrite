@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { LogOut, Monitor, Moon, Sun, User } from "lucide-react";
+import { LogOut, Monitor, Moon, Shuffle, Sun, User } from "lucide-react";
 import { useRef } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import {
@@ -11,6 +11,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Segmented } from "@/components/ui/segmented";
+import { courseHues, hueStyle } from "@/lib/courseHues";
+
+const PREVIEW_CODES = ["CS F213", "MATH F211", "CS F215", "ECON F211"];
 
 type Theme = "light" | "dark" | "system";
 
@@ -53,7 +56,8 @@ const OPTIONS = [
 ];
 
 export function AvatarMenu({ user }: { user: { name: string } }) {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, colorSeed, shuffleColors } = useTheme();
+  const previewHues = [...courseHues(PREVIEW_CODES, colorSeed).values()];
   const pointer = useRef<{ x: number; y: number } | null>(null);
 
   const change = (next: Theme, fallback: HTMLElement) => {
@@ -126,6 +130,24 @@ export function AvatarMenu({ user }: { user: { name: string } }) {
           />
           <span role="status" className="sr-only">
             {`Theme: ${THEME_NAMES[theme]}`}
+          </span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onSelect={(e) => {
+            e.preventDefault();
+            shuffleColors();
+          }}
+        >
+          <Shuffle className="size-4" />
+          <span className="flex-1">Shuffle colours</span>
+          <span aria-hidden="true" className="flex items-center gap-1">
+            {previewHues.map((hue, i) => (
+              <span
+                key={PREVIEW_CODES[i]}
+                className="course-tint size-2.5 rounded-[3px] border border-line bg-ev"
+                style={hueStyle(hue)}
+              />
+            ))}
           </span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

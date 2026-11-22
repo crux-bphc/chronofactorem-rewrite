@@ -16,6 +16,7 @@ export type TimetableCell = Omit<TimetableSectionType, "roomTime"> & {
   day: number;
   hour: number;
   span: number;
+  hue?: number;
   /** Set by the surface while a section animates in or out. */
   presence?: "present" | "entering" | "leaving";
 };
@@ -137,13 +138,14 @@ export function parseTiming(entry: string) {
 }
 
 export function buildTimingsPreview(timings: readonly string[]) {
-  const filled = new Set<string>();
+  // store the course code per slot so callers can tint each cell
+  const filled = new Map<string, string>();
   let dayCount = 5;
   let hourCount = 9;
   for (const entry of timings) {
     const slot = parseTiming(entry);
     if (!slot) continue;
-    filled.add(`${slot.day}:${slot.hour}`);
+    filled.set(`${slot.day}:${slot.hour}`, entry.split(":", 1)[0]);
     dayCount = Math.max(dayCount, slot.day + 1);
     hourCount = Math.max(hourCount, slot.hour + 1);
   }

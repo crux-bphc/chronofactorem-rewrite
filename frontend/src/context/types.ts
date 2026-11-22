@@ -45,6 +45,7 @@ export type TimetableStateType = TimetableUIState & {
   course: z.infer<typeof courseWithSectionsType> | undefined;
   uniqueSectionTypes: sectionTypeList;
   timetableDetailsSections: TimetableSectionType[];
+  courseHues: Map<string, number>;
 };
 
 export enum TimetableActionType {

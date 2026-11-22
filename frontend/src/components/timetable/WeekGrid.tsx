@@ -1,3 +1,4 @@
+import { hueStyle } from "@/lib/courseHues";
 import { formatAxisHour } from "@/utils/timeFormat";
 import {
   blockName,
@@ -26,7 +27,7 @@ type WeekGridProps = {
 // tiles are size containers: narrow ones (phone) stack dept / number so the
 // number never truncates; from 88px wide (tablet) the code fits on one line
 const tileClass =
-  "relative z-1 min-w-0 overflow-hidden rounded-sm border border-line bg-ev";
+  "course-tint relative z-1 min-w-0 overflow-hidden rounded-sm border border-line bg-ev";
 const padClass =
   "flex flex-col justify-start px-[7px] pt-1.5 pb-[5px] text-left leading-[1.15]";
 
@@ -145,6 +146,7 @@ export function WeekGrid({
         const placement = {
           gridColumn: cell.day + 2,
           gridRow: `${cell.hour + 2} / span ${cell.span}`,
+          ...hueStyle(cell.hue),
           ...(named ? { "--vt": blockName(cell) } : {}),
         } as React.CSSProperties;
         const nameClass = named ? "tt-block" : "";

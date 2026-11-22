@@ -36,7 +36,7 @@ const topIn = (el: Element, list: Element) =>
 
 export function CoursesTab({ editable }: { editable: boolean }) {
   const {
-    state: { timetable, coursesInTimetable, cdcs },
+    state: { timetable, coursesInTimetable, cdcs, courseHues },
   } = useTimetableState();
   const { openCourse } = useTimetableNav();
   const { notFound } = useWarningsSummary();
@@ -185,6 +185,7 @@ export function CoursesTab({ editable }: { editable: boolean }) {
               key={course.id}
               course={course}
               pills={pillsFor(course.id)}
+              hue={courseHues.get(course.code)}
               onOpen={
                 editable ? panelForward(() => openCourse(course.id)) : undefined
               }
