@@ -18,7 +18,7 @@ function Login() {
       <div className="flex-1 flex flex-col justify-center mx-auto w-full max-w-[400px] px-7">
         <div className={enter} style={stagger(0)}>
           <p className="text-lg text-ink-muted">Welcome to</p>
-          <h1 className="text-[40px] lg:text-[46px] font-bold tracking-tight leading-tight">
+          <h1 className="text-[40px] lg:text-[46px] font-medium tracking-[-0.03em] leading-tight">
             ChronoFactorem
           </h1>
         </div>
@@ -41,7 +41,7 @@ function Login() {
             className="mt-10 flex items-center gap-3 rounded-xl border border-line bg-surface px-3.5 py-3"
           >
             <span className="flex-1">
-              <span className="block text-base font-semibold">
+              <span className="block text-base font-medium">
                 Draft Timetable for 2026-27 Sem 1 Out Now!!
               </span>
               <span className="block text-sm text-ink-muted">

@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import useCreateTimetable from "@/data-access/hooks/useCreateTimetable";
 import useUser from "@/data-access/hooks/useUser";
 import { preloadEditorOnIntent } from "@/lib/preloadOnIntent";
-import { cn } from "@/lib/utils";
 import { router } from "../router";
 import Announcements from "./Announcements";
 import { AvatarMenu } from "./AvatarMenu";
@@ -115,19 +114,19 @@ function AppBar({ user, showCreate, isCreating, create, showLogin }: BarProps) {
   return (
     <header
       data-shot="navbar"
-      className="app-navbar flex h-[52px] w-full shrink-0 items-center justify-between bg-bg px-4"
+      className="app-navbar flex h-[52px] w-full shrink-0 items-center justify-between border-b border-line bg-bg px-4"
     >
       {/* About sits next to the wordmark, as on master */}
       <div className="flex items-center gap-1">
         {user ? (
           <Link
             to="/"
-            className="relative flex h-11 items-center text-[20px] font-bold tracking-tight text-ink"
+            className="relative flex h-11 items-center text-[19px] font-medium tracking-[-0.02em] text-ink"
           >
             Chrono
           </Link>
         ) : (
-          <span className="text-[20px] font-bold tracking-tight text-ink">
+          <span className="text-[19px] font-medium tracking-[-0.02em] text-ink">
             Chrono
           </span>
         )}
@@ -169,32 +168,38 @@ function DesktopNav({
   create,
   showLogin,
 }: BarProps) {
-  const linkClass = (active: boolean) =>
-    cn(
-      "text-base font-medium transition-colors duration-(--d-1) hover:text-ink",
-      active ? "text-ink" : "text-ink-muted",
-    );
   return (
     <header
       data-shot="navbar"
-      className="app-navbar flex h-[60px] w-full shrink-0 items-center gap-6 border-b border-line bg-bg px-7"
+      className="app-navbar flex h-[60px] w-full shrink-0 items-center gap-8 border-b border-line bg-bg px-7"
     >
       {user ? (
-        <Link to="/" className="text-[21px] font-bold tracking-tight text-ink">
+        <Link
+          to="/"
+          className="text-[20px] font-medium tracking-[-0.025em] text-ink"
+        >
           ChronoFactorem
         </Link>
       ) : (
-        <span className="text-[21px] font-bold tracking-tight text-ink">
+        <span className="text-[20px] font-medium tracking-[-0.025em] text-ink">
           ChronoFactorem
         </span>
       )}
-      <nav className="flex items-center gap-5" aria-label="Main">
+      <nav className="flex h-full items-center gap-6" aria-label="Main">
         {user && (
-          <Link to="/" className={linkClass(pathname === "/")}>
+          <Link
+            to="/"
+            aria-current={pathname === "/" ? "page" : undefined}
+            className="nav-link"
+          >
             Timetables
           </Link>
         )}
-        <Link to="/about" className={linkClass(pathname.startsWith("/about"))}>
+        <Link
+          to="/about"
+          aria-current={pathname.startsWith("/about") ? "page" : undefined}
+          className="nav-link"
+        >
           About
         </Link>
       </nav>

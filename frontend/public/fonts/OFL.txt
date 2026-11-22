@@ -1,13 +1,13 @@
 Chrono self-hosts two font families, both licensed under the SIL Open Font
 License, Version 1.1.
 
-Host Grotesk
-  Copyright 2024 The Host Grotesk Project Authors
-  (https://github.com/Fontsource/font-files)
+Outfit
+  Copyright 2021 The Outfit Project Authors
+  (https://github.com/Outfitio/Outfit-Fonts)
 
-DM Sans
-  Copyright 2014 The DM Sans Project Authors
-  (https://github.com/googlefonts/dm-fonts)
+DM Mono
+  Copyright 2020 The DM Mono Project Authors
+  (https://github.com/googlefonts/dm-mono)
 
 -----------------------------------------------------------
 SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007

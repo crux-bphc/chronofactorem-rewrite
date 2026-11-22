@@ -39,7 +39,7 @@ type DeskGridProps = {
 
 // blocks are size containers: under 72px wide they stack dept / number like
 // the phone tiles instead of truncating the code
-const padClass = "px-2.5 py-[9px] @max-[72px]:px-1 @max-[72px]:py-1.5";
+const padClass = "px-2 py-2 @max-[72px]:px-1 @max-[72px]:py-1.5";
 
 // on big monitors the live grid's text steps up a size at 1920px and again
 // at 2560px so it stays in proportion with the much larger blocks. the export
@@ -64,21 +64,23 @@ function BlockLines({
   remove?: boolean;
 }) {
   const size = scale
-    ? "text-base min-[1920px]:text-lg min-[2560px]:text-xl min-[3200px]:text-2xl"
-    : "text-base";
+    ? "text-[13px] min-[1920px]:text-base min-[2560px]:text-lg min-[3200px]:text-xl"
+    : "text-[13px]";
   const subSize = scale
-    ? "text-sm min-[1920px]:text-base min-[2560px]:text-lg min-[3200px]:text-xl"
-    : "text-sm";
+    ? "text-[11px] tracking-[-0.02em] min-[1920px]:text-sm min-[2560px]:text-base min-[3200px]:text-lg"
+    : "text-[11px] tracking-[-0.02em]";
   return (
     <>
       {named && (
         <div className="hidden @min-[120px]:block">
           <span
-            className={`block truncate leading-tight font-semibold ${size} ${remove ? "pr-4" : ""}`}
+            className={`block truncate leading-tight font-medium ${size} ${remove ? "pr-4" : ""}`}
           >
             {nameCase(cell.name)}
           </span>
-          <span className={`mt-[3px] block truncate text-ink-muted ${subSize}`}>
+          <span
+            className={`mt-[3px] block truncate font-mono text-ink-muted ${subSize}`}
+          >
             {`${cell.code} · ${cell.type}${cell.number} · ${cell.room}`}
           </span>
         </div>
@@ -87,7 +89,7 @@ function BlockLines({
         className={`@max-[72px]:hidden ${named ? "@min-[120px]:hidden" : ""}`}
       >
         <span
-          className={`block font-semibold ${size} ${
+          className={`block font-mono font-medium ${size} ${
             scale ? "leading-tight" : "truncate"
           }`}
         >
@@ -96,7 +98,9 @@ function BlockLines({
           )}
           {cell.code}
         </span>
-        <span className={`mt-[3px] block truncate text-ink-muted ${subSize}`}>
+        <span
+          className={`mt-[3px] block truncate font-mono text-ink-muted ${subSize}`}
+        >
           {`${cell.type}${cell.number} · ${cell.room}`}
         </span>
       </div>
@@ -150,7 +154,7 @@ export function DeskGrid({
       {days.map((name, d) => (
         <div
           key={name}
-          className={`self-center font-semibold tracking-[.06em] text-ink-muted uppercase ${
+          className={`self-center font-mono font-medium text-ink-muted ${
             mode === "export"
               ? "text-xs"
               : "text-xs min-[1920px]:text-sm min-[2560px]:text-base min-[3200px]:text-lg"
@@ -167,10 +171,10 @@ export function DeskGrid({
       {hours.map((h) => (
         <div
           key={`hour-${h}`}
-          className={`whitespace-nowrap text-ink-faint ${
+          className={`whitespace-nowrap font-mono text-ink-faint ${
             mode === "export"
-              ? "text-sm"
-              : "text-sm min-[1920px]:text-base min-[2560px]:text-lg min-[3200px]:text-xl"
+              ? "text-xs"
+              : "text-xs min-[1920px]:text-sm min-[2560px]:text-base min-[3200px]:text-lg"
           } ${rows ? "self-end pl-0.5" : "self-start pr-1 text-right"}`}
           style={
             rows
@@ -208,7 +212,7 @@ export function DeskGrid({
               style={style}
               data-presence="present"
               className={
-                "@container relative z-1 min-w-0 overflow-hidden rounded-md bg-ev"
+                "@container relative z-1 min-w-0 overflow-hidden rounded-md border border-line bg-ev"
               }
             >
               <div className={padClass}>
@@ -229,11 +233,9 @@ export function DeskGrid({
             data-outgoing={going ? "" : undefined}
             inert={leaving}
             className={`@container relative z-1 min-w-0 overflow-hidden rounded-md ${
-              going ? "tt-outgoing" : "bg-ev"
+              going ? "tt-outgoing" : "border border-line bg-ev"
             } ${leaving ? "" : "tt-block"} ${
-              edit
-                ? "hover:bg-ev-hover hover:shadow-[inset_0_0_0_1.5px_var(--ink)]"
-                : ""
+              edit ? "hover:border-ink/40 hover:bg-ev-hover" : ""
             }`}
           >
             <Tooltip delayDuration={200}>
@@ -297,7 +299,7 @@ export function DeskGrid({
             aria-hidden="true"
             style={place(cell.day, cell.hour, cell.span)}
             className={
-              "@container tt-ghost pointer-events-none relative z-2 min-w-0 overflow-hidden rounded-md bg-surface/85 text-ink-muted outline-[1.5px] -outline-offset-[1.5px] outline-ink-faint outline-dashed [&_span]:text-ink-muted"
+              "@container tt-ghost pointer-events-none relative z-2 min-w-0 overflow-hidden rounded-md text-ink-muted [&_span]:text-ink-muted"
             }
           >
             <div className={padClass}>

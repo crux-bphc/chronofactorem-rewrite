@@ -327,14 +327,16 @@ function Home() {
       <h1
         id="home-title"
         tabIndex={-1}
-        className="pt-2 text-2xl font-semibold outline-none lg:pt-10 lg:text-3xl"
+        className="pt-4 text-3xl font-normal tracking-[-0.03em] outline-none lg:pt-10 lg:text-[40px]"
       >
         Timetables
       </h1>
       {isEmpty ? (
         <div className="flex flex-col items-center pt-24 lg:pt-28">
           <EmptyBird />
-          <h2 className="mt-5 text-xl font-semibold">It's empty in here.</h2>
+          <h2 className="mt-5 text-xl font-medium tracking-[-0.02em]">
+            It's empty in here.
+          </h2>
           {createButton("mt-6 w-full max-w-[310px]")}
         </div>
       ) : (

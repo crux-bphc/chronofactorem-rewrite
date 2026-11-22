@@ -8,8 +8,7 @@ import { cn } from "@/lib/utils";
 import { cdcIssueUrl } from "@/utils/timetable";
 import { Button } from "./ui/button";
 
-const overline =
-  "px-4 lg:px-0 pt-3 text-xs font-semibold normal-case tracking-[.07em] text-ink-muted";
+const overline = "px-4 lg:px-0 pt-3 text-[13px] font-medium text-ink-muted";
 const group =
   "mx-4 mt-2 lg:mx-0 rounded-xl border border-line bg-surface [&>*+*]:border-t [&>*+*]:border-line";
 const row = "flex min-h-[60px] items-center gap-2.5 px-3.5 py-3";

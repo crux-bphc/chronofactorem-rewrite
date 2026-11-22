@@ -2,25 +2,25 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { skeletonRef } from "@/lib/skeletonFade";
 
 export const mainClass =
-  "mx-auto w-full max-w-[640px] px-4 pb-12 lg:max-w-[1100px] lg:px-7";
-export const gridClass = "grid gap-2 lg:grid-cols-3 lg:gap-3.5";
+  "mx-auto w-full max-w-[640px] px-4 pb-16 lg:max-w-[1200px] lg:px-7";
+export const gridClass = "grid gap-3 lg:grid-cols-3 lg:gap-4";
 export const overlineClass =
-  "mt-5 mb-2 text-xs font-semibold tracking-[.07em] text-ink-muted uppercase lg:mt-7 lg:mb-2.5";
+  "mt-6 mb-2.5 text-[13px] font-medium text-ink-muted lg:mt-8 lg:mb-3";
 
 const homeSkeletonRef = skeletonRef("home");
 
 export function HomeSkeleton() {
   return (
     <main ref={homeSkeletonRef} className={mainClass} aria-busy="true">
-      <h1 className="pt-2 text-2xl font-semibold lg:pt-10 lg:text-3xl">
+      <h1 className="pt-4 text-3xl font-normal tracking-[-0.03em] lg:pt-10 lg:text-[40px]">
         Timetables
       </h1>
-      <Skeleton className="mt-5 mb-2 h-3 w-20 lg:mt-7 lg:mb-2.5" />
+      <Skeleton className="mt-6 mb-2.5 h-3.5 w-20 lg:mt-8 lg:mb-3" />
       <div className={gridClass}>
         {[0, 1, 2].map((i) => (
           <div
             key={i}
-            className="grid grid-cols-[92px_1fr_auto] items-center gap-3.5 rounded-xl border border-line bg-surface p-3.5"
+            className="grid grid-cols-[92px_1fr_auto] items-center gap-4 rounded-xl border border-line bg-surface p-4"
           >
             <Skeleton className="h-16 w-[92px] rounded-[8px]" />
             {/* Rows sized by the card's own line heights; the desktop meta

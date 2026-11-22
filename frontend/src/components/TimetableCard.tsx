@@ -90,8 +90,8 @@ function TimetableCard({
   return (
     <article
       className={cn(
-        "relative grid grid-cols-[92px_1fr_auto] items-center gap-3.5 rounded-xl border border-line bg-surface p-3.5",
-        "transition-[border-color,box-shadow] duration-(--d-1) lg:hover:border-ink-faint lg:hover:shadow-float",
+        "relative grid h-full grid-cols-[92px_1fr_auto] items-center gap-3.5 rounded-xl border border-line bg-surface p-3.5",
+        "transition-[transform,border-color,box-shadow] duration-(--d-2) ease-(--e-out) [@media(hover:hover)_and_(pointer:fine)]:hover:-translate-y-0.5 [@media(hover:hover)_and_(pointer:fine)]:hover:border-ink/25 [@media(hover:hover)_and_(pointer:fine)]:hover:shadow-float",
         "has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-brand has-[a:focus-visible]:outline-offset-2",
         className,
       )}
@@ -110,14 +110,14 @@ function TimetableCard({
           style={
             shared ? { viewTransitionName: TIMETABLE_TITLE_VT } : undefined
           }
-          className="text-lg font-semibold text-ink line-clamp-2 break-words outline-none after:absolute after:inset-0 after:content-['']"
+          className="text-[16px] leading-snug font-medium tracking-[-0.015em] text-ink line-clamp-2 break-words outline-none after:absolute after:inset-0 after:content-['']"
         >
           {timetable.name}
         </Link>
-        <div className="text-sm text-ink-muted mt-[3px]">
+        <div className="mt-1 truncate font-mono text-[11.5px] tracking-[-0.02em] text-ink-muted">
           {formatCardMeta(timetable)}
         </div>
-        <div className="mt-[7px]">
+        <div className="mt-2">
           <TimetableStatusChip timetable={timetable} />
         </div>
       </div>
