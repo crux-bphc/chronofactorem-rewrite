@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { hueStyle } from "@/lib/courseHues";
 import { titleCase } from "@/lib/titleCase";
 import { formatClock, formatSlotEnd } from "@/utils/timeFormat";
 import {
@@ -25,7 +26,7 @@ type AgendaProps = {
   onRemove?: (cell: TimetableCell) => void;
 };
 
-const blockClass = "rounded-md border border-line bg-ev";
+const blockClass = "course-tint rounded-md border border-line bg-ev";
 const bodyClass =
   "flex w-full justify-between gap-2 rounded-md px-3 pt-[9px] pb-2.5 text-left";
 
@@ -117,10 +118,13 @@ export function Agenda({
   // live blocks carry their morph name (C7); it only applies during a morph
   const named = (cell: TimetableCell) =>
     cell.presence === "leaving" || mode === "export"
-      ? { className: "", style: undefined }
+      ? { className: "", style: hueStyle(cell.hue) }
       : {
           className: "tt-block",
-          style: { "--vt": blockName(cell) } as React.CSSProperties,
+          style: {
+            ...hueStyle(cell.hue),
+            "--vt": blockName(cell),
+          } as React.CSSProperties,
         };
 
   // the 10 minutes after a class are its break, not part of it. during the

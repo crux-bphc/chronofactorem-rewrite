@@ -9,10 +9,12 @@ import {
   useReducer,
   useRef,
 } from "react";
+import { useTheme } from "@/components/ThemeProvider";
 import useCourse from "@/data-access/hooks/useCourse";
 import { courseQueryOptions } from "@/data-access/hooks/useCourses";
 import useTimetable from "@/data-access/hooks/useTimetable";
 import useUser from "@/data-access/hooks/useUser";
+import { courseHues } from "@/lib/courseHues";
 import { useTimetableNav } from "@/lib/useTimetableNav";
 import {
   filterCoursesInTimetable,
@@ -106,6 +108,7 @@ const TimetableDataProvider = ({
   );
   const { search } = useTimetableNav();
   const { data: course } = useCourse(search.course ?? null);
+  const { colorSeed } = useTheme();
 
   const value = useMemo(() => {
     const uniqueSectionTypes = course
@@ -134,6 +137,10 @@ const TimetableDataProvider = ({
           courses && timetable
             ? getFilledTimetableSections(courses, timetable)
             : [],
+        courseHues: courseHues(
+          (timetable?.timings ?? []).map((entry) => entry.split(":", 1)[0]),
+          colorSeed,
+        ),
         cdcs:
           courses && timetable
             ? formatCDCWarningsAndOptions(courses, timetable)
@@ -141,7 +148,7 @@ const TimetableDataProvider = ({
       },
       dispatch,
     };
-  }, [state, search, user, timetable, courses, course]);
+  }, [state, search, user, timetable, courses, course, colorSeed]);
 
   // If there some unknown courses then lets try refetching the courses
   const refetchedFor = useRef<string | null>(null);

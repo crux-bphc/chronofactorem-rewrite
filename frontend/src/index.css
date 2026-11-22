@@ -623,6 +623,35 @@ html.theme-transition * {
   }
 }
 
+/* A course's colour (--h from courseHues), redefines tile tokens so bg-ev,
+   border-line, hover and muted text inside all follow the course */
+.course-tint {
+  --ev: oklch(89% 0.13 var(--h));
+  --ev-hover: oklch(84% 0.14 var(--h));
+  --line: oklch(81% 0.14 var(--h));
+  --ink: oklch(21% 0.04 var(--h));
+  --muted: oklch(35% 0.06 var(--h));
+  --faint: var(--muted);
+  color: var(--ink);
+}
+
+.dark .course-tint {
+  --ev: oklch(79% 0.105 var(--h));
+  --ev-hover: oklch(83% 0.11 var(--h));
+  --line: oklch(85% 0.095 var(--h));
+  --ink: oklch(18% 0.03 var(--h));
+  --muted: oklch(34% 0.045 var(--h));
+}
+
+.dark .course-tint.tt-ghost {
+  --ink: oklch(95% 0.02 var(--h));
+  --muted: oklch(82% 0.04 var(--h));
+  --faint: var(--muted);
+  color: var(--ink);
+  background-color: color-mix(in oklab, var(--ev) 22%, var(--surface));
+  outline-color: color-mix(in oklab, var(--ev) 80%, transparent);
+}
+
 /* The section a hovered pick would swap out: a faded, struck-through
    danger tint, dashed like the ghost that replaces it */
 .tt-outgoing {

@@ -5,6 +5,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { hueStyle } from "@/lib/courseHues";
 import { titleCase as nameCase } from "@/lib/titleCase";
 import { formatAxisHour } from "@/utils/timeFormat";
 import {
@@ -204,7 +205,10 @@ export function DeskGrid({
       )}
       {cells.map((cell) => {
         const key = `${cell.id}-${cell.day}-${cell.hour}`;
-        const style = place(cell.day, cell.hour, cell.span);
+        const style = {
+          ...place(cell.day, cell.hour, cell.span),
+          ...hueStyle(cell.hue),
+        };
         if (mode === "export") {
           return (
             <div
@@ -212,7 +216,7 @@ export function DeskGrid({
               style={style}
               data-presence="present"
               className={
-                "@container relative z-1 min-w-0 overflow-hidden rounded-md border border-line bg-ev"
+                "@container course-tint relative z-1 min-w-0 overflow-hidden rounded-md border border-line bg-ev"
               }
             >
               <div className={padClass}>
@@ -233,7 +237,7 @@ export function DeskGrid({
             data-outgoing={going ? "" : undefined}
             inert={leaving}
             className={`@container relative z-1 min-w-0 overflow-hidden rounded-md ${
-              going ? "tt-outgoing" : "border border-line bg-ev"
+              going ? "tt-outgoing" : "course-tint border border-line bg-ev"
             } ${leaving ? "" : "tt-block"} ${
               edit ? "hover:border-ink/40 hover:bg-ev-hover" : ""
             }`}
@@ -297,9 +301,12 @@ export function DeskGrid({
             data-ghost=""
             data-visible={ghostVisible ? "" : undefined}
             aria-hidden="true"
-            style={place(cell.day, cell.hour, cell.span)}
+            style={{
+              ...place(cell.day, cell.hour, cell.span),
+              ...hueStyle(cell.hue),
+            }}
             className={
-              "@container tt-ghost pointer-events-none relative z-2 min-w-0 overflow-hidden rounded-md text-ink-muted [&_span]:text-ink-muted"
+              "@container course-tint tt-ghost pointer-events-none relative z-2 min-w-0 overflow-hidden rounded-md"
             }
           >
             <div className={padClass}>

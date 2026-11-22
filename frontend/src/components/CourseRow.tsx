@@ -3,6 +3,7 @@ import { ChevronRight, X } from "lucide-react";
 import { Fragment } from "react";
 import type z from "zod";
 import { useTimetableState } from "@/context";
+import { hueStyle } from "@/lib/courseHues";
 import { HapticTap } from "@/lib/haptics";
 import { panelForward } from "@/lib/panelTransition";
 import { titleCase } from "@/lib/titleCase";
@@ -18,17 +19,30 @@ const rowPad = "px-3.5 py-3";
 function CourseText({
   course,
   extra,
+  hue,
 }: {
   course: Course;
   extra?: React.ReactNode;
+  hue?: number;
 }) {
-  return (
+  const text = (
     <span className="flex min-w-0 flex-col">
       <span className="text-[15px] leading-snug font-medium text-ink">
         {titleCase(course.name)}
       </span>
       <span className="font-mono text-xs text-ink-muted">{course.code}</span>
       {extra}
+    </span>
+  );
+  if (hue === undefined) return text;
+  return (
+    <span className="flex min-w-0 items-start gap-2.5">
+      <span
+        aria-hidden="true"
+        className="course-tint mt-1.5 size-2.5 shrink-0 rounded-[3px] border border-line bg-ev"
+        style={hueStyle(hue)}
+      />
+      {text}
     </span>
   );
 }
@@ -72,6 +86,7 @@ export function CourseRow({
   clashing,
   className,
   extra,
+  hue,
 }: {
   course: Course;
   pills?: string[];
@@ -82,6 +97,7 @@ export function CourseRow({
   clashing?: string[] | null;
   className?: string;
   extra?: React.ReactNode;
+  hue?: number;
 }) {
   if (clashing && clashing.length > 0) {
     return (
@@ -96,7 +112,7 @@ export function CourseRow({
 
   const content = (
     <>
-      <CourseText course={course} extra={extra} />
+      <CourseText course={course} extra={extra} hue={hue} />
       {pills && pills.length > 0 ? (
         <span className="flex flex-wrap justify-end gap-1">
           {pills.map((p) => (
