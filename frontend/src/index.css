@@ -661,7 +661,7 @@ html.theme-transition * {
   & span {
     color: var(--muted);
   }
-  & span:is(.font-semibold, .font-medium) {
+  & [data-cell-title] {
     text-decoration: line-through;
     text-decoration-color: var(--danger);
     text-decoration-thickness: 1.5px;

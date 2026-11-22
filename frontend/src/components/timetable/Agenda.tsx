@@ -28,9 +28,8 @@ type AgendaProps = {
 
 const blockClass = "course-tint rounded-md border border-line bg-ev";
 const bodyClass =
-  "flex w-full justify-between gap-2 rounded-md px-3 pt-[9px] pb-2.5 text-left";
+  "flex w-full items-center justify-between gap-3 rounded-md px-3.5 py-2.5 text-left";
 
-/** `remove` floats a spacer where the editor's × sits so the room clears it. */
 function BlockBody({
   cell,
   remove = false,
@@ -38,27 +37,22 @@ function BlockBody({
   cell: TimetableCell;
   remove?: boolean;
 }) {
+  const roomPad = remove ? "pr-5" : ""; // clear the editor's × button
   return (
     <>
       <span className="min-w-0">
-        <span className="block text-[15.5px] leading-snug font-medium">
+        <span className="block text-[15px] leading-snug font-medium tracking-[-0.01em]">
           {titleCase(cell.name)}
         </span>
-        <span className="block font-mono text-xs text-ink-muted">
-          {cell.code}
-        </span>
-      </span>
-      <span className="shrink-0 text-right">
-        <span className="block whitespace-nowrap font-mono text-xs font-medium">
-          {remove && (
-            <span aria-hidden="true" className="float-right h-4 w-4" />
-          )}
-          {cell.room}
-        </span>
-        <span className="block font-mono text-xs text-ink-muted">
+        <span className="mt-0.5 block font-mono text-xs font-medium text-ink-muted">
           {cell.type}
           {cell.number}
         </span>
+      </span>
+      <span
+        className={`shrink-0 text-right font-mono text-[15px] leading-none font-medium tracking-[-0.02em] text-ink ${roomPad}`}
+      >
+        {cell.room}
       </span>
     </>
   );
