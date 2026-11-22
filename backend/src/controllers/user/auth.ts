@@ -242,12 +242,49 @@ async function startSession(
   }
 }
 
+export const isLoginAsEnabled = (): boolean =>
+  env.NODE_ENV !== "production" && env.LOGIN_AS;
+
+export const authMethods = async (_req: Request, res: Response) => {
+  if (!isLoginAsEnabled()) {
+    return res.json({ loginAs: false, users: [] });
+  }
+  const rows = await userRepository.find({
+    relations: { timetables: true },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      batch: true,
+      degrees: true,
+      timetables: { id: true, archived: true },
+    },
+    order: { name: "ASC" },
+  });
+  const users = rows
+    .map((user) => ({
+      email: user.email,
+      name: user.name,
+      batch: user.batch,
+      degrees: user.degrees,
+      timetableCount: user.timetables.filter((t) => !t.archived).length,
+    }))
+    .sort(
+      (a, b) =>
+        b.timetableCount - a.timetableCount || a.name.localeCompare(b.name),
+    );
+  return res.json({ loginAs: true, users });
+};
+
 export async function loginAs(req: Request, res: Response) {
   const email = emailType.safeParse(req.query.email);
   if (!email.success) {
     return res.status(400).json({ message: "pass a valid ?email=" });
   }
-  const name = typeof req.query.name === "string" ? req.query.name : "Dev User";
+  const name =
+    typeof req.query.name === "string" && req.query.name.trim()
+      ? req.query.name.trim()
+      : "Dev User";
   return startSession(res, name, email.data, env.SESSION_MAX_AGE_MS);
 }
 
@@ -377,6 +414,9 @@ export async function getDegrees(req: Request, res: Response) {
 // which ends the sso session and sends the user back to the login page
 export async function logout(_req: Request, res: Response) {
   clearAuthCookies(res);
+  if (isLoginAsEnabled()) {
+    return res.redirect(`${env.FRONTEND_URL}/login`);
+  }
   const endSessionUrl = new URL(`${env.LOGTO_ENDPOINT}/oidc/session/end`);
   endSessionUrl.searchParams.set("client_id", env.LOGTO_APP_ID);
   endSessionUrl.searchParams.set(

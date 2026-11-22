@@ -1,10 +1,11 @@
 import type { Request, Response } from "express";
 import * as express from "express";
-import { env } from "../config/server.js";
 import {
   authCallback,
+  authMethods,
   checkAuthStatus,
   getDegrees,
+  isLoginAsEnabled,
   loginAs,
   logout,
   manageAuthRedirect,
@@ -35,7 +36,9 @@ authRouter.post("/submit", getDegrees);
 
 authRouter.get("/check", checkAuthStatus);
 
-if (env.NODE_ENV === "development" && env.LOGIN_AS) {
+authRouter.get("/methods", authMethods);
+
+if (isLoginAsEnabled()) {
   authRouter.get("/as", loginAs);
 }
 

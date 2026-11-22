@@ -6,7 +6,7 @@
     {
       "key": "alice",
       "email": "f20250001@hyderabad.bits-pilani.ac.in",
-      "name": "Alice Sharma",
+      "name": "Single Degree",
       "degrees": ["A7"],
       "timetables": [
         {
@@ -90,7 +90,7 @@
     {
       "key": "bob",
       "email": "f20240002@hyderabad.bits-pilani.ac.in",
-      "name": "Bob Kumar",
+      "name": "Dual Degree",
       "degrees": ["B4", "A7"],
       "timetables": [
         {
@@ -121,7 +121,7 @@
     {
       "key": "hd",
       "email": "h20260003@hyderabad.bits-pilani.ac.in",
-      "name": "Harsh Mehta",
+      "name": "Higher Degree",
       "timetables": [
         {
           "key": "hd-draft",
@@ -138,7 +138,7 @@
     {
       "key": "esha",
       "email": "f20250005@hyderabad.bits-pilani.ac.in",
-      "name": "Esha Rao",
+      "name": "Empty Account",
       "degrees": ["A7"],
       "timetables": []
     }
