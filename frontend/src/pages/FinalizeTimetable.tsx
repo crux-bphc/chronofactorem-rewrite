@@ -60,7 +60,8 @@ function FinalizeTimetable() {
     );
   }
 
-  const link = `${import.meta.env.VITE_FRONTEND_URL}/view/${timetableId}`;
+  const origin = import.meta.env.VITE_FRONTEND_URL || window.location.origin;
+  const link = `${origin}/view/${timetableId}`;
 
   const copyLink = async () => {
     if (copyTimer.current) clearTimeout(copyTimer.current);
@@ -142,12 +143,12 @@ function FinalizeTimetable() {
         Back to editing
       </Button>
       <h1
-        className="mt-4 text-3xl font-semibold"
+        className="mt-4 text-3xl font-normal tracking-[-0.03em] lg:text-[38px]"
         style={{ viewTransitionName: TIMETABLE_TITLE_VT }}
       >
         {headingText}
       </h1>
-      <Label htmlFor="name" className="mt-6 mb-2 block">
+      <Label htmlFor="name" className="mt-6 mb-2 block text-sm font-medium">
         Name
       </Label>
       <Input
@@ -156,14 +157,14 @@ function FinalizeTimetable() {
         defaultValue={timetable.name}
         placeholder="Timetable Name"
       />
-      <fieldset className="mt-5 flex flex-col gap-2">
-        <legend className="mb-2 text-base font-medium text-ink">
+      <fieldset className="mt-6 flex flex-col gap-2.5">
+        <legend className="mb-2 text-sm font-medium text-ink">
           Share your timetable
         </legend>
         {choices.map(({ isPrivate, Icon, title, subtitle }) => (
           <label
             key={title}
-            className="group grid cursor-pointer grid-cols-[22px_1fr] gap-2.5 rounded-lg border border-line bg-surface px-3.5 py-3 transition-[border-color,box-shadow] duration-(--d-2) has-[:checked]:border-brand has-[:checked]:shadow-[inset_0_0_0_1px_var(--accent)] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-brand"
+            className="group grid cursor-pointer grid-cols-[22px_1fr] gap-2.5 rounded-lg border border-line bg-surface px-4 py-3.5 transition-[border-color,box-shadow] duration-(--d-1) has-[:checked]:border-brand has-[:checked]:shadow-[inset_0_0_0_1px_var(--accent)] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-brand"
           >
             <input
               type="radio"
@@ -176,7 +177,7 @@ function FinalizeTimetable() {
               <span className="size-2.5 scale-0 rounded-full bg-brand transition-transform duration-(--d-2) ease-(--e-spring) group-has-[:checked]:scale-100" />
             </span>
             <span>
-              <span className="flex items-center gap-1.5 font-semibold">
+              <span className="flex items-center gap-1.5 font-medium">
                 <Icon className="size-3.5" />
                 {title}
               </span>
@@ -186,12 +187,12 @@ function FinalizeTimetable() {
             </span>
           </label>
         ))}
-        <div className="flex h-[46px] items-center rounded-lg border border-line bg-surface pr-1.5 pl-3.5">
+        <div className="flex h-12 items-center gap-2 rounded-lg border border-line bg-surface pr-1.5 pl-3.5">
           <input
             readOnly
             aria-label="Link to timetable"
             value={link}
-            className="min-w-0 flex-1 bg-transparent text-lg text-ink-muted outline-none"
+            className="min-w-0 flex-1 truncate bg-transparent font-mono text-sm text-ink-muted outline-none"
           />
           <Button
             variant="secondary"

@@ -73,21 +73,25 @@ function EditUserProfile() {
   const canEdit = !user.degrees.includes(unknownDegree);
 
   return (
-    <main className="mx-auto w-full max-w-[640px] px-4 pt-2 pb-28 lg:pt-10 lg:pb-12">
-      <h1 className="text-2xl lg:text-3xl font-semibold">Edit User Profile</h1>
-      <div className="mt-5 flex items-center gap-3.5">
-        <div className="size-14 shrink-0 rounded-full bg-sunk grid place-items-center text-xl font-semibold">
+    <main className="mx-auto w-full max-w-[640px] px-4 pt-4 pb-28 lg:pt-10 lg:pb-12">
+      <h1 className="text-3xl font-normal tracking-[-0.03em] lg:text-[38px]">
+        Edit User Profile
+      </h1>
+      <div className="mt-6 flex items-center gap-3.5 rounded-xl border border-line bg-surface p-4">
+        <div className="grid size-14 shrink-0 place-items-center rounded-full border border-line bg-bg text-xl font-medium">
           {user.name[0]}
         </div>
         <div className="min-w-0">
-          <p className="text-lg font-semibold">{user.name}</p>
-          <p className="text-sm text-ink-muted break-words">{user.email}</p>
+          <p className="text-lg font-medium">{user.name}</p>
+          <p className="font-mono text-xs text-ink-muted break-words">
+            {user.email}
+          </p>
         </div>
       </div>
       {batch !== "0000" && (
-        <div className="mt-5 flex h-[46px] items-center justify-between rounded-lg border border-line bg-surface px-3.5">
-          <span className="text-ink-muted">Batch</span>
-          <span className="font-medium">{batch}</span>
+        <div className="mt-4 flex h-12 items-center justify-between rounded-lg border border-line bg-surface px-4">
+          <span className="text-sm text-ink-muted">Batch</span>
+          <span className="font-mono text-sm font-medium">{batch}</span>
         </div>
       )}
       {canEdit && (
