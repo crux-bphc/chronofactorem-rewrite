@@ -1,13 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import ReportIssueToastAction from "@/components/ReportIssueToastAction";
 import { TimetableSurface } from "@/components/timetable/TimetableSurface";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { toast } from "@/components/ui/use-toast";
 import { useTimetableState } from "@/context";
+import { hueStyle } from "@/lib/courseHues";
 import { haptic } from "@/lib/haptics";
+import { titleCase } from "@/lib/titleCase";
 import { formatExamRange } from "@/utils/timeFormat";
 import { timetableMeta } from "@/utils/timetable";
-import { titleCase } from "@/utils/timetableGrid";
 import { useOrientation } from "./useOrientation";
 
 export type ExportStatus = "idle" | "rendering" | "done";
@@ -54,6 +55,15 @@ function declaredStyleProperties(node: HTMLElement): string[] {
   return styleProperties;
 }
 
+const CourseSwatch = ({ hue }: { hue: number | undefined }) =>
+  hue === undefined ? null : (
+    <span
+      aria-hidden="true"
+      className="course-tint mt-1.5 size-2.5 shrink-0 rounded-[3px] border border-line bg-ev"
+      style={hueStyle(hue)}
+    />
+  );
+
 function ExamList({
   title,
   kind,
@@ -62,7 +72,7 @@ function ExamList({
   kind: "MIDSEM" | "COMPRE";
 }) {
   const {
-    state: { timetable, coursesInTimetable },
+    state: { timetable, coursesInTimetable, courseHues },
   } = useTimetableState();
   if (timetable === undefined) return null;
   const nameOf = (code: string) =>
@@ -74,25 +84,37 @@ function ExamList({
       return { code: parts[0], start: parts[2], end: parts[3] };
     })
     .sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+  if (exams.length === 0) return null;
   return (
     <div>
-      <h3 className="text-lg font-semibold">{title}</h3>
-      <ul className="mt-2 flex flex-col gap-1.5">
-        {exams.map((exam) => (
-          <li key={exam.code} className="flex gap-3 text-sm">
-            <span className="w-72 shrink-0 truncate">
-              <span className="font-semibold">
-                {titleCase(nameOf(exam.code) ?? exam.code)}
+      <h3 className="text-[13px] font-medium text-ink-muted">{title}</h3>
+      <ul className="mt-2 divide-y divide-line rounded-xl border border-line bg-surface">
+        {exams.map((exam) => {
+          const name = nameOf(exam.code);
+          return (
+            <li
+              key={exam.code}
+              className="flex items-center justify-between gap-4 px-4 py-3"
+            >
+              <div className="flex min-w-0 items-start gap-2.5">
+                <CourseSwatch hue={courseHues.get(exam.code)} />
+                <div className="min-w-0">
+                  <div className="truncate text-[15px] leading-snug font-medium text-ink">
+                    {titleCase(name ?? exam.code)}
+                  </div>
+                  {name && (
+                    <div className="font-mono text-xs text-ink-muted">
+                      {exam.code}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <span className="shrink-0 font-mono text-xs font-medium tabular-nums text-ink">
+                {formatExamRange(new Date(exam.start), new Date(exam.end))}
               </span>
-              {nameOf(exam.code) && (
-                <span className="text-ink-muted">{` · ${exam.code}`}</span>
-              )}
-            </span>
-            <span className="text-ink-muted">
-              {formatExamRange(new Date(exam.start), new Date(exam.end))}
-            </span>
-          </li>
-        ))}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
@@ -109,7 +131,12 @@ export function useTimetableExport(): {
   exportElement: React.ReactNode;
 } {
   const {
-    state: { timetable, coursesInTimetable, timetableDetailsSections },
+    state: {
+      timetable,
+      coursesInTimetable,
+      timetableDetailsSections,
+      courseHues,
+    },
   } = useTimetableState();
   const { orientation } = useOrientation();
   const [status, setStatus] = useState<ExportStatus>("idle");
@@ -185,15 +212,30 @@ export function useTimetableExport(): {
           ref={frame}
           className="pointer-events-none fixed left-[-10000px] top-0 w-[1440px] bg-bg px-10 pt-9 pb-10 text-ink"
         >
-          <div className="flex items-start justify-between">
+          <div className="flex items-end justify-between gap-6">
             <div>
-              <h2 className="text-3xl font-semibold">{timetable.name}</h2>
-              <p className="mt-1 text-sm text-ink-muted">
-                {timetableMeta(timetable).join(" · ")}
-              </p>
+              <h2 className="text-[36px] leading-[1.08] font-normal tracking-[-0.03em]">
+                {timetable.name}
+              </h2>
+              <div className="mt-2 flex flex-wrap items-center gap-2 font-mono text-xs text-ink-muted">
+                {timetableMeta(timetable).map((part, i) => (
+                  <Fragment key={part}>
+                    {i > 0 && (
+                      <span aria-hidden="true" className="text-ink-faint">
+                        ·
+                      </span>
+                    )}
+                    <span
+                      className={i === 0 ? "font-medium text-ink" : undefined}
+                    >
+                      {part}
+                    </span>
+                  </Fragment>
+                ))}
+              </div>
             </div>
           </div>
-          <div className={`mt-5 ${orientation === "rows" ? "h-[700px]" : ""}`}>
+          <div className={`mt-6 ${orientation === "rows" ? "h-[720px]" : ""}`}>
             <TimetableSurface
               sections={timetableDetailsSections}
               layout="desktop"
@@ -203,37 +245,59 @@ export function useTimetableExport(): {
               mode="export"
             />
           </div>
-          <div className="mt-6 grid grid-cols-[1fr_1fr] gap-10">
-            <ul className="flex flex-col gap-2">
-              {coursesInTimetable.map((course) =>
-                course === undefined ? null : (
-                  <li
-                    key={course.id}
-                    className="rounded-md border border-line bg-surface px-3 py-2"
-                  >
-                    <div className="text-sm">
-                      <span className="font-semibold">
-                        {titleCase(course.name)}
-                      </span>
-                      <span className="text-ink-muted">{` · ${course.code}`}</span>
-                    </div>
-                    <div className="text-xs text-ink-faint">
-                      {timetable.sections
+          <div className="mt-7 grid grid-cols-[1fr_1fr] gap-10">
+            <div>
+              {coursesInTimetable.some((course) => course !== undefined) && (
+                <>
+                  <h3 className="text-[13px] font-medium text-ink-muted">
+                    Courses
+                  </h3>
+                  <ul className="mt-2 divide-y divide-line rounded-xl border border-line bg-surface">
+                    {coursesInTimetable.map((course) => {
+                      if (course === undefined) return null;
+                      const sections = timetable.sections
                         .filter((s) => s.courseId === course.id)
                         .map((s) => `${s.type}${s.number}`)
-                        .sort()
-                        .join(", ")}
-                    </div>
-                  </li>
-                ),
+                        .sort();
+                      return (
+                        <li
+                          key={course.id}
+                          className="flex items-center justify-between gap-4 px-4 py-3"
+                        >
+                          <div className="flex min-w-0 items-start gap-2.5">
+                            <CourseSwatch hue={courseHues.get(course.code)} />
+                            <div className="min-w-0">
+                              <div className="truncate text-[15px] leading-snug font-medium text-ink">
+                                {titleCase(course.name)}
+                              </div>
+                              <div className="font-mono text-xs text-ink-muted">
+                                {course.code}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex shrink-0 flex-wrap justify-end gap-1">
+                            {sections.map((section) => (
+                              <span
+                                key={section}
+                                className="rounded-md bg-sunk px-2 py-0.5 font-mono text-xs font-medium text-ink-muted"
+                              >
+                                {section}
+                              </span>
+                            ))}
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </>
               )}
-            </ul>
+            </div>
             <div className="flex flex-col gap-6">
               <ExamList title="Midsems" kind="MIDSEM" />
               <ExamList title="Compres" kind="COMPRE" />
             </div>
           </div>
-          <p className="mt-6 text-sm text-ink-faint">
+          <p className="mt-7 font-mono text-xs text-ink-faint">
             Made with ChronoFactorem
           </p>
         </div>
