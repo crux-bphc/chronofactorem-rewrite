@@ -38,7 +38,7 @@ jobs:
       ${{ github.event_name == 'push' || (github.event.pull_request.head.repo.full_name == github.repository && (
       (github.event.action == 'labeled' && github.event.label.name == 'ready')
       || (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, 'ready')
-        || (!github.event.pull_request.draft && contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.pull_request.author_association)))))) }}
+        || (!github.event.pull_request.draft && contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR", "CONTRIBUTOR"]'), github.event.pull_request.author_association)))))) }}
     runs-on: ubuntu-24.04
     strategy:
       matrix:
