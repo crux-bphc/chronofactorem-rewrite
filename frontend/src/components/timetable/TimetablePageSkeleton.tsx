@@ -74,7 +74,7 @@ export function TimetablePageSkeleton({
             // WeekGrid's frame: same columns, rows and labels (the hours
             // start at the grid's fixed first hour), with placeholder tiles
             <div
-              className="relative grid gap-x-[3px] gap-y-1.5 px-2.5 py-1 [--tt-row:48px] sm:[--tt-row:64px]"
+              className="relative grid gap-x-[3px] gap-y-[5px] sm:gap-y-1.5 px-2.5 py-1 [--tt-row:50px] sm:[--tt-row:64px]"
               style={{
                 gridTemplateColumns: "40px repeat(5, minmax(0, 1fr))",
                 gridTemplateRows: "22px repeat(10, var(--tt-row))",
