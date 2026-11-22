@@ -26,6 +26,14 @@
   src: url("/fonts/dm-mono-500-latin.woff2") format("woff2");
 }
 
+/* Atkinson Hyperlegible Next for the timetable: one variable file, 200-800 */
+@font-face {
+  font-family: "Chrono Timetable";
+  font-weight: 200 800;
+  font-display: block;
+  src: url("/fonts/atkinson-hyperlegible-next-latin.woff2") format("woff2");
+}
+
 /* Warm paper light palette and dark slate neutral chrome. */
 :root {
   color-scheme: light;
@@ -77,6 +85,7 @@
   --font-sans: "Outfit", system-ui, sans-serif;
   --font-mono:
     "DM Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --font-timetable: "Chrono Timetable", "Outfit", system-ui, sans-serif;
 
   --text-xs: 11px;
   --text-xs--line-height: 1.4;
