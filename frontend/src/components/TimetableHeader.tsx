@@ -57,11 +57,11 @@ const TimetableHeader = ({
           <div className="min-w-0">
             <h1
               style={{ viewTransitionName: TIMETABLE_TITLE_VT }}
-              className="text-2xl font-semibold leading-[1.15] tracking-[-.02em] break-words"
+              className="text-2xl leading-[1.12] font-normal tracking-[-0.03em] break-words"
             >
               {timetable.name}
             </h1>
-            <div className="mt-[5px] flex flex-wrap items-center gap-[7px] text-[13px] text-ink-muted">
+            <div className="mt-1.5 flex flex-wrap items-center gap-[7px] font-mono text-xs text-ink-muted">
               {meta}
               {page === "edit" ? (
                 <WarningsChip />
@@ -79,16 +79,16 @@ const TimetableHeader = ({
   return (
     <div
       data-shot="timetable-header"
-      className="flex items-end justify-between gap-4 px-7 pt-[22px] pb-[18px]"
+      className="flex items-end justify-between gap-4 px-7 pt-6 pb-4"
     >
       <div className="min-w-0">
         <h1
           style={{ viewTransitionName: TIMETABLE_TITLE_VT }}
-          className="text-3xl font-semibold leading-[1.15] tracking-[-.02em] break-words"
+          className="text-3xl leading-[1.1] font-normal tracking-[-0.03em] break-words"
         >
           {timetable.name}
         </h1>
-        <div className="mt-[5px] flex flex-wrap items-center gap-[7px] text-[13px] text-ink-muted">
+        <div className="mt-1.5 flex flex-wrap items-center gap-[7px] font-mono text-xs text-ink-muted">
           {meta}
           <Dot />
           <span>

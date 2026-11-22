@@ -68,7 +68,7 @@ function Segmented<T extends string>({
       aria-labelledby={ariaLabelledby}
       onKeyDown={onKeyDown}
       className={cn(
-        "relative grid rounded-md bg-sunk p-[3px]",
+        "relative grid rounded-md border border-line bg-sunk p-[3px]",
         size === "md" ? "h-10" : "h-8",
         className
       )}
@@ -76,7 +76,7 @@ function Segmented<T extends string>({
     >
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute top-[3px] bottom-[3px] left-[3px] rounded-[8px] bg-surface shadow-sm transition-transform duration-(--d-2) ease-(--e-out)"
+        className="pointer-events-none absolute top-[3px] bottom-[3px] left-[3px] rounded-[7px] bg-surface shadow-xs transition-transform duration-(--d-2) ease-(--e-out)"
         style={{
           width: `calc((100% - 6px) / ${count})`,
           transform: `translateX(${index * 100}%)`,
@@ -95,9 +95,9 @@ function Segmented<T extends string>({
           tabIndex={i === index ? 0 : -1}
           onClick={() => onValueChange(o.value)}
           className={cn(
-            "relative z-10 flex cursor-pointer after:absolute after:inset-x-0 after:content-[''] items-center justify-center gap-1.5 rounded-[8px] px-3 font-semibold transition-colors duration-(--d-1)",
+            "relative z-10 flex cursor-pointer after:absolute after:inset-x-0 after:content-[''] items-center justify-center gap-1.5 rounded-[7px] px-3 font-medium transition-colors duration-(--d-1) ease-(--e-out)",
             size === "md"
-              ? "text-base max-lg:after:-inset-y-[5px]"
+              ? "text-sm max-lg:after:-inset-y-[5px]"
               : "text-sm max-lg:after:-inset-y-[9px]",
             i === index ? "text-ink" : "text-ink-muted hover:text-ink"
           )}

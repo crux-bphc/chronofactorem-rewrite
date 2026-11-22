@@ -25,7 +25,8 @@ type WeekGridProps = {
 
 // tiles are size containers: narrow ones (phone) stack dept / number so the
 // number never truncates; from 88px wide (tablet) the code fits on one line
-const tileClass = "relative z-1 min-w-0 overflow-hidden rounded-sm bg-ev";
+const tileClass =
+  "relative z-1 min-w-0 overflow-hidden rounded-sm border border-line bg-ev";
 const padClass =
   "flex flex-col justify-start px-[7px] pt-1.5 pb-[5px] text-left leading-[1.15]";
 
@@ -53,24 +54,28 @@ export function TileBody({
     <>
       <span className="contents @min-[88px]:hidden">
         <span
-          className={`block text-xs font-medium text-ink-muted ${
+          className={`block font-mono text-[10.5px] font-medium text-ink-muted ${
             reserve ? `truncate ${reserve}` : spacer ? "" : "truncate"
           }`}
         >
           {!reserve && float}
           {dept}
         </span>
-        <span className="block truncate text-base font-semibold">{number}</span>
-        <span className="block truncate text-xs text-ink-muted">{sub}</span>
+        <span className="block truncate font-mono text-[13px] font-medium">
+          {number}
+        </span>
+        <span className="block truncate font-mono text-[10.5px] text-ink-muted">
+          {sub}
+        </span>
       </span>
       <span className="hidden @min-[88px]:contents">
         <span
-          className={`block text-base font-semibold ${spacer ? "" : "truncate"}`}
+          className={`block font-mono text-[13px] font-medium ${spacer ? "" : "truncate"}`}
         >
           {float}
           {cell.code}
         </span>
-        <span className="mt-0.5 block truncate text-xs text-ink-muted">
+        <span className="mt-0.5 block truncate font-mono text-[11px] text-ink-muted">
           {sub}
         </span>
       </span>
@@ -100,7 +105,7 @@ export function WeekGrid({
       {timetableDayNames.slice(0, dayCount).map((name, d) => (
         <div
           key={name}
-          className="self-end pb-1 text-center text-xs font-semibold tracking-[.06em] text-ink-muted uppercase"
+          className="self-end pb-1 text-center font-mono text-[11px] font-medium text-ink-muted"
           style={{ gridColumn: d + 2, gridRow: 1 }}
         >
           {name.slice(0, 3)}
@@ -114,7 +119,7 @@ export function WeekGrid({
             style={{ gridColumn: "2 / -1", gridRow: h + 2 }}
           />
           <div
-            className="pr-1 text-right text-xs whitespace-nowrap text-ink-faint"
+            className="pr-1 text-right font-mono text-[11px] whitespace-nowrap text-ink-faint"
             style={{
               gridColumn: 1,
               gridRow: h + 2,

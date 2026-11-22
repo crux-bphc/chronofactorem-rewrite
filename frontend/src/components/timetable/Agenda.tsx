@@ -25,9 +25,9 @@ type AgendaProps = {
   onRemove?: (cell: TimetableCell) => void;
 };
 
-const blockClass = "rounded-lg bg-ev";
+const blockClass = "rounded-md border border-line bg-ev";
 const bodyClass =
-  "flex w-full justify-between gap-2 rounded-lg px-3 pt-[9px] pb-2.5 text-left";
+  "flex w-full justify-between gap-2 rounded-md px-3 pt-[9px] pb-2.5 text-left";
 
 /** `remove` floats a spacer where the editor's × sits so the room clears it. */
 function BlockBody({
@@ -40,19 +40,21 @@ function BlockBody({
   return (
     <>
       <span className="min-w-0">
-        <span className="block text-lg leading-snug font-semibold">
+        <span className="block text-[15.5px] leading-snug font-medium">
           {titleCase(cell.name)}
         </span>
-        <span className="block text-sm text-ink-muted">{cell.code}</span>
+        <span className="block font-mono text-xs text-ink-muted">
+          {cell.code}
+        </span>
       </span>
       <span className="shrink-0 text-right">
-        <span className="block whitespace-nowrap text-sm font-medium">
+        <span className="block whitespace-nowrap font-mono text-xs font-medium">
           {remove && (
             <span aria-hidden="true" className="float-right h-4 w-4" />
           )}
           {cell.room}
         </span>
-        <span className="block text-sm text-ink-muted">
+        <span className="block font-mono text-xs text-ink-muted">
           {cell.type}
           {cell.number}
         </span>
@@ -150,7 +152,7 @@ export function Agenda({
             >
               <div className="min-h-0 overflow-hidden">
                 <div className="mb-1.5 grid grid-cols-[64px_1fr] gap-3">
-                  <div className="col-start-2 pt-1 pb-2.5 pl-0.5 text-sm text-ink-faint">
+                  <div className="col-start-2 pt-1 pb-2.5 pl-0.5 font-mono text-xs text-ink-faint">
                     {`Free · ${formatClock(item.from)} – ${formatClock(item.to)}`}
                   </div>
                 </div>
@@ -160,11 +162,11 @@ export function Agenda({
             <div className="tt-row" data-row-presence={item.cell.presence}>
               <div className="min-h-0 overflow-hidden">
                 <div className="relative mb-1.5 grid grid-cols-[64px_1fr] gap-3">
-                  <div className="pt-2.5 text-right">
-                    <div className="whitespace-nowrap text-sm font-medium">
+                  <div className="pt-2.5 text-right font-mono">
+                    <div className="whitespace-nowrap text-xs font-medium">
                       {formatClock(item.cell.hour)}
                     </div>
-                    <div className="whitespace-nowrap text-sm text-ink-faint">
+                    <div className="whitespace-nowrap text-xs text-ink-faint">
                       {formatSlotEnd(item.cell.hour, item.cell.span)}
                     </div>
                   </div>

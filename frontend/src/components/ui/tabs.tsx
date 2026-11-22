@@ -174,7 +174,7 @@ function Tabs<T extends string>({
             tabIndex={i === index ? 0 : -1}
             onClick={() => select(i)}
             className={cn(
-              "inline-flex cursor-pointer items-center justify-center whitespace-nowrap px-3 py-2.5 text-base font-medium text-ink-muted transition-colors duration-(--d-1) hover:text-ink focus-visible:outline-2 focus-visible:outline-ring data-current:text-ink",
+              "inline-flex cursor-pointer items-center justify-center whitespace-nowrap px-3 py-2.5 text-sm font-medium text-ink-muted transition-colors duration-(--d-1) ease-(--e-out) hover:text-ink focus-visible:outline-2 focus-visible:outline-ring data-current:text-ink",
               tabClassName
             )}
           >

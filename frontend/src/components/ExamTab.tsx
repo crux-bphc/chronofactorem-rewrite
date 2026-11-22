@@ -8,8 +8,7 @@ import { cn } from "@/lib/utils";
 
 type ExamKind = "midsem" | "compre";
 
-const overline =
-  "px-4 lg:px-0 text-xs font-semibold uppercase tracking-[.07em] text-ink-muted";
+const overline = "px-4 lg:px-0 text-[13px] font-medium text-ink-muted";
 const group =
   "mx-4 mt-2 lg:mx-0 rounded-xl border border-line bg-surface [&>*+*]:border-t [&>*+*]:border-line [&>:first-child]:rounded-t-[calc(var(--radius-xl)-1px)] [&>:last-child]:rounded-b-[calc(var(--radius-xl)-1px)]";
 
@@ -65,16 +64,16 @@ function DayGroups({ kind }: { kind: ExamKind }) {
                   className="flex items-center justify-between gap-3 px-4 py-3"
                 >
                   <div className="min-w-0">
-                    <div className="text-[15px] leading-snug font-semibold text-ink">
+                    <div className="text-[15px] leading-snug font-medium text-ink">
                       {name ?? exam.code}
                     </div>
                     {name && (
-                      <div className="text-[12.5px] text-ink-muted">
+                      <div className="font-mono text-xs text-ink-muted">
                         {exam.code}
                       </div>
                     )}
                   </div>
-                  <span className="shrink-0 text-sm font-medium text-ink">
+                  <span className="shrink-0 font-mono text-xs font-medium text-ink">
                     {formatRange(exam.start, exam.end)}
                   </span>
                 </div>

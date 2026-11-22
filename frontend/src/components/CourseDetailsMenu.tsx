@@ -90,7 +90,7 @@ function ExamLine({
 function SectionText({ section }: { section: Section }) {
   return (
     <>
-      <span className="text-[15px] font-semibold text-ink">
+      <span className="font-mono text-sm font-medium text-ink">
         {section.type}
         {section.number}
       </span>
@@ -99,7 +99,7 @@ function SectionText({ section }: { section: Section }) {
           {section.instructors.join(", ")}
         </span>
         {summarizeRoomTimes(section.roomTime).map((line) => (
-          <span key={line} className="text-[13px] text-ink-muted">
+          <span key={line} className="font-mono text-xs text-ink-muted">
             {line}
           </span>
         ))}
@@ -374,7 +374,7 @@ const CourseDetailsMenu = ({
             {course ? (
               <h2
                 className={cn(
-                  "line-clamp-2 min-w-0 text-[19px] leading-tight font-semibold text-ink",
+                  "line-clamp-2 min-w-0 text-[19px] leading-tight font-medium tracking-[-0.02em] text-ink",
                   fadeIn.className,
                 )}
               >
@@ -388,7 +388,7 @@ const CourseDetailsMenu = ({
         {course && (
           <div
             className={cn(
-              "flex flex-col text-[13px] leading-normal text-ink-muted",
+              "flex flex-col font-mono text-xs leading-normal text-ink-muted",
               // phone sheet: line up with the sheet title after its ‹ button
               showHeader ? "pl-7" : "pl-[38px]",
               fadeIn.className,

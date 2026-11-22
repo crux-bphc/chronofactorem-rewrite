@@ -8,21 +8,21 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        chip: "gap-1 rounded-full border-transparent bg-sunk px-2 py-0.5 text-sm font-semibold text-ink-muted",
+        chip: "gap-1 rounded-full border-line bg-sunk px-2.5 py-0.5 text-[12.5px] font-medium text-ink-muted",
         "chip-brand":
-          "gap-1 rounded-full border-transparent bg-brand-bg px-2 py-0.5 text-sm font-semibold text-brand",
-        pill: "rounded-sm border-transparent bg-sunk px-[7px] py-0.5 text-[11.5px] font-semibold text-ink-muted",
+          "gap-1 rounded-full border-transparent bg-brand-bg px-2.5 py-0.5 text-[12.5px] font-medium text-brand",
+        pill: "rounded-sm border-transparent bg-sunk px-1.5 py-0.5 font-mono text-[11px] font-medium text-ink-muted",
         "pill-ghost":
-          "rounded-sm border-dashed border-ink-faint bg-transparent px-[7px] py-0.5 text-[11.5px] font-semibold text-ink-muted",
+          "rounded-sm border-dashed border-ink-faint bg-transparent px-1.5 py-0.5 font-mono text-[11px] font-medium text-ink-muted",
         // Legacy names.
         default:
-          "rounded-full border-transparent bg-brand px-2.5 py-0.5 text-sm font-semibold text-brand-ink",
+          "rounded-full border-transparent bg-brand px-2.5 py-0.5 text-sm font-medium text-brand-ink",
         secondary:
-          "rounded-full border-transparent bg-sunk px-2.5 py-0.5 text-sm font-semibold text-ink",
+          "rounded-full border-transparent bg-sunk px-2.5 py-0.5 text-sm font-medium text-ink",
         destructive:
-          "rounded-full border-transparent bg-danger px-2.5 py-0.5 text-sm font-semibold text-danger-ink",
+          "rounded-full border-transparent bg-danger px-2.5 py-0.5 text-sm font-medium text-danger-ink",
         outline:
-          "rounded-full border-line px-2.5 py-0.5 text-sm font-semibold text-ink",
+          "rounded-full border-line px-2.5 py-0.5 text-sm font-medium text-ink",
       },
     },
     defaultVariants: {
