@@ -40,27 +40,46 @@ type DeskGridProps = {
 
 // blocks are size containers: under 72px wide they stack dept / number like
 // the phone tiles instead of truncating the code
-const padClass = (compact: boolean): string =>
+const padClass = (compact: boolean, scale: boolean): string =>
   `flex size-full flex-col justify-between px-2.5 ${
-    compact ? "py-1.5 min-[1920px]:py-3" : "py-2.5 min-[1920px]:py-3"
-  } min-[1920px]:px-3 @max-[72px]:px-1 @max-[72px]:py-1.5`;
+    scale
+      ? `${compact ? "py-1.5 min-[1920px]:py-3" : "py-2.5 min-[1920px]:py-3"} min-[1920px]:px-3`
+      : compact
+        ? "py-2"
+        : "py-2.5"
+  } @max-[72px]:px-1 @max-[72px]:py-1.5`;
 
 const TEXT_SIZES = {
   scaled: {
     name: "text-[14px] min-[1920px]:text-[16px] min-[2560px]:text-[19px] min-[3200px]:text-[22px]",
+    singleName:
+      "truncate text-[13px] min-[1920px]:line-clamp-2 min-[1920px]:whitespace-normal min-[1920px]:text-[16px] min-[2560px]:text-[19px] min-[3200px]:text-[22px]",
     section:
       "text-[12px] min-[1920px]:text-[13.5px] min-[2560px]:text-[15.5px] min-[3200px]:text-[18px]",
+    singleSection:
+      "text-[11px] min-[1920px]:text-[13.5px] min-[2560px]:text-[15.5px] min-[3200px]:text-[18px]",
     room: "text-[15px] min-[1920px]:text-[19px] min-[2560px]:text-[24px] min-[3200px]:text-[28px]",
+    singleRoom:
+      "text-xs tracking-[-0.03em] min-[1920px]:text-[19px] min-[1920px]:tracking-[-0.04em] min-[2560px]:text-[24px] min-[3200px]:text-[28px]",
     code: "text-[12.5px] min-[1920px]:text-[15px] min-[2560px]:text-[17px] min-[3200px]:text-[20px]",
     compactRoom:
       "text-[13px] min-[1920px]:text-[16px] min-[2560px]:text-[20px] min-[3200px]:text-[24px]",
+    rowGap: "gap-2 min-[1920px]:gap-2.5",
+    rowNameClamp: "max-h-[3.6em] min-[1920px]:max-h-none",
+    colGap: "gap-1 min-[1920px]:gap-2",
   },
   fixed: {
-    name: "text-[14px]",
+    name: "text-[15px]",
+    singleName: "line-clamp-2 text-[14.5px]",
     section: "text-[12px]",
-    room: "text-[15px]",
-    code: "text-[12.5px]",
-    compactRoom: "text-[13px]",
+    singleSection: "text-[12px]",
+    room: "text-[17px]",
+    singleRoom: "text-[15px] tracking-[-0.03em]",
+    code: "text-[13px]",
+    compactRoom: "text-[14px]",
+    rowGap: "gap-2",
+    rowNameClamp: "max-h-[3.6em]",
+    colGap: "gap-1.5",
   },
 } as const;
 
@@ -86,11 +105,13 @@ const RowBlockLines = ({
   remove: boolean;
 }) => (
   <>
-    <div className="hidden size-full min-h-0 flex-col justify-between gap-2 min-[1920px]:gap-2.5 @min-[104px]:flex">
+    <div
+      className={`hidden size-full min-h-0 flex-col justify-between @min-[104px]:flex ${sizes.rowGap}`}
+    >
       <div className="min-h-0">
         <span
           data-cell-title=""
-          className={`block overflow-hidden leading-[1.16] font-medium tracking-[-0.015em] break-words max-h-[3.6em] min-[1920px]:max-h-none ${sizes.name}`}
+          className={`block overflow-hidden leading-[1.16] font-medium tracking-[-0.015em] break-words ${sizes.rowNameClamp} ${sizes.name}`}
         >
           {remove && <RemoveSpacer />}
           {nameCase(cell.name)}
@@ -147,14 +168,14 @@ const ColumnBlockLines = ({
   const tallColumn = cell.span >= 2;
   return (
     <>
-      <div className="hidden size-full min-h-0 flex-col justify-between gap-1 min-[1920px]:gap-2 @min-[120px]:flex">
+      <div
+        className={`hidden size-full min-h-0 flex-col justify-between @min-[120px]:flex ${sizes.colGap}`}
+      >
         <div className="min-h-0">
           <span
             data-cell-title=""
             className={`block leading-[1.15] font-medium tracking-[-0.015em] ${
-              tallColumn
-                ? `break-words ${sizes.name}`
-                : "truncate text-[13px] min-[1920px]:line-clamp-2 min-[1920px]:whitespace-normal min-[1920px]:text-[16px] min-[2560px]:text-[19px] min-[3200px]:text-[22px]"
+              tallColumn ? `break-words ${sizes.name}` : sizes.singleName
             } ${remove && !tallColumn ? "pr-4 min-[1920px]:pr-0" : ""}`}
           >
             {remove && (
@@ -184,10 +205,14 @@ const ColumnBlockLines = ({
           </span>
         ) : (
           <span className="flex shrink-0 items-baseline justify-between gap-2">
-            <span className="truncate font-mono text-xs leading-none font-medium tracking-[-0.03em] text-ink min-[1920px]:text-[19px] min-[1920px]:tracking-[-0.04em] min-[2560px]:text-[24px] min-[3200px]:text-[28px]">
+            <span
+              className={`truncate font-mono leading-none font-medium text-ink ${sizes.singleRoom}`}
+            >
               {cell.room}
             </span>
-            <span className="shrink-0 font-mono text-[11px] leading-none font-medium text-ink-muted min-[1920px]:text-[13.5px] min-[2560px]:text-[15.5px] min-[3200px]:text-[18px]">
+            <span
+              className={`shrink-0 font-mono leading-none font-medium text-ink-muted ${sizes.singleSection}`}
+            >
               {sectionLabel}
             </span>
           </span>
@@ -291,7 +316,7 @@ export function DeskGrid({
             }
           : {
               gridTemplateColumns: `48px repeat(${dayCount}, minmax(86px, 1fr))`,
-              gridTemplateRows: `26px repeat(${hourCount}, minmax(${mode === "export" ? 56 : 44}px, 1fr))`,
+              gridTemplateRows: `26px repeat(${hourCount}, minmax(${mode === "export" ? 72 : 44}px, 1fr))`,
             }
       }
     >
@@ -362,7 +387,7 @@ export function DeskGrid({
                 "@container course-tint relative z-1 min-w-0 overflow-hidden rounded-md border border-line bg-ev"
               }
             >
-              <div className={padClass(!rows && cell.span === 1)}>
+              <div className={padClass(!rows && cell.span === 1, false)}>
                 <BlockLines cell={cell} scale={false} rows={rows} />
               </div>
             </div>
@@ -408,12 +433,12 @@ export function DeskGrid({
                           }
                     }
                     aria-description="Press Delete to remove"
-                    className={`cursor-pointer rounded-md text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring disabled:opacity-60 ${padClass(!rows && cell.span === 1)}`}
+                    className={`cursor-pointer rounded-md text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring disabled:opacity-60 ${padClass(!rows && cell.span === 1, true)}`}
                   >
                     <BlockLines cell={cell} scale rows={rows} remove />
                   </button>
                 ) : (
-                  <div className={padClass(!rows && cell.span === 1)}>
+                  <div className={padClass(!rows && cell.span === 1, true)}>
                     <BlockLines cell={cell} scale rows={rows} />
                   </div>
                 )}
@@ -452,7 +477,7 @@ export function DeskGrid({
               "@container course-tint tt-ghost pointer-events-none relative z-2 min-w-0 overflow-hidden rounded-md"
             }
           >
-            <div className={padClass(!rows && cell.span === 1)}>
+            <div className={padClass(!rows && cell.span === 1, true)}>
               <BlockLines cell={cell} scale rows={rows} />
             </div>
           </div>
