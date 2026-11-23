@@ -1,0 +1,441 @@
+{
+  "A1": {
+    "1-1": [
+      "BIO U101",
+      "CS U111",
+      "MATH U101",
+      "PHY U110",
+      "PHY U101",
+      "BITS U103",
+      "MGTS U102"
+    ],
+    "1-2": [
+      "MATH U102",
+      "EEE U111",
+      "BITS U104",
+      "MATH U113",
+      "CHE U141",
+      "CHEM U101",
+      "CHEM U110"
+    ],
+    "2-1": ["CHE U211", "CHE U212", "CHE U213", "BITS U225"],
+    "2-2": [
+      "EF/MGTS U211/U211",
+      "CHE U241",
+      "CHE U242",
+      "CHE U243",
+      "CHE U244"
+    ],
+    "3-1": ["CHE U311", "CHE U312"],
+    "3-2": ["CHE U341", "CHE U342"]
+  },
+  "A5": {
+    "1-1": [
+      "BIO U101",
+      "CS U111",
+      "MATH/MATH U101/U110",
+      "PHY U110",
+      "PHY/PHY U101/U102",
+      "BITS U103",
+      "MGTS U102"
+    ],
+    "1-2": [
+      "MATH/MATH U102/U112",
+      "BITS U104",
+      "MATH/MATH U113/U114",
+      "CHEM/CHEM U101/U102",
+      "CHEM U110",
+      "PHA U214",
+      "PHA U216"
+    ],
+    "2-1": ["PHA U201", "BITS U219", "PHA U217", "PHA U241"],
+    "2-2": ["PHA U215", "PHA U244", "PHA U312", "BITS U225"],
+    "3-1": ["PHA U311", "PHA U342", "PHA U315"],
+    "3-2": ["PHA U343", "PHA U344", "PHA U341"]
+  },
+  "A2": {
+    "1-1": [
+      "BIO U101",
+      "CS U111",
+      "MATH U101",
+      "PHY U110",
+      "PHY U101",
+      "BITS U103",
+      "MGTS U102"
+    ],
+    "1-2": [
+      "MATH U102",
+      "EEE U111",
+      "BITS U104",
+      "MATH U113",
+      "CE U141",
+      "CHEM U101",
+      "CHEM U110"
+    ],
+    "2-1": ["CE U211", "CE U231", "CE U212", "CE U213"],
+    "2-2": ["EF/MGTS U211/U211", "CE U241", "CE U244", "BITS U225"],
+    "3-1": ["CE U311", "CE U312"],
+    "3-2": ["CE U342"]
+  },
+  "A3": {
+    "1-1": [
+      "BIO U101",
+      "CS U111",
+      "MATH U101",
+      "PHY U110",
+      "PHY U101",
+      "BITS U103",
+      "MGTS U102"
+    ],
+    "1-2": [
+      "MATH U102",
+      "EEE U111",
+      "BITS U104",
+      "MATH U113",
+      "EEE U141",
+      "CHEM U101",
+      "CHEM U110"
+    ],
+    "2-1": ["EEE U211", "EEE U212", "EEE U213", "EEE U214"],
+    "2-2": [
+      "EF/MGTS U211/U211",
+      "EEE U241",
+      "EEE U243",
+      "EEE U244",
+      "BITS U225"
+    ],
+    "3-1": ["EEE U311", "EEE U313"],
+    "3-2": ["EEE U341"]
+  },
+  "A8": {
+    "1-1": [
+      "BIO U101",
+      "CS U111",
+      "MATH U101",
+      "PHY U110",
+      "PHY U101",
+      "BITS U103",
+      "MGTS U102"
+    ],
+    "1-2": [
+      "MATH U102",
+      "EEE U111",
+      "BITS U104",
+      "MATH U113",
+      "EEE U141",
+      "CHEM U101",
+      "CHEM U110"
+    ],
+    "2-1": ["EEE U211", "EEE U213", "EEE U214", "EEE U215"],
+    "2-2": [
+      "EF/MGTS U211/U211",
+      "BITS U225",
+      "EEE U241",
+      "EEE U243",
+      "EEE U244"
+    ],
+    "3-1": ["EEE U312", "EEE U314"],
+    "3-2": ["EEE U342"]
+  },
+  "AA": {
+    "1-1": [
+      "BIO U101",
+      "CS U111",
+      "MATH U101",
+      "PHY U110",
+      "PHY U101",
+      "BITS U103",
+      "MGTS U102"
+    ],
+    "1-2": [
+      "MATH U102",
+      "EEE U111",
+      "BITS U104",
+      "MATH U113",
+      "EEE U141",
+      "CHEM U101",
+      "CHEM U110"
+    ],
+    "2-1": ["EEE U211", "EEE U212", "EEE U213", "EEE U214"],
+    "2-2": [
+      "EF/MGTS U211/U211",
+      "BITS U225",
+      "EEE U241",
+      "EEE U242",
+      "EEE U244"
+    ],
+    "3-1": ["EEE U312", "EEE U315"],
+    "3-2": ["EEE U346"]
+  },
+  "A7": {
+    "1-1": [
+      "BIO U101",
+      "CS U111",
+      "MATH U101",
+      "PHY U110",
+      "PHY U101",
+      "BITS U103",
+      "MGTS U102"
+    ],
+    "1-2": [
+      "MATH U102",
+      "EEE U111",
+      "BITS U104",
+      "MATH U113",
+      "CS U141",
+      "CHEM U101",
+      "CHEM U110"
+    ],
+    "2-1": ["CS U211", "CS U212", "EEE U141"],
+    "2-2": ["EF/MGTS U211/U211", "CS U241", "CS U242", "CS U243", "BITS U225"],
+    "3-1": ["CS/CS U411/U401", "CS U312"],
+    "3-2": ["CS U342", "CS U343"]
+  },
+  "AD": {
+    "1-1": [
+      "BIO U101",
+      "CS U111",
+      "MATH U101",
+      "PHY U110",
+      "PHY U101",
+      "BITS U103",
+      "MGTS U102"
+    ],
+    "1-2": [
+      "MATH U102",
+      "EEE U111",
+      "BITS U104",
+      "MATH U113",
+      "MATH U141",
+      "CHEM U101",
+      "CHEM U110"
+    ],
+    "2-1": ["MATH U214", "MATH U218", "MATH U219", "CS U211"],
+    "2-2": [
+      "EF/MGTS U211/U211",
+      "CS U241",
+      "MATH U241",
+      "BITS U225",
+      "CS U243"
+    ],
+    "3-1": ["CS U411", "CS U312"],
+    "3-2": ["MATH U246", "MATH/MATH U346/U347"]
+  },
+  "A4": {
+    "1-1": [
+      "BIO U101",
+      "CS U111",
+      "MATH U101",
+      "PHY U110",
+      "PHY U101",
+      "BITS U103",
+      "MGTS U102"
+    ],
+    "1-2": [
+      "MATH U102",
+      "EEE U111",
+      "BITS U104",
+      "MATH U113",
+      "ME U141",
+      "CHEM U101",
+      "CHEM U110"
+    ],
+    "2-1": ["ME U211", "ME U212", "ME U213"],
+    "2-2": ["EF/MGTS U211/U211", "ME U219", "ME U241", "ME U242", "BITS U225"],
+    "3-1": ["ME U343", "ME U312", "ME U214", "ME U245"],
+    "3-2": ["ME U311", "ME U341", "ME U342", "ME U246"]
+  },
+  "B1": {
+    "1-1": [
+      "BIO U101",
+      "CS U111",
+      "MATH/MATH U101/U110",
+      "PHY U110",
+      "PHY/PHY U101/U102",
+      "BITS U103",
+      "MGTS U102"
+    ],
+    "1-2": [
+      "MATH/MATH U102/U112",
+      "EEE U111",
+      "BITS U104",
+      "MATH/MATH U113/U114",
+      "BIO U141",
+      "CHEM/CHEM U101/U102",
+      "CHEM U110"
+    ],
+    "2-1": ["BIO U211", "BIO U212", "BIO U213", "BIO U215"],
+    "2-2": [
+      "EF/MGTS U211/U211",
+      "BIO U241",
+      "BIO U312",
+      "BIO U314",
+      "BITS U225"
+    ],
+    "3-1": ["BIO U311", "BIO U242", "BIO U243"],
+    "3-2": ["BIO U341"]
+  },
+  "B5": {
+    "1-1": [
+      "BIO U101",
+      "CS U111",
+      "MATH U101",
+      "PHY U110",
+      "PHY U101",
+      "BITS U103",
+      "MGTS U102"
+    ],
+    "1-2": [
+      "MATH U102",
+      "EEE U111",
+      "BITS U104",
+      "MATH U113",
+      "PHY U141",
+      "CHEM U101",
+      "CHEM U110"
+    ],
+    "2-1": ["PHY U212", "PHY U213", "PHY U211", "PHY U214"],
+    "2-2": [
+      "EF/MGTS U211/U211",
+      "PHY U243",
+      "PHY U241",
+      "PHY U242",
+      "BITS U225",
+      "PHY U244"
+    ],
+    "3-1": ["PHY U311", "PHY U312"],
+    "3-2": ["PHY U341", "PHY U344"]
+  },
+  "B2": {
+    "1-1": [
+      "BIO U101",
+      "CS U111",
+      "MATH U101",
+      "PHY U110",
+      "PHY U101",
+      "BITS U103",
+      "MGTS U102"
+    ],
+    "1-2": [
+      "MATH U102",
+      "EEE U111",
+      "BITS U104",
+      "MATH U113",
+      "CHEM U141",
+      "CHEM U101",
+      "CHEM U110"
+    ],
+    "2-1": ["CHEM U211", "CHEM U212", "CHEM U213", "CHEM U214"],
+    "2-2": ["EF/MGTS U211/U211", "CHEM U241", "CHEM U243", "BITS U225"],
+    "3-1": ["CHEM U311", "CHEM U313"],
+    "3-2": ["CHEM U341", "CHEM U342", "CHEM U343"]
+  },
+  "B4": {
+    "1-1": [
+      "BIO U101",
+      "CS U111",
+      "MATH U101",
+      "PHY U110",
+      "PHY U101",
+      "BITS U103",
+      "MGTS U102"
+    ],
+    "1-2": [
+      "MATH U102",
+      "EEE U111",
+      "BITS U104",
+      "MATH U113",
+      "CHEM U101",
+      "CHEM U110",
+      "MATH U140"
+    ],
+    "2-1": ["MATH U211", "MATH U214", "MATH U215", "MATH U217"],
+    "2-2": [
+      "EF/MGTS U211/U211",
+      "MATH U242",
+      "MATH U243",
+      "MATH U244",
+      "BITS U225"
+    ],
+    "3-1": ["MATH U241", "MATH U312"],
+    "3-2": ["MATH U343", "MATH U344"]
+  },
+  "B3": {
+    "1-1": [
+      "BIO U101",
+      "CS U111",
+      "MATH U101",
+      "PHY U110",
+      "PHY U101",
+      "BITS U103",
+      "MGTS U102"
+    ],
+    "1-2": [
+      "MATH U102",
+      "EEE U111",
+      "BITS U104",
+      "MATH U113",
+      "CHEM U101",
+      "CHEM U110",
+      "EF U211"
+    ],
+    "2-1": ["EF U210", "EF U213", "EF U216", "EF U212"],
+    "2-2": ["MGTS U211", "EF U240", "EF U242", "EF U245", "BITS U225"],
+    "3-1": ["EF U312", "EF U310"],
+    "3-2": ["EF U344"]
+  },
+  "B7": {
+    "1-1": [
+      "BIO U101",
+      "CS U111",
+      "MATH U101",
+      "PHY U110",
+      "PHY U101",
+      "BITS U103",
+      "MGTS U102"
+    ],
+    "1-2": [
+      "MATH U102",
+      "EEE U111",
+      "BITS U104",
+      "MATH U113",
+      "CHEM U101",
+      "CHEM U110",
+      "PHY U140"
+    ],
+    "2-1": ["CHEM U202", "EEE U214", "CHE U211", "CHE U301"],
+    "2-2": ["EF/MGTS U211/U211", "PHY U240", "CHEM U239", "BITS U225"],
+    "3-1": ["EEE U240", "CHEM U303"],
+    "3-2": ["BIO U338", "EEE U340"]
+  },
+  "AJ": {
+    "1-1": [
+      "BIO U101",
+      "CS U111",
+      "MATH U101",
+      "PHY U110",
+      "PHY U101",
+      "BITS U103",
+      "MGTS U102"
+    ],
+    "1-2": [
+      "MATH U102",
+      "EEE U111",
+      "BITS U104",
+      "MATH U113",
+      "CHEM U101",
+      "CHEM U110",
+      "CHE U140"
+    ],
+    "2-1": ["CHE U201", "CHE U202", "CE U201", "CHE U206"],
+    "2-2": [
+      "EF/MGTS U211/U211",
+      "CE U202",
+      "CHE U203",
+      "CHE U204",
+      "BITS U240"
+    ],
+    "3-1": ["CHE U307", "CHE U302"],
+    "3-2": ["CHE U303", "CHE U304"]
+  }
+}
