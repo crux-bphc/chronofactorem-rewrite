@@ -20,7 +20,7 @@ export function TimetablePreview({
       cells.push(
         <i
           key={`${day}:${hour}`}
-          className={`rounded-[1.5px] ${code === undefined ? "bg-sunk" : "course-tint bg-ev"}`}
+          className={`rounded-[1.5px] ${code === undefined ? "bg-sunk" : "course-tint bg-(--swatch)"}`}
           style={code === undefined ? undefined : hueStyle(hues.get(code))}
         />,
       );

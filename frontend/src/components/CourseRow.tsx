@@ -39,7 +39,7 @@ function CourseText({
     <span className="flex min-w-0 items-start gap-2.5">
       <span
         aria-hidden="true"
-        className="course-tint mt-1.5 size-2.5 shrink-0 rounded-[3px] border border-line bg-ev"
+        className="course-tint mt-1.5 size-2.5 shrink-0 rounded-[3px] bg-(--swatch)"
         style={hueStyle(hue)}
       />
       {text}

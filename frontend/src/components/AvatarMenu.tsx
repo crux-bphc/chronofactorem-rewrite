@@ -144,7 +144,7 @@ export function AvatarMenu({ user }: { user: { name: string } }) {
             {previewHues.map((hue, i) => (
               <span
                 key={PREVIEW_CODES[i]}
-                className="course-tint size-2.5 rounded-[3px] border border-line bg-ev"
+                className="course-tint size-2.5 rounded-[3px] bg-(--swatch)"
                 style={hueStyle(hue)}
               />
             ))}

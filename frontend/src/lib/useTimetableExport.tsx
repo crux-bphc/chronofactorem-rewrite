@@ -59,7 +59,7 @@ const CourseSwatch = ({ hue }: { hue: number | undefined }) =>
   hue === undefined ? null : (
     <span
       aria-hidden="true"
-      className="course-tint mt-1.5 size-2.5 shrink-0 rounded-[3px] border border-line bg-ev"
+      className="course-tint mt-1.5 size-2.5 shrink-0 rounded-[3px] bg-(--swatch)"
       style={hueStyle(hue)}
     />
   );
