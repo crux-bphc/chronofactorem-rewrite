@@ -327,7 +327,7 @@ function Home() {
       <h1
         id="home-title"
         tabIndex={-1}
-        className="pt-4 text-3xl font-normal tracking-[-0.03em] outline-none lg:pt-10 lg:text-[40px]"
+        className="pt-4 text-3xl font-medium tracking-[-0.03em] outline-none lg:pt-10 lg:text-[40px]"
       >
         Timetables
       </h1>

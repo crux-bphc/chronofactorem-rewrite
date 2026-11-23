@@ -143,7 +143,7 @@ function FinalizeTimetable() {
         Back to editing
       </Button>
       <h1
-        className="mt-4 text-3xl font-normal tracking-[-0.03em] lg:text-[38px]"
+        className="mt-4 text-3xl font-medium tracking-[-0.03em] lg:text-[38px]"
         style={{ viewTransitionName: TIMETABLE_TITLE_VT }}
       >
         {headingText}

@@ -36,7 +36,7 @@ function About() {
       <CruxMark />
       <div className="grid gap-10 lg:grid-cols-[320px_minmax(0,1fr)] lg:gap-16">
         <div className="space-y-4">
-          <h1 className="text-3xl font-normal tracking-[-0.03em] text-ink lg:text-[42px] lg:leading-[1.08]">
+          <h1 className="text-3xl font-medium tracking-[-0.03em] text-ink lg:text-[42px] lg:leading-[1.08]">
             About ChronoFactorem
           </h1>
           <p className="text-base leading-relaxed text-ink-muted">

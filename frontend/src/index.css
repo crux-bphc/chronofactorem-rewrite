@@ -1,29 +1,22 @@
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
-/* Outfit for UI copy, DM Mono for codes, rooms, and times. */
 @font-face {
-  font-family: "Outfit";
+  font-family: "Lexend";
   font-style: normal;
-  font-weight: 400 600;
+  font-weight: 400 700;
   font-display: swap;
-  src: url("/fonts/outfit-latin.woff2") format("woff2");
+  size-adjust: 93%;
+  src: url("/fonts/lexend-latin.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: "DM Mono";
+  font-family: "JetBrains Mono";
   font-style: normal;
-  font-weight: 400;
+  font-weight: 400 700;
   font-display: swap;
-  src: url("/fonts/dm-mono-400-latin.woff2") format("woff2");
-}
-
-@font-face {
-  font-family: "DM Mono";
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("/fonts/dm-mono-500-latin.woff2") format("woff2");
+  size-adjust: 95%;
+  src: url("/fonts/jetbrains-mono-latin.woff2") format("woff2");
 }
 
 /* Warm paper light palette and dark slate neutral chrome. */
@@ -74,9 +67,13 @@
 }
 
 @theme inline {
-  --font-sans: "Outfit", system-ui, sans-serif;
+  --font-sans: "Lexend", system-ui, sans-serif;
   --font-mono:
-    "DM Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --font-weight-normal: 500;
+  --font-weight-medium: 600;
+  --font-weight-semibold: 650;
 
   --text-xs: 11px;
   --text-xs--line-height: 1.4;
@@ -151,6 +148,7 @@
     color: var(--ink);
     font-family: var(--font-sans);
     font-size: var(--text-base);
+    font-weight: 500;
     font-variant-numeric: tabular-nums;
     -webkit-font-smoothing: antialiased;
   }
@@ -187,7 +185,7 @@
   align-items: center;
   height: 100%;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--muted);
   transition: color var(--d-1) var(--e-out);
 }

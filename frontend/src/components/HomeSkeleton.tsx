@@ -12,7 +12,7 @@ const homeSkeletonRef = skeletonRef("home");
 export function HomeSkeleton() {
   return (
     <main ref={homeSkeletonRef} className={mainClass} aria-busy="true">
-      <h1 className="pt-4 text-3xl font-normal tracking-[-0.03em] lg:pt-10 lg:text-[40px]">
+      <h1 className="pt-4 text-3xl font-medium tracking-[-0.03em] lg:pt-10 lg:text-[40px]">
         Timetables
       </h1>
       <Skeleton className="mt-6 mb-2.5 h-3.5 w-20 lg:mt-8 lg:mb-3" />

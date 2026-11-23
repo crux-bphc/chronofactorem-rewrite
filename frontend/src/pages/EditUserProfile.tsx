@@ -74,7 +74,7 @@ function EditUserProfile() {
 
   return (
     <main className="mx-auto w-full max-w-[640px] px-4 pt-4 pb-28 lg:pt-10 lg:pb-12">
-      <h1 className="text-3xl font-normal tracking-[-0.03em] lg:text-[38px]">
+      <h1 className="text-3xl font-medium tracking-[-0.03em] lg:text-[38px]">
         Edit User Profile
       </h1>
       <div className="mt-6 flex items-center gap-3.5 rounded-xl border border-line bg-surface p-4">
