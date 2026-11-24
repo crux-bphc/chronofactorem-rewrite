@@ -5,9 +5,9 @@ Lexend
   Copyright 2018 The Lexend Project Authors
   (https://github.com/googlefonts/lexend)
 
-JetBrains Mono
-  Copyright 2020 The JetBrains Mono Project Authors
-  (https://github.com/JetBrains/JetBrainsMono)
+DM Mono
+  Copyright 2020 The DM Mono Project Authors
+  (https://github.com/googlefonts/dm-mono)
 
 -----------------------------------------------------------
 SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007

@@ -10,13 +10,21 @@
   src: url("/fonts/lexend-latin.woff2") format("woff2");
 }
 
+/* Weights run a step up (normal is 500), so DM Mono's cuts are shifted to match */
 @font-face {
-  font-family: "JetBrains Mono";
+  font-family: "DM Mono";
   font-style: normal;
-  font-weight: 400 700;
+  font-weight: 400 500;
   font-display: swap;
-  size-adjust: 95%;
-  src: url("/fonts/jetbrains-mono-latin.woff2") format("woff2");
+  src: url("/fonts/dm-mono-400-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "DM Mono";
+  font-style: normal;
+  font-weight: 600 700;
+  font-display: swap;
+  src: url("/fonts/dm-mono-500-latin.woff2") format("woff2");
 }
 
 /* Warm paper light palette and dark slate neutral chrome. */
@@ -69,7 +77,7 @@
 @theme inline {
   --font-sans: "Lexend", system-ui, sans-serif;
   --font-mono:
-    "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    "DM Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 
   --font-weight-normal: 500;
   --font-weight-medium: 600;
