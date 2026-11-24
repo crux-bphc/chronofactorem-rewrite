@@ -16,7 +16,6 @@ import { EmptyBird } from "@/components/EmptyBird";
 import {
   gridClass,
   HomeSkeleton,
-  mainClass,
   overlineClass,
 } from "@/components/HomeSkeleton";
 import ReportIssue from "@/components/ReportIssue";
@@ -29,7 +28,7 @@ import {
   subscribeSharedTimetable,
 } from "@/lib/sharedTransition";
 import { useSkeletonCrossfade } from "@/lib/skeletonFade";
-import { cn } from "@/lib/utils";
+import { cn, widePageClass } from "@/lib/utils";
 import TimetableCard from "../components/TimetableCard";
 import { Button } from "../components/ui/button";
 import { router } from "../router";
@@ -323,11 +322,11 @@ function Home() {
   const archivedAt = publishedAt + countIn("published", published);
 
   return (
-    <main className={mainClass}>
+    <main className={widePageClass}>
       <h1
         id="home-title"
         tabIndex={-1}
-        className="pt-4 text-3xl font-normal tracking-[-0.03em] outline-none lg:pt-10 lg:text-[40px]"
+        className="pt-4 text-3xl font-medium tracking-[-0.03em] outline-none lg:pt-10 lg:text-[40px]"
       >
         Timetables
       </h1>

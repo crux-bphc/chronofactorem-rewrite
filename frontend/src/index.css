@@ -1,19 +1,20 @@
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
-/* Outfit for UI copy, DM Mono for codes, rooms, and times. */
 @font-face {
-  font-family: "Outfit";
+  font-family: "Lexend";
   font-style: normal;
-  font-weight: 400 600;
+  font-weight: 400 700;
   font-display: swap;
-  src: url("/fonts/outfit-latin.woff2") format("woff2");
+  size-adjust: 93%;
+  src: url("/fonts/lexend-latin.woff2") format("woff2");
 }
 
+/* Weights run a step up (normal is 500), so DM Mono's cuts are shifted to match */
 @font-face {
   font-family: "DM Mono";
   font-style: normal;
-  font-weight: 400;
+  font-weight: 400 500;
   font-display: swap;
   src: url("/fonts/dm-mono-400-latin.woff2") format("woff2");
 }
@@ -21,7 +22,7 @@
 @font-face {
   font-family: "DM Mono";
   font-style: normal;
-  font-weight: 500;
+  font-weight: 600 700;
   font-display: swap;
   src: url("/fonts/dm-mono-500-latin.woff2") format("woff2");
 }
@@ -74,9 +75,13 @@
 }
 
 @theme inline {
-  --font-sans: "Outfit", system-ui, sans-serif;
+  --font-sans: "Lexend", system-ui, sans-serif;
   --font-mono:
     "DM Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --font-weight-normal: 500;
+  --font-weight-medium: 600;
+  --font-weight-semibold: 650;
 
   --text-xs: 11px;
   --text-xs--line-height: 1.4;
@@ -151,6 +156,7 @@
     color: var(--ink);
     font-family: var(--font-sans);
     font-size: var(--text-base);
+    font-weight: 500;
     font-variant-numeric: tabular-nums;
     -webkit-font-smoothing: antialiased;
   }
@@ -187,7 +193,7 @@
   align-items: center;
   height: 100%;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--muted);
   transition: color var(--d-1) var(--e-out);
 }
@@ -623,33 +629,33 @@ html.theme-transition * {
   }
 }
 
-/* A course's colour (--h from courseHues), redefines tile tokens so bg-ev,
-   border-line, hover and muted text inside all follow the course */
+/* A course's colour (--h and chroma scale --k from courseHues), redefines
+   tile tokens so bg-ev, border-line, hover and muted text inside all follow
+   the course. Dusty pastels in light, deep tiles with light text in dark */
 .course-tint {
-  --ev: oklch(89% 0.13 var(--h));
-  --ev-hover: oklch(84% 0.14 var(--h));
-  --line: oklch(81% 0.14 var(--h));
-  --ink: oklch(21% 0.04 var(--h));
-  --muted: oklch(35% 0.06 var(--h));
+  --ev: oklch(91% calc(0.06 * var(--k, 1)) var(--h));
+  --ev-hover: oklch(88% calc(0.07 * var(--k, 1)) var(--h));
+  --line: oklch(85% calc(0.07 * var(--k, 1)) var(--h));
+  --ink: oklch(27% calc(0.06 * var(--k, 1)) var(--h));
+  --muted: oklch(42% calc(0.06 * var(--k, 1)) var(--h));
   --faint: var(--muted);
+  /* small marks (swatches, home thumbnails) need more colour than a tile */
+  --swatch: oklch(76% calc(0.11 * var(--k, 1)) var(--h));
   color: var(--ink);
 }
 
 .dark .course-tint {
-  --ev: oklch(79% 0.105 var(--h));
-  --ev-hover: oklch(83% 0.11 var(--h));
-  --line: oklch(85% 0.095 var(--h));
-  --ink: oklch(18% 0.03 var(--h));
-  --muted: oklch(34% 0.045 var(--h));
+  --ev: oklch(36% calc(0.06 * var(--k, 1)) var(--h));
+  --ev-hover: oklch(40% calc(0.065 * var(--k, 1)) var(--h));
+  --line: oklch(42% calc(0.06 * var(--k, 1)) var(--h));
+  --ink: oklch(94% calc(0.02 * var(--k, 1)) var(--h));
+  --muted: oklch(80% calc(0.04 * var(--k, 1)) var(--h));
+  --swatch: oklch(62% calc(0.1 * var(--k, 1)) var(--h));
 }
 
 .dark .course-tint.tt-ghost {
-  --ink: oklch(95% 0.02 var(--h));
-  --muted: oklch(82% 0.04 var(--h));
-  --faint: var(--muted);
-  color: var(--ink);
-  background-color: color-mix(in oklab, var(--ev) 22%, var(--surface));
-  outline-color: color-mix(in oklab, var(--ev) 80%, transparent);
+  background-color: color-mix(in oklab, var(--ev) 45%, var(--surface));
+  outline-color: oklch(65% calc(0.08 * var(--k, 1)) var(--h));
 }
 
 /* The section a hovered pick would swap out: a faded, struck-through

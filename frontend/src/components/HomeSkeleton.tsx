@@ -1,8 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { skeletonRef } from "@/lib/skeletonFade";
+import { widePageClass } from "@/lib/utils";
 
-export const mainClass =
-  "mx-auto w-full max-w-[640px] px-4 pb-16 lg:max-w-[1200px] lg:px-7";
 export const gridClass = "grid gap-3 lg:grid-cols-3 lg:gap-4";
 export const overlineClass =
   "mt-6 mb-2.5 text-[13px] font-medium text-ink-muted lg:mt-8 lg:mb-3";
@@ -11,8 +10,8 @@ const homeSkeletonRef = skeletonRef("home");
 
 export function HomeSkeleton() {
   return (
-    <main ref={homeSkeletonRef} className={mainClass} aria-busy="true">
-      <h1 className="pt-4 text-3xl font-normal tracking-[-0.03em] lg:pt-10 lg:text-[40px]">
+    <main ref={homeSkeletonRef} className={widePageClass} aria-busy="true">
+      <h1 className="pt-4 text-3xl font-medium tracking-[-0.03em] lg:pt-10 lg:text-[40px]">
         Timetables
       </h1>
       <Skeleton className="mt-6 mb-2.5 h-3.5 w-20 lg:mt-8 lg:mb-3" />

@@ -1,8 +1,25 @@
 import type { CSSProperties } from "react";
 
-// space 8 primary hues ~45 deg apart and fall back to the 8 midpoints past 8 courses
-const PRIMARY_HUES = [12, 56, 96, 146, 195, 246, 296, 338] as const;
-const OVERFLOW_HUES = [34, 76, 121, 170, 220, 271, 317, 355] as const;
+// hand-picked dusty hues instead of an even spread, so no cyan, lime or
+// magenta; past 8 courses the overflow hues fill the gaps
+const PRIMARY_HUES = [28, 55, 85, 155, 230, 262, 295, 350] as const;
+const OVERFLOW_HUES = [12, 40, 110, 185, 210, 245, 320, 335] as const;
+
+// greens, yellows and purples look louder than reds and blues at the same
+// chroma, so they get less of it
+const CHROMA_SCALE: Partial<Record<number, number>> = {
+  55: 0.9,
+  85: 0.9,
+  110: 0.8,
+  155: 0.8,
+  185: 0.8,
+  210: 0.9,
+  230: 0.9,
+  295: 0.8,
+  320: 0.8,
+  335: 0.8,
+  350: 0.8,
+};
 const CHRONO_BIRTHDAY = 20230617; // chrono birthday!!!!
 const CRUX_BLUE = 0x164a9e; // CRUx blue #164a9e
 const HASH_MODULUS = 1_000_000_007;
@@ -75,4 +92,6 @@ export const courseHues = (
 };
 
 export const hueStyle = (hue: number | undefined): CSSProperties | undefined =>
-  hue === undefined ? undefined : ({ "--h": hue } as CSSProperties);
+  hue === undefined
+    ? undefined
+    : ({ "--h": hue, "--k": CHROMA_SCALE[hue] ?? 1 } as CSSProperties);

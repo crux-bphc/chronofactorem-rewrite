@@ -57,7 +57,7 @@ const TimetableHeader = ({
           <div className="min-w-0">
             <h1
               style={{ viewTransitionName: TIMETABLE_TITLE_VT }}
-              className="text-2xl leading-[1.12] font-normal tracking-[-0.03em] break-words"
+              className="text-2xl leading-[1.12] font-medium tracking-[-0.03em] break-words"
             >
               {timetable.name}
             </h1>
@@ -84,7 +84,7 @@ const TimetableHeader = ({
       <div className="min-w-0">
         <h1
           style={{ viewTransitionName: TIMETABLE_TITLE_VT }}
-          className="text-3xl leading-[1.1] font-normal tracking-[-0.03em] break-words"
+          className="text-3xl leading-[1.1] font-medium tracking-[-0.03em] break-words"
         >
           {timetable.name}
         </h1>

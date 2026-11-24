@@ -59,7 +59,7 @@ const CourseSwatch = ({ hue }: { hue: number | undefined }) =>
   hue === undefined ? null : (
     <span
       aria-hidden="true"
-      className="course-tint mt-1.5 size-2.5 shrink-0 rounded-[3px] border border-line bg-ev"
+      className="course-tint mt-1.5 size-2.5 shrink-0 rounded-[3px] bg-(--swatch)"
       style={hueStyle(hue)}
     />
   );
@@ -214,7 +214,7 @@ export function useTimetableExport(): {
         >
           <div className="flex items-end justify-between gap-6">
             <div>
-              <h2 className="text-[36px] leading-[1.08] font-normal tracking-[-0.03em]">
+              <h2 className="text-[36px] leading-[1.08] font-medium tracking-[-0.03em]">
                 {timetable.name}
               </h2>
               <div className="mt-2 flex flex-wrap items-center gap-2 font-mono text-xs text-ink-muted">

@@ -10,7 +10,7 @@ import useTimetable from "@/data-access/hooks/useTimetable";
 import { HapticTap, haptic } from "@/lib/haptics";
 import { preloadOnIntent } from "@/lib/preloadOnIntent";
 import { TIMETABLE_TITLE_VT } from "@/lib/sharedTransition";
-import { cn } from "@/lib/utils";
+import { cn, narrowPageClass } from "@/lib/utils";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -123,7 +123,7 @@ function FinalizeTimetable() {
   ];
 
   return (
-    <main className="mx-auto w-full max-w-[640px] px-4 pt-2 pb-28 lg:pt-10 lg:pb-12">
+    <main className={cn(narrowPageClass, "pt-2")}>
       <Button
         variant="quiet"
         size="sm"
@@ -143,7 +143,7 @@ function FinalizeTimetable() {
         Back to editing
       </Button>
       <h1
-        className="mt-4 text-3xl font-normal tracking-[-0.03em] lg:text-[38px]"
+        className="mt-4 text-3xl font-medium tracking-[-0.03em] lg:text-[38px]"
         style={{ viewTransitionName: TIMETABLE_TITLE_VT }}
       >
         {headingText}

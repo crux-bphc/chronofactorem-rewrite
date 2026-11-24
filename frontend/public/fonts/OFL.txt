@@ -1,9 +1,9 @@
 Chrono self-hosts two font families, both licensed under the SIL Open Font
 License, Version 1.1.
 
-Outfit
-  Copyright 2021 The Outfit Project Authors
-  (https://github.com/Outfitio/Outfit-Fonts)
+Lexend
+  Copyright 2018 The Lexend Project Authors
+  (https://github.com/googlefonts/lexend)
 
 DM Mono
   Copyright 2020 The DM Mono Project Authors
