@@ -16,12 +16,12 @@ import { EmptyBird } from "@/components/EmptyBird";
 import {
   gridClass,
   HomeSkeleton,
-  mainClass,
   overlineClass,
 } from "@/components/HomeSkeleton";
 import ReportIssue from "@/components/ReportIssue";
 import useCreateTimetable from "@/data-access/hooks/useCreateTimetable";
 import useUser from "@/data-access/hooks/useUser";
+import { widePageClass } from "@/lib/pageLayout";
 import { preloadEditorOnIntent } from "@/lib/preloadOnIntent";
 import {
   getSharedTimetable,
@@ -323,7 +323,7 @@ function Home() {
   const archivedAt = publishedAt + countIn("published", published);
 
   return (
-    <main className={mainClass}>
+    <main className={widePageClass}>
       <h1
         id="home-title"
         tabIndex={-1}

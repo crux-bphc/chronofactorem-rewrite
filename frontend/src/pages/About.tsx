@@ -1,5 +1,7 @@
 import { createLazyRoute } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
+import { widePageClass } from "@/lib/pageLayout";
+import { cn } from "@/lib/utils";
 import { CruxMark } from "../components/CruxMark";
 
 const PREVIOUS_TEAM = [
@@ -32,7 +34,12 @@ const linkClass =
 
 function About() {
   return (
-    <main className="mx-auto w-full max-w-[1040px] px-5 pt-6 pb-[calc(4rem+env(safe-area-inset-bottom))] lg:px-7 lg:pt-14">
+    <main
+      className={cn(
+        widePageClass,
+        "pt-6 pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pt-14",
+      )}
+    >
       <CruxMark />
       <div className="grid gap-10 lg:grid-cols-[320px_minmax(0,1fr)] lg:gap-16">
         <div className="space-y-4">
@@ -66,7 +73,7 @@ function About() {
           </div>
         </div>
 
-        <div className="max-w-[62ch] space-y-5 text-base leading-[1.65] text-ink lg:text-[17px]">
+        <div className="max-w-[62ch] space-y-5 text-base leading-[1.65] text-ink">
           <p>
             ChronoFactorem is a project that makes the process of creating
             timetables and sharing them easy as pie. ChronoFactorem is developed
