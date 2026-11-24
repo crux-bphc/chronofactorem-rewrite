@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { narrowPageClass } from "@/lib/pageLayout";
-import { cn } from "@/lib/utils";
+import { cn, narrowPageClass } from "@/lib/utils";
 import { CruxMark } from "./CruxMark";
 import { Button } from "./ui/button";
 

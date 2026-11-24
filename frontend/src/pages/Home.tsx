@@ -21,7 +21,6 @@ import {
 import ReportIssue from "@/components/ReportIssue";
 import useCreateTimetable from "@/data-access/hooks/useCreateTimetable";
 import useUser from "@/data-access/hooks/useUser";
-import { widePageClass } from "@/lib/pageLayout";
 import { preloadEditorOnIntent } from "@/lib/preloadOnIntent";
 import {
   getSharedTimetable,
@@ -29,7 +28,7 @@ import {
   subscribeSharedTimetable,
 } from "@/lib/sharedTransition";
 import { useSkeletonCrossfade } from "@/lib/skeletonFade";
-import { cn } from "@/lib/utils";
+import { cn, widePageClass } from "@/lib/utils";
 import TimetableCard from "../components/TimetableCard";
 import { Button } from "../components/ui/button";
 import { router } from "../router";

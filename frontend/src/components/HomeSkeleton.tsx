@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { widePageClass } from "@/lib/pageLayout";
 import { skeletonRef } from "@/lib/skeletonFade";
+import { widePageClass } from "@/lib/utils";
 
 export const gridClass = "grid gap-3 lg:grid-cols-3 lg:gap-4";
 export const overlineClass =

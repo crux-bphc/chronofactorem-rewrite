@@ -1,7 +1,6 @@
 import { createLazyRoute } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
-import { widePageClass } from "@/lib/pageLayout";
-import { cn } from "@/lib/utils";
+import { cn, widePageClass } from "@/lib/utils";
 import { CruxMark } from "../components/CruxMark";
 
 const PREVIOUS_TEAM = [

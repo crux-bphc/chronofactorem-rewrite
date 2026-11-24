@@ -8,8 +8,7 @@ import ReportIssue from "@/components/ReportIssue";
 import { Button } from "@/components/ui/button";
 import useEditUser from "@/data-access/hooks/useEditUser";
 import useUser from "@/data-access/hooks/useUser";
-import { narrowPageClass } from "@/lib/pageLayout";
-import { cn } from "@/lib/utils";
+import { cn, narrowPageClass } from "@/lib/utils";
 import { useToast } from "../components/ui/use-toast";
 import { router } from "../router";
 
