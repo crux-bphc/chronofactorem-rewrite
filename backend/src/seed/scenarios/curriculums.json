@@ -1,0 +1,42 @@
+{
+  "name": "CDC curricula",
+  "description": "One 2026 batch CS student (new curriculum, NewCDCs.json) and one 2025 batch CS student (old curriculum, CDCs.json).",
+  "seededAt": "2026-10-12T09:00:00+05:30",
+  "users": [
+    {
+      "key": "26-didy",
+      "email": "f20260101@hyderabad.bits-pilani.ac.in",
+      "name": "26 didy",
+      "degrees": ["A7"],
+      "timetables": [
+        {
+          "key": "26-didy-tt",
+          "name": "Sem 1 plan",
+          "sections": {
+            "CS U111": ["L1", "P1"],
+            "MATH U101": ["L1", "T1"],
+            "BIO U101": ["L1", "P1"]
+          }
+        }
+      ]
+    },
+    {
+      "key": "25-didy",
+      "email": "f20250101@hyderabad.bits-pilani.ac.in",
+      "name": "25 didy",
+      "degrees": ["A7"],
+      "timetables": [
+        {
+          "key": "25-didy-tt",
+          "name": "Sem 1 plan",
+          "sections": {
+            "MATH F211": ["L1", "T1"],
+            "CS F222": ["L1", "T1"],
+            "CS F213": ["L1", "P1"]
+          }
+        }
+      ]
+    }
+  ],
+  "announcements": []
+}
