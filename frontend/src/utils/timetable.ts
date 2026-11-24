@@ -3,6 +3,7 @@ import { unknownDegree } from "lib";
 import type z from "zod";
 import type { CDCType } from "@/context/types";
 import CDCList from "@/data/CDCs.json";
+import NewCDCList from "@/data/NewCDCs.json";
 
 export const filterCoursesInTimetable = (
   courses: z.infer<typeof courseType>[],
@@ -45,8 +46,18 @@ export const hasUnknownCourses = (
 
 type CdcTimetable = Pick<
   z.infer<typeof timetableWithSectionsType>,
-  "degrees" | "year" | "semester"
+  "degrees" | "year" | "semester" | "acadYear"
 >;
+
+type CdcFile = Record<string, Record<string, string[]>>;
+
+const curricula: { firstBatch: number; cdcs: CdcFile }[] = [
+  { firstBatch: 2026, cdcs: NewCDCList },
+  { firstBatch: 0, cdcs: CDCList },
+];
+
+export const batchOf = (timetable: Pick<CdcTimetable, "year" | "acadYear">) =>
+  timetable.acadYear - timetable.year + 1;
 
 export const cdcListFor = (timetable: CdcTimetable): string[] | undefined => {
   // CDCs.json is keyed by degree combo: the timetable's degrees sorted,
@@ -55,17 +66,16 @@ export const cdcListFor = (timetable: CdcTimetable): string[] | undefined => {
   // either course counts.
   // This only works because B-series duals are keyed by that concatenation.
   // Reverse duals like "A3B4" and other degree codes (RMIT, other 2+2 programs) may not match.
-  const degree = (
+  if (timetable.year < 1) return undefined;
+  const batch = batchOf(timetable);
+  const curriculum = curricula.find((c) => batch >= c.firstBatch);
+  if (curriculum === undefined) return undefined;
+
+  const degree =
     timetable.degrees.length === 1
       ? timetable.degrees[0]
-      : [...timetable.degrees].sort().reverse().join("")
-  ) as keyof typeof CDCList;
-  const cdcListKey =
-    `${timetable.year}-${timetable.semester}` as keyof (typeof CDCList)[typeof degree];
-
-  return degree in CDCList && cdcListKey in CDCList[degree]
-    ? CDCList[degree][cdcListKey]
-    : undefined;
+      : [...timetable.degrees].sort().reverse().join("");
+  return curriculum.cdcs[degree]?.[`${timetable.year}-${timetable.semester}`];
 };
 
 export const formatCDCWarningsAndOptions = (
@@ -199,10 +209,7 @@ export const timetableMeta = (t: {
 };
 
 // Pre-fill data we know so that issues are more helpful and easier to file
-export const cdcIssueUrl = (
-  t: CdcTimetable & { acadYear: number },
-  notFound: string[],
-): string => {
+export const cdcIssueUrl = (t: CdcTimetable, notFound: string[]): string => {
   const sem = `${t.year}-${t.semester}`;
   const body = [
     notFound.length > 0
