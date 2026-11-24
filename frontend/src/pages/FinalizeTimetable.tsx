@@ -8,6 +8,7 @@ import { toast } from "@/components/ui/use-toast";
 import useEditTimetable from "@/data-access/hooks/useEditTimetable";
 import useTimetable from "@/data-access/hooks/useTimetable";
 import { HapticTap, haptic } from "@/lib/haptics";
+import { narrowPageClass } from "@/lib/pageLayout";
 import { preloadOnIntent } from "@/lib/preloadOnIntent";
 import { TIMETABLE_TITLE_VT } from "@/lib/sharedTransition";
 import { cn } from "@/lib/utils";
@@ -123,7 +124,7 @@ function FinalizeTimetable() {
   ];
 
   return (
-    <main className="mx-auto w-full max-w-[640px] px-4 pt-2 pb-28 lg:pt-10 lg:pb-12">
+    <main className={cn(narrowPageClass, "pt-2")}>
       <Button
         variant="quiet"
         size="sm"

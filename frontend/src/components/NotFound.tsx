@@ -1,9 +1,16 @@
 import { Link } from "@tanstack/react-router";
+import { narrowPageClass } from "@/lib/pageLayout";
+import { cn } from "@/lib/utils";
 import { CruxMark } from "./CruxMark";
 import { Button } from "./ui/button";
 
 const NotFound = () => (
-  <div className="mx-auto flex w-full max-w-[640px] flex-1 flex-col justify-center px-7 py-16">
+  <div
+    className={cn(
+      narrowPageClass,
+      "flex flex-1 flex-col justify-center py-16 lg:py-16",
+    )}
+  >
     <CruxMark />
     <h1 className="font-mono text-[88px] leading-none font-normal tracking-[-0.04em]">
       404

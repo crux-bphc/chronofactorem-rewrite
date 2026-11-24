@@ -8,6 +8,8 @@ import ReportIssue from "@/components/ReportIssue";
 import { Button } from "@/components/ui/button";
 import useEditUser from "@/data-access/hooks/useEditUser";
 import useUser from "@/data-access/hooks/useUser";
+import { narrowPageClass } from "@/lib/pageLayout";
+import { cn } from "@/lib/utils";
 import { useToast } from "../components/ui/use-toast";
 import { router } from "../router";
 
@@ -73,7 +75,7 @@ function EditUserProfile() {
   const canEdit = !user.degrees.includes(unknownDegree);
 
   return (
-    <main className="mx-auto w-full max-w-[640px] px-4 pt-4 pb-28 lg:pt-10 lg:pb-12">
+    <main className={cn(narrowPageClass, "pt-4")}>
       <h1 className="text-3xl font-medium tracking-[-0.03em] lg:text-[38px]">
         Edit User Profile
       </h1>
